@@ -17,6 +17,10 @@ const getUserByBillingID = (User) => async (billingID) => {
   return await User.findOne({ billingID })
 }
 
+const updateBillingID = (User) => async (email, billingID) => {
+  return await User.findOneAndUpdate({ email, billingID })
+}
+
 const updatePlan = (User) => (email, plan) => {
   return User.findOneAndUpdate({ email, plan })
 }
@@ -27,6 +31,7 @@ module.exports = (User) => {
     getUsers: getUsers(User),
     getUserByEmail: getUserByEmail(User),
     updatePlan: updatePlan(User),
-    getUserByBillingID: getUserByBillingID(User)
+    getUserByBillingID: getUserByBillingID(User),
+    updateBillingID: updateBillingID(User),
   }
 }

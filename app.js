@@ -103,6 +103,25 @@ app.post('/login', async function (req, res) {
             return
         }
     } else {
+        let stripeCustomer = await Stripe.getCustomerByID(customer.billingID)
+
+        //Validate if the user is deleted on Stripe.
+        if (stripeCustomer.deleted) {
+            try {
+                console.log(`User exists on DB, but not in Stripe.`)
+                customerInfo = await Stripe.addNewCustomer(customer.email)
+                
+                customer = await UserService.updateBillingID(customer.email, customerInfo.id)
+                console.log(
+                    `A new user signed up and addded to Stripe. The ID for ${customer.email}.`
+                )
+            }
+            catch (e) {
+                console.log(e)
+                res.status(200).json({ e })
+                return
+            }
+        }
         const isTrialExpired =
             customer.plan != 'none' && customer.endDate < new Date().getTime()
 
