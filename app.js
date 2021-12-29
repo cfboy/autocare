@@ -61,6 +61,9 @@ app.get('/', function (req, res) {
     res.render('login.ejs')
 })
 
+app.get('/register', function (req, res) {
+    res.render('register.ejs')
+})
 app.get('/account', async function (req, res) {
     let { email } = req.session
     let customer = await UserService.getUserByEmail(email)
@@ -110,7 +113,7 @@ app.post('/login', async function (req, res) {
             try {
                 console.log(`User exists on DB, but not in Stripe.`)
                 customerInfo = await Stripe.addNewCustomer(customer.email)
-                
+
                 customer = await UserService.updateBillingID(customer.email, customerInfo.id)
                 console.log(
                     `A new user signed up and addded to Stripe. The ID for ${customer.email}.`

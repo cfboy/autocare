@@ -57,10 +57,20 @@ const createWebhook = (rawBody, sig) => {
   return event
 }
 
+
+async function getAllProducts() {
+  const products = await Stripe.products.list({
+    active: true
+  })
+
+  return products
+}
+
 module.exports = {
   getCustomerByID,
   addNewCustomer,
   createCheckoutSession,
   createBillingSession,
-  createWebhook
+  createWebhook,
+  getAllProducts
 }
