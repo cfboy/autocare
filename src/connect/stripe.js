@@ -1,4 +1,5 @@
 const stripe = require('stripe')
+const Dinero = require('dinero.js')
 
 const Stripe = stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: '2020-08-27'
@@ -63,7 +64,29 @@ async function getAllProducts() {
     active: true
   })
 
-  return products
+  return products.data
+}
+
+async function getAllPrices() {
+  const prices = await Stripe.prices.list({
+    active: true
+  })
+
+  return prices.data
+}
+
+const getProductPrice = async (productID) => {
+  const productPrices = await Stripe.prices.list({
+    product: productID
+  })
+
+  // format currency
+  for (const productPrice of productPrices.data) {
+    productPrice.unit_amount = Dinero({ amount: productPrice.unit_amount }).toFormat('$0,0.00')
+
+  }
+
+  return productPrices.data
 }
 
 module.exports = {
@@ -72,5 +95,7 @@ module.exports = {
   createCheckoutSession,
   createBillingSession,
   createWebhook,
-  getAllProducts
+  getAllProducts,
+  getAllPrices,
+  getProductPrice
 }

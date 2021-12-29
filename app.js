@@ -70,7 +70,15 @@ app.get('/account', async function (req, res) {
     if (!customer) {
         res.redirect('/')
     } else {
-        res.render('account.ejs', { customer })
+        let products = await Stripe.getAllProducts()
+        if (products) {
+            // Get price of all products.
+            for (const product of products) {
+                product.priceInfo = await Stripe.getProductPrice(product.id)
+            }
+        }
+
+        res.render('account.ejs', { customer, products })
     }
 })
 
