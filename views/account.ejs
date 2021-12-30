@@ -23,7 +23,7 @@
       <%if (customer) { %>
         <p class="lead">Hi <%- customer.email %>
         </p>
-        <%if (customer.plan=="none" ) { %>
+        <%if (customer.membershipInfo.plan =="none" ) { %>
           <p class="lead">
             You are currently not on any plan. Purchase a subscription below.
           </p>
@@ -42,14 +42,14 @@
               </button>
               <% } else{ %>
                 <p class="lead">
-                  You are currently on the <%- customer.plan %> plan %>
+                  You are currently on the <%- customer.membershipInfo.plan %> plan %>
                 </p>
-                <% if (customer.hasTrial) { %>
-                  <p class="lead">Trial active until <%- customer.endDate %>
+                <% if (customer.membershipInfo.hasTrial) { %>
+                  <p class="lead">Trial active until <%- customer.membershipInfo.endDate %>
                   </p>
                   <% } else{ %>
                     <p class="lead">
-                      Trial inactive. Plan will end on <%- customer.endDate %>
+                      Trial inactive. Plan will end on <%- customer.membershipInfo.endDate %>
                     </p>
                     <% } %>
                       <hr />

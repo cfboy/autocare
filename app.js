@@ -134,18 +134,18 @@ app.post('/login', async function (req, res) {
             }
         }
         const isTrialExpired =
-            customer.plan != 'none' && customer.endDate < new Date().getTime()
+            customer.membershipInfo.plan != 'none' && customer.membershipInfo.endDate < new Date().getTime()
 
         if (isTrialExpired) {
             console.log('trial expired')
-            customer.hasTrial = false
+            customer.membershipInfo.hasTrial = false
             customer.save()
         } else {
             console.log(
                 'no trial information',
-                customer.hasTrial,
-                customer.plan != 'none',
-                customer.endDate < new Date().getTime()
+                customer.membershipInfo.hasTrial,
+                customer.membershipInfo.plan != 'none',
+                customer.membershipInfo.endDate < new Date().getTime()
             )
         }
 
@@ -179,9 +179,9 @@ app.post('/checkout', setCurrentUser, async (req, res) => {
             new Date().getTime() + 1000 * 60 * 60 * 24 * process.env.TRIAL_DAYS
         const n = new Date(ms)
 
-        customer.plan = product
-        customer.hasTrial = true
-        customer.endDate = n
+        customer.membershipInfo.plan = product
+        customer.membershipInfo.hasTrial = true
+        customer.membershipInfo.endDate = n
         customer.save()
 
         res.send({
@@ -232,16 +232,16 @@ app.post('/webhook', async (req, res) => {
 
             if (data.plan.id === process.env.PRODUCT_BASIC) {
                 console.log('You are talking about basic product')
-                user.plan = 'basic'
+                user.membershipInfo.plan = 'basic'
             }
 
             if (data.plan.id === process.env.PRODUCT_PRO) {
                 console.log('You are talking about pro product')
-                user.plan = 'pro'
+                user.membershipInfo.plan = 'pro'
             }
 
-            user.hasTrial = true
-            user.endDate = new Date(data.current_period_end * 1000)
+            user.membershipInfo.hasTrial = true
+            user.membershipInfo.endDate = new Date(data.current_period_end * 1000)
 
             await user.save()
 
@@ -253,32 +253,32 @@ app.post('/webhook', async (req, res) => {
 
             if (data.plan.id == process.env.PRODUCT_BASIC) {
                 console.log('You are talking about basic product')
-                user.plan = 'basic'
+                user.membershipInfo.plan = 'basic'
             }
 
             if (data.plan.id === process.env.PRODUCT_PRO) {
                 console.log('You are talking about pro product')
-                user.plan = 'pro'
+                user.membershipInfo.plan = 'pro'
             }
 
             const isOnTrial = data.status === 'trialing'
 
             if (isOnTrial) {
-                user.hasTrial = true
-                user.endDate = new Date(data.current_period_end * 1000)
+                user.membershipInfo.hasTrial = true
+                user.membershipInfo.endDate = new Date(data.current_period_end * 1000)
             } else if (data.status === 'active') {
-                user.hasTrial = false
-                user.endDate = new Date(data.current_period_end * 1000)
+                user.membershipInfo.hasTrial = false
+                use.membershipInfo.endDate = new Date(data.current_period_end * 1000)
             }
 
             if (data.canceled_at) {
                 // cancelled
                 console.log('You just canceled the subscription' + data.canceled_at)
-                user.plan = 'none'
-                user.hasTrial = false
-                user.endDate = null
+                user.membershipInfo.plan = 'none'
+                user.membershipInfo.hasTrial = false
+                user.membershipInfo.endDate = null
             }
-            console.log('actual', user.hasTrial, data.current_period_end, user.plan)
+            console.log('actual', user.membershipInfo.hasTrial, data.current_period_end, user.membershipInfo.plan)
 
             await user.save()
             console.log('customer changed', JSON.stringify(data))

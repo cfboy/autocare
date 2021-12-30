@@ -1,7 +1,7 @@
 const addUser = (User) => ({ email, billingID, plan, endDate }) => {
   if (!email || !billingID || !plan) { throw new Error('Missing Data. Please provide values for email, billingID, plan') }
 
-  const user = new User({ email, billingID, plan, endDate })
+  const user = new User({ email, billingID, membershipInfo: { plan, endDate } })
   return user.save()
 }
 
@@ -18,11 +18,11 @@ const getUserByBillingID = (User) => async (billingID) => {
 }
 
 const updateBillingID = (User) => async (email, billingID) => {
-  return await User.findOneAndUpdate({ email, billingID })
+  return await User.findOneAndUpdate({ email, membershipInfo: { billingID } })
 }
 
 const updatePlan = (User) => (email, plan) => {
-  return User.findOneAndUpdate({ email, plan })
+  return User.findOneAndUpdate({ email, membershipInfo: { plan } })
 }
 
 module.exports = (User) => {
