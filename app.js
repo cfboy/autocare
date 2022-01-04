@@ -8,6 +8,7 @@ const UserService = require('./src/user')
 const Stripe = require('./src/connect/stripe')
 const setCurrentUser = require('./src/middleware/setCurrentUser')
 const hasPlan = require('./src/middleware/hasPlan')
+var path = require('path');
 
 const app = express()
 app.use(session({
@@ -61,9 +62,10 @@ app.get('/', function (req, res) {
     res.render('login.ejs')
 })
 
-app.get('/register', function (req, res) {
+app.get('/create-account', function (req, res) {
     res.render('register.ejs')
 })
+
 app.get('/account', async function (req, res) {
     let { email } = req.session
     let customer = await UserService.getUserByEmail(email)
@@ -78,7 +80,9 @@ app.get('/account', async function (req, res) {
             }
         }
 
-        res.render('account.ejs', { customer, products })
+        // res.render('account.ejs', { customer, products })
+        res.render('index.ejs', { customer, products })
+
     }
 })
 
@@ -164,6 +168,12 @@ app.post('/login', async function (req, res) {
     // })
 
     res.redirect('/account')
+})
+
+app.get('/logout', async function (req, res) {
+    // req.session.email = null
+    res.clearCookie('connect.sid', { path: '/' }).status(200);
+    res.redirect('/')
 })
 
 app.post('/checkout', setCurrentUser, async (req, res) => {
