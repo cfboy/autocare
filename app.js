@@ -34,7 +34,7 @@ const productToPriceMap = {
     pro: process.env.PRODUCT_PRO
 }
 
-app.get('/none', [setCurrentUser, hasPlan('none')], async function (
+app.get('/none', [setCurrentUser, hasPlan('none')], async function(
     req,
     res,
     next
@@ -42,7 +42,7 @@ app.get('/none', [setCurrentUser, hasPlan('none')], async function (
     res.status(200).render('none.ejs')
 })
 
-app.get('/basic', [setCurrentUser, hasPlan('basic')], async function (
+app.get('/basic', [setCurrentUser, hasPlan('basic')], async function(
     req,
     res,
     next
@@ -50,7 +50,7 @@ app.get('/basic', [setCurrentUser, hasPlan('basic')], async function (
     res.status(200).render('basic.ejs')
 })
 
-app.get('/pro', [setCurrentUser, hasPlan('pro')], async function (
+app.get('/pro', [setCurrentUser, hasPlan('pro')], async function(
     req,
     res,
     next
@@ -58,15 +58,22 @@ app.get('/pro', [setCurrentUser, hasPlan('pro')], async function (
     res.status(200).render('pro.ejs')
 })
 
-app.get('/', function (req, res) {
-    res.render('login.ejs')
+app.get('/', function(req, res) {
+    // Message for alerts
+    let { message, alertType } = req.session
+
+    // Destroy the session if exist anny message.
+    if (message)
+        req.session.destroy()
+
+    res.render('login.ejs', { message, alertType })
 })
 
-app.get('/create-account', function (req, res) {
+app.get('/create-account', function(req, res) {
     res.render('register.ejs')
 })
 
-app.get('/account', async function (req, res) {
+app.get('/account', async function(req, res) {
     let { email } = req.session
     let customer = await UserService.getUserByEmail(email)
     if (!customer) {
@@ -86,7 +93,7 @@ app.get('/account', async function (req, res) {
     }
 })
 
-app.post('/login', async function (req, res) {
+app.post('/login', async function(req, res) {
     const { email } = req.body
     console.log('email', email)
 
@@ -130,8 +137,7 @@ app.post('/login', async function (req, res) {
                 console.log(
                     `A new user signed up and addded to Stripe. The ID for ${customer.email}.`
                 )
-            }
-            catch (e) {
+            } catch (e) {
                 console.log(e)
                 res.status(200).json({ e })
                 return
@@ -161,22 +167,66 @@ app.post('/login', async function (req, res) {
 
     req.session.email = email
 
-    // res.render('account.ejs', {
-    //   customer,
-    //   customerInfo,
-    //   email
-    // })
-
     res.redirect('/account')
 })
 
-app.get('/logout', async function (req, res) {
+app.post('/register', async function(req, res) {
+    // TODO: Finish this method.
+    const { email } = req.body
+    console.log('email', email)
+
+    let customer = await UserService.getUserByEmail(email)
+    let customerInfo = {}
+
+    if (!customer) {
+        console.log(`email ${email} does not exist. Making one. `)
+        try {
+            customerInfo = await Stripe.addNewCustomer(email)
+
+            customer = await UserService.addUser({
+                email: customerInfo.email,
+                billingID: customerInfo.id,
+                plan: 'none',
+                endDate: null
+            })
+
+            console.log(
+                `A new user signed up and addded to DB. The ID for ${email} is ${JSON.stringify(
+                    customerInfo
+                )}`
+            )
+
+            console.log(`User also added to DB. Information from DB: ${customer}`)
+        } catch (e) {
+            console.log(e)
+            res.status(200).json({ e })
+            return
+        }
+        req.session.email = email
+
+        res.redirect('/account')
+    } else {
+        let message = `The user ${email} has already exist.`
+        console.log(
+            `The existing ID for ${email} is ${JSON.stringify(customerInfo)}`
+        )
+
+        // Set the message for alert. 
+        req.session.message = message
+
+        // AlertTypes: success, error, warning, question, info. 
+        req.session.alertType = 'warning'
+        res.redirect('/')
+    }
+})
+
+app.get('/logout', async function(req, res) {
     // req.session.email = null
     res.clearCookie('connect.sid', { path: '/' }).status(200);
     res.redirect('/')
 })
 
-app.post('/checkout', setCurrentUser, async (req, res) => {
+app.post('/checkout', setCurrentUser, async(req, res) => {
     const customer = req.user
     const { product, customerID } = req.body
 
@@ -208,7 +258,7 @@ app.post('/checkout', setCurrentUser, async (req, res) => {
     }
 })
 
-app.post('/billing', setCurrentUser, async (req, res) => {
+app.post('/billing', setCurrentUser, async(req, res) => {
     const { customer } = req.body
     console.log('customer', customer)
 
@@ -218,7 +268,7 @@ app.post('/billing', setCurrentUser, async (req, res) => {
     res.json({ url: session.url })
 })
 
-app.post('/webhook', async (req, res) => {
+app.post('/webhook', async(req, res) => {
     let event
 
     try {
@@ -237,63 +287,65 @@ app.post('/webhook', async (req, res) => {
             break
         case 'invoice.paid':
             break
-        case 'customer.subscription.created': {
-            const user = await UserService.getUserByBillingID(data.customer)
+        case 'customer.subscription.created':
+            {
+                const user = await UserService.getUserByBillingID(data.customer)
 
-            if (data.plan.id === process.env.PRODUCT_BASIC) {
-                console.log('You are talking about basic product')
-                user.membershipInfo.plan = 'basic'
-            }
+                if (data.plan.id === process.env.PRODUCT_BASIC) {
+                    console.log('You are talking about basic product')
+                    user.membershipInfo.plan = 'basic'
+                }
 
-            if (data.plan.id === process.env.PRODUCT_PRO) {
-                console.log('You are talking about pro product')
-                user.membershipInfo.plan = 'pro'
-            }
+                if (data.plan.id === process.env.PRODUCT_PRO) {
+                    console.log('You are talking about pro product')
+                    user.membershipInfo.plan = 'pro'
+                }
 
-            user.membershipInfo.hasTrial = true
-            user.membershipInfo.endDate = new Date(data.current_period_end * 1000)
-
-            await user.save()
-
-            break
-        }
-        case 'customer.subscription.updated': {
-            // started trial
-            const user = await UserService.getUserByBillingID(data.customer)
-
-            if (data.plan.id == process.env.PRODUCT_BASIC) {
-                console.log('You are talking about basic product')
-                user.membershipInfo.plan = 'basic'
-            }
-
-            if (data.plan.id === process.env.PRODUCT_PRO) {
-                console.log('You are talking about pro product')
-                user.membershipInfo.plan = 'pro'
-            }
-
-            const isOnTrial = data.status === 'trialing'
-
-            if (isOnTrial) {
                 user.membershipInfo.hasTrial = true
                 user.membershipInfo.endDate = new Date(data.current_period_end * 1000)
-            } else if (data.status === 'active') {
-                user.membershipInfo.hasTrial = false
-                use.membershipInfo.endDate = new Date(data.current_period_end * 1000)
-            }
 
-            if (data.canceled_at) {
-                // cancelled
-                console.log('You just canceled the subscription' + data.canceled_at)
-                user.membershipInfo.plan = 'none'
-                user.membershipInfo.hasTrial = false
-                user.membershipInfo.endDate = null
-            }
-            console.log('actual', user.membershipInfo.hasTrial, data.current_period_end, user.membershipInfo.plan)
+                await user.save()
 
-            await user.save()
-            console.log('customer changed', JSON.stringify(data))
-            break
-        }
+                break
+            }
+        case 'customer.subscription.updated':
+            {
+                // started trial
+                const user = await UserService.getUserByBillingID(data.customer)
+
+                if (data.plan.id == process.env.PRODUCT_BASIC) {
+                    console.log('You are talking about basic product')
+                    user.membershipInfo.plan = 'basic'
+                }
+
+                if (data.plan.id === process.env.PRODUCT_PRO) {
+                    console.log('You are talking about pro product')
+                    user.membershipInfo.plan = 'pro'
+                }
+
+                const isOnTrial = data.status === 'trialing'
+
+                if (isOnTrial) {
+                    user.membershipInfo.hasTrial = true
+                    user.membershipInfo.endDate = new Date(data.current_period_end * 1000)
+                } else if (data.status === 'active') {
+                    user.membershipInfo.hasTrial = false
+                    use.membershipInfo.endDate = new Date(data.current_period_end * 1000)
+                }
+
+                if (data.canceled_at) {
+                    // cancelled
+                    console.log('You just canceled the subscription' + data.canceled_at)
+                    user.membershipInfo.plan = 'none'
+                    user.membershipInfo.hasTrial = false
+                    user.membershipInfo.endDate = null
+                }
+                console.log('actual', user.membershipInfo.hasTrial, data.current_period_end, user.membershipInfo.plan)
+
+                await user.save()
+                console.log('customer changed', JSON.stringify(data))
+                break
+            }
         default:
     }
     res.sendStatus(200)
