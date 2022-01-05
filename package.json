@@ -21,6 +21,7 @@
         "codemirror": "^5.47.0",
         "colcade": "^0.2.0",
         "cookie-parser": "^1.4.5",
+        "crypto": "^1.0.1",
         "d3": "^5.9.2",
         "dinero.js": "^1.9.1",
         "dotenv": "^10.0.0",

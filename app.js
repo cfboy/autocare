@@ -6,6 +6,7 @@ const session = require('express-session')
 var MemoryStore = require('memorystore')(session)
 const UserService = require('./src/user')
 const Stripe = require('./src/connect/stripe')
+const Crypto = require('./src/middleware/crypto')
 const setCurrentUser = require('./src/middleware/setCurrentUser')
 const hasPlan = require('./src/middleware/hasPlan')
 var path = require('path');
@@ -120,7 +121,7 @@ app.post('/login', async function(req, res) {
             alertType = 'warning'
         } else {
             // TODO: Decrypt Password
-            if (password != user.password) {
+            if (password != Crypto.decryptData(user.password)) {
                 error = true
                 console.log(`Wrong password.`)
                 message = `Wrong password.`
@@ -183,7 +184,6 @@ app.post('/register', async function(req, res) {
     // TODO: Finish this method.
     const {
         email,
-        password,
         firstName,
         lastName,
         phoneNumber,
@@ -193,6 +193,8 @@ app.post('/register', async function(req, res) {
         model,
         plate
     } = req.body
+
+    var { password } = req.body
 
     console.log('email', email)
 
@@ -209,6 +211,8 @@ app.post('/register', async function(req, res) {
                     phoneNumber,
                     city)
             }
+
+            password = Crypto.encryptData(password)
 
             customer = await UserService.addUser({
                 email,
