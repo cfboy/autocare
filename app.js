@@ -94,85 +94,106 @@ app.get('/account', async function(req, res) {
 })
 
 app.post('/login', async function(req, res) {
-    const { email } = req.body
+    const { email, password } = req.body
+    let { message, alertType } = ''
+    let error = false
+
     console.log('email', email)
 
-    let customer = await UserService.getUserByEmail(email)
-    let customerInfo = {}
-
-    if (!customer) {
-        console.log(`email ${email} does not exist. Making one. `)
-        try {
-            customerInfo = await Stripe.addNewCustomer(email)
-
-            customer = await UserService.addUser({
-                email: customerInfo.email,
-                billingID: customerInfo.id,
-                plan: 'none',
-                endDate: null
-            })
-
-            console.log(
-                `A new user signed up and addded to DB. The ID for ${email} is ${JSON.stringify(
-                    customerInfo
-                )}`
-            )
-
-            console.log(`User also added to DB. Information from DB: ${customer}`)
-        } catch (e) {
-            console.log(e)
-            res.status(200).json({ e })
-            return
-        }
-    } else {
-        let stripeCustomer = await Stripe.getCustomerByID(customer.billingID)
-
-        //Validate if the user is deleted on Stripe.
-        if (stripeCustomer.deleted) {
-            try {
-                console.log(`User exists on DB, but not in Stripe.`)
-                customerInfo = await Stripe.addNewCustomer(customer.email)
-
-                customer = await UserService.updateBillingID(customer.email, customerInfo.id)
-                console.log(
-                    `A new user signed up and addded to Stripe. The ID for ${customer.email}.`
-                )
-            } catch (e) {
-                console.log(e)
-                res.status(200).json({ e })
-                return
-            }
-        }
-        const isTrialExpired =
-            customer.membershipInfo.plan != 'none' && customer.membershipInfo.endDate < new Date().getTime()
-
-        if (isTrialExpired) {
-            console.log('trial expired')
-            customer.membershipInfo.hasTrial = false
-            customer.save()
-        } else {
-            console.log(
-                'no trial information',
-                customer.membershipInfo.hasTrial,
-                customer.membershipInfo.plan != 'none',
-                customer.membershipInfo.endDate < new Date().getTime()
-            )
-        }
-
-        customerInfo = await Stripe.getCustomerByID(customer.billingID)
-        console.log(
-            `The existing ID for ${email} is ${JSON.stringify(customerInfo)}`
-        )
+    if (!email || !password) {
+        console.log(`Missing Email or password.`)
+        message = `Missing email or password.`
+        alertType = 'error'
+            // Set the message for alert. 
+        error = true
     }
 
-    req.session.email = email
+    if (!error) {
+        let user = await UserService.getUserByEmail(email)
+        let customerInfo = {}
 
-    res.redirect('/account')
+        if (!user) {
+            error = true
+            console.log(`email ${email} does not exist.`)
+            message = `This user ${email} not exist.`
+                // Set the message for alert. 
+            alertType = 'warning'
+        } else {
+            // TODO: Decrypt Password
+            if (password != user.password) {
+                error = true
+                console.log(`Wrong password.`)
+                message = `Wrong password.`
+                alertType = 'error'
+            }
+            if (!error) {
+                let stripeCustomer = await Stripe.getCustomerByID(user.billingID)
+                    //Validate if the user is deleted on Stripe.
+                if (stripeCustomer.deleted) {
+                    try {
+                        console.log(`User exists on DB, but not in Stripe.`)
+                        customerInfo = await Stripe.addNewCustomer(user.email)
+                            // Update the BillingID of User. 
+                        customer = await UserService.updateBillingID(user.email, customerInfo.id)
+                        console.log(
+                            `A new user signed up and addded to Stripe. The ID for ${user.email}.`
+                        )
+                    } catch (e) {
+                        console.log(e)
+                        res.status(200).json({ e })
+                        return
+                    }
+                }
+
+                // TODO: Optimize and change this Trial Logic.
+                const isTrialExpired =
+                    user.membershipInfo.plan != 'none' && user.membershipInfo.endDate < new Date().getTime()
+
+                if (isTrialExpired) {
+                    console.log('trial expired')
+                    user.membershipInfo.hasTrial = false
+                    user.save()
+                } else {
+                    console.log(
+                        `No trial information, Has trial: ${user.membershipInfo.hasTrial}, 
+                        Plan: ${user.membershipInfo.plan},
+                        End Date: ${user.membershipInfo.endDate}`
+                        // user.membershipInfo.endDate < new Date().getTime()
+                    )
+                }
+                console.log(
+                    `The existing ID for ${email} is ${JSON.stringify(customerInfo)}`
+                )
+            }
+        }
+    }
+
+    if (error) {
+        req.session.message = message
+            // AlertTypes: success, error, warning, question, info. 
+        req.session.alertType = alertType
+        res.redirect('/')
+    } else {
+        req.session.email = email
+        res.redirect('/account')
+    }
 })
 
 app.post('/register', async function(req, res) {
     // TODO: Finish this method.
-    const { email } = req.body
+    const {
+        email,
+        password,
+        firstName,
+        lastName,
+        phoneNumber,
+        dateOfBirth,
+        city,
+        brand,
+        model,
+        plate
+    } = req.body
+
     console.log('email', email)
 
     let customer = await UserService.getUserByEmail(email)
@@ -181,11 +202,26 @@ app.post('/register', async function(req, res) {
     if (!customer) {
         console.log(`email ${email} does not exist. Making one. `)
         try {
-            customerInfo = await Stripe.addNewCustomer(email)
+            customerInfo = await Stripe.getCustomerByEmail(email)
+            if (!customerInfo) {
+                customerInfo = await Stripe.addNewCustomer(email, firstName,
+                    lastName,
+                    phoneNumber,
+                    city)
+            }
 
             customer = await UserService.addUser({
-                email: customerInfo.email,
+                email,
+                password,
                 billingID: customerInfo.id,
+                role: 'user',
+                firstName,
+                lastName,
+                phoneNumber,
+                dateOfBirth,
+                brand,
+                model,
+                plate,
                 plan: 'none',
                 endDate: null
             })
