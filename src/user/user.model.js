@@ -5,7 +5,7 @@ const userSchema = new Schema({
     email: String,
     password: String,
     billingID: String, //Stripe ID
-    role: { type: String, enum: ['user', 'manager', 'admin'], default: 'user' },
+    role: { type: String, enum: ['customer', 'cashier', 'manager', 'admin'], default: 'customer' },
     hasAllInformation: { type: Boolean, default: false },
 
     personalInfo: {

@@ -61,13 +61,13 @@ app.get('/pro', [setCurrentUser, hasPlan('pro')], async function(
 
 app.get('/', function(req, res) {
     // Message for alerts
-    let { message, alertType } = req.session
+    let { message, email, alertType } = req.session
 
     // Destroy the session if exist anny message.
     if (message)
         req.session.destroy()
 
-    res.render('login.ejs', { message, alertType })
+    res.render('login.ejs', { message, email, alertType })
 })
 
 app.get('/create-account', function(req, res) {
@@ -124,10 +124,11 @@ app.post('/login', async function(req, res) {
             if (password != Crypto.decryptData(user.password)) {
                 error = true
                 console.log(`Wrong password.`)
-                message = `Wrong password.`
+                message = `That email/password combination was not found.`
                 alertType = 'error'
             }
             if (!error) {
+                // TODO: validate if the user is a customer or admin
                 let stripeCustomer = await Stripe.getCustomerByID(user.billingID)
                     //Validate if the user is deleted on Stripe.
                 if (stripeCustomer.deleted) {
@@ -246,10 +247,11 @@ app.post('/register', async function(req, res) {
 
         res.redirect('/account')
     } else {
-        let message = `The user ${email} has already exist.`
+        let message = `That email already exist, please login.`
         console.log(
             `The existing ID for ${email} is ${JSON.stringify(customerInfo)}`
         )
+        req.session.email = email
 
         // Set the message for alert. 
         req.session.message = message
