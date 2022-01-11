@@ -1,7 +1,7 @@
 const UserService = require('../user')
 const Crypto = require('../middleware/crypto')
 const Stripe = require('../connect/stripe')
-
+const Roles = require('../middleware/roles')
 
 exports.login = async(req, res) => {
     const { email, password } = req.body
@@ -29,7 +29,6 @@ exports.login = async(req, res) => {
                 // Set the message for alert. 
             alertType = 'warning'
         } else {
-            // TODO: Decrypt Password
             if (password != Crypto.decryptData(user.password)) {
                 error = true
                 console.log(`Wrong password.`)
@@ -128,7 +127,7 @@ exports.register = async(req, res) => {
                 email,
                 password,
                 billingID: customerInfo.id,
-                role: 'customer',
+                role: Roles.Test,
                 firstName,
                 lastName,
                 phoneNumber,
@@ -184,7 +183,8 @@ exports.account = async(req, res) => {
                 product.priceInfo = await Stripe.getProductPrice(product.id)
             }
         }
-        res.render('index.ejs', { customer, products })
+        let users = await UserService.getUsers()
+        res.render('index.ejs', { customer, products, users })
     }
 }
 

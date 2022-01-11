@@ -4,6 +4,9 @@ const express = require('express')
 const session = require('express-session')
 var MemoryStore = require('memorystore')(session)
 var path = require('path');
+var router = require('./router');
+var moment = require('moment');
+const formats = require('./src/helpers/formats')
 
 const app = express()
 
@@ -26,7 +29,11 @@ app.use(express.static('public'))
 app.set('view engine', 'ejs')
     // app.engine('html', require('ejs').renderFile)
 
-app.use('/', require('./router'));
+// Used to format dates
+app.locals.moment = moment
+app.locals.shortDateFormat = formats.shortDateFormat
+
+app.use('/', router);
 
 const port = process.env.PORT || 4242
 

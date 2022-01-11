@@ -1,0 +1,1 @@
+exports.shortDateFormat = "MM-DD-YYYY";
