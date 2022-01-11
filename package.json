@@ -5,7 +5,7 @@
     "description": "Add Stripe Subscriptions Payments using Node.js",
     "main": "app.js",
     "scripts": {
-        "start": "node app.js"
+        "start": "nodemon app.js"
     },
     "license": "ISC",
     "dependencies": {
@@ -60,6 +60,7 @@
         "mongodb": "^4.2.2",
         "mongoose": "^5.10.11",
         "morris.js06": "^0.6.6",
+        "nodemon": "^2.0.15",
         "nouislider": "^13.1.5",
         "owl-carousel-2": "0.0.3",
         "perfect-scrollbar": "^1.4.0",
