@@ -133,7 +133,7 @@
     <script src="../../js/template.js"></script>
     <script src="../../js/settings.js"></script>
     <script src="../../js/todolist.js"></script>
-    <script type="text/javascript" src="./js/helper.js"></script>
+    <script type="text/javascript" src="./js/sweet-alerts.js"></script>
 
     <!-- endinject -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.3.3/dist/sweetalert2.all.min.js"></script>
@@ -141,8 +141,11 @@
         $(document).ready(function() {
             var msj = '<%- message %>';
             var alertType = '<%- alertType %>';
-            if (msj !== '' && alertType !== '')
-                simpleAlert(alertType, msj);
+            var allAlertTypes = '<%- allAlertTypes %>';
+
+            if (msj !== '' && alertType !== '') {
+                sweetAlerts(allAlertTypes, alertType, msj);
+            }
         });
     </script>
 </body>

@@ -3,6 +3,7 @@ const Stripe = require('./src/connect/stripe')
 const setCurrentUser = require('./src/middleware/setCurrentUser')
 const hasPlan = require('./src/middleware/hasPlan')
 const auth = require('./src/controllers/auth')
+const dashboards = require('./src/controllers/dashboards')
 
 const express = require('express');
 const router = express.Router();
@@ -13,28 +14,44 @@ const productToPriceMap = {
 }
 
 router.get('/', function(req, res) {
-    // Message for alerts
-    let { message, email, alertType } = req.session
 
-    // Destroy the session if exist anny message.
-    if (message)
-        req.session.destroy()
+    // If the session is active then redirect to the account.
+    if (req.session.user) {
+        res.redirect('/account')
+    } else {
+        // Message for alerts
+        let { message, email, alertType, allAlertTypes } = req.session
 
-    res.render('login.ejs', { message, email, alertType })
+        // Destroy the session if exist anny message.
+        if (message)
+            req.session.destroy()
+
+        res.render('login.ejs', { message, email, alertType, allAlertTypes })
+    }
 })
 
 router.get('/create-account', function(req, res) {
     res.render('register.ejs')
 })
 
-router.get('/account', auth.account)
-
+//------ Auth Routes ------
 router.post('/login', auth.login)
 
 router.post('/register', auth.register)
 
 router.get('/logout', auth.logout)
 
+router.post('/webhook', auth.webhook)
+
+// ---------------------------------------
+
+//------ Dashboard Routes ------
+router.get('/account', dashboards.account)
+
+// ---------------------------------------
+
+
+//------ Payment Routes ------
 router.post('/checkout', setCurrentUser, async(req, res) => {
     const customer = req.user
     const { product, customerID } = req.body
@@ -77,6 +94,8 @@ router.post('/billing', setCurrentUser, async(req, res) => {
     res.json({ url: session.url })
 })
 
+// ---------------------------------------
+
 router.get('/none', [setCurrentUser, hasPlan('none')], async function(
     req,
     res,
@@ -101,6 +120,5 @@ router.get('/pro', [setCurrentUser, hasPlan('pro')], async function(
     res.status(200).render('pro.ejs')
 })
 
-router.post('/webhook', auth.webhook)
 
 module.exports = router;

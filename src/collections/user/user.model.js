@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
-const Roles = require('../middleware/roles')
+const Roles = require('../../middleware/roles')
 
 const userSchema = new Schema({
     email: String,

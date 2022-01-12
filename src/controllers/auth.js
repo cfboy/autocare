@@ -1,7 +1,8 @@
-const UserService = require('../user')
+const UserService = require('../collections/user')
 const Crypto = require('../middleware/crypto')
 const Stripe = require('../connect/stripe')
 const Roles = require('../middleware/roles')
+const alertTypes = require('../helpers/alertTypes')
 
 exports.login = async(req, res) => {
     const { email, password } = req.body
@@ -13,7 +14,7 @@ exports.login = async(req, res) => {
     if (!email || !password) {
         console.log(`Missing Email or password.`)
         message = `Missing email or password.`
-        alertType = 'error'
+        alertType = alertTypes.ErrorAlert
             // Set the message for alert. 
         error = true
     }
@@ -27,13 +28,13 @@ exports.login = async(req, res) => {
             console.log(`email ${email} does not exist.`)
             message = `This user ${email} does not exist.`
                 // Set the message for alert. 
-            alertType = 'warning'
+            alertType = alertTypes.WarningAlert
         } else {
             if (password != Crypto.decryptData(user.password)) {
                 error = true
                 console.log(`Wrong password.`)
                 message = `That email/password combination was not found.`
-                alertType = 'error'
+                alertType = alertTypes.ErrorAlert
             }
             if (!error) {
                 // TODO: validate if the user is a customer or admin
@@ -80,11 +81,12 @@ exports.login = async(req, res) => {
 
     if (error) {
         req.session.message = message
-            // AlertTypes: success, error, warning, question, info. 
+            // TODO: Optimize this mode of pass all alert types.
+        req.session.allAlertTypes = JSON.stringify(alertTypes)
         req.session.alertType = alertType
         res.redirect('/')
     } else {
-        req.session.email = email
+        req.session.user = email
         res.redirect('/account')
     }
 }
@@ -151,7 +153,7 @@ exports.register = async(req, res) => {
             res.status(200).json({ e })
             return
         }
-        req.session.email = email
+        req.session.user = email
 
         res.redirect('/account')
     } else {
@@ -165,26 +167,8 @@ exports.register = async(req, res) => {
         req.session.message = message
 
         // AlertTypes: success, error, warning, question, info. 
-        req.session.alertType = 'warning'
+        req.session.alertType = 'warning-icon-alert'
         res.redirect('/')
-    }
-}
-
-exports.account = async(req, res) => {
-    let { email } = req.session
-    let customer = await UserService.getUserByEmail(email)
-    if (!customer) {
-        res.redirect('/')
-    } else {
-        let products = await Stripe.getAllProducts()
-        if (products) {
-            // Get price of all products.
-            for (const product of products) {
-                product.priceInfo = await Stripe.getProductPrice(product.id)
-            }
-        }
-        let users = await UserService.getUsers()
-        res.render('index.ejs', { customer, products, users })
     }
 }
 
