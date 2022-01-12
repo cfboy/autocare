@@ -14,14 +14,14 @@ var iv = Crypto.createHash('sha512').update(secret_iv, 'utf-8').digest('hex').su
 function encryptData(data) {
     console.log('Encrypting data...')
     var encryptedMessage = encryptString(data, encryptionMethod, key, iv);
-    console.log(`Encrypted data: ${encryptedMessage}`)
+    console.debug(`Encrypted data: ${encryptedMessage}`)
     return encryptedMessage
 }
 
 function decryptData(data) {
     console.log('Decrypting data...')
     var decryptedMessage = decryptString(data, encryptionMethod, key, iv);
-    console.log(`Decrypted data: ${decryptedMessage}`)
+    console.debug(`Decrypted data: ${decryptedMessage}`)
     return decryptedMessage
 }
 

@@ -141,7 +141,7 @@
         $(document).ready(function() {
             var msj = '<%- message %>';
             var alertType = '<%- alertType %>';
-            var allAlertTypes = '<%- allAlertTypes %>';
+            var allAlertTypes = '<%- JSON.stringify(alertTypes) %>';
 
             if (msj !== '' && alertType !== '') {
                 sweetAlerts(allAlertTypes, alertType, msj);

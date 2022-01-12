@@ -1,4 +1,4 @@
-//If add moder cases of alert, please keep updated AlertTypes: /src/helpers/alertTypes.js 
+//If add more cases of alerts, please keep updated AlertTypes on /src/helpers/alertTypes.js 
 function sweetAlerts(AlertTypes, type, message) {
     if (AlertTypes) {
         AlertTypes = JSON.parse(AlertTypes)

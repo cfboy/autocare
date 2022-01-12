@@ -7,6 +7,7 @@ var path = require('path');
 var router = require('./router');
 var moment = require('moment');
 const formats = require('./src/helpers/formats')
+const alertTypes = require('./src/helpers/alertTypes')
 
 const app = express()
 
@@ -32,6 +33,11 @@ app.set('view engine', 'ejs')
 // Used to format dates
 app.locals.moment = moment
 app.locals.shortDateFormat = formats.shortDateFormat
+
+// Pass all available alertTypes to the app variable.
+app.locals.alertTypes = alertTypes //To use this on the client side is necessary to use JSON.stringify
+    // app.locals.alertType = ''
+    // app.locals.alertMessage = ''
 
 app.use('/', router);
 

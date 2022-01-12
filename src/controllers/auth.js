@@ -14,8 +14,7 @@ exports.login = async(req, res) => {
     if (!email || !password) {
         console.log(`Missing Email or password.`)
         message = `Missing email or password.`
-        alertType = alertTypes.ErrorAlert
-            // Set the message for alert. 
+        alertType = alertTypes.ErrorAlert // Set the message for alert. 
         error = true
     }
 
@@ -25,7 +24,7 @@ exports.login = async(req, res) => {
 
         if (!user) {
             error = true
-            console.log(`email ${email} does not exist.`)
+            console.log(`This user ${email} does not exist.`)
             message = `This user ${email} does not exist.`
                 // Set the message for alert. 
             alertType = alertTypes.WarningAlert
@@ -81,8 +80,6 @@ exports.login = async(req, res) => {
 
     if (error) {
         req.session.message = message
-            // TODO: Optimize this mode of pass all alert types.
-        req.session.allAlertTypes = JSON.stringify(alertTypes)
         req.session.alertType = alertType
         res.redirect('/')
     } else {
@@ -165,16 +162,16 @@ exports.register = async(req, res) => {
 
         // Set the message for alert. 
         req.session.message = message
-
-        // AlertTypes: success, error, warning, question, info. 
         req.session.alertType = 'warning-icon-alert'
         res.redirect('/')
     }
 }
 
 exports.logout = async(req, res) => {
-    // req.session.email = null
-    res.clearCookie('connect.sid', { path: '/' }).status(200);
+    console.log('Log out...')
+        // res.clearCookie('connect.sid', { path: '/' }).status(200);
+    req.session.destroy()
+    console.log('Good Bye.')
     res.redirect('/')
 }
 
