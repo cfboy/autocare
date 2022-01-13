@@ -162,7 +162,7 @@ exports.register = async(req, res) => {
 
         // Set the message for alert. 
         req.session.message = message
-        req.session.alertType = 'warning-icon-alert'
+        req.session.alertType = alertTypes.WarningAlert
         res.redirect('/')
     }
 }

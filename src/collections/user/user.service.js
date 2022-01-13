@@ -42,8 +42,30 @@ const addUser = (User) => ({
     return user.save()
 }
 
+// TODO: Finish this
+const updateUser = (User) => async({ id, updates }) => {
+    return await User.findOneAndUpdate(id, updates, { new: true, runValidators: true })
+}
+
+const deleteUser = (User) => (id) => {
+    console.log(`deleteUser() by ID: ${id}`)
+
+    return User.deleteOne({ _id: id }, function(err, docs) {
+        if (err) {
+            console.log(err)
+        } else {
+            console.debug("Deleted : ", docs);
+        }
+    })
+}
+
 const getUsers = (User) => () => {
     return User.find({})
+}
+
+// TODO: Test this method.
+const getUserById = (User) => async(id) => {
+    return await User.findOne({ id })
 }
 
 const getUserByEmail = (User) => async(email) => {
@@ -65,7 +87,10 @@ const updatePlan = (User) => (email, plan) => {
 module.exports = (User) => {
     return {
         addUser: addUser(User),
+        updateUser: updateUser(User),
+        deleteUser: deleteUser(User),
         getUsers: getUsers(User),
+        getUserById: getUserById(User),
         getUserByEmail: getUserByEmail(User),
         updatePlan: updatePlan(User),
         getUserByBillingID: getUserByBillingID(User),

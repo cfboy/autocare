@@ -1,8 +1,10 @@
 require('./src/connect/mongodb') //Connection to MongoDB
+const UserService = require('./src/collections/user')
 const Stripe = require('./src/connect/stripe')
 const setCurrentUser = require('./src/middleware/setCurrentUser')
 const hasPlan = require('./src/middleware/hasPlan')
 const auth = require('./src/controllers/auth')
+const userController = require('./src/controllers/user')
 const dashboards = require('./src/controllers/dashboards')
 
 const express = require('express');
@@ -13,29 +15,31 @@ const productToPriceMap = {
     pro: process.env.PRODUCT_PRO
 }
 
+// Main Route
 router.get('/', function(req, res) {
 
     // If the session is active then redirect to the account.
     if (req.session.user) {
         res.redirect('/account')
     } else {
-        // Message for alerts
-        let { message, email, alertType, allAlertTypes } = req.session
+        // Get Message and Type for alerts
+        let { message, email, alertType } = req.session
 
         // Destroy the session if exist anny message.
         if (message)
             req.session.destroy()
 
-        res.render('login.ejs', { message, email, alertType, allAlertTypes })
+        res.render('login.ejs', { message, email, alertType })
     }
 })
+
+
+//------ Auth Routes ------
+router.post('/login', auth.login)
 
 router.get('/create-account', function(req, res) {
     res.render('register.ejs')
 })
-
-//------ Auth Routes ------
-router.post('/login', auth.login)
 
 router.post('/register', auth.register)
 
@@ -43,7 +47,12 @@ router.get('/logout', auth.logout)
 
 router.post('/webhook', auth.webhook)
 
-// ---------------------------------------
+
+//------ USER CRUDS ------
+router.post('/create-user', userController.save)
+router.post('/edit-user/:id', userController.update)
+router.get('/delete-user/:id', userController.delete)
+
 
 //------ Dashboard Routes ------
 router.get('/account', dashboards.account)

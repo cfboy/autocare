@@ -25302,11 +25302,11 @@ select.border-dark.tt-hint:focus {
 }
 
 .icon-md {
-    font-size: 2rem;
+    font-size: 2rem !important;
 }
 
 .icon-sm {
-    font-size: 1rem;
+    font-size: 1rem !important;
 }
 
 
@@ -33910,6 +33910,18 @@ label.required:after {
     content: " *";
     color: red;
     display: inline;
+}
+
+.btn-icon-md {
+    font-size: 2rem!important;
+}
+
+.btn-icon-no-border {
+    border: none !important
+}
+
+.no-margin {
+    margin: 0 !important;
 }
 
 
