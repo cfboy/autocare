@@ -12,14 +12,14 @@ var iv = Crypto.createHash('sha512').update(secret_iv, 'utf-8').digest('hex').su
 
 // These functions cannot be async to be able to return the value. 
 function encryptData(data) {
-    console.log('Encrypting data...')
+    console.debug('Encrypting data...')
     var encryptedMessage = encryptString(data, encryptionMethod, key, iv);
     console.debug(`Encrypted data: ${encryptedMessage}`)
     return encryptedMessage
 }
 
 function decryptData(data) {
-    console.log('Decrypting data...')
+    console.debug('Decrypting data...')
     var decryptedMessage = decryptString(data, encryptionMethod, key, iv);
     console.debug(`Decrypted data: ${decryptedMessage}`)
     return decryptedMessage

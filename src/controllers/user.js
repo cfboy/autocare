@@ -5,34 +5,55 @@ const alertTypes = require('../helpers/alertTypes')
 //  https://stackoverflow.com/questions/17250496/update-a-record-where-id-id-with-mongoose
 exports.save = async(req, res) => {}
 
-// Update CRUD
-exports.update = async(req, res) => {
-    const updates = Object.keys(req.body)
-    const allowedUpdates = ['name', 'email']
-    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
-    if (!isValidOperation) {
+// Route for edit user form.
+exports.editUser = async(req, res) => {
+    const id = req.params.id;
+    const user = await UserService.getUserById(id)
 
-        return res.status(400).send('Invalid updates!')
-    }
-    try {
-
-        const user = await UserService.updateUser(req.params.id, req.body)
-
-        if (!user) {
-
-            return res.status(404).send()
-
-        }
-
-        res.status(201).send(user)
-
-    } catch (error) {
-
-        res.status(400).send(error)
-
+    if (user) {
+        res.status(200).render('user/edit.ejs', { customer: user })
+    } else {
+        console.log('User not found.')
+        res.redirect('/account')
     }
 }
 
+// Update CRUD
+// TODO: Manage membership 
+exports.update = async(req, res) => {
+    const updates = Object.keys(req.body)
+        // TODO: Implement allowedUpdates per ROLE.
+        // const allowedUpdates = ['name', 'email']
+        // const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
+        // if (!isValidOperation) {
+
+    // return res.status(400).send('Invalid updates!')
+    // }
+
+    try {
+        const user = await UserService.updateUser(req.body.id, req.body)
+
+        if (!user) {
+            req.session.message = `Can't update User  ${req.body.email}`
+            req.session.alertType = alertTypes.WarningAlert
+                // return res.status(404).send()
+
+        } else {
+            req.session.message = `User updated ${user.email}`
+            req.session.alertType = alertTypes.CompletedActionAlert
+        }
+        // res.status(201).send(user)
+        res.redirect('/account')
+
+
+    } catch (error) {
+        req.session.message = `Error trying to update user.`
+        req.session.alertType = alertTypes.ErrorAlert
+            // res.status(400).send(error)
+        res.redirect('/account')
+
+    }
+}
 
 // Delete Users method
 exports.delete = async(req, res) => {

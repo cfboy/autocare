@@ -14,7 +14,8 @@ const userSchema = new Schema({
         middleName: String,
         lastName: String,
         phoneNumber: String,
-        dateOfBirth: { type: Date, default: null }
+        dateOfBirth: { type: Date, default: null },
+        city: String
     },
 
     carInfo: {

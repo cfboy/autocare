@@ -47,10 +47,11 @@ router.get('/logout', auth.logout)
 
 router.post('/webhook', auth.webhook)
 
+router.get('/edit-user/:id', userController.editUser)
 
 //------ USER CRUDS ------
 router.post('/create-user', userController.save)
-router.post('/edit-user/:id', userController.update)
+router.post('/edit-user', userController.update)
 router.get('/delete-user/:id', userController.delete)
 
 

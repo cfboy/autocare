@@ -618,7 +618,7 @@
                                                                                         <%= moment(user.membershipInfo.endDate).isValid() ? moment(user.membershipInfo.endDate).format(shortDateFormat) : 'N/A' %>
                                                                                     </td>
                                                                                     <td>
-                                                                                        <a href="/delete-user/<%- user.id%>" type="button" class="btn btn-icon btn-icon-no-border no-margin">
+                                                                                        <a href="/edit-user/<%- user.id%>" type="button" class="btn btn-icon btn-icon-no-border no-margin">
                                                                                             <i class="mdi mdi-square-edit-outline icon-md"></i>
                                                                                         </a>
                                                                                         <a href="/delete-user/<%- user.id%>" class="btn btn-icon btn-icon-no-border no-margin">

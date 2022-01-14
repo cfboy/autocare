@@ -34,35 +34,59 @@ const createBillingSession = async(customer) => {
 }
 
 const getCustomerByID = async(id) => {
-    const customer = await Stripe.customers.retrieve(id)
-    return customer
+    try {
+        console.debug(`STRIPE: getCustomerByID(${id})`);
+        const customer = await Stripe.customers.retrieve(id)
+        console.log(`STRIPE: Customer Found: ${customer.email}`);
+        return customer
+
+    } catch (error) {
+        console.debug(`ERROR-STRIPE: Customer Not Found`);
+        console.debug(`ERROR-STRIPE: ${error.message}`);
+    }
+
 }
 
 const getCustomerByEmail = async(email) => {
-    const customer = await Stripe.customers.list({
+    try {
+        console.debug(`STRIPE: getCustomerByEmail(${email})`);
+
+        const customer = await Stripe.customers.list({
             limit: 1,
             email: email
         })
+        console.debug(`STRIPE: Customer Found`);
         // Return the first and only object in the customer list.
-    return customer.data[0]
+        return customer.data[0]
+
+    } catch (error) {
+        console.debug(`ERROR-STRIPE: Stripe Customer Not Found`);
+    }
 }
 const addNewCustomer = async(email,
     firstName,
     lastName,
     phoneNumber,
     city) => {
+    try {
+        console.debug(`STRIPE: addNewCustomer()`);
 
-    const customer = await Stripe.customers.create({
-        email,
-        description: 'New Customer',
-        name: firstName + ' ' + lastName,
-        phone: phoneNumber,
-        address: {
-            city: city
-        }
-    })
+        const customer = await Stripe.customers.create({
+            email,
+            description: 'New Customer',
+            name: firstName + ' ' + lastName,
+            phone: phoneNumber,
+            address: {
+                city: city
+            }
+        })
 
-    return customer
+        return customer
+    } catch (error) {
+        console.debug(`ERROR-STRIPE: Fail Add New Customer`);
+
+        console.debug(`ERROR-STRIPE: ${error.message}`);
+    }
 }
 
 const createWebhook = (rawBody, sig) => {

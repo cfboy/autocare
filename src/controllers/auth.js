@@ -38,42 +38,52 @@ exports.login = async(req, res) => {
             if (!error) {
                 // TODO: validate if the user is a customer or admin
                 let stripeCustomer = await Stripe.getCustomerByID(user.billingID)
-                    //Validate if the user is deleted on Stripe.
-                if (stripeCustomer.deleted) {
-                    try {
-                        console.log(`User exists on DB, but not in Stripe.`)
-                        customerInfo = await Stripe.addNewCustomer(user.email)
-                            // Update the BillingID of User. 
-                        customer = await UserService.updateBillingID(user.email, customerInfo.id)
-                        console.log(
-                            `A new user signed up and addded to Stripe. The ID for ${user.email}.`
-                        )
-                    } catch (e) {
-                        console.log(e)
-                        res.status(200).json({ e })
-                        return
-                    }
+                if (!stripeCustomer) {
+                    error = true
+                    message = `Not found Stripe User`
+                    alertType = alertTypes.ErrorAlert
                 }
+                if (!error) {
+                    //Validate if the user is deleted on Stripe.
+                    if (stripeCustomer.deleted) {
+                        try {
+                            console.log(`User exists on DB, but not in Stripe.`)
+                            customerInfo = await Stripe.addNewCustomer(user.email, user.personalInfo.firstName,
+                                    user.personalInfo.lastName,
+                                    user.personalInfo.phoneNumber,
+                                    user.personalInfo.city)
+                                // Update the BillingID of User. 
+                            customer = await UserService.updateBillingID(user.id, customerInfo.id)
+                            console.log(
+                                `A new user signed up and addded to Stripe. The ID for ${user.email}.`
+                            )
+                        } catch (e) {
+                            console.log(e)
+                            res.status(200).json({ e })
+                            return
+                        }
+                    }
 
-                // TODO: Optimize and change this Trial Logic.
-                const isTrialExpired =
-                    user.membershipInfo.plan != 'none' && user.membershipInfo.endDate < new Date().getTime()
+                    // TODO: Optimize and change this Trial Logic.
+                    const isTrialExpired =
+                        user.membershipInfo.plan != 'none' && user.membershipInfo.endDate < new Date().getTime()
 
-                if (isTrialExpired) {
-                    console.log('trial expired')
-                    user.membershipInfo.hasTrial = false
-                    user.save()
-                } else {
-                    console.log(
-                        `No trial information, Has trial: ${user.membershipInfo.hasTrial}, 
+                    if (isTrialExpired) {
+                        console.log('trial expired')
+                        user.membershipInfo.hasTrial = false
+                        user.save()
+                    } else {
+                        console.log(
+                            `No trial information, Has trial: ${user.membershipInfo.hasTrial}, 
                             Plan: ${user.membershipInfo.plan},
                             End Date: ${user.membershipInfo.endDate}`
-                        // user.membershipInfo.endDate < new Date().getTime()
+                            // user.membershipInfo.endDate < new Date().getTime()
+                        )
+                    }
+                    console.log(
+                        `The existing ID for ${email} is ${user.billingID}`
                     )
                 }
-                console.log(
-                    `The existing ID for ${email} is ${user.billingID}`
-                )
             }
         }
     }
@@ -131,6 +141,7 @@ exports.register = async(req, res) => {
                 lastName,
                 phoneNumber,
                 dateOfBirth,
+                city,
                 brand,
                 model,
                 plate,

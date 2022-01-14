@@ -9,6 +9,7 @@ const addUser = (User) => ({
     lastName,
     phoneNumber,
     dateOfBirth,
+    city,
     brand,
     model,
     plate
@@ -27,7 +28,8 @@ const addUser = (User) => ({
             firstName,
             lastName,
             phoneNumber,
-            dateOfBirth
+            dateOfBirth,
+            city
         },
         carInfo: {
             brand,
@@ -43,10 +45,21 @@ const addUser = (User) => ({
 }
 
 // TODO: Finish this
-const updateUser = (User) => async({ id, updates }) => {
-    return await User.findOneAndUpdate(id, updates, { new: true, runValidators: true })
+const updateUser = (User) => async(id, updates) => {
+    console.log(`updateUser() ID: ${id}`)
+        // findByIdAndUpdate returns the user
+        // updateOne is more quickly but not return the user.
+    return await User.findByIdAndUpdate({ _id: id }, updates, function(err, doc) {
+        // return await User.updateOne({ _id: id }, updates, function(err, docs) {
+        if (err) {
+            console.log(err)
+        } else {
+            console.debug("Updated : ", doc.email);
+        }
+    })
 }
 
+// TODO: maybe need delete customer on Stripe 
 const deleteUser = (User) => (id) => {
     console.log(`deleteUser() by ID: ${id}`)
 
@@ -59,27 +72,48 @@ const deleteUser = (User) => (id) => {
     })
 }
 
+// Get All users from User Collection.
 const getUsers = (User) => () => {
     return User.find({})
 }
 
-// TODO: Test this method.
-const getUserById = (User) => async(id) => {
-    return await User.findOne({ id })
+// Get User by ID. 
+const getUserById = (User) => (id) => {
+    console.log(`getUserById() by ID: ${id}`)
+
+    return User.findOne({ _id: id }, function(err, docs) {
+        if (err) {
+            console.log(err)
+        } else {
+            console.debug("Founded user to edit: ", docs);
+        }
+    })
 }
 
+// Get User by email.
 const getUserByEmail = (User) => async(email) => {
     return await User.findOne({ email })
 }
 
+// Get User By Billing ID / Stripe ID
 const getUserByBillingID = (User) => async(billingID) => {
     return await User.findOne({ billingID })
 }
 
-const updateBillingID = (User) => async(email, billingID) => {
-    return await User.findOneAndUpdate({ email, membershipInfo: { billingID } })
+// TODO add error handler and logs
+const updateBillingID = (User) => async(id, billingID) => {
+    console.log(`updateBilligID() ID: ${id}`)
+
+    return await User.findByIdAndUpdate({ _id: id }, { billingID: billingID }, { new: true }, function(err, doc) {
+        if (err) {
+            console.log(err)
+        } else {
+            console.debug(`Updated BillingID of ${doc.email} ->> ${doc.billingID}`);
+        }
+    })
 }
 
+// TODO: TEST METHOD
 const updatePlan = (User) => (email, plan) => {
     return User.findOneAndUpdate({ email, membershipInfo: { plan } })
 }
