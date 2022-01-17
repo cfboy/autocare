@@ -136,7 +136,7 @@ exports.register = async(req, res) => {
                 email,
                 password,
                 billingID: customerInfo.id,
-                role: Roles.Test,
+                role: Roles.Customer,
                 firstName,
                 lastName,
                 phoneNumber,
@@ -186,6 +186,8 @@ exports.logout = async(req, res) => {
     res.redirect('/')
 }
 
+// TODO: Move to another controller.
+// This function handle all Stripe events.
 exports.webhook = async(req, res) => {
     let event
 
@@ -199,14 +201,38 @@ exports.webhook = async(req, res) => {
     const data = event.data.object
 
     console.log(event.type, data)
+        // TODO: Develop necessary events
     switch (event.type) {
         case 'customer.created':
             console.log(JSON.stringify(data))
+            if (data) {
+                let user = await UserService.addUser({
+                    email: data.email,
+                    password: 'Test1234',
+                    billingID: data.id,
+                    role: Roles.Customer,
+                    firstName: data.name.split(' ')[0],
+                    lastName: data.name.split(' ')[1],
+                    phoneNumber: data.phone,
+                    dateOfBirth: null,
+                    city: data.address ? data.address.city : null,
+                    brand: null,
+                    model: null,
+                    plate: null,
+                    plan: 'none',
+                    endDate: null
+                })
+            }
+            break
+        case 'customer.deleted':
+            break
+        case 'customer.updated':
             break
         case 'invoice.paid':
             break
         case 'customer.subscription.created':
             {
+                // TODO: move all logic to user.service
                 const user = await UserService.getUserByBillingID(data.customer)
 
                 if (data.plan.id === process.env.PRODUCT_BASIC) {
@@ -248,7 +274,7 @@ exports.webhook = async(req, res) => {
                     user.membershipInfo.endDate = new Date(data.current_period_end * 1000)
                 } else if (data.status === 'active') {
                     user.membershipInfo.hasTrial = false
-                    use.membershipInfo.endDate = new Date(data.current_period_end * 1000)
+                    user.membershipInfo.endDate = new Date(data.current_period_end * 1000)
                 }
 
                 if (data.canceled_at) {
@@ -264,6 +290,8 @@ exports.webhook = async(req, res) => {
                 console.log('customer changed', JSON.stringify(data))
                 break
             }
+        case 'customer.subscription.deleted':
+            break;
         default:
     }
     res.sendStatus(200)

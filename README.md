@@ -58,6 +58,7 @@ If you have an external Mongo server running, replace the default connection str
 
 Download Stripe CLI.
 
+<!-- Go first to the path where stripe is installed. -->
 ```bash
 stripe listen --forward-to localhost:4242/webhook
 ```

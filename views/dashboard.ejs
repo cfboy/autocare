@@ -498,7 +498,7 @@
                                             <a class="nav-link active ps-0" id="home-tab" data-bs-toggle="tab" href="#members" role="tab" aria-controls="members" aria-selected="true">Members</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" id="profile-tab" data-bs-toggle="tab" href="#audiences" role="tab" aria-selected="false">Audiences</a>
+                                            <a class="nav-link" id="profile-tab" data-bs-toggle="tab" href="#plan" role="tab" aria-selected="false">My Plan</a>
                                         </li>
                                         <li class="nav-item">
                                             <a class="nav-link" id="contact-tab" data-bs-toggle="tab" href="#demographics" role="tab" aria-selected="false">Demographics</a>
@@ -517,6 +517,77 @@
                                 </div>
                                 <div class="tab-content tab-content-basic">
                                     <div class="tab-pane fade show active" id="members" role="tabpanel" aria-labelledby="members">
+                                        <div class="row">
+                                            <div class="col-lg-12 d-flex flex-column">
+                                                <div class="row flex-grow">
+                                                    <div class="col-12 grid-margin stretch-card">
+                                                        <div class="card card-rounded">
+                                                            <div class="card-body">
+                                                                <div class="d-sm-flex justify-content-between align-items-start">
+                                                                    <div>
+                                                                        <h4 class="card-title card-title-dash">Members</h4>
+                                                                    </div>
+                                                                    <div>
+                                                                        <button class="btn btn-primary btn-lg text-white mb-0 me-0" type="button"><i class="mdi mdi-account-plus"></i>Add new member</button>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="table-responsive  mt-1">
+                                                                    <table class="table table-hover">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th>Name</th>
+                                                                                <th>Phone</th>
+                                                                                <th>Email</th>
+                                                                                <th>Plan</th>
+                                                                                <th>Expiration Date <br> (MM/DD/YYYY)
+                                                                                </th>
+                                                                                <th>Action</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            <% for(const user of users) { %>
+                                                                                <tr>
+                                                                                    <td>
+                                                                                        <a class="btn-link" href="/view-user/<%- user.id%>">
+                                                                                            <%- user.personalInfo.firstName + ' ' + user.personalInfo.lastName %>
+                                                                                                <% if(!user.hasAllInformation) {%>
+                                                                                                    <i class="mdi mdi-alert text-warning" style="padding-left: 10px;"></i>
+                                                                                                    <%}%>
+                                                                                        </a>
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <%- user.personalInfo.phoneNumber %>
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <%- user.email%>
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <%- user.membershipInfo.plan%>
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <%= moment(user.membershipInfo.endDate).isValid() ? moment(user.membershipInfo.endDate).utc().format(shortDateFormat) : 'N/A' %>
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <a href="/edit-user/<%- user.id%>?url=account" type="button" class="btn btn-icon btn-icon-no-border no-margin">
+                                                                                            <i class="mdi mdi-square-edit-outline icon-md"></i>
+                                                                                        </a>
+                                                                                        <a id="deleteBtn" href="/delete-user/<%- user.id%>" class="btn btn-icon btn-icon-no-border no-margin">
+                                                                                            <i class="mdi mdi-delete icon-md text-danger"></i>
+                                                                                        </a>
+                                                                                    </td>
+                                                                                </tr>
+                                                                                <%}%>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane" id="plan" role="tabpanel" aria-labelledby="plan">
                                         <div class="row">
                                             <div class="col-lg-12 d-flex flex-column">
                                                 <div class="row flex-grow">
@@ -570,75 +641,9 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="row">
-                                            <div class="col-lg-12 d-flex flex-column">
-                                                <div class="row flex-grow">
-                                                    <div class="col-12 grid-margin stretch-card">
-                                                        <div class="card card-rounded">
-                                                            <div class="card-body">
-                                                                <div class="d-sm-flex justify-content-between align-items-start">
-                                                                    <div>
-                                                                        <h4 class="card-title card-title-dash">Members</h4>
-                                                                    </div>
-                                                                    <div>
-                                                                        <button class="btn btn-primary btn-lg text-white mb-0 me-0" type="button"><i class="mdi mdi-account-plus"></i>Add new member</button>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="table-responsive  mt-1">
-                                                                    <table class="table table-hover">
-                                                                        <thead>
-                                                                            <tr>
-                                                                                <th>Name</th>
-                                                                                <th>Phone</th>
-                                                                                <th>Email</th>
-                                                                                <th>Plan</th>
-                                                                                <th>Expiration Date <br> (MM/DD/YYYY)
-                                                                                </th>
-                                                                                <th>Action</th>
-                                                                            </tr>
-                                                                        </thead>
-                                                                        <tbody>
-                                                                            <% for(const user of users) { %>
-                                                                                <tr>
-                                                                                    <!-- <td></td> -->
-
-                                                                                    <td>
-                                                                                        <%- user.personalInfo.firstName + ' ' + user.personalInfo.lastName %>
-                                                                                    </td>
-                                                                                    <td>
-                                                                                        <%- user.personalInfo.phoneNumber %>
-                                                                                    </td>
-                                                                                    <td>
-                                                                                        <%- user.email%>
-                                                                                    </td>
-                                                                                    <td>
-                                                                                        <%- user.membershipInfo.plan%>
-                                                                                    </td>
-                                                                                    <td>
-                                                                                        <%= moment(user.membershipInfo.endDate).isValid() ? moment(user.membershipInfo.endDate).format(shortDateFormat) : 'N/A' %>
-                                                                                    </td>
-                                                                                    <td>
-                                                                                        <a href="/edit-user/<%- user.id%>" type="button" class="btn btn-icon btn-icon-no-border no-margin">
-                                                                                            <i class="mdi mdi-square-edit-outline icon-md"></i>
-                                                                                        </a>
-                                                                                        <a href="/delete-user/<%- user.id%>" class="btn btn-icon btn-icon-no-border no-margin">
-                                                                                            <i class="mdi mdi-delete icon-md text-danger"></i>
-                                                                                        </a>
-                                                                                    </td>
-                                                                                </tr>
-                                                                                <%}%>
-
-                                                                        </tbody>
-                                                                    </table>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
+
                             </div>
                         </div>
                     </div>

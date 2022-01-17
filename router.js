@@ -47,6 +47,9 @@ router.get('/logout', auth.logout)
 
 router.post('/webhook', auth.webhook)
 
+//------ User Routes ------
+router.get('/create-user')
+router.get('/view-user/:id', userController.viewUser)
 router.get('/edit-user/:id', userController.editUser)
 
 //------ USER CRUDS ------

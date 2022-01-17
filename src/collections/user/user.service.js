@@ -15,8 +15,10 @@ const addUser = (User) => ({
     plate
 }) => {
     if (!email || !password || !firstName || !lastName || !phoneNumber || !billingID || !plan) {
-        throw new Error(`Missing Data. Please provide values for email=${email}, password=${password}, billingID=${billingID}, firstName=${firstName}, lastName=${lastName}, plan=${plan}, dateOfBirth=${dateOfBirth}`)
+        throw new Error(`USER: Missing Data. Please provide values for email=${email}, password=${password}, billingID=${billingID}, firstName=${firstName}, lastName=${lastName}, plan=${plan}, dateOfBirth=${dateOfBirth}`)
     }
+
+    console.log(`USER: addUser(${email})`)
 
     const user = new User({
         email,
@@ -41,7 +43,13 @@ const addUser = (User) => ({
             endDate
         }
     })
-    return user.save()
+    return user.save(function(err, doc) {
+        if (err) {
+            console.error(err)
+        } else {
+            console.debug("Created new user: ", doc.email);
+        }
+    })
 }
 
 // TODO: Finish this
@@ -52,7 +60,7 @@ const updateUser = (User) => async(id, updates) => {
     return await User.findByIdAndUpdate({ _id: id }, updates, function(err, doc) {
         // return await User.updateOne({ _id: id }, updates, function(err, docs) {
         if (err) {
-            console.log(err)
+            console.error(err)
         } else {
             console.debug("Updated : ", doc.email);
         }
@@ -65,7 +73,7 @@ const deleteUser = (User) => (id) => {
 
     return User.deleteOne({ _id: id }, function(err, docs) {
         if (err) {
-            console.log(err)
+            console.error(err)
         } else {
             console.debug("Deleted : ", docs);
         }
@@ -83,7 +91,7 @@ const getUserById = (User) => (id) => {
 
     return User.findOne({ _id: id }, function(err, docs) {
         if (err) {
-            console.log(err)
+            console.error(err)
         } else {
             console.debug("Founded user to edit: ", docs);
         }
