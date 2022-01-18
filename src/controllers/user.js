@@ -2,13 +2,100 @@ const UserService = require('../collections/user')
 const alertTypes = require('../helpers/alertTypes')
 
 
-// --------------------- CRUDS --------------------- 
-// TODO: Finish CRUDS
-//  https://stackoverflow.com/questions/17250496/update-a-record-where-id-id-with-mongoose
-// --------------- Create ---------------
-exports.save = async(req, res) => {}
+// ------------------------------- CRUDS ------------------------------- 
 
-// --------------- Read ---------------
+
+// ------------------------------- Create -------------------------------
+
+// Route for create user.
+exports.createUser = async(req, res) => {
+    let { message, alertType } = req.session
+        // clear message y alertType
+    req.session.message = ''
+    req.session.alertType = ''
+
+    res.render('user/create.ejs', { message, alertType })
+}
+
+
+// TODO: Test this method. NOT FINISHED
+exports.save = async(req, res) => {
+    const {
+        email,
+        firstName,
+        lastName,
+        phoneNumber,
+        dateOfBirth,
+        city,
+        brand,
+        model,
+        plate
+    } = req.body
+
+    var { password } = req.body //Password is variable for encryption.
+    try {
+
+        console.log('Creating New User: ', email)
+
+        let user = await UserService.getUserByEmail(email)
+        let customerInfo = {}
+
+        if (!user) {
+            console.log(`Email ${email} does not exist. Making one...`)
+            customerInfo = await Stripe.getCustomerByEmail(email)
+            if (!customerInfo) {
+                customerInfo = await Stripe.addNewCustomer(email, firstName,
+                    lastName,
+                    phoneNumber,
+                    city)
+            }
+
+            password = Crypto.encryptData(password)
+
+            user = await UserService.addUser({
+                email,
+                password,
+                billingID: customerInfo.id,
+                role: Roles.Customer,
+                firstName,
+                lastName,
+                phoneNumber,
+                dateOfBirth,
+                city,
+                brand,
+                model,
+                plate,
+                plan: 'none',
+                endDate: null
+            })
+
+            console.log(
+                `A new user added to DB. The ID for ${user.email} is ${user.id}`
+            )
+
+            req.session.message = `User Created ${user.email}.`
+            req.session.alertType = alertTypes.CompletedActionAlert
+
+            res.redirect('/account')
+
+        } else {
+            let message = `That email ${user.email} already exist.`
+            console.log(`The existing ID for ${user.email} is ${user.id}`)
+
+            // Set the message for alert. 
+            req.session.message = message
+            req.session.alertType = alertTypes.WarningAlert
+            res.redirect('/create-user')
+        }
+    } catch (error) {
+        req.session.message = error.message
+        req.session.alertType = alertTypes.ErrorAlert
+            // res.status(400).send(error)
+        res.redirect('/account')
+    }
+}
+
+// ------------------------------- Read -------------------------------
 // Route for view user info.
 exports.viewUser = async(req, res) => {
     try {
@@ -21,7 +108,7 @@ exports.viewUser = async(req, res) => {
         const user = await UserService.getUserById(id)
 
         if (user) {
-            res.status(200).render('user/index.ejs', { user: user, message, alertType })
+            res.status(200).render('user/index.ejs', { user, message, alertType })
         } else {
             console.log('User not found.')
             res.redirect('/account')
@@ -35,22 +122,29 @@ exports.viewUser = async(req, res) => {
     }
 }
 
+// ------------------------------- Update -------------------------------
+
 // Route for view/edit user info.
 exports.editUser = async(req, res) => {
-    const id = req.params.id;
-    const url = req.query.url
-    const user = await UserService.getUserById(id)
+    try {
+        const id = req.params.id;
+        const url = req.query.url ? req.query.url : '/account'
+        const user = await UserService.getUserById(id)
 
-    if (user) {
-        res.status(200).render('user/edit.ejs', { customer: user, url: url })
-    } else {
-        console.log('User not found.')
-        res.redirect(`/${url}`)
+        if (user) {
+            res.status(200).render('user/edit.ejs', { customer: user, url: url })
+        } else {
+            console.log('User not found.')
+            res.redirect(`/${url}`)
+        }
+    } catch (error) {
+        req.session.message = error.message
+        req.session.alertType = alertTypes.ErrorAlert
+            // res.status(400).send(error)
+        res.redirect('/account')
     }
 }
 
-
-// --------------- Update ---------------
 // TODO: Manage membership 
 exports.update = async(req, res) => {
     const updates = Object.keys(req.body)
@@ -87,8 +181,7 @@ exports.update = async(req, res) => {
     }
 }
 
-
-// --------------- Delete ---------------
+// ------------------------------- Delete -------------------------------
 exports.delete = async(req, res) => {
     console.log('Deleting User...')
     const id = req.params.id

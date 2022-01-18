@@ -100,6 +100,8 @@ const getUserById = (User) => (id) => {
 
 // Get User by email.
 const getUserByEmail = (User) => async(email) => {
+    console.log(`getUserByEmail(): ${email}`)
+
     return await User.findOne({ email })
 }
 

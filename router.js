@@ -1,5 +1,4 @@
 require('./src/connect/mongodb') //Connection to MongoDB
-const UserService = require('./src/collections/user')
 const Stripe = require('./src/connect/stripe')
 const setCurrentUser = require('./src/middleware/setCurrentUser')
 const hasPlan = require('./src/middleware/hasPlan')
@@ -45,10 +44,11 @@ router.post('/register', auth.register)
 
 router.get('/logout', auth.logout)
 
+// TODO: Move to Stripe Controller
 router.post('/webhook', auth.webhook)
 
 //------ User Routes ------
-router.get('/create-user')
+router.get('/create-user', userController.createUser)
 router.get('/view-user/:id', userController.viewUser)
 router.get('/edit-user/:id', userController.editUser)
 
@@ -63,7 +63,7 @@ router.get('/account', dashboards.account)
 
 // ---------------------------------------
 
-
+// TODO: Move to Stripe Controller
 //------ Payment Routes ------
 router.post('/checkout', setCurrentUser, async(req, res) => {
     const customer = req.user

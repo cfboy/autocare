@@ -208,7 +208,7 @@ exports.webhook = async(req, res) => {
             if (data) {
                 let user = await UserService.addUser({
                     email: data.email,
-                    password: 'Test1234',
+                    password: 'Test1234', //TODO: optimize
                     billingID: data.id,
                     role: Roles.Customer,
                     firstName: data.name.split(' ')[0],
