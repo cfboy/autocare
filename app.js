@@ -10,6 +10,7 @@ var router = require('./router');
 var moment = require('moment');
 const formats = require('./src/helpers/formats')
 const alertTypes = require('./src/helpers/alertTypes')
+const roles = require('./src/middleware/roles')
 const passport = require('passport')
 const flash = require('express-flash')
 const methodOverride = require('method-override')
@@ -44,7 +45,7 @@ app.locals.shortDateFormat = formats.shortDateFormat
 
 // Pass all available alertTypes to the app variable.
 app.locals.alertTypes = alertTypes //To use this on the client side is necessary to use JSON.stringify
-
+app.locals.roles = roles
 app.use('/', router);
 
 const port = process.env.PORT || 4242

@@ -1,6 +1,6 @@
 module.exports = {
-    Admin: 'Admin',
-    Customer: 'Customer',
-    Cashier: 'Cashier',
-    Manager: 'Manager'
+    Admin: 'admin',
+    Customer: 'customer',
+    Cashier: 'cashier',
+    Manager: 'manager'
 }

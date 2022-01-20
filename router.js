@@ -1,6 +1,5 @@
 // Connections
 require('./src/connect/mongodb') //Connection to MongoDB
-const Stripe = require('./src/connect/stripe')
 
 // Controllers
 const stripeController = require('./src/controllers/stripe.controller')
