@@ -1,111 +1,75 @@
+// Connections
 require('./src/connect/mongodb') //Connection to MongoDB
 const Stripe = require('./src/connect/stripe')
-const setCurrentUser = require('./src/middleware/setCurrentUser')
-const hasPlan = require('./src/middleware/hasPlan')
+
+// Controllers
+const stripeController = require('./src/controllers/stripe.controller')
 const auth = require('./src/controllers/auth')
 const userController = require('./src/controllers/user')
 const dashboards = require('./src/controllers/dashboards')
 
+// Express
 const express = require('express');
 const router = express.Router();
 
-const productToPriceMap = {
-    basic: process.env.PRODUCT_BASIC,
-    pro: process.env.PRODUCT_PRO
-}
+// Middleware helpers
+const setCurrentUser = require('./src/middleware/setCurrentUser')
+const checkAuthenticated = require('./src/middleware/checkAuthenticated')
+const checkNotAuthenticated = require('./src/middleware/checkNotAuthenticated')
+const hasPlan = require('./src/middleware/hasPlan')
+
 
 // Main Route
-router.get('/', function(req, res) {
-
-    // If the session is active then redirect to the account.
-    if (req.session.user) {
-        res.redirect('/account')
-    } else {
-        // Get Message and Type for alerts
-        let { message, email, alertType } = req.session
-
-        // Destroy the session if exist anny message.
-        if (message)
-            req.session.destroy()
-
-        res.render('login.ejs', { message, email, alertType })
-    }
+router.get('/', checkAuthenticated, (req, res) => {
+    res.redirect('/account')
 })
 
-
 //------ Auth Routes ------
-router.post('/login', auth.login)
 
-router.get('/create-account', function(req, res) {
+router.get('/login', checkNotAuthenticated, (req, res) => {
+
+    let { message, email, alertType } = req.session
+
+    // Clear session alerts variables.
+    if (message) {
+        req.session.message = ''
+        req.session.alertType = ''
+    }
+
+    res.render('login.ejs', { message, email, alertType })
+})
+
+router.post('/login', checkNotAuthenticated, auth.login)
+
+router.get('/create-account', checkNotAuthenticated, (req, res) => {
     res.render('register.ejs')
 })
 
-router.post('/register', auth.register)
-
-router.get('/logout', auth.logout)
-
-// TODO: Move to Stripe Controller
-router.post('/webhook', auth.webhook)
+router.post('/register', checkNotAuthenticated, auth.register)
+router.delete('/logout', checkAuthenticated, auth.logout)
 
 //------ User Routes ------
-router.get('/create-user', userController.createUser)
-router.get('/view-user/:id', userController.viewUser)
-router.get('/edit-user/:id', userController.editUser)
+router.get('/create-user', checkAuthenticated, userController.createUser)
+router.get('/view-user/:id', checkAuthenticated, userController.viewUser)
+router.get('/edit-user/:id', checkAuthenticated, userController.editUser)
 
 //------ USER CRUDS ------
-router.post('/create-user', userController.save)
-router.post('/edit-user', userController.update)
-router.get('/delete-user/:id', userController.delete)
+router.post('/create-user', checkAuthenticated, userController.save)
+router.post('/edit-user', checkAuthenticated, userController.update)
+router.get('/delete-user/:id', checkAuthenticated, userController.delete)
 
 
 //------ Dashboard Routes ------
-router.get('/account', dashboards.account)
+router.get('/account', checkAuthenticated, dashboards.account)
 
 // ---------------------------------------
 
-// TODO: Move to Stripe Controller
-//------ Payment Routes ------
-router.post('/checkout', setCurrentUser, async(req, res) => {
-    const customer = req.user
-    const { product, customerID } = req.body
+//------ Stripe and Payment Routes ------
+router.post('/webhook', stripeController.webhook)
 
-    const price = productToPriceMap[product]
+router.post('/checkout', setCurrentUser, stripeController.checkout)
 
-    try {
-        const session = await Stripe.createCheckoutSession(customerID, price)
-
-        const ms =
-            new Date().getTime() + 1000 * 60 * 60 * 24 * process.env.TRIAL_DAYS
-        const n = new Date(ms)
-
-        customer.membershipInfo.plan = product
-        customer.membershipInfo.hasTrial = true
-        customer.membershipInfo.endDate = n
-        customer.save()
-
-        res.send({
-            sessionId: session.id
-        })
-    } catch (e) {
-        console.log(e)
-        res.status(400)
-        return res.send({
-            error: {
-                message: e.message
-            }
-        })
-    }
-})
-
-router.post('/billing', setCurrentUser, async(req, res) => {
-    const { customer } = req.body
-    console.log('customer', customer)
-
-    const session = await Stripe.createBillingSession(customer)
-    console.log('session', session)
-
-    res.json({ url: session.url })
-})
+router.post('/billing', setCurrentUser, stripeController.billing)
 
 // ---------------------------------------
 

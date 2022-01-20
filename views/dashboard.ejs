@@ -27,7 +27,7 @@
 <body>
     <div class="container-scroller">
         <!-- partial:partials/_navbar.html -->
-        <%- include('./partials/navbar.ejs'); %>
+        <%- include('./partials/navbar.ejs' , {user, user}); %>
             <!-- partial -->
             <div class="container-fluid page-body-wrapper">
                 <!-- partial:partials/_settings-panel.html -->
@@ -143,7 +143,7 @@
                                                                 <div class="col-12 col-lg-4 col-lg-12 grid-margin stretch-card">
                                                                     <div class="card card-rounded">
                                                                         <div class="card-body">
-                                                                            <%if (customer.membershipInfo.plan=="none" ) { %>
+                                                                            <%if (user.membershipInfo.plan=="none" ) { %>
                                                                                 <p class="lead">
                                                                                     You are currently not on any plan. Purchase a subscription below.
                                                                                 </p>
@@ -159,16 +159,16 @@
                                                                                         <% } else{ %>
                                                                                             <p class="lead">
                                                                                                 You are currently on the
-                                                                                                <%- customer.membershipInfo.plan %> plan. %>
+                                                                                                <%- user.membershipInfo.plan %> plan. %>
                                                                                             </p>
-                                                                                            <% if (customer.membershipInfo.hasTrial) { %>
+                                                                                            <% if (user.membershipInfo.hasTrial) { %>
                                                                                                 <p class="lead">Trial active until
-                                                                                                    <%- customer.membershipInfo.endDate %>
+                                                                                                    <%- user.membershipInfo.endDate %>
                                                                                                 </p>
                                                                                                 <% } else{ %>
                                                                                                     <p class="lead">
                                                                                                         Trial inactive. Plan will end on
-                                                                                                        <%- customer.membershipInfo.endDate %>
+                                                                                                        <%- user.membershipInfo.endDate %>
                                                                                                     </p>
                                                                                                     <% } %>
                                                                                                         <hr />
@@ -227,8 +227,8 @@
     <!-- endinject -->
     <!-- Custom js for this page-->
     <script>
-        var customer = <%- JSON.stringify(customer) %>;
-        console.log(customer);
+        var user = <%- JSON.stringify(user) %>;
+        console.log(user);
     </script>
     <script type="text/javascript" src="https://js.stripe.com/v3/"></script>
     <script type="text/javascript" src="./js/account.js"></script>

@@ -14,7 +14,7 @@ exports.createUser = async(req, res) => {
     req.session.message = ''
     req.session.alertType = ''
 
-    res.render('user/create.ejs', { message, alertType })
+    res.render('user/create.ejs', { user: req.user, message, alertType })
 }
 
 
@@ -42,7 +42,7 @@ exports.save = async(req, res) => {
 
         if (!user) {
             console.log(`Email ${email} does not exist. Making one...`)
-            customerInfo = await Stripe.getCustomerByEmail(email)
+            customerInfo = await Stripe.getCustomerByEmail(email) //TODO: getCustomerByEmail not return the user
             if (!customerInfo) {
                 customerInfo = await Stripe.addNewCustomer(email, firstName,
                     lastName,
@@ -100,17 +100,17 @@ exports.save = async(req, res) => {
 exports.viewUser = async(req, res) => {
     try {
         let { message, alertType } = req.session
-            // clear message y alertType
-        req.session.message = ''
-        req.session.alertType = ''
-
+        if (message) {
+            req.session.message = ''
+            req.session.alertType = ''
+        }
         const id = req.params.id;
-        const user = await UserService.getUserById(id)
+        const customer = await UserService.getUserById(id)
 
-        if (user) {
-            res.status(200).render('user/index.ejs', { user, message, alertType })
+        if (customer) {
+            res.status(200).render('user/index.ejs', { user: req.user, customer, message, alertType })
         } else {
-            console.log('User not found.')
+            console.log('Customer not found.')
             res.redirect('/account')
         }
     } catch (error) {
@@ -129,10 +129,10 @@ exports.editUser = async(req, res) => {
     try {
         const id = req.params.id;
         const url = req.query.url ? req.query.url : '/account'
-        const user = await UserService.getUserById(id)
+        const customer = await UserService.getUserById(id)
 
-        if (user) {
-            res.status(200).render('user/edit.ejs', { customer: user, url: url })
+        if (customer) {
+            res.status(200).render('user/edit.ejs', { user: req.user, customer, url: url })
         } else {
             console.log('User not found.')
             res.redirect(`/${url}`)

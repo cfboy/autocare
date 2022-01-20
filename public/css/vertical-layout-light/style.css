@@ -33924,5 +33924,22 @@ label.required:after {
     margin: 0 !important;
 }
 
+.error {
+    color: red;
+}
+
+.error a {
+    color: black!important;
+    text-decoration: none;
+}
+
+.error a:hover {
+    text-decoration: underline;
+}
+
+.info {
+    color: green;
+}
+
 
 /*# sourceMappingURL=../maps/vertical-layout-light/style.css.map */
