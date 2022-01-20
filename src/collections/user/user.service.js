@@ -1,4 +1,4 @@
-const addUser = (User) => ({
+const addUser = (User) => async({
     email,
     password,
     role,
@@ -43,13 +43,21 @@ const addUser = (User) => ({
             endDate
         }
     })
-    return user.save(function(err, doc) {
-        if (err) {
-            console.error(err)
-        } else {
-            console.debug("Created new user: ", doc.email);
-        }
-    })
+
+    // TODO: handle errors and return the doc.
+    return await user.save()
+        // .then((doc) => {
+        //         // If everything goes as planed
+        //         //use the retured user document for something
+        //         console.log("User Added: " + doc.email);
+        //         return doc
+        //             //  res.redirect("/");
+        //     })
+        //     .catch((error) => {
+        //         //When there are errors We handle them here
+        //         console.error(error);
+        //         // res.send(400, "Bad Request");
+        //     });
 }
 
 // TODO: Finish this
@@ -82,6 +90,11 @@ const deleteUser = (User) => (id) => {
 // Get All users from User Collection.
 const getUsers = (User) => () => {
     return User.find({})
+}
+
+// Get All users from User Collection.
+const getUsersPerRole = (User) => (role) => {
+    return User.find({ role: role })
 }
 
 // Get User by ID. 
@@ -133,6 +146,7 @@ module.exports = (User) => {
         updateUser: updateUser(User),
         deleteUser: deleteUser(User),
         getUsers: getUsers(User),
+        getUsersPerRole: getUsersPerRole(User),
         getUserById: getUserById(User),
         getUserByEmail: getUserByEmail(User),
         updatePlan: updatePlan(User),

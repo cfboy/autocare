@@ -63,6 +63,7 @@ const getCustomerByEmail = async(email) => {
         console.debug(`ERROR-STRIPE: Stripe Customer Not Found`);
     }
 }
+
 const addNewCustomer = async(email,
     firstName,
     lastName,
@@ -97,7 +98,6 @@ const createWebhook = (rawBody, sig) => {
     )
     return event
 }
-
 
 async function getAllProducts() {
     // On Stripe All products need a productKey Metadata field.

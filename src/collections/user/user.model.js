@@ -1,12 +1,12 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
-const Roles = require('../../middleware/roles')
+const Roles = require('../../config/roles')
 
 const userSchema = new Schema({
     email: String,
     password: String,
     billingID: String, //Stripe ID
-    role: { type: String, enum: Object.values(Roles), default: Roles.Customer },
+    role: { type: String, enum: Object.values(Roles), default: Roles.CUSTOMER },
     hasAllInformation: { type: Boolean, default: false },
 
     personalInfo: {

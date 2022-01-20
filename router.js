@@ -35,13 +35,13 @@ router.get('/login', checkNotAuthenticated, (req, res) => {
         req.session.alertType = ''
     }
 
-    res.render('login.ejs', { message, email, alertType })
+    res.render('auth/login.ejs', { message, email, alertType })
 })
 
 router.post('/login', checkNotAuthenticated, auth.login)
 
 router.get('/create-account', checkNotAuthenticated, (req, res) => {
-    res.render('register.ejs')
+    res.render('auth/register.ejs')
 })
 
 router.post('/register', checkNotAuthenticated, auth.register)

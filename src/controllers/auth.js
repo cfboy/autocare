@@ -1,7 +1,6 @@
 const UserService = require('../collections/user')
-const Crypto = require('../middleware/crypto')
 const Stripe = require('../connect/stripe')
-const Roles = require('../middleware/roles')
+const Roles = require('../config/roles')
 const alertTypes = require('../helpers/alertTypes')
 const bcrypt = require('bcrypt');
 const passport = require('passport');
@@ -53,7 +52,7 @@ exports.register = async(req, res) => {
                 email,
                 password,
                 billingID: customerInfo.id,
-                role: Roles.Customer,
+                role: Roles.CUSTOMER,
                 firstName,
                 lastName,
                 phoneNumber,
@@ -67,12 +66,8 @@ exports.register = async(req, res) => {
             })
 
             console.log(
-                `A new user signed up and addded to DB. The ID for ${email} is ${JSON.stringify(
-                    customerInfo
-                )}`
+                `A new user added to DB. The ID for ${customer.email} is ${customer.id}`
             )
-
-            console.log(`User also added to DB. Information from DB: ${customer}`)
 
             // req.session.user = email
             req.session.message = `Account Created.`
@@ -88,13 +83,13 @@ exports.register = async(req, res) => {
             // Set the message for alert. 
             req.session.message = message
             req.session.alertType = alertTypes.WarningAlert
-            res.redirect('/')
+            res.redirect('/login')
         }
     } catch (error) {
         console.error(error)
         req.session.message = error.message
         req.session.alertType = alertTypes.ErrorAlert
-        res.redirect('/')
+        res.redirect('/login')
     }
 }
 

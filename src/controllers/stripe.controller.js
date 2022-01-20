@@ -1,6 +1,6 @@
 const Stripe = require('../connect/stripe')
 const UserService = require('../collections/user')
-const Roles = require('../middleware/roles')
+const Roles = require('../config/roles')
 
 const productToPriceMap = {
     basic: process.env.PRODUCT_BASIC,
@@ -30,7 +30,7 @@ exports.webhook = async(req, res) => {
                     email: data.email,
                     password: 'Test1234', //TODO: optimize
                     billingID: data.id,
-                    role: Roles.Customer,
+                    role: Roles.CUSTOMER,
                     firstName: data.name.split(' ')[0],
                     lastName: data.name.split(' ')[1],
                     phoneNumber: data.phone,

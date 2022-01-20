@@ -1,7 +1,7 @@
 const UserService = require('../collections/user')
 const Stripe = require('../connect/stripe')
 const alertTypes = require('../helpers/alertTypes')
-const roles = require('../middleware/roles')
+const Roles = require('../config/roles')
 const bcrypt = require('bcrypt');
 
 // ------------------------------- CRUDS ------------------------------- 
@@ -17,8 +17,8 @@ exports.createUser = async(req, res) => {
     req.session.message = ''
     req.session.alertType = ''
 
-    if (roles)
-        selectRoles = Object.entries(roles)
+    if (Roles)
+        selectRoles = Object.entries(Roles)
 
     // const map = new Map(Object.entries(roles))
 
