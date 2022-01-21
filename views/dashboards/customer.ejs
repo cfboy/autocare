@@ -31,10 +31,10 @@
             <!-- partial -->
             <div class="container-fluid page-body-wrapper">
                 <!-- partial:partials/_settings-panel.html -->
-                <%- include('../partials/settings-panel.ejs'); %>
+                <%- include('../partials/settings-panel.ejs', {user, user}); %>
                     <!-- partial -->
                     <!-- partial:partials/_sidebar.html -->
-                    <%- include('../partials/sidebar.ejs'); %>
+                    <%- include('../partials/sidebar.ejs', {user, user}); %>
                         <!-- partial -->
                         <div class="main-panel">
                             <div class="content-wrapper">
@@ -75,7 +75,7 @@
                                                                                     <label for="<%=product.metadata.productKey%>"><%= product.name %> for <%= product.priceInfo[0].unit_amount%></label><br><br>
                                                                                     <% }; %>
 
-                                                                                        <button class="btn btn-info upgrade-btn" id="checkout-button" type="submit">Buy now</button>
+                                                                                        <button class="btn btn-primary upgrade-btn" id="checkout-button" type="submit">Buy now</button>
                                                                                         <% } else{ %>
                                                                                             <p class="lead">
                                                                                                 You are currently on the

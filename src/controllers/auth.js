@@ -72,6 +72,7 @@ exports.register = async(req, res) => {
             // req.session.user = email
             req.session.message = `Account Created.`
             req.session.alertType = alertTypes.CompletedActionAlert
+            req.flash('info', 'Account Created!');
             res.redirect('/account')
         } else {
             let message = `That email already exist, please login.`

@@ -30604,7 +30604,8 @@ div.tagsinput span.tag a {
 }
 
 .auth .brand-logo img {
-    width: 90px;
+    /* width: 90px; */
+    width: 100px !important;
 }
 
 .auth form .form-group {

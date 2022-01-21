@@ -67,7 +67,7 @@ const updateUser = (User) => async(id, updates) => {
         // updateOne is more quickly but not return the user.
     return await User.findByIdAndUpdate({ _id: id }, updates, function(err, doc) {
         if (err) {
-            console.error(err)
+            console.error(err.message)
         } else {
             console.debug("Updated : ", doc.email);
         }

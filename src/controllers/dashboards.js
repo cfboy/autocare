@@ -51,15 +51,5 @@ exports.account = async(req, res) => {
             default:
                 console.log('No ROLE detected.');
         }
-
-        // let products = await Stripe.getAllProducts()
-        // if (products) {
-        //     // Get price of all products.
-        //     for (const product of products) {
-        //         product.priceInfo = await Stripe.getProductPrice(product.id)
-        //     }
-        // }
-        // let users = await UserService.getUsers()
-        // res.render('dashboards/admin.ejs', { user, products, users, message, alertType })
     }
 }

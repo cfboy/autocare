@@ -95,15 +95,17 @@ exports.save = async(req, res) => {
 exports.viewUser = async(req, res) => {
     try {
         let { message, alertType } = req.session
+
         if (message) {
             req.session.message = ''
             req.session.alertType = ''
         }
         const id = req.params.id;
         const customer = await UserService.getUserById(id)
-
+        var isMyProfile = false
         if (customer) {
-            res.status(200).render('user/index.ejs', { user: req.user, customer, message, alertType })
+            isMyProfile = (req.user.id === customer.id)
+            res.status(200).render('user/index.ejs', { user: req.user, isMyProfile, customer, message, alertType })
         } else {
             console.log('Customer not found.')
             res.redirect('/account')
@@ -130,7 +132,7 @@ exports.editUser = async(req, res) => {
             res.status(200).render('user/edit.ejs', { user: req.user, customer, url: url == '/account' ? url : `${url}/${id}` })
         } else {
             console.log('User not found.')
-            res.redirect(`/${url}`)
+            res.redirect(`${url}`)
         }
     } catch (error) {
         req.session.message = error.message
@@ -160,18 +162,19 @@ exports.update = async(req, res) => {
                 // return res.status(404).send()
 
         } else {
+            req.flash('info', 'Update Completed.')
             req.session.message = `User updated ${user.email}`
             req.session.alertType = alertTypes.CompletedActionAlert
         }
         // res.status(201).send(user)
-        res.redirect(`/${url}`)
+        res.redirect(`${url}`)
 
 
     } catch (error) {
-        req.session.message = `Error trying to update user.`
+        req.session.message = error.message
         req.session.alertType = alertTypes.ErrorAlert
             // res.status(400).send(error)
-        res.redirect(`/${url}`)
+        res.redirect(`${url}`)
 
     }
 }

@@ -27,6 +27,7 @@ app.use(session({
     secret: process.env.SESSION_SECRET
 }))
 
+// Flash is an extension of connect-flash with the ability to define a flash message and render it without redirecting the request.
 app.use(flash())
 app.use(passport.initialize())
 app.use(passport.session())

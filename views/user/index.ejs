@@ -34,16 +34,22 @@
             <!-- partial -->
             <div class="container-fluid page-body-wrapper">
                 <!-- partial:partials/_sidebar.html -->
-                <%- include('../partials/sidebar.ejs'); %>
+                <%- include('../partials/sidebar.ejs' , {user, user}); %>
                     <!-- partial -->
                     <div class="main-panel">
                         <div class="content-wrapper">
-                            <h4>View User</h4>
+                            <h4>
+                                <%if(isMyProfile){%>
+                                    My Profile
+                                    <%}else{%>
+                                        View User
+                                        <%}%>
+                            </h4>
                             <% if(customer) {%>
                                 <div class="row text-left">
                                     <div class="col-lg-12 d-flex flex-column">
                                         <div class="row flex-grow">
-                                            <div class="col-6 grid-margin stretch-card">
+                                            <div class="col-8 grid-margin stretch-card">
                                                 <div class="card card-rounded">
                                                     <div class="card-body">
                                                         <div class="table-responsive mt-1">
@@ -67,6 +73,19 @@
                                                                         </td>
                                                                     </tr>
                                                                     <tr>
+                                                                        <td>Password</td>
+                                                                        <td id="password">
+                                                                            <!-- <%- customer.password%> -->
+                                                                            *********
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>Role</td>
+                                                                        <td>
+                                                                            <%- customer.role%>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
                                                                         <td>Name</td>
                                                                         <td>
                                                                             <%- customer.personalInfo.firstName + ' ' + customer.personalInfo.lastName %>
@@ -87,44 +106,6 @@
                                                                     </tr>
                                                                 </tbody>
                                                             </table>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-6 grid-margin stretch-card">
-                                                <div class="card card-rounded">
-                                                    <div class="card-body">
-                                                        <div class="table-responsive  mt-1">
-                                                            <table class="table table-hover">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th>Membership Information</th>
-                                                                        <th></th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    <tr>
-                                                                        <td>Plan</td>
-                                                                        <td>
-                                                                            <%- customer.membershipInfo.plan%>
-                                                                        </td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>End Date</td>
-                                                                        <td>
-                                                                            <%= moment(customer.membershipInfo.endDate).isValid() ? moment(customer.membershipInfo.endDate).utc().format(shortDateFormat) : 'N/A' %>
-                                                                        </td>
-                                                                    </tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-6 grid-margin stretch-card">
-                                                <div class="card card-rounded">
-                                                    <div class="card-body">
-                                                        <div class="table-responsive  mt-1">
                                                             <table class="table table-hover">
                                                                 <thead>
                                                                     <tr>
@@ -149,6 +130,38 @@
                                                                         <td>Plate</td>
                                                                         <td>
                                                                             <%- customer.carInfo.plate%>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+
+                                                            </table>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-4 grid-margin stretch-card">
+                                                <div class="card card-rounded">
+                                                    <div class="card-body">
+                                                        <div class="table-responsive  mt-1">
+                                                            <table class="table table-hover">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Membership Information</th>
+                                                                        <th></th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td>Plan</td>
+                                                                        <td>
+                                                                            <%- customer.membershipInfo.plan%>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>End Date</td>
+                                                                        <td>
+                                                                            <%= moment(customer.membershipInfo.endDate).isValid() ? moment(customer.membershipInfo.endDate).utc().format(shortDateFormat) : 'N/A' %>
                                                                         </td>
                                                                     </tr>
                                                                 </tbody>
