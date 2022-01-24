@@ -78,12 +78,12 @@
                                                                                         <button class="btn btn-primary upgrade-btn" id="checkout-button" type="submit">Buy now</button>
                                                                                         <% } else{ %>
                                                                                             <p class="lead">
-                                                                                                You are currently on the
-                                                                                                <%- user.membershipInfo.plan %> plan. %>
+                                                                                                You are currently on the <b>
+                                                                                                <%- user.membershipInfo.plan %></b> plan. %>
                                                                                             </p>
                                                                                             <% if (user.membershipInfo.hasTrial) { %>
                                                                                                 <p class="lead">Trial active until
-                                                                                                    <%- user.membershipInfo.endDate %>
+                                                                                                    <%= moment(user.membershipInfo.endDate).isValid() ? moment(user.membershipInfo.endDate).utc().format('MMMM DD, YYYY. h:mm:ss a') : 'N/A' %>
                                                                                                 </p>
                                                                                                 <% } else{ %>
                                                                                                     <p class="lead">
@@ -147,8 +147,9 @@
     <!-- endinject -->
     <!-- Custom js for this page-->
     <script>
-        var user = <%- JSON.stringify(user) %>;
-        console.debug(user);
+        // This variables is important for checkout and manage billing.
+        var customer = <%- JSON.stringify(user) %>;
+        console.debug(customer);
     </script>
     <script type="text/javascript" src="https://js.stripe.com/v3/"></script>
     <script type="text/javascript" src="./js/account.js"></script>

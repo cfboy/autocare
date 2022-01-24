@@ -8,7 +8,7 @@ const Stripe = stripe(process.env.STRIPE_SECRET_KEY, {
 const createCheckoutSession = async(customerID, price) => {
     const session = await Stripe.checkout.sessions.create({
         mode: 'subscription',
-        payment_method_types: ['card'],
+        payment_method_types: ['card', 'ach_credit_transfer'],
         customer: customerID,
         line_items: [{
             price,
@@ -28,7 +28,7 @@ const createCheckoutSession = async(customerID, price) => {
 const createBillingSession = async(customer) => {
     const session = await Stripe.billingPortal.sessions.create({
         customer,
-        return_url: 'http://localhost:4242/account'
+        return_url: `${process.env.DOMAIN}`
     })
     return session
 }
@@ -130,6 +130,40 @@ const getProductPrice = async(productID) => {
     return productPrices.data
 }
 
+const getProductInfoById = async(id) => {
+    try {
+        const product = await Stripe.products.retrieve(id)
+        console.debug(`STRIPE: Product ${id} Found`);
+
+        return product
+
+    } catch (error) {
+        console.debug(`ERROR-STRIPE: Product Not Found`);
+        console.debug(`ERROR-STRIPE: ${error.message}`);
+
+        return null
+    }
+}
+
+
+const getCustomerSubscription = async(customerID) => {
+    try {
+        console.debug(`STRIPE: getCustomerSubscription(${customerID})`);
+        const subscription = await Stripe.subscriptions.list({
+            customer: customerID,
+            limit: 3
+        });
+        console.debug(`STRIPE: Subscription Found`);
+
+        return subscription
+    } catch (error) {
+        console.debug(`ERROR-STRIPE: Stripe Subscription Not Found`);
+        console.debug(`ERROR-STRIPE: ${error.message}`);
+
+        return null
+    }
+}
+
 module.exports = {
     getCustomerByID,
     getCustomerByEmail,
@@ -139,5 +173,7 @@ module.exports = {
     createWebhook,
     getAllProducts,
     getAllPrices,
-    getProductPrice
+    getProductPrice,
+    getProductInfoById,
+    getCustomerSubscription
 }

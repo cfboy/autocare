@@ -2,10 +2,11 @@
 require('./src/connect/mongodb') //Connection to MongoDB
 
 // Controllers
-const stripeController = require('./src/controllers/stripe.controller')
-const auth = require('./src/controllers/auth')
-const userController = require('./src/controllers/user')
-const dashboards = require('./src/controllers/dashboards')
+const stripeController = require('./src/controllers/stripeController')
+const authController = require('./src/controllers/authController')
+const userController = require('./src/controllers/userController')
+const locationController = require('./src/controllers/locationController')
+const dashboardsController = require('./src/controllers/dashboardsController')
 
 // Express
 const express = require('express');
@@ -38,14 +39,14 @@ router.get('/login', checkNotAuthenticated, (req, res) => {
     res.render('auth/login.ejs', { message, email, alertType })
 })
 
-router.post('/login', checkNotAuthenticated, auth.login)
+router.post('/login', checkNotAuthenticated, authController.login)
 
 router.get('/create-account', checkNotAuthenticated, (req, res) => {
     res.render('auth/register.ejs')
 })
 
-router.post('/register', checkNotAuthenticated, auth.register)
-router.delete('/logout', checkAuthenticated, auth.logout)
+router.post('/register', checkNotAuthenticated, authController.register)
+router.delete('/logout', checkAuthenticated, authController.logout)
 
 //------ User Routes ------
 router.get('/create-user', checkAuthenticated, userController.createUser)
@@ -58,21 +59,32 @@ router.post('/edit-user', checkAuthenticated, userController.update)
 router.get('/delete-user/:id', checkAuthenticated, userController.delete)
 
 
+//------ Location Routes ------
+router.get('/locations', checkAuthenticated, locationController.locations)
+router.get('/create-location', checkAuthenticated, locationController.createLocation)
+router.get('/view-location/:id', checkAuthenticated, locationController.viewLocation)
+router.get('/edit-location/:id', checkAuthenticated, locationController.editLocation)
+
+//------ Location CRUDS ------
+router.post('/create-location', checkAuthenticated, locationController.save)
+router.post('/edit-location', checkAuthenticated, locationController.update)
+router.get('/delete-location/:id', checkAuthenticated, locationController.delete)
+
 //------ Dashboard Routes ------
-router.get('/account', checkAuthenticated, dashboards.account)
+router.get('/account', checkAuthenticated, dashboardsController.account)
 
 // ---------------------------------------
 
 //------ Stripe and Payment Routes ------
 router.post('/webhook', stripeController.webhook)
 
-router.post('/checkout', setCurrentUser, stripeController.checkout)
+router.post('/checkout', checkAuthenticated, stripeController.checkout)
 
-router.post('/billing', setCurrentUser, stripeController.billing)
+router.post('/billing', checkAuthenticated, stripeController.billing)
 
 // ---------------------------------------
 
-router.get('/none', [setCurrentUser, hasPlan('none')], async function(
+router.get('/none', [checkAuthenticated, hasPlan('none')], async function(
     req,
     res,
     next
@@ -80,7 +92,7 @@ router.get('/none', [setCurrentUser, hasPlan('none')], async function(
     res.status(200).render('none.ejs')
 })
 
-router.get('/basic', [setCurrentUser, hasPlan('basic')], async function(
+router.get('/basic', [checkAuthenticated, hasPlan('basic')], async function(
     req,
     res,
     next
@@ -88,7 +100,7 @@ router.get('/basic', [setCurrentUser, hasPlan('basic')], async function(
     res.status(200).render('basic.ejs')
 })
 
-router.get('/pro', [setCurrentUser, hasPlan('pro')], async function(
+router.get('/pro', [checkAuthenticated, hasPlan('pro')], async function(
     req,
     res,
     next

@@ -25,24 +25,24 @@ exports.webhook = async(req, res) => {
     switch (event.type) {
         case 'customer.created':
             console.log(JSON.stringify(data))
-            if (data) {
-                let user = await UserService.addUser({
-                    email: data.email,
-                    password: 'Test1234', //TODO: optimize
-                    billingID: data.id,
-                    role: Roles.CUSTOMER,
-                    firstName: data.name.split(' ')[0],
-                    lastName: data.name.split(' ')[1],
-                    phoneNumber: data.phone,
-                    dateOfBirth: null,
-                    city: data.address ? data.address.city : null,
-                    brand: null,
-                    model: null,
-                    plate: null,
-                    plan: 'none',
-                    endDate: null
-                })
-            }
+                // if (data) {
+                //     let user = await UserService.addUser({
+                //         email: data.email,
+                //         password: 'Test1234', //TODO: optimize
+                //         billingID: data.id,
+                //         role: Roles.CUSTOMER,
+                //         firstName: data.name.split(' ')[0],
+                //         lastName: data.name.split(' ')[1],
+                //         phoneNumber: data.phone,
+                //         dateOfBirth: null,
+                //         city: data.address ? data.address.city : null,
+                //         brand: null,
+                //         model: null,
+                //         plate: null,
+                //         plan: 'none',
+                //         endDate: null
+                //     })
+                // }
             break
         case 'customer.deleted':
             break
@@ -104,10 +104,10 @@ exports.webhook = async(req, res) => {
                     user.membershipInfo.hasTrial = false
                     user.membershipInfo.endDate = null
                 }
-                console.log('actual', user.membershipInfo.hasTrial, data.current_period_end, user.membershipInfo.plan)
+                console.debug(`Actual: hasTrial: ${user.membershipInfo.hasTrial}, current_period_end ${data.current_period_end}, User Plan: ${user.membershipInfo.plan}`)
 
                 await user.save()
-                console.log('customer changed', JSON.stringify(data))
+                console.log('Customer Changed', JSON.stringify(data))
                 break
             }
         case 'customer.subscription.deleted':
@@ -125,7 +125,7 @@ exports.checkout = async(req, res) => {
 
     try {
         const session = await Stripe.createCheckoutSession(customerID, price)
-
+            // TODO: change this logic
         const ms =
             new Date().getTime() + 1000 * 60 * 60 * 24 * process.env.TRIAL_DAYS
         const n = new Date(ms)
