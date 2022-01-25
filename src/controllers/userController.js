@@ -8,6 +8,33 @@ const bcrypt = require('bcrypt');
 
 
 // ------------------------------- Create -------------------------------
+exports.users = async(req, res) => {
+    // Message for alerts
+    let { message, alertType } = req.session
+
+    // clear message y alertType
+    if (message) {
+        req.session.message = ''
+        req.session.alertType = ''
+    }
+    // Passport store the user in req.user
+    let user = req.user
+
+    if (!user) {
+        res.redirect('/')
+    } else {
+        let users
+        if (user.role == Roles.MANAGER)
+            users = await UserService.getUsersPerRole(req, Roles.CUSTOMER)
+        else
+        if (user.role == Roles.ADMIN)
+            users = await UserService.getUsers(req)
+
+
+        res.render('user/index.ejs', { user, users, message, alertType })
+
+    }
+}
 
 // Route for create user.
 exports.createUser = async(req, res) => {
@@ -16,13 +43,20 @@ exports.createUser = async(req, res) => {
         // clear message y alertType
     req.session.message = ''
     req.session.alertType = ''
+    const isAdmin = req.user === Roles.ADMIN
 
-    if (Roles)
-        selectRoles = Object.entries(Roles)
+    if (Roles) {
+        if (isAdmin)
+            selectRoles = Object.entries(Roles)
+        else {
+            // If User Role is not ADMIN, then the only users they can create are Customers.
+            const { CUSTOMER } = Roles
+            const subset = { CUSTOMER }
+            selectRoles = Object.entries(subset)
+        }
 
-    // const map = new Map(Object.entries(roles))
-
-    res.render('user/create.ejs', { user: req.user, message, alertType, selectRoles })
+        res.render('user/create.ejs', { user: req.user, message, alertType, selectRoles })
+    }
 }
 
 // TODO: Test this method. NOT FINISHED
@@ -70,7 +104,7 @@ exports.save = async(req, res) => {
             req.session.message = `User Created ${user.email}.`
             req.session.alertType = alertTypes.CompletedActionAlert
 
-            res.redirect('/account')
+            res.redirect('/users')
 
         } else {
             let message = `That email ${user.email} already exist.`
@@ -105,10 +139,10 @@ exports.viewUser = async(req, res) => {
         var isMyProfile = false
         if (customer) {
             isMyProfile = (req.user.id === customer.id)
-            res.status(200).render('user/index.ejs', { user: req.user, isMyProfile, customer, message, alertType })
+            res.status(200).render('user/view.ejs', { user: req.user, isMyProfile, customer, message, alertType })
         } else {
             console.log('Customer not found.')
-            res.redirect('/account')
+            res.redirect('/users')
         }
     } catch (error) {
         req.session.message = error.message
@@ -129,7 +163,10 @@ exports.editUser = async(req, res) => {
         const customer = await UserService.getUserById(id)
 
         if (customer) {
-            res.status(200).render('user/edit.ejs', { user: req.user, customer, url: url == '/account' ? url : `${url}/${id}` })
+            if (Roles)
+                selectRoles = Object.entries(Roles)
+
+            res.status(200).render('user/edit.ejs', { user: req.user, customer, selectRoles, url: url == '/users' ? url : `${url}/${id}` })
         } else {
             console.log('User not found.')
             res.redirect(`${url}`)

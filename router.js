@@ -17,7 +17,8 @@ const setCurrentUser = require('./src/middleware/setCurrentUser')
 const checkAuthenticated = require('./src/middleware/checkAuthenticated')
 const checkNotAuthenticated = require('./src/middleware/checkNotAuthenticated')
 const hasPlan = require('./src/middleware/hasPlan')
-
+const authDeleteLocation = require('./src/middleware/authDeleteLocation')
+const authDeleteUser = require('./src/middleware/authDeleteUser')
 
 // Main Route
 router.get('/', checkAuthenticated, (req, res) => {
@@ -49,6 +50,7 @@ router.post('/register', checkNotAuthenticated, authController.register)
 router.delete('/logout', checkAuthenticated, authController.logout)
 
 //------ User Routes ------
+router.get('/users', checkAuthenticated, userController.users)
 router.get('/create-user', checkAuthenticated, userController.createUser)
 router.get('/view-user/:id', checkAuthenticated, userController.viewUser)
 router.get('/edit-user/:id', checkAuthenticated, userController.editUser)
@@ -56,7 +58,7 @@ router.get('/edit-user/:id', checkAuthenticated, userController.editUser)
 //------ USER CRUDS ------
 router.post('/create-user', checkAuthenticated, userController.save)
 router.post('/edit-user', checkAuthenticated, userController.update)
-router.get('/delete-user/:id', checkAuthenticated, userController.delete)
+router.get('/delete-user/:id', checkAuthenticated, authDeleteUser, userController.delete)
 
 
 //------ Location Routes ------
@@ -68,7 +70,7 @@ router.get('/edit-location/:id', checkAuthenticated, locationController.editLoca
 //------ Location CRUDS ------
 router.post('/create-location', checkAuthenticated, locationController.save)
 router.post('/edit-location', checkAuthenticated, locationController.update)
-router.get('/delete-location/:id', checkAuthenticated, locationController.delete)
+router.get('/delete-location/:id', checkAuthenticated, authDeleteLocation, locationController.delete)
 
 //------ Dashboard Routes ------
 router.get('/account', checkAuthenticated, dashboardsController.account)
@@ -107,6 +109,13 @@ router.get('/pro', [checkAuthenticated, hasPlan('pro')], async function(
 ) {
     res.status(200).render('pro.ejs')
 })
+
+// The last route for not found pages.
+router.get('*', (req, res) =>
+    // res.send('Page Not found 404')
+    res.status(404).redirect('/account')
+
+);
 
 
 module.exports = router;

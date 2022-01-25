@@ -24964,7 +24964,7 @@ select.tt-hint {
     padding: .4375rem .75rem;
     border: 0;
     outline: 1px solid #dee2e6;
-    color: #c9c8c8;
+    color: black;
 }
 
 select.form-control:focus,
@@ -29980,7 +29980,7 @@ table.dataTable tbody td.select-checkbox:after {
 }
 
 .select2-container--default .select2-selection--multiple .select2-selection__choice {
-    color: color(white);
+    color: white;
     border: 0;
     border-radius: 3px;
     padding: 6px;
@@ -29990,7 +29990,7 @@ table.dataTable tbody td.select-checkbox:after {
 }
 
 .select2-container--default .select2-selection--multiple .select2-selection__choice .select2-selection__choice__remove {
-    color: color(white);
+    color: white;
 }
 
 .select2-container--default .select2-selection--multiple .select2-selection__choice:nth-child(5n+1) {

@@ -43,10 +43,19 @@ exports.account = async(req, res) => {
                         }
                     }
                 }
-                // users = await UserService.getUsers()
                 res.render('dashboards/customer.ejs', { user, products, message, alertType })
                 break;
             case Roles.MANAGER:
+                products = await Stripe.getAllProducts()
+                if (products) {
+                    // Get price of all products.
+                    for (const product of products) {
+                        product.priceInfo = await Stripe.getProductPrice(product.id)
+                    }
+                }
+                // Get Customers
+                users = await UserService.getUsersPerRole(Roles.CUSTOMER)
+                res.render('dashboards/admin.ejs', { user, products, users, message, alertType })
                 break;
             default:
                 console.log('No ROLE detected.');

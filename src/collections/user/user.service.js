@@ -46,18 +46,6 @@ const addUser = (User) => async({
 
     // TODO: handle errors and return the doc.
     return await user.save()
-        // .then((doc) => {
-        //         // If everything goes as planed
-        //         //use the retured user document for something
-        //         console.log("User Added: " + doc.email);
-        //         return doc
-        //             //  res.redirect("/");
-        //     })
-        //     .catch((error) => {
-        //         //When there are errors We handle them here
-        //         console.error(error);
-        //         // res.send(400, "Bad Request");
-        //     });
 }
 
 // TODO: Finish this
@@ -88,12 +76,12 @@ const deleteUser = (User) => (id) => {
 }
 
 // Get All users from User Collection.
-const getUsers = (User) => () => {
-    return User.find({})
+const getUsers = (User) => (req) => {
+    return User.find({ _id: { $ne: req.user.id } })
 }
 
 // Get All users from User Collection.
-const getUsersPerRole = (User) => (role) => {
+const getUsersPerRole = (User) => (req, role) => {
     return User.find({ role: role })
 }
 
