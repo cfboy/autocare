@@ -13,7 +13,7 @@ const express = require('express');
 const router = express.Router();
 
 // Middleware helpers
-const setCurrentUser = require('./src/middleware/setCurrentUser')
+// const setCurrentUser = require('./src/middleware/setCurrentUser')
 const checkAuthenticated = require('./src/middleware/checkAuthenticated')
 const checkNotAuthenticated = require('./src/middleware/checkNotAuthenticated')
 const hasPlan = require('./src/middleware/hasPlan')
@@ -110,12 +110,14 @@ router.get('/pro', [checkAuthenticated, hasPlan('pro')], async function(
     res.status(200).render('pro.ejs')
 })
 
-// The last route for not found pages.
-router.get('*', (req, res) =>
-    // res.send('Page Not found 404')
-    res.status(404).redirect('/account')
+if (process.env.NODE_ENV !== 'production') {
+    // The last route for not found pages.
+    router.get('*', (req, res) =>
+        // res.send('Page Not found 404')
+        res.status(404).redirect('/account')
 
-);
+    );
+}
 
 
 module.exports = router;

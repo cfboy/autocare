@@ -4,7 +4,7 @@ $(document).ready(function() {
     const stripe = Stripe(
         publishableKey)
     const checkoutButton = $('#checkout-button')
-    const manageBillingButton = $('#manage-billing-button')
+    const manageBillingButton = $('.manage-billing-button')
 
     checkoutButton.click(function() {
         const product = $("input[name='product']:checked").val()
@@ -43,9 +43,4 @@ $(document).ready(function() {
             .then((result) => window.location.replace(result.url))
             .catch((error) => console.log('error', error))
     })
-
-    function manageBilling(billingID, email) {
-        alert('billingID:' + billingID);
-        alert('email: ' + email)
-    }
 })

@@ -62,6 +62,13 @@
                                                                             <% }%>
                                                                         </select>
                                                                     </div>
+                                                                    <div class="form-check form-check-flat form-check-primary">
+                                                                        <label class="form-check-label">
+                                                                            <% var checked = (location.isActive) ? "checked" : "";   %>
+
+                                                                          <input name="isActive" type="checkbox" class="form-check-input" <%= checked%>>Active
+                                                                        <i class="input-helper"></i></label>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                             <div class="row">

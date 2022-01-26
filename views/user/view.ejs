@@ -14,7 +14,8 @@
     <link rel="stylesheet" href="../vendors/simple-line-icons/css/simple-line-icons.css">
     <link rel="stylesheet" href="../vendors/css/vendor.bundle.base.css">
     <link rel="stylesheet" href="../../css/register.css">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA==" crossorigin="anonymous" referrerpolicy="no-referrer"
+    />
     <!-- endinject -->
     <!-- Plugin css for this page -->
     <link rel="stylesheet" href="../vendors/datatables.net-bs4/dataTables.bootstrap4.css">
@@ -145,11 +146,16 @@
                                                     <div class="card card-rounded">
                                                         <div class="card-body">
                                                             <div class="table-responsive  mt-1">
+                                                                <div class="d-sm-flex justify-content-between align-items-start float-end">
+                                                                    <a id="manage-billing-button" class="btn btn-primary btn-icon-text" style="margin: 0;" type="submit" value="<%- customer.billingID%>" email="<%- customer.email%>">
+                                                                        <i class="fab fa-stripe-s"></i> Manage Billing</a>
+                                                                </div>
                                                                 <table class="table table-hover">
                                                                     <thead>
                                                                         <tr>
                                                                             <th>Membership Information</th>
-                                                                            <th></th>
+                                                                            <th>
+                                                                            </th>
                                                                         </tr>
                                                                     </thead>
                                                                     <tbody>

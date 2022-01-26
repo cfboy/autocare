@@ -141,6 +141,9 @@ exports.update = async(req, res) => {
 
     const url = req.query.url
     try {
+        // Handle checkbox value.
+        req.body.isActive = req.body.isActive == 'on' ? true : false
+
         const location = await LocationService.updateLocation(req.body.id, req.body)
 
         if (!location) {
