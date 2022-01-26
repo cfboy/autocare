@@ -30,7 +30,7 @@ exports.account = async(req, res) => {
                     }
                 }
                 // Get Customers
-                users = await UserService.getUsersPerRole(Roles.CUSTOMER)
+                users = await UserService.getUsersPerRole(req, Roles.CUSTOMER)
                 res.render('dashboards/admin.ejs', { user, products, users, message, alertType })
                 break;
             case Roles.CUSTOMER:
@@ -54,7 +54,7 @@ exports.account = async(req, res) => {
                     }
                 }
                 // Get Customers
-                users = await UserService.getUsersPerRole(Roles.CUSTOMER)
+                users = await UserService.getUsersPerRole(req, Roles.CUSTOMER)
                 res.render('dashboards/admin.ejs', { user, products, users, message, alertType })
                 break;
             default:

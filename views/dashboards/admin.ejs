@@ -120,6 +120,13 @@
                                                                                                     <a href="/edit-user/<%- user.id%>?url=/account" type="button" class="btn btn-icon btn-icon-no-border no-margin">
                                                                                                         <i class="mdi mdi-square-edit-outline icon-md"></i>
                                                                                                     </a>
+                                                                                                    <!-- <a id="manage-billing-button" class="btn btn-icon btn-icon-no-border no-margin">
+                                                                                                        
+                                                                                                        <i class="fab fa-stripe"></i>
+                                                                                                    </a> -->
+                                                                                                    <button class="btn btn-outline-primary" style="margin: 0;" id="manage-billing-button" type="submit" value="<%- user.billingID%>" email="<%- user.email%>">
+                                                                                                        Manage Billing
+                                                                                                    </button>
                                                                                                     <a id="deleteBtn" href="/delete-user/<%- user.id%>" class="btn btn-icon btn-icon-no-border no-margin">
                                                                                                         <i class="mdi mdi-delete icon-md text-danger"></i>
                                                                                                     </a>

@@ -43,7 +43,7 @@ exports.createUser = async(req, res) => {
         // clear message y alertType
     req.session.message = ''
     req.session.alertType = ''
-    const isAdmin = req.user === Roles.ADMIN
+    const isAdmin = req.user.role === Roles.ADMIN
 
     if (Roles) {
         if (isAdmin)

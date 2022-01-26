@@ -102,7 +102,7 @@
                                                                                                         <p class="mt-4 text-muted">
                                                                                                             Not happy with your current plan? Cancel or Upgrade by clicking the button below.
                                                                                                         </p>
-                                                                                                        <button class="btn btn-primary btn-lg text-white mb-0 me-0" id="manage-billing-button" type="submit">Manage Billing</button>
+                                                                                                        <button class="btn btn-primary btn-lg text-white mb-0 me-0" id="manage-billing-button" type="submit" value="<%- user.billingID%>" email="<%- user.email%>">Manage Billing</button>
                                                                                                         <% } %>
                                                                         </div>
                                                                     </div>
@@ -146,10 +146,10 @@
     <script src="./js/todolist.js"></script>
     <!-- endinject -->
     <!-- Custom js for this page-->
-    <script>
+    <!-- <script>
         // This variables is important for checkout and manage billing.
-        var customer = <%- JSON.stringify(user) %>;
-        console.debug(customer);
+        var customer = <%# JSON.stringify(user) %>;
+        console.debug(customer); -->
     </script>
     <script type="text/javascript" src="https://js.stripe.com/v3/"></script>
     <script type="text/javascript" src="./js/account.js"></script>

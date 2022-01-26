@@ -25,14 +25,16 @@ $(document).ready(function() {
     })
 
     manageBillingButton.click(function() {
+        const billingID = $(this).attr("value");
+        const email = $(this).attr("email");
         const requestOptions = {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                email: customer.email
+                email: email
             },
             body: JSON.stringify({
-                customer: customer.billingID
+                customer: billingID
             })
         }
 
@@ -41,4 +43,9 @@ $(document).ready(function() {
             .then((result) => window.location.replace(result.url))
             .catch((error) => console.log('error', error))
     })
+
+    function manageBilling(billingID, email) {
+        alert('billingID:' + billingID);
+        alert('email: ' + email)
+    }
 })
