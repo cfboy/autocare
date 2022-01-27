@@ -1,19 +1,20 @@
 if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config() //Loads environment variables from .env file into the process
 }
-const bodyParser = require('body-parser')
-const express = require('express')
-const session = require('express-session')
-var MemoryStore = require('memorystore')(session)
-var path = require('path');
-var router = require('./router');
-var moment = require('moment');
-const formats = require('./src/helpers/formats')
-const alertTypes = require('./src/helpers/alertTypes')
-const Roles = require('./src/config/roles')
-const passport = require('passport')
-const flash = require('express-flash')
-const methodOverride = require('method-override')
+const bodyParser = require('body-parser'),
+    express = require('express'),
+    session = require('express-session'),
+    flash = require('express-flash'),
+    methodOverride = require('method-override'),
+    lingua = require('lingua'),
+    formats = require('./src/helpers/formats'),
+    alertTypes = require('./src/helpers/alertTypes'),
+    Roles = require('./src/config/roles'),
+    passport = require('passport');
+
+var MemoryStore = require('memorystore')(session),
+    router = require('./router'),
+    moment = require('moment');
 
 const app = express()
 
@@ -29,9 +30,14 @@ app.use(session({
 
 // Flash is an extension of connect-flash with the ability to define a flash message and render it without redirecting the request.
 app.use(flash())
+
+// Passport handle authentication.
 app.use(passport.initialize())
 app.use(passport.session())
+
+// methodOverride is to use DELETE method on router.
 app.use(methodOverride('_method'))
+
 app.use('/webhook', bodyParser.raw({ type: 'application/json' }))
 
 app.use(bodyParser.json())
@@ -47,6 +53,21 @@ app.locals.shortDateFormat = formats.shortDateFormat
 // Pass all available alertTypes to the app variable.
 app.locals.alertTypes = alertTypes //To use this on the client side is necessary to use JSON.stringify
 app.locals.roles = Roles
+
+// Lingua configuration
+app.use(lingua(app, {
+    defaultLocale: 'es',
+    path: __dirname + '/languages',
+    storageKey: 'lang', // http://domain.tld/?lang=de
+    cookieOptions: {
+        // domain: '.domain.tld', // to allow subdomains access to the same cookie, for instance
+        // path: '/blog', // to restrict the language cookie to a path
+        httpOnly: false, // if you need access to this cookie from javascript on the client
+        expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // expire in 1 day instead of 1 year
+        // secure: true // for serving over https
+    }
+}));
+
 app.use('/', router);
 
 const port = process.env.PORT || 4242

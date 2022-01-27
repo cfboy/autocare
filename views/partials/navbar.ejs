@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="../../vendors/flag-icon-css/css/flag-icon.min.css">
+
 <nav class="navbar default-layout col-lg-12 col-12 p-0 fixed-top d-flex align-items-top flex-row">
     <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-start">
         <div class="me-3">
@@ -52,7 +54,6 @@
         </ul>
         <ul class="navbar-nav ms-auto">
             <%if([roles.ADMIN].includes(user.role)) {%>
-
                 <li class="nav-item dropdown d-none d-lg-block">
                     <a class="nav-link dropdown-bordered dropdown-toggle dropdown-toggle-split" id="messageDropdown" href="#" data-bs-toggle="dropdown" aria-expanded="false"> Select Category </a>
                     <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list pb-0" aria-labelledby="messageDropdown">
@@ -175,6 +176,20 @@
                                 <p class="preview-subject ellipsis font-weight-medium text-dark">Travis Jenkins </p>
                                 <p class="fw-light small-text mb-0"> The meeting is cancelled </p>
                             </div>
+                        </a>
+                    </div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link count-indicator" id="languageDropdown" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="icon-globe"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list pb-0" aria-labelledby="languageDropdown">
+                        <a href="?lang=es" class="dropdown-item dropdown-item py-3">
+
+                            ES <span class="flag-icon flag-icon-pr" style="margin-left: 5px;"></span>
+                        </a>
+                        <a href="?lang=en" class="dropdown-item dropdown-item py-3">
+                            EN <span class="flag-icon flag-icon-um" style="margin-left: 5px;"></span>
                         </a>
                     </div>
                 </li>
