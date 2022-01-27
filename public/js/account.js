@@ -8,16 +8,18 @@ $(document).ready(function() {
 
     checkoutButton.click(function() {
         const product = $("input[name='product']:checked").val()
+        const billingID = $(this).attr("value");
+        const email = $(this).attr("email");
 
         fetch('/checkout', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'email': customer.email
+                    'email': email
                 },
                 body: JSON.stringify({
                     product,
-                    customerID: customer.billingID
+                    customerID: billingID
                 })
             })
             .then((result) => result.json())

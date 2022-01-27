@@ -8,7 +8,7 @@ const Stripe = stripe(process.env.STRIPE_SECRET_KEY, {
 const createCheckoutSession = async(customerID, price) => {
     const session = await Stripe.checkout.sessions.create({
         mode: 'subscription',
-        payment_method_types: ['card', 'ach_credit_transfer'],
+        payment_method_types: ['card'],
         customer: customerID,
         line_items: [{
             price,

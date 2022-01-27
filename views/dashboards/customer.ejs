@@ -75,7 +75,7 @@
                                                                                     <label for="<%=product.metadata.productKey%>"><%= product.name %> for <%= product.priceInfo[0].unit_amount%></label><br><br>
                                                                                     <% }; %>
 
-                                                                                        <button class="btn btn-primary upgrade-btn" id="checkout-button" type="submit">Buy now</button>
+                                                                                        <button class="btn btn-primary upgrade-btn" id="checkout-button" type="submit" value="<%- user.billingID%>" email="<%- user.email%>">Buy now</button>
                                                                                         <% } else{ %>
                                                                                             <p class="lead">
                                                                                                 You are currently on the <b>
