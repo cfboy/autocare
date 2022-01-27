@@ -30,7 +30,7 @@
     <link rel="shortcut icon" href="../images/favicon.png" />
 </head>
 
-<body class="sidebar-icon-only">
+<body>
     <div class="container-scroller">
         <!-- partial:partials/_navbar.html -->
         <%- include('../partials/navbar.ejs' , {user, user}); %>
@@ -81,10 +81,10 @@
                                                                         </td>
                                                                         <td>
                                                                             <a href="/edit-location/<%- location.id%>?url=/locations" type="button" class="btn btn-icon btn-icon-no-border no-margin">
-                                                                                <i class="mdi mdi-square-edit-outline icon-md"></i>
+                                                                                <i class="far fa-edit icon-sm"></i>
                                                                             </a>
                                                                             <a id="deleteBtn" onclick="return confirmDelete('/delete-location', '<%- location.id%>')" class="btn btn-icon btn-icon-no-border no-margin">
-                                                                                <i class="mdi mdi-delete icon-md text-danger"></i>
+                                                                                <i class="fas fa-trash-alt icon-sm text-danger"></i>
                                                                             </a>
                                                                         </td>
                                                                     </tr>
