@@ -1,0 +1,11 @@
+{
+    "title": "Portal de Subscripciones",
+    "login": "Entrar",
+    "register": "Registrar",
+    "dontHaveAccount": "No tiene una cuenta?",
+    "create": "Crear",
+    "selectLanguage": "Seleccionar Lenguaje",
+    "content": {
+        "description": "Descripción"
+    }
+}

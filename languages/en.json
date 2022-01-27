@@ -1,0 +1,11 @@
+{
+    "title": "Subscriptions Portal",
+    "login": "Login",
+    "register": "Register",
+    "dontHaveAccount": "Don't have an account?",
+    "create": "Create",
+    "selectLanguage": "Select Language",
+    "content": {
+        "description": "A little description."
+    }
+}
