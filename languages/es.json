@@ -5,6 +5,26 @@
     "register": "Registrar",
     "dontHaveAccount": "No tiene una cuenta?",
     "create": "Crear",
+    "members": "Miembros",
+    "add": "Añadir",
+    "name": "Nombre",
+    "lastName": "Apellido",
+    "phoneNumber": "Teléfono",
+    "email": "Correo Electrónico",
+    "password": "Contraseña",
+    "dateOfBirth": "Fecha de Nacimiento",
+    "plan": "Plan",
+    "action": "Acción",
+    "membership": {
+        "notPlan": "Actualmente no estás en ningún plan. Compre una suscripción a continuación.",
+        "notHappy": "¿No estás satisfecho con tu plan actual? Cancele o actualice haciendo clic en el botón a continuación."
+    },
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "search": "Buscar",
+    "emptyTable": "No hay información disponible para esta tabla.",
+    "infoNotEmpty": "Mostrando _START_ a _END_ de _TOTAL_ entradas",
+    "infoEmpty": "Mostrando 0 a 0 de 0 entradas",
     "selectLanguage": "Seleccionar Lenguaje",
     "content": {
         "description": "Descripción"

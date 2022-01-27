@@ -79,10 +79,12 @@
                                                                         <div class="card-body">
                                                                             <div class="d-sm-flex justify-content-between align-items-start">
                                                                                 <div>
-                                                                                    <h4 class="card-title card-title-dash">Members</h4>
+                                                                                    <h4 class="card-title card-title-dash">
+                                                                                        <%= lingua.members%>
+                                                                                    </h4>
                                                                                 </div>
                                                                                 <div>
-                                                                                    <a href="/create-user" class="btn btn-primary btn-lg text-white mb-0 me-0" type="button"><i class="mdi mdi-account-plus"></i>Add new member</a>
+                                                                                    <a href="/create-user" class="btn btn-primary btn-lg text-white mb-0 me-0" type="button"><i class="mdi mdi-account-plus"></i><%= lingua.add%></a>
                                                                                 </div>
                                                                             </div>
                                                                             <br>
@@ -90,13 +92,23 @@
                                                                                 <table id="membersTable" class="table table-hover">
                                                                                     <thead>
                                                                                         <tr>
-                                                                                            <th>Name</th>
-                                                                                            <th>Phone</th>
-                                                                                            <th>Email</th>
-                                                                                            <th>Plan</th>
+                                                                                            <th>
+                                                                                                <%= lingua.name%>
+                                                                                            </th>
+                                                                                            <th>
+                                                                                                <%= lingua.phoneNumber%>
+                                                                                            </th>
+                                                                                            <th>
+                                                                                                <%= lingua.email%>
+                                                                                            </th>
+                                                                                            <th>
+                                                                                                <%= lingua.plan%>
+                                                                                            </th>
                                                                                             <!-- <th>Expiration Date <br> <small>(MM/DD/YYYY)</small>
                                                                                             </th> -->
-                                                                                            <th>Action</th>
+                                                                                            <th>
+                                                                                                <%= lingua.action%>
+                                                                                            </th>
                                                                                         </tr>
                                                                                     </thead>
                                                                                     <tbody>
@@ -159,7 +171,7 @@
                                                                         <div class="card-body">
                                                                             <%if (user.membershipInfo.plan=="none" ) { %>
                                                                                 <p class="lead">
-                                                                                    You are currently not on any plan. Purchase a subscription below.
+                                                                                    <%= lingua.membership.notPlan%>
                                                                                 </p>
                                                                                 <br>
                                                                                 <% for(const product of products) { %>
@@ -194,7 +206,7 @@
                                                                                                         </ul>
                                                                                                         <hr />
                                                                                                         <p class="mt-4 text-muted">
-                                                                                                            Not happy with your current plan? Cancel or Upgrade by clicking the button below.
+                                                                                                            <%= lingua.membership.notHappy%>
                                                                                                         </p>
                                                                                                         <button class="btn btn-primary btn-lg text-white mb-0 me-0" id="manage-billing-button" type="submit">Manage Billing</button>
                                                                                                         <% } %>
@@ -260,7 +272,27 @@
 
         <script>
             $(document).ready(function() {
-                $('#membersTable').DataTable();
+                $('#membersTable').DataTable({
+                    "language": {
+                        "emptyTable": "<%= lingua.emptyTable%>",
+                        "info": "<%= lingua.infoNotEmpty%>",
+                        "infoEmpty": "<%= lingua.infoEmpty%>",
+                        "infoFiltered": "(filtered from _MAX_ total entries)",
+                        "infoPostFix": "",
+                        "thousands": ",",
+                        "lengthMenu": "Show _MENU_ entries",
+                        "loadingRecords": "Loading...",
+                        "processing": "Processing...",
+                        "search": "<%= lingua.search%>:",
+                        "zeroRecords": "No matching records found",
+                        "paginate": {
+                            "first": "First",
+                            "last": "Last",
+                            "next": "<%= lingua.next%>",
+                            "previous": "<%= lingua.previous%>"
+                        },
+                    }
+                });
             });
         </script>
 </body>
