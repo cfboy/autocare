@@ -1,4 +1,3 @@
-const UserService = require('../collections/user')
 const HistoryService = require('../collections/history')
 const Stripe = require('../connect/stripe')
 const alertTypes = require('../helpers/alertTypes')
@@ -9,7 +8,7 @@ const bcrypt = require('bcrypt');
 
 
 // ------------------------------- Create -------------------------------
-exports.users = async(req, res) => {
+exports.history = async(req, res) => {
     // Message for alerts
     let { message, alertType } = req.session
 
@@ -24,39 +23,10 @@ exports.users = async(req, res) => {
     if (!user) {
         res.redirect('/')
     } else {
-        let users
-        if (user.role == Roles.MANAGER)
-            users = await UserService.getUsersPerRole(req, Roles.CUSTOMER)
-        else
-        if (user.role == Roles.ADMIN)
-            users = await UserService.getUsers(req)
+        let historial = await HistoryService.getHistory()
 
+        res.render('history/index.ejs', { user, historial, message, alertType })
 
-        res.render('user/index.ejs', { user, users, message, alertType })
-
-    }
-}
-
-// Route for create user.
-exports.createUser = async(req, res) => {
-    let { message, alertType } = req.session
-    let selectRoles = []
-        // clear message y alertType
-    req.session.message = ''
-    req.session.alertType = ''
-    const isAdmin = req.user.role === Roles.ADMIN
-
-    if (Roles) {
-        if (isAdmin)
-            selectRoles = Object.entries(Roles)
-        else {
-            // If User Role is not ADMIN, then the only users they can create are Customers.
-            const { CUSTOMER } = Roles
-            const subset = { CUSTOMER }
-            selectRoles = Object.entries(subset)
-        }
-
-        res.render('user/create.ejs', { user: req.user, message, alertType, selectRoles })
     }
 }
 
@@ -127,7 +97,7 @@ exports.save = async(req, res) => {
 
 // ------------------------------- Read -------------------------------
 // Route for view user info.
-exports.viewUser = async(req, res) => {
+exports.viewHistory = async(req, res) => {
     try {
         let { message, alertType } = req.session
 
@@ -150,69 +120,6 @@ exports.viewUser = async(req, res) => {
         req.session.alertType = alertTypes.ErrorAlert
             // res.status(400).send(error)
         res.redirect('/account')
-
-    }
-}
-
-// ------------------------------- Update -------------------------------
-
-// Route for view/edit user info.
-exports.editUser = async(req, res) => {
-    try {
-        const id = req.params.id;
-        const url = req.query.url ? req.query.url : '/account'
-        const customer = await UserService.getUserById(id)
-
-        if (customer) {
-            if (Roles)
-                selectRoles = Object.entries(Roles)
-
-            res.status(200).render('user/edit.ejs', { user: req.user, customer, selectRoles, url: url == '/users' ? url : `${url}/${id}` })
-        } else {
-            console.log('User not found.')
-            res.redirect(`${url}`)
-        }
-    } catch (error) {
-        req.session.message = error.message
-        req.session.alertType = alertTypes.ErrorAlert
-            // res.status(400).send(error)
-        res.redirect('/account')
-    }
-}
-
-// TODO: Manage membership 
-exports.update = async(req, res) => {
-    const updates = Object.keys(req.body)
-        // TODO: Implement allowedUpdates per ROLE.
-        // const allowedUpdates = ['name', 'email']
-        // const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
-        // if (!isValidOperation) {
-
-    // return res.status(400).send('Invalid updates!')
-    // }
-    const url = req.query.url
-    try {
-        const user = await UserService.updateUser(req.body.id, req.body)
-
-        if (!user) {
-            req.session.message = `Can't update User  ${req.body.email}`
-            req.session.alertType = alertTypes.WarningAlert
-                // return res.status(404).send()
-
-        } else {
-            req.flash('info', 'Update Completed.')
-            req.session.message = `User updated ${user.email}`
-            req.session.alertType = alertTypes.CompletedActionAlert
-        }
-        // res.status(201).send(user)
-        res.redirect(`${url}`)
-
-
-    } catch (error) {
-        req.session.message = error.message
-        req.session.alertType = alertTypes.ErrorAlert
-            // res.status(400).send(error)
-        res.redirect(`${url}`)
 
     }
 }

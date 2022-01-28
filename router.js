@@ -7,13 +7,13 @@ const authController = require('./src/controllers/authController')
 const userController = require('./src/controllers/userController')
 const locationController = require('./src/controllers/locationController')
 const dashboardsController = require('./src/controllers/dashboardsController')
+const historyController = require('./src/controllers/historyController')
 
 // Express
 const express = require('express');
 const router = express.Router();
 
 // Middleware helpers
-// const setCurrentUser = require('./src/middleware/setCurrentUser')
 const checkAuthenticated = require('./src/middleware/checkAuthenticated')
 const checkNotAuthenticated = require('./src/middleware/checkNotAuthenticated')
 const hasPlan = require('./src/middleware/hasPlan')
@@ -48,6 +48,15 @@ router.get('/create-account', checkNotAuthenticated, (req, res) => {
 
 router.post('/register', checkNotAuthenticated, authController.register)
 router.delete('/logout', checkAuthenticated, authController.logout)
+
+//------ History Routes ------
+router.get('/history', checkAuthenticated, historyController.history)
+router.get('/history/:id', checkAuthenticated, historyController.viewHistory)
+
+//------ History CRUDS ------
+router.post('/create-history', checkAuthenticated, historyController.save)
+router.get('/delete-history/:id', checkAuthenticated, authDeleteUser, historyController.delete)
+
 
 //------ User Routes ------
 router.get('/users', checkAuthenticated, userController.users)
