@@ -5,7 +5,9 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Create Account </title>
+    <title>
+        <%= lingua.createAccount%>
+    </title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="../../vendors/feather/feather.css">
     <link rel="stylesheet" href="../../vendors/mdi/css/materialdesignicons.min.css">
@@ -40,71 +42,75 @@
                                 <img src="/images/mrquicks-logo.png" alt="logo">
                             </div>
 
-                            <h4>Create Account</h4>
+                            <h4>
+                                <%= lingua.createAccount%>
+                            </h4>
                             <!-- <h6 class="fw-light">Sign in to continue.</h6> -->
                             <form id="form-register" class="pt-3" action="/register" method="post">
                                 <div class="row">
                                     <div class="col-lg-6">
                                         <div class="form-group">
-                                            <label class="required" for="email">Email</label>
+                                            <label class="required" for="email"><%= lingua.email%></label>
                                             <input type="email" id="email" name="email" class="form-control form-control-lg" placeholder="example@gmail.com" required />
 
                                         </div>
 
                                         <div class="form-group">
-                                            <label for="password" class="required">Password</label>
+                                            <label for="password" class="required"><%= lingua.password%></label>
 
                                             <input type="password" id="password" name="password" class="form-control mb-3 form-control-lg" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters"
                                                 placeholder="Password" required />
                                             <div id="message">
-                                                <p>Password must contain the following:</p>
-                                                <p> <span id="letter" class="invalid"> <b>1 lowercase letter</b> </span>, <span id="capital" class="invalid"><b>1 capital (uppercase) letter</b></span>, <span id="number" class="invalid"> <b>1 number</b></span>,
-                                                    <span id="length" class="invalid"> <b>8 characters</b></span>
+                                                <p>
+                                                    <%= lingua.passwordRequirement%>
+                                                </p>
+                                                <p> <span id="letter" class="invalid"> <b>1 <%= lingua.lowerCase%></b> </span>, <span id="capital" class="invalid"><b>1 <%= lingua.upperCase%></b></span>, <span id="number" class="invalid"> <b>1 <%= lingua.number%></b></span>,
+                                                    <span id="length" class="invalid"> <b>8 <%= lingua.characters%></b></span>
                                                 </p>
                                             </div>
                                         </div>
 
                                         <div class="form-group">
-                                            <label for="firstName" class="required">First Name</label>
+                                            <label for="firstName" class="required"><%= lingua.name%></label>
 
                                             <input type="text" id="firstName" name="firstName" class="form-control mb-3 form-control-lg" placeholder="First Name" required autofocus />
                                         </div>
 
                                         <div class="form-group">
-                                            <label for="lastName" class="required">Last Name</label>
+                                            <label for="lastName" class="required"><%= lingua.lastName%></label>
 
                                             <input type="text" id="lastName" name="lastName" class="form-control mb-3 form-control-lg" placeholder="LastName" required autofocus />
                                         </div>
 
                                         <div class="form-group">
-                                            <label for="phoneNumber" class="required">Phone Number</label>
+                                            <label for="phoneNumber" class="required"><%= lingua.phoneNumber%></label>
 
                                             <input type="tel" id="phoneNumber" name="phoneNumber" class="form-control mb-3 form-control-lg" placeholder="XXX-XXX-XXXX" required autofocus />
                                         </div>
                                     </div>
                                     <div class="col-lg-6">
                                         <div class="form-group">
-                                            <label for="dateOfBirth" class="required">Date Of Birth</label>
+                                            <label for="dateOfBirth" class="required"><%= lingua.dateOfBirth%></label>
 
                                             <input type="date" id="dateOfBirth" name="dateOfBirth" class="form-control mb-3 form-control-lg" required autofocus />
                                         </div>
                                         <div class="form-group">
-                                            <label for="city" class="required">City</label>
+                                            <label for="city" class="required"><%= lingua.city%></label>
 
                                             <input type="text" id="city" name="city" class="form-control form-control-lg" placeholder="City" required autofocus />
                                         </div>
                                         <div class="form-group">
-                                            <label for="carBrand" class="sr-only">Car Brand</label>
+                                            <label for="carBrand" class="sr-only"><%= lingua.carBrand%></label>
 
                                             <input type="text" id="carBrand" name="brand" class="form-control mb-3 form-control-lg" placeholder="Car Brand" autofocus />
                                         </div>
                                         <div class="form-group">
-                                            <label for="carModel" class="sr-only">Car Model</label>
+                                            <label for="carModel" class="sr-only"><%= lingua.carModel%></label>
 
                                             <input type="text" id="carModel" name="model" class="form-control mb-3 form-control-lg" placeholder="Car Model" autofocus />
                                         </div>
                                         <div class="form-group">
-                                            <label for="carPlate" class="sr-only">Car Plate</label>
+                                            <label for="carPlate" class="sr-only"><%= lingua.carPlate%></label>
 
                                             <input type="text" id="carPlate" name="plate" class="form-control mb-3 form-control-lg" placeholder="Car Plate" autofocus />
                                         </div>
@@ -112,7 +118,7 @@
                                 </div>
                                 <div class="row">
                                     <div class="mt-3">
-                                        <button class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn float-end" type="submit">Create Account</button>
+                                        <button class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn float-end" type="submit"><%= lingua.create%></button>
                                     </div>
                                 </div>
                             </form>
