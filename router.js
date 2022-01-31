@@ -121,14 +121,14 @@ router.get('/pro', [checkAuthenticated, hasPlan('pro')], async function(
     res.status(200).render('pro.ejs')
 })
 
-if (process.env.NODE_ENV !== 'production') {
-    // The last route for not found pages.
-    router.get('*', (req, res) =>
-        // res.send('Page Not found 404')
-        res.status(404).redirect('/account')
+// if (process.env.NODE_ENV !== 'production') {
+// The last route for not found pages.
+// router.get('*', (req, res) =>
+//     // res.send('Page Not found 404')
+//     res.status(404).redirect('/account')
 
-    );
-}
+// );
+// }
 
 
 module.exports = router;

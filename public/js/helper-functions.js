@@ -29,3 +29,18 @@ function getCookie(cname) {
     }
     return "";
 }
+
+function manageLangDropdown() {
+    var lang = getCookie('lang');
+    if (lang !== '') {
+        if (lang === 'es') {
+            $('#es-lang').addClass('active');
+            $('#en-lang').removeClass('active');
+        }
+
+        if (lang === 'en') {
+            $('#en-lang').addClass('active');
+            $('#es-lang').removeClass('active');
+        }
+    }
+}
