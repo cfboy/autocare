@@ -56,7 +56,7 @@ router.get('/activity', checkAuthenticated, historyController.activity)
 router.get('/history/:id', checkAuthenticated, historyController.viewHistory)
 
 //------ History CRUDS ------
-router.post('/create-history', checkAuthenticated, historyController.save)
+// router.post('/create-history', checkAuthenticated, historyController.save)
 router.get('/delete-history/:id', checkAuthenticated, authDeleteUser, historyController.delete)
 
 

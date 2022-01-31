@@ -78,9 +78,9 @@
                                                                                 </a>
                                                                             </td> -->
                                                                             <td>
-                                                                                <a class="btn-link" href="/view-history/<%- history.id%>">
+                                                                                <a class="btn-link" href="/history/<%- history?.id%>">
 
-                                                                                    <%- history.description%>
+                                                                                    <%- history?.description%>
                                                                                 </a>
 
                                                                             </td>
@@ -92,13 +92,13 @@
 
                                                                             </td>
                                                                             <td>
-                                                                                <%- history.user.personalInfo.firstName + ' ' + history.user.personalInfo.lastName %>
+                                                                                <%- history?.user?.personalInfo?.firstName + ' ' + history?.user?.personalInfo?.lastName %>
                                                                             </td>
                                                                             <td>
                                                                                 <%- history?.location?.name %>
                                                                             </td>
                                                                             <!-- <td>
-                                                                                <a id="deleteBtn" onclick="return confirmDelete('/delete-history', '<%- history.id%>')" class="btn btn-icon btn-icon-no-border no-margin">
+                                                                                <a id="deleteBtn" onclick="return confirmDelete('/delete-history', '<%# history.id%>')" class="btn btn-icon btn-icon-no-border no-margin">
                                                                                     <i class="fas fa-trash-alt icon-sm text-danger"></i>
                                                                                 </a>
                                                                             </td> -->

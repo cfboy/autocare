@@ -2,6 +2,7 @@ const HistoryService = require('../collections/history')
 const Stripe = require('../connect/stripe')
 const alertTypes = require('../helpers/alertTypes')
 const bcrypt = require('bcrypt');
+const Roles = require('../config/roles')
 
 // ------------------------------- CRUDS ------------------------------- 
 
@@ -51,73 +52,6 @@ exports.history = async(req, res) => {
     }
 }
 
-
-
-// TODO: Test this method. NOT FINISHED
-exports.save = async(req, res) => {
-    const fields = req.body
-    try {
-        console.log('Creating New User: ', fields.email)
-
-        let user = await UserService.getUserByEmail(fields.email)
-        let customerInfo = {}
-
-        if (!user) {
-            console.log(`Email ${fields.email} does not exist. Making one...`)
-            customerInfo = await Stripe.getCustomerByEmail(fields.email)
-            if (!customerInfo) {
-                customerInfo = await Stripe.addNewCustomer(fields.email, fields.firstName,
-                    fields.lastName,
-                    fields.phoneNumber,
-                    fields.city)
-            }
-
-            var hashPassword = await bcrypt.hash(fields.password, 10)
-
-            user = await UserService.addUser({
-                email: fields.email,
-                password: hashPassword,
-                billingID: customerInfo.id,
-                role: fields.role,
-                firstName: fields.firstName,
-                lastName: fields.lastName,
-                phoneNumber: fields.phoneNumber,
-                dateOfBirth: fields.dateOfBirth,
-                city: fields.city,
-                brand: fields.brand,
-                model: fields.model,
-                plate: fields.plate,
-                plan: 'none',
-                endDate: null
-            })
-
-            console.log(
-                `A new user added to DB. The ID for ${user.email} is ${user.id}`
-            )
-
-            req.session.message = `User Created ${user.email}.`
-            req.session.alertType = alertTypes.CompletedActionAlert
-
-            res.redirect('/users')
-
-        } else {
-            let message = `That email ${user.email} already exist.`
-            console.log(`The existing ID for ${user.email} is ${user.id}`)
-
-            // Set the message for alert. 
-            req.session.message = message
-            req.session.alertType = alertTypes.WarningAlert
-            res.redirect('/create-user')
-        }
-    } catch (error) {
-        // console.error(error.message)
-        req.session.message = error.message
-        req.session.alertType = alertTypes.ErrorAlert
-            // res.status(400).send(error)
-        res.redirect('/account')
-    }
-}
-
 // ------------------------------- Read -------------------------------
 // Route for view user info.
 exports.viewHistory = async(req, res) => {
@@ -129,21 +63,27 @@ exports.viewHistory = async(req, res) => {
             req.session.alertType = ''
         }
         const id = req.params.id;
-        const customer = await UserService.getUserById(id)
-        var isMyProfile = false
-        if (customer) {
-            isMyProfile = (req.user.id === customer.id)
-            res.status(200).render('user/view.ejs', { user: req.user, isMyProfile, customer, message, alertType })
+        const history = await HistoryService.getHistoryById(id)
+        var isMyActivity = false
+        if (history) {
+            isMyActivity = (req.user.id === history.user.id)
+            const canView = (isMyActivity || req.user.role == Roles.ADMIN)
+            if (canView) {
+                res.status(200).render('history/view.ejs', { user: req.user, isMyActivity, history, message, alertType })
+            } else {
+                req.session.message = "Can't view this actitiy."
+                req.session.alertType = alertTypes.WarningAlert
+                res.redirect('/account')
+
+            }
         } else {
-            console.log('Customer not found.')
-            res.redirect('/users')
+            console.log('History not found.')
+            res.redirect('/account')
         }
     } catch (error) {
         req.session.message = error.message
         req.session.alertType = alertTypes.ErrorAlert
-            // res.status(400).send(error)
         res.redirect('/account')
-
     }
 }
 

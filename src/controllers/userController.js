@@ -1,5 +1,6 @@
 const UserService = require('../collections/user')
 const HistoryService = require('../collections/history')
+const historyTypes = require('../config/historyTypes')
 const Stripe = require('../connect/stripe')
 const alertTypes = require('../helpers/alertTypes')
 const Roles = require('../config/roles')
@@ -219,7 +220,7 @@ exports.update = async(req, res) => {
 
 // ------------------------------- Delete -------------------------------
 exports.delete = async(req, res) => {
-    console.log('Deleting User...')
+    console.debug('Deleting User...')
     const id = req.params.id
 
     try {
@@ -227,12 +228,19 @@ exports.delete = async(req, res) => {
             // Set the message for alert. 
         req.session.message = `User Deleted.`
         req.session.alertType = alertTypes.CompletedActionAlert
-        res.redirect('/account')
     } catch (error) {
         console.log(`ERROR on user.js delete: ${error.message}`)
         req.session.message = "Can't delete user."
         req.session.alertType = alertTypes.ErrorAlert
-        res.redirect('/account')
-
     }
+
+    try {
+        HistoryService.addHistory("User deleted", historyTypes.USER_ACTION, req.user, null)
+    } catch (error) {
+        console.debug(`ERROR-userController: ${error.message}`)
+        req.session.message = "Can't add to History."
+        req.session.alertType = alertTypes.ErrorAlert
+    }
+    res.redirect('/users')
+
 }
