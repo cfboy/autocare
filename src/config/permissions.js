@@ -12,7 +12,14 @@ function canDeleteUser(user) {
     )
 }
 
+function canValidateMemberships(user) {
+    return (
+        user.role === ROLES.ADMIN || user.role === ROLES.MANAGER || user.role === ROLES.CASHIER
+    )
+}
+
 module.exports = {
     canDeleteLocation,
-    canDeleteUser
+    canDeleteUser,
+    canValidateMemberships
 }

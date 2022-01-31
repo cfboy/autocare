@@ -62,3 +62,29 @@ exports.account = async(req, res) => {
         }
     }
 }
+
+exports.validateMembership = async(req, res) => {
+    // Message for alerts
+    let { message, alertType } = req.session
+
+    // clear message y alertType
+    if (message) {
+        req.session.message = ''
+        req.session.alertType = ''
+    }
+    let user = req.user
+
+    res.render('dashboards/validateMembership.ejs', { user, message, alertType })
+
+}
+
+exports.validate = async(req, res) => {
+    // Message for alerts
+    let user = req.user
+
+    let carPlate = req.body.tagNumber
+
+    let customer = await UserService.getUserByPlate(carPlate)
+
+    res.render('ajaxSnippets/validationResult.ejs', { customer })
+}

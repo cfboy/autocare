@@ -1,0 +1,63 @@
+<div class="row">
+    <div class="col-lg-12">
+        <%if(customer) {%>
+
+            <div class="row">
+                <div class="col-md-8">
+                    <p>
+                        Name:
+                        <%- customer?.personalInfo.firstName%>
+                    </p>
+
+                    <p>
+                        Email:
+                        <%- customer?.email%>
+                    </p>
+
+                    <p>
+                        Membership:
+                        <%- customer?.membershipInfo.plan%>
+                    </p>
+
+                    <p>
+                        Expiration Date:
+                        <%= moment(customer.membershipInfo.endDate).isValid() ? moment(customer.membershipInfo.endDate).utc().format(shortDateFormat) : 'N/A' %>
+                    </p>
+
+                    <p>
+                        Car Brand
+                        <%- customer.carInfo.brand%>
+
+                    </p>
+                    <p>Model :
+                        <%- customer.carInfo.model%>
+                    </p>
+                    <p>Plate:
+                        <%- customer.carInfo.plate%>
+                    </p>
+
+                </div>
+                <div class="col-md-4">
+                    <%if(customer.hasAllInformation){%>
+
+                        <%if(customer.membershipInfo.plan !== 'none'){%>
+                            <i class="fas fa-4x fa-check-circle valid"></i>
+                            <p>Valid Membership</p>
+                            <%}else{%>
+                                <i class="far fa-4x fa-times-circle invalid"></i>
+                                <p>Invalid Membership</p>
+                                <%}%>
+                                    <%} else{%>
+                                        <i class="fas fa-4x fa-exclamation-triangle text-warning"></i>
+                                        <br>
+                                        <p>Missing Information</p>
+                                        <%}%>
+
+                </div>
+            </div>
+            <%} else{%>
+
+                <p>Customer not found.</p>
+                <%}%>
+    </div>
+</div>

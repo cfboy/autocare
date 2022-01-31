@@ -123,6 +123,17 @@ const updateBillingID = (User) => async(id, billingID) => {
     })
 }
 
+// Get User By Car Plate
+const getUserByPlate = (User) => async(plate) => {
+    return User.findOne({ $and: [{ 'carInfo.plate': plate }, { 'carInfo.plate': { $ne: '' } }] }, function(err, docs) {
+        if (err) {
+            console.error(err)
+        } else {
+            console.debug("Founded user: ", docs);
+        }
+    })
+}
+
 // TODO: TEST METHOD
 const updatePlan = (User) => (email, plan) => {
     return User.findOneAndUpdate({ email, membershipInfo: { plan } })
@@ -140,5 +151,6 @@ module.exports = (User) => {
         updatePlan: updatePlan(User),
         getUserByBillingID: getUserByBillingID(User),
         updateBillingID: updateBillingID(User),
+        getUserByPlate: getUserByPlate(User)
     }
 }

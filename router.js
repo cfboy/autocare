@@ -19,6 +19,7 @@ const checkNotAuthenticated = require('./src/middleware/checkNotAuthenticated')
 const hasPlan = require('./src/middleware/hasPlan')
 const authDeleteLocation = require('./src/middleware/authDeleteLocation')
 const authDeleteUser = require('./src/middleware/authDeleteUser')
+const authValidateMembership = require('./src/middleware/authValidateMembership')
 
 // Main Route
 router.get('/', checkAuthenticated, (req, res) => {
@@ -85,6 +86,9 @@ router.get('/delete-location/:id', checkAuthenticated, authDeleteLocation, locat
 
 //------ Dashboard Routes ------
 router.get('/account', checkAuthenticated, dashboardsController.account)
+
+router.get('/validateMembership', checkAuthenticated, authValidateMembership, dashboardsController.validateMembership)
+router.post('/validateMembership', checkAuthenticated, authValidateMembership, dashboardsController.validate)
 
 // ---------------------------------------
 
