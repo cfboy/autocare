@@ -1,11 +1,32 @@
 const HistoryService = require('../collections/history')
 const Stripe = require('../connect/stripe')
 const alertTypes = require('../helpers/alertTypes')
-const Roles = require('../config/roles')
 const bcrypt = require('bcrypt');
 
 // ------------------------------- CRUDS ------------------------------- 
 
+exports.activity = async(req, res) => {
+    // Message for alerts
+    let { message, alertType } = req.session
+
+    // clear message y alertType
+    if (message) {
+        req.session.message = ''
+        req.session.alertType = ''
+    }
+    // Passport store the user in req.user
+    let user = req.user
+
+    if (!user) {
+        res.redirect('/')
+    } else {
+
+        let historial = await HistoryService.getMyHistory(req.user)
+
+        res.render('history/index.ejs', { user, historial, message, alertType })
+
+    }
+}
 
 // ------------------------------- Create -------------------------------
 exports.history = async(req, res) => {
@@ -29,6 +50,8 @@ exports.history = async(req, res) => {
 
     }
 }
+
+
 
 // TODO: Test this method. NOT FINISHED
 exports.save = async(req, res) => {

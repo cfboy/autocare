@@ -83,7 +83,7 @@
                                                                                             </p>
                                                                                             <% if (user.membershipInfo.hasTrial) { %>
                                                                                                 <p class="lead">Trial active until
-                                                                                                    <%= moment(user.membershipInfo.endDate).isValid() ? moment(user.membershipInfo.endDate).utc().format('MMMM DD, YYYY. h:mm:ss a') : 'N/A' %>
+                                                                                                    <%= moment(user.membershipInfo.endDate).isValid() ? moment(user.membershipInfo.endDate).format('MMMM DD, YYYY. h:mm:ss a') : 'N/A' %>
                                                                                                 </p>
                                                                                                 <% } else{ %>
                                                                                                     <p class="lead">

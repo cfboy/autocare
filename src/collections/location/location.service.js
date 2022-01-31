@@ -24,7 +24,7 @@ const updateLocation = (Location) => async(id, updates) => {
     })
 }
 
-const deleteLocation = (Location) => (id) => {
+const deleteLocation = (Location) => async(id) => {
     console.log(`deleteLocation() by ID: ${id}`)
 
     return Location.deleteOne({ _id: id }, function(err, docs) {

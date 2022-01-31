@@ -1,4 +1,7 @@
 const LocationService = require('../collections/location')
+const HistoryService = require('../collections/history')
+const historyTypes = require('../config/historyTypes')
+
 const Stripe = require('../connect/stripe')
 const alertTypes = require('../helpers/alertTypes')
 
@@ -171,14 +174,24 @@ exports.delete = async(req, res) => {
 
     try {
         LocationService.deleteLocation(id)
-            // Set the message for alert. 
+
+        // Set the message for alert. 
         req.session.message = `Location Deleted.`
         req.session.alertType = alertTypes.CompletedActionAlert
-        res.redirect('/locations')
+
     } catch (error) {
         console.log(`ERROR-locationController: ${error.message}`)
         req.session.message = "Can't delete location."
         req.session.alertType = alertTypes.ErrorAlert
-        res.redirect('/locations')
     }
+
+    try {
+        HistoryService.addHistory("Location deleted", historyTypes.USER_ACTION, req.user, null)
+    } catch (error) {
+        console.debug(`ERROR-locationController: ${error.message}`)
+        req.session.message = "Can't add to History."
+        req.session.alertType = alertTypes.ErrorAlert
+    }
+    res.redirect('/locations')
+
 }

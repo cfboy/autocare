@@ -6,6 +6,12 @@
                 <span class="menu-title">Home</span>
             </a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/activity">
+                <i class="mdi mdi-clipboard-text menu-icon"></i>
+                <span class="menu-title">My Activity</span>
+            </a>
+        </li>
         <%if([roles.ADMIN, roles.MANAGER].includes(user.role)) {%>
             <li class="nav-item">
                 <a class="nav-link" href="/users">
@@ -19,6 +25,7 @@
                     <span class="menu-title">Locations</span>
                 </a>
             </li>
+
             <%}%>
 
                 <%if([roles.ADMIN].includes(user.role)) {%>

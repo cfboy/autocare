@@ -51,6 +51,8 @@ router.delete('/logout', checkAuthenticated, authController.logout)
 
 //------ History Routes ------
 router.get('/history', checkAuthenticated, historyController.history)
+router.get('/activity', checkAuthenticated, historyController.activity)
+
 router.get('/history/:id', checkAuthenticated, historyController.viewHistory)
 
 //------ History CRUDS ------

@@ -60,8 +60,9 @@
                                                             <thead>
                                                                 <tr>
                                                                     <!-- <th>ID</th> -->
-                                                                    <th>Date</th>
                                                                     <th>Description</th>
+                                                                    <td>Type</td>
+                                                                    <th>Date</th>
                                                                     <th>User</th>
                                                                     <th>Location</th>
                                                                     <!-- <th>Action</th> -->
@@ -84,14 +85,17 @@
 
                                                                             </td>
                                                                             <td>
-                                                                                <%= moment(history.date).isValid() ? moment(history.date).utc().format('MMMM DD, YYYY. h:mm:ss a') : 'N/A' %>
+                                                                                <%- history.type%>
+                                                                            </td>
+                                                                            <td>
+                                                                                <%= moment(history.date).isValid() ? moment(history.date).format('MMMM DD, YYYY. h:mm:ss a') : 'N/A' %>
 
                                                                             </td>
                                                                             <td>
                                                                                 <%- history.user.personalInfo.firstName + ' ' + history.user.personalInfo.lastName %>
                                                                             </td>
                                                                             <td>
-                                                                                <%- history.location.name %>
+                                                                                <%- history?.location?.name %>
                                                                             </td>
                                                                             <!-- <td>
                                                                                 <a id="deleteBtn" onclick="return confirmDelete('/delete-history', '<%- history.id%>')" class="btn btn-icon btn-icon-no-border no-margin">
