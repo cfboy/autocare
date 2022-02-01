@@ -1,6 +1,6 @@
 const Stripe = require('../connect/stripe')
 const UserService = require('../collections/user')
-const Roles = require('../config/roles')
+const {ROLES} = require('../collections/user/user.model')
 
 const productToPriceMap = {
     basic: process.env.PRODUCT_BASIC,

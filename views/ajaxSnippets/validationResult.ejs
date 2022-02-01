@@ -21,7 +21,8 @@
 
                     <p>
                         Expiration Date:
-                        <%= moment(customer.membershipInfo.endDate).isValid() ? moment(customer.membershipInfo.endDate).utc().format(shortDateFormat) : 'N/A' %>
+                        <%= moment(customer.membershipInfo.endDate).isValid() ?
+                            moment(customer.membershipInfo.endDate).utc().format(shortDateFormat) : 'N/A' %>
                     </p>
 
                     <p>
@@ -37,21 +38,20 @@
                     </p>
 
                 </div>
-                <div class="col-md-4">
-                    <%if(customer.hasAllInformation){%>
-
-                        <%if(customer.membershipInfo.plan !== 'none'){%>
-                            <i class="fas fa-4x fa-check-circle valid"></i>
-                            <p>Valid Membership</p>
-                            <%}else{%>
+                <div class="col-md-4 text-center">
+                    <%if([stripeStatus.ACTIVE, stripeStatus.TRIALING].includes(membershipStatus)){%>
+                        <i class="fas fa-4x fa-check-circle valid"></i>
+                        <p>Valid Membership</p>
+                        <%}else if(membershipStatus==stripeStatus.CANCELED){%>
+                            <i class="far fa-4x fa-times-circle invalid"></i>
+                            <p>Canceled Membership</p>
+                            <%}else if(membershipStatus==stripeStatus.UNPAID){%>
                                 <i class="far fa-4x fa-times-circle invalid"></i>
-                                <p>Invalid Membership</p>
-                                <%}%>
-                                    <%} else{%>
-                                        <i class="fas fa-4x fa-exclamation-triangle text-warning"></i>
-                                        <br>
-                                        <p>Missing Information</p>
-                                        <%}%>
+                                <p>Unpaid Membership</p>
+                                <%}else if(membershipStatus==stripeStatus.NONE){%>
+                                    <i class="far fa-4x fa-times-circle invalid"></i>
+                                    <p>This user don't have Membership</p>
+                                    <%}%>
 
                 </div>
             </div>

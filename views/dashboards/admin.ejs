@@ -112,41 +112,41 @@
                                                                                         </tr>
                                                                                     </thead>
                                                                                     <tbody>
-                                                                                        <% for(const user of users) { %>
+                                                                                        <% for(const member of users) { %>
                                                                                             <tr>
                                                                                                 <td>
-                                                                                                    <a class="btn-link" href="/view-user/<%- user.id%>">
-                                                                                                        <%- user.personalInfo.firstName + ' ' + user.personalInfo.lastName %>
-                                                                                                            <% if(!user.hasAllInformation) {%>
+                                                                                                    <a class="btn-link" href="/view-user/<%- member.id%>">
+                                                                                                        <%- member.personalInfo.firstName + ' ' + member.personalInfo.lastName %>
+                                                                                                            <% if(!member.hasAllInformation) {%>
                                                                                                                 <i class="mdi mdi-alert text-warning" style="padding-left: 10px;"></i>
                                                                                                                 <%}%>
                                                                                                     </a>
                                                                                                 </td>
                                                                                                 <td>
-                                                                                                    <%- user.personalInfo.phoneNumber %>
+                                                                                                    <%- member.personalInfo.phoneNumber %>
                                                                                                 </td>
                                                                                                 <td>
-                                                                                                    <%- user.email%>
+                                                                                                    <%- member.email%>
                                                                                                 </td>
                                                                                                 <td>
-                                                                                                    <%- user.membershipInfo.plan%>
+                                                                                                    <%- member.membershipInfo.plan%>
                                                                                                 </td>
                                                                                                 <!-- <td>
-                                                                                                    <%# moment(user.membershipInfo.endDate).isValid() ? moment(user.membershipInfo.endDate).utc().format(shortDateFormat) : 'N/A' %>
+                                                                                                    <%# moment(member.membershipInfo.endDate).isValid() ? moment(member.membershipInfo.endDate).utc().format(shortDateFormat) : 'N/A' %>
                                                                                                 </td> -->
                                                                                                 <td>
-                                                                                                    <a href="/edit-user/<%- user.id%>?url=/account" type="button" class="btn btn-icon btn-icon-no-border no-margin">
+                                                                                                    <a href="/edit-user/<%- member.id%>?url=/account" type="button" class="btn btn-icon btn-icon-no-border no-margin">
                                                                                                         <i class="far fa-edit icon-sm"></i>
                                                                                                     </a>
                                                                                                     <!-- <a id="manage-billing-button" class="btn btn-icon btn-icon-no-border no-margin">
                                                                                                         
                                                                                                         <i class="fab fa-stripe"></i>
                                                                                                     </a> -->
-                                                                                                    <a class="btn btn-icon btn-icon-no-border no-margin manage-billing-button" style="margin: 0;" type="submit" value="<%- user.billingID%>" email="<%- user.email%>">
+                                                                                                    <a class="btn btn-icon btn-icon-no-border no-margin manage-billing-button" style="margin: 0;" type="submit" value="<%- member.billingID%>" email="<%- member.email%>">
                                                                                                         <i class="fab fa-stripe-s icon-sm"></i>
                                                                                                     </a>
 
-                                                                                                    <a id="deleteBtn" onclick="return confirmDelete('/delete-user', '<%- user.id%>')" class="btn btn-icon btn-icon-no-border no-margin">
+                                                                                                    <a id="deleteBtn" onclick="return confirmDelete('/delete-user', '<%- member.id%>')" class="btn btn-icon btn-icon-no-border no-margin">
                                                                                                         <i class="fas fa-trash-alt icon-sm text-danger"></i>
                                                                                                     </a>
                                                                                                 </td>
@@ -181,7 +181,8 @@
                                                                                     <label for="<%=product.metadata.productKey%>"><%= product.name %> for <%= product.priceInfo[0].unit_amount%></label><br><br>
                                                                                     <% }; %>
 
-                                                                                        <button class="btn btn-info upgrade-btn" id="checkout-button" type="submit">Buy now</button>
+                                                                                        <button class="btn btn-primary upgrade-btn" id="checkout-button" type="submit" value="<%- user.billingID%>" email="<%- user.email%>">Buy now</button>
+
                                                                                         <% } else{ %>
                                                                                             <p class="lead">
                                                                                                 You are currently on the
@@ -208,7 +209,8 @@
                                                                                                         <p class="mt-4 text-muted">
                                                                                                             <%= lingua.membership.notHappy%>
                                                                                                         </p>
-                                                                                                        <button class="btn btn-primary btn-lg text-white mb-0 me-0" id="manage-billing-button" type="submit">Manage Billing</button>
+
+                                                                                                        <button class="btn btn-primary btn-lg text-white mb-0 me-0 manage-billing-button" id="manage-billing-button" type="submit" value="<%- user.billingID%>" email="<%- user.email%>">Manage Billing</button>
                                                                                                         <% } %>
                                                                         </div>
                                                                     </div>
@@ -257,7 +259,7 @@
         console.debug(customer);
     </script> -->
     <script type="text/javascript" src="https://js.stripe.com/v3/"></script>
-    <script type="text/javascript" src="./js/account.js"></script>
+    <script type="text/javascript" src="../js/account.js"></script>
     <script src="./js/jquery.cookie.js" type="text/javascript"></script>
     <script src="./js/dashboard.js"></script>
     <script src="./js/Chart.roundedBarCharts.js"></script>

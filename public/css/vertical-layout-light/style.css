@@ -33942,5 +33942,11 @@ label.required:after {
     color: green;
 }
 
+.valid {
+    color: green;
+}
+.invalid {
+    color: red;
+}
 
 /*# sourceMappingURL=../maps/vertical-layout-light/style.css.map */

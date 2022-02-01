@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
-const historyTypes = require('../../config/historyTypes')
+const historyTypes = { SERVICE: 'Service', USER_ACTION: 'User Action', CUSTOMER_ACTION: 'Customer Action' }
 
 const historySchema = new Schema({
     description: String,
@@ -10,6 +10,6 @@ const historySchema = new Schema({
     date: { type: Date, default: Date.now },
 })
 
-const historyModel = mongoose.model('history', historySchema, 'history')
+const History = mongoose.model('history', historySchema, 'history')
 
-module.exports = historyModel
+module.exports = {History, historyTypes}

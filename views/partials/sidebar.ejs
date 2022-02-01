@@ -2,32 +2,32 @@
     <ul class="nav">
         <li class="nav-item">
             <a class="nav-link" href="/account">
-                <i class="mdi mdi-home menu-icon"></i>
+                <i class="fas fa-home menu-icon"></i>
                 <span class="menu-title">Home</span>
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="/validateMembership">
-                <i class="mdi mdi-clipboard-text menu-icon"></i>
+                <i class="fas fa-car menu-icon"></i>
                 <span class="menu-title">Validate Membership</span>
             </a>
         </li>
-        <li class="nav-item">
+        <!-- <li class="nav-item">
             <a class="nav-link" href="/activity">
-                <i class="mdi mdi-clipboard-text menu-icon"></i>
+                <i class="fas fa-book menu-icon"></i>
                 <span class="menu-title">My Activity</span>
             </a>
-        </li>
+        </li> -->
         <%if([roles.ADMIN, roles.MANAGER].includes(user.role)) {%>
             <li class="nav-item">
                 <a class="nav-link" href="/users">
-                    <i class="mdi mdi-account-group menu-icon"></i>
+                    <i class="fas fa-users menu-icon"></i>
                     <span class="menu-title">Users</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/locations">
-                    <i class="mdi mdi-map-marker-multiple menu-icon"></i>
+                    <i class="fas fa-map-marker-alt menu-icon"></i>
                     <span class="menu-title">Locations</span>
                 </a>
             </li>
@@ -37,7 +37,7 @@
                 <%if([roles.ADMIN].includes(user.role)) {%>
                     <li class="nav-item">
                         <a class="nav-link" href="/history">
-                            <i class="mdi mdi-history menu-icon"></i>
+                            <i class="fas fa-history menu-icon"></i>
                             <span class="menu-title">History</span>
                         </a>
                     </li>

@@ -1,4 +1,4 @@
-const ROLES = require('./roles')
+const {ROLES} = require('../collections/user/user.model')
 
 function canDeleteLocation(user) {
     return (

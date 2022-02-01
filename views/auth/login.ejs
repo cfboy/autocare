@@ -85,11 +85,11 @@
                                                   <%= lingua.selectLanguage%> 
                                               </button>
                                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuSplitButton1">
-                                                    <a href="?lang=es" class="dropdown-item">
+                                                    <a id="es-lang" href="?lang=es" class="dropdown-item">
 
                                                         <span class="flag-icon flag-icon-pr "></span> ES
                                                     </a>
-                                                    <a href="?lang=en" class="dropdown-item">
+                                                    <a id="en-lang" href="?lang=en" class="dropdown-item">
                                                         <span class="flag-icon flag-icon-um "></span> EN
                                                     </a>
                                                 </div>
@@ -121,6 +121,8 @@
 
     <!-- Alerts Code -->
     <script type="text/javascript " src="./js/sweet-alerts.js "></script>
+    <script src="./js/helper-functions.js"></script>
+
     <script>
         $(document).ready(function() {
             var msj = '<%- message %>';
@@ -130,6 +132,10 @@
             if (msj !== '' && alertType !== '') {
                 sweetAlerts(allAlertTypes, alertType, msj);
             }
+
+
+            manageLangDropdown();
+
         });
     </script>
 </body>

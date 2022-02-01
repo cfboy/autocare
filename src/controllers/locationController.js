@@ -1,6 +1,6 @@
 const LocationService = require('../collections/location')
 const HistoryService = require('../collections/history')
-const historyTypes = require('../config/historyTypes')
+const {historyTypes} = require('../collections/history/history.model')
 
 const Stripe = require('../connect/stripe')
 const alertTypes = require('../helpers/alertTypes')

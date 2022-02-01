@@ -1,9 +1,9 @@
 const UserService = require('../collections/user')
+const {ROLES} = require('../collections/user/user.model')
 const HistoryService = require('../collections/history')
-const historyTypes = require('../config/historyTypes')
+const {historyTypes} = require('../collections/history/history.model')
 const Stripe = require('../connect/stripe')
 const alertTypes = require('../helpers/alertTypes')
-const Roles = require('../config/roles')
 const bcrypt = require('bcrypt');
 
 // ------------------------------- CRUDS ------------------------------- 
@@ -26,10 +26,10 @@ exports.users = async(req, res) => {
         res.redirect('/')
     } else {
         let users
-        if (user.role == Roles.MANAGER)
-            users = await UserService.getUsersPerRole(req, Roles.CUSTOMER)
+        if (user.role == ROLES.MANAGER)
+            users = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
         else
-        if (user.role == Roles.ADMIN)
+        if (user.role == ROLES.ADMIN)
             users = await UserService.getUsers(req)
 
 
@@ -45,14 +45,14 @@ exports.createUser = async(req, res) => {
         // clear message y alertType
     req.session.message = ''
     req.session.alertType = ''
-    const isAdmin = req.user.role === Roles.ADMIN
+    const isAdmin = req.user.role === ROLES.ADMIN
 
-    if (Roles) {
+    if (ROLES) {
         if (isAdmin)
-            selectRoles = Object.entries(Roles)
+            selectRoles = Object.entries(ROLES)
         else {
             // If User Role is not ADMIN, then the only users they can create are Customers.
-            const { CUSTOMER } = Roles
+            const { CUSTOMER } = ROLES
             const subset = { CUSTOMER }
             selectRoles = Object.entries(subset)
         }
@@ -165,10 +165,10 @@ exports.editUser = async(req, res) => {
         const customer = await UserService.getUserById(id)
 
         if (customer) {
-            if (Roles)
-                selectRoles = Object.entries(Roles)
+            if (ROLES)
+                selectRoles = Object.entries(ROLES)
 
-            res.status(200).render('user/edit.ejs', { user: req.user, customer, selectRoles, url: url == '/users' ? url : `${url}/${id}` })
+            res.status(200).render('user/edit.ejs', { user: req.user, customer, selectRoles, url: (url == '/users' || url == '/account') ? url : `${url}/${id}` })
         } else {
             console.log('User not found.')
             res.redirect(`${url}`)

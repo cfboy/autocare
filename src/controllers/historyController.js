@@ -1,8 +1,6 @@
 const HistoryService = require('../collections/history')
-const Stripe = require('../connect/stripe')
 const alertTypes = require('../helpers/alertTypes')
-const bcrypt = require('bcrypt');
-const Roles = require('../config/roles')
+const {ROLES} = require('../collections/user/user.model')
 
 // ------------------------------- CRUDS ------------------------------- 
 
@@ -67,7 +65,7 @@ exports.viewHistory = async(req, res) => {
         var isMyActivity = false
         if (history) {
             isMyActivity = (req.user.id === history.user.id)
-            const canView = (isMyActivity || req.user.role == Roles.ADMIN)
+            const canView = (isMyActivity || req.user.role == ROLES.ADMIN)
             if (canView) {
                 res.status(200).render('history/view.ejs', { user: req.user, isMyActivity, history, message, alertType })
             } else {

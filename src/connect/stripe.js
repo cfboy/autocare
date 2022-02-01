@@ -1,6 +1,17 @@
 const stripe = require('stripe')
 const Dinero = require('dinero.js')
 
+const STATUS = {
+    NONE : "none",
+    ACTIVE: "active",
+    PAST_DUE: "past_due",
+    UNPAID: "unpaid",
+    CANCELED: "canceled",
+    INCOMPLETE: "incomplete",
+    INCOMPLETE_EXPIRED: "incomplete_expired",
+    TRIALING: "trialing",
+}
+
 const Stripe = stripe(process.env.STRIPE_SECRET_KEY, {
     apiVersion: '2020-08-27'
 })
@@ -36,7 +47,9 @@ const createBillingSession = async(customer) => {
 const getCustomerByID = async(id) => {
     try {
         console.debug(`STRIPE: getCustomerByID(${id})`);
-        const customer = await Stripe.customers.retrieve(id)
+        const customer = await Stripe.customers.retrieve(id, {
+            expand: ['subscriptions'] //Expand the Customer Obj to get subscriptions info.
+        })
         console.log(`STRIPE: Customer Found: ${customer.email}`);
         return customer
 
@@ -165,6 +178,7 @@ const getCustomerSubscription = async(customerID) => {
 }
 
 module.exports = {
+    STATUS,
     getCustomerByID,
     getCustomerByEmail,
     addNewCustomer,

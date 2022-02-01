@@ -183,7 +183,8 @@
                 <%}%>
                     <li class="nav-item dropdown">
                         <a class="nav-link count-indicator" id="languageDropdown" href="#" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="icon-globe"></i>
+                            <!-- <i class="icon-globe"></i> -->
+                            <i class="fas fa-globe-americas"></i>
                         </a>
                         <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list pb-0" aria-labelledby="languageDropdown">
                             <a id="es-lang" href="?lang=es" class="dropdown-item py-3">
@@ -212,14 +213,25 @@
                                     <%- user.email%>
                                 </p>
                             </div>
-                            <a href="/view-user/<%- user.id%>?viewType=myProfile" class="dropdown-item"><i class="dropdown-item-icon mdi mdi-account-outline text-primary me-2"></i> My Profile 
+                            <a href="/view-user/<%- user.id%>?viewType=myProfile" class="dropdown-item">
+                                <!-- <i class="dropdown-item-icon mdi mdi-account-outline text-primary me-2"></i>  -->
+                                <i class="dropdown-item-icon far fa-user text-primary me-2"></i> My Profile
                                 <!-- <span class="badge badge-pill badge-danger">1</span> -->
                             </a>
                             <!-- <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-message-text-outline text-primary me-2"></i> Messages</a> -->
-                            <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-calendar-check-outline text-primary me-2"></i> Activity</a>
-                            <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-help-circle-outline text-primary me-2"></i> FAQ</a>
+                            <a class="dropdown-item" href="/activity">
+                                <!-- <i class="dropdown-item-icon mdi mdi-calendar-check-outline text-primary me-2"></i> -->
+                                <i class="dropdown-item-icon far fa-calendar-check text-primary me-2"></i> Activity
+                            </a>
+                            <a class="dropdown-item">
+                                <!-- <i class="dropdown-item-icon mdi mdi-help-circle-outline text-primary me-2"></i> -->
+                                <i class="dropdown-item-icon far fa-question-circle text-primary me-2"></i> FAQ
+                            </a>
                             <form action="/logout?_method=DELETE" method="POST">
-                                <button type="submit" class="dropdown-item"><i class="dropdown-item-icon mdi mdi-power text-primary me-2"></i>Sign Out</button>
+                                <button type="submit" class="dropdown-item">
+                                    <!-- <i class="dropdown-item-icon mdi mdi-power text-primary me-2"></i> -->
+                                    <i class="ropdown-item-icon fas fa-sign-out-alt text-primary me-2"></i>
+                                    Sign Out</button>
                             </form>
                         </div>
                     </li>

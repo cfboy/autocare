@@ -1,6 +1,6 @@
 const UserService = require('../collections/user')
+const {ROLES} = require('../collections/user/user.model')
 const Stripe = require('../connect/stripe')
-const Roles = require('../config/roles')
 const alertTypes = require('../helpers/alertTypes')
 const bcrypt = require('bcrypt');
 const passport = require('passport');
@@ -52,7 +52,7 @@ exports.register = async(req, res) => {
                 email,
                 password,
                 billingID: customerInfo.id,
-                role: Roles.CUSTOMER,
+                role: ROLES.CUSTOMER,
                 firstName,
                 lastName,
                 phoneNumber,

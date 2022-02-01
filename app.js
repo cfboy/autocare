@@ -9,8 +9,9 @@ const bodyParser = require('body-parser'),
     lingua = require('lingua'),
     formats = require('./src/helpers/formats'),
     alertTypes = require('./src/helpers/alertTypes'),
-    Roles = require('./src/config/roles'),
-    passport = require('passport');
+    {ROLES} = require('./src/collections/user/user.model'),
+    passport = require('passport'),
+    { STATUS } = require('./src/connect/stripe');
 
 var MemoryStore = require('memorystore')(session),
     router = require('./router'),
@@ -52,7 +53,8 @@ app.locals.shortDateFormat = formats.shortDateFormat
 
 // Pass all available alertTypes to the app variable.
 app.locals.alertTypes = alertTypes //To use this on the client side is necessary to use JSON.stringify
-app.locals.roles = Roles
+app.locals.roles = ROLES
+app.locals.stripeStatus = STATUS
 
 // Lingua configuration
 app.use(lingua(app, {

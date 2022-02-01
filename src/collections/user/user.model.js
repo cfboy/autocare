@@ -1,12 +1,18 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
-const Roles = require('../../config/roles')
+
+const ROLES = {
+    ADMIN: 'Admin',
+    CUSTOMER: 'Customer',
+    CASHIER: 'Cashier',
+    MANAGER: 'Manager'
+}
 
 const userSchema = new Schema({
     email: String,
     password: String,
     billingID: String, //Stripe ID
-    role: { type: String, enum: Object.values(Roles), default: Roles.CUSTOMER },
+    role: { type: String, enum: Object.values(ROLES), default: ROLES.CUSTOMER },
     hasAllInformation: { type: Boolean, default: false },
 
     personalInfo: {
@@ -35,6 +41,6 @@ const userSchema = new Schema({
     }
 })
 
-const userModel = mongoose.model('user', userSchema, 'user')
+const User = mongoose.model('user', userSchema, 'user')
 
-module.exports = userModel
+module.exports = {ROLES, User}
