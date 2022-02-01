@@ -38,5 +38,8 @@
     "selectLanguage": "Seleccionar Lenguaje",
     "content": {
         "description": "Descripción"
-    }
+    },
+    "missingCredentials" : "El correo o la contraseña no pueden estar vacíos.",
+    "userNotExist" : "El usuario '{email}' no existe. Por favor registrase.",
+    "wrongPassword": "Contraseña Incorrecta."
 }

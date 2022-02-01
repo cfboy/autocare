@@ -1,5 +1,5 @@
 const UserService = require('../collections/user')
-const {ROLES} = require('../collections/user/user.model')
+const { ROLES } = require('../collections/user/user.model')
 const Stripe = require('../connect/stripe')
 const alertTypes = require('../helpers/alertTypes')
 const bcrypt = require('bcrypt');
@@ -7,13 +7,14 @@ const passport = require('passport');
 require("../config/passport");
 require("../config/local");
 
-exports.login = passport.authenticate('local', {
-    successRedirect: '/account',
-    failureRedirect: '/login',
-    failureFlash: true
-})
+exports.login =
+    passport.authenticate('local', {
+        successRedirect: '/account',
+        failureRedirect: '/login',
+        failureFlash: true
+    })
 
-exports.register = async(req, res) => {
+exports.register = async (req, res) => {
     // TODO: Finish this method.
     try {
         const {
@@ -65,7 +66,7 @@ exports.register = async(req, res) => {
                 endDate: null
             })
 
-            console.log(
+            console.debug(
                 `A new user added to DB. The ID for ${customer.email} is ${customer.id}`
             )
 
@@ -94,7 +95,7 @@ exports.register = async(req, res) => {
     }
 }
 
-exports.logout = async(req, res) => {
+exports.logout = async (req, res) => {
     console.log('Log out...')
     req.logOut()
     res.redirect("/");

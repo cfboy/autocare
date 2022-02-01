@@ -38,5 +38,8 @@
     "selectLanguage": "Select Language",
     "content": {
         "description": "A little description."
-    }
+    },
+    "missingCredentials" : "Missing email or password",
+    "userNotExist" : "User with email {email} does not exist. Please Register.",
+    "wrongPassword": "Incorrect password provided"
 }

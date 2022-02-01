@@ -2,7 +2,7 @@ const stripe = require('stripe')
 const Dinero = require('dinero.js')
 
 const STATUS = {
-    NONE : "none",
+    NONE: "none",
     ACTIVE: "active",
     PAST_DUE: "past_due",
     UNPAID: "unpaid",
@@ -16,7 +16,7 @@ const Stripe = stripe(process.env.STRIPE_SECRET_KEY, {
     apiVersion: '2020-08-27'
 })
 
-const createCheckoutSession = async(customerID, price) => {
+const createCheckoutSession = async (customerID, price) => {
     const session = await Stripe.checkout.sessions.create({
         mode: 'subscription',
         payment_method_types: ['card'],
@@ -36,7 +36,7 @@ const createCheckoutSession = async(customerID, price) => {
     return session
 }
 
-const createBillingSession = async(customer) => {
+const createBillingSession = async (customer) => {
     const session = await Stripe.billingPortal.sessions.create({
         customer,
         return_url: `${process.env.DOMAIN}`
@@ -44,7 +44,7 @@ const createBillingSession = async(customer) => {
     return session
 }
 
-const getCustomerByID = async(id) => {
+const getCustomerByID = async (id) => {
     try {
         console.debug(`STRIPE: getCustomerByID(${id})`);
         const customer = await Stripe.customers.retrieve(id, {
@@ -60,7 +60,7 @@ const getCustomerByID = async(id) => {
 
 }
 
-const getCustomerByEmail = async(email) => {
+const getCustomerByEmail = async (email) => {
     try {
         console.debug(`STRIPE: getCustomerByEmail(${email})`);
 
@@ -77,7 +77,7 @@ const getCustomerByEmail = async(email) => {
     }
 }
 
-const addNewCustomer = async(email,
+const addNewCustomer = async (email,
     firstName,
     lastName,
     phoneNumber,
@@ -118,6 +118,13 @@ async function getAllProducts() {
         active: true
     })
 
+    if (products.data) {
+        // Get price of all products.
+        for (const product of products.data) {
+            product.priceInfo = await getProductPrice(product.id)
+        }
+    }
+
     return products.data
 }
 
@@ -129,7 +136,7 @@ async function getAllPrices() {
     return prices.data
 }
 
-const getProductPrice = async(productID) => {
+const getProductPrice = async (productID) => {
     const productPrices = await Stripe.prices.list({
         product: productID
     })
@@ -143,7 +150,7 @@ const getProductPrice = async(productID) => {
     return productPrices.data
 }
 
-const getProductInfoById = async(id) => {
+const getProductInfoById = async (id) => {
     try {
         const product = await Stripe.products.retrieve(id)
         console.debug(`STRIPE: Product ${id} Found`);
@@ -159,7 +166,7 @@ const getProductInfoById = async(id) => {
 }
 
 
-const getCustomerSubscription = async(customerID) => {
+const getCustomerSubscription = async (customerID) => {
     try {
         console.debug(`STRIPE: getCustomerSubscription(${customerID})`);
         const subscription = await Stripe.subscriptions.list({

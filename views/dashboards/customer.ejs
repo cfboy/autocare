@@ -2,166 +2,177 @@
 <html lang="en">
 
 <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Customer Dashboard </title>
-    <!-- plugins:css -->
-    <link rel="stylesheet" href="./vendors/feather/feather.css">
-    <link rel="stylesheet" href="./vendors/mdi/css/materialdesignicons.min.css">
-    <link rel="stylesheet" href="./vendors/ti-icons/css/themify-icons.css">
-    <link rel="stylesheet" href="./vendors/typicons/typicons.css">
-    <link rel="stylesheet" href="./vendors/simple-line-icons/css/simple-line-icons.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA==" crossorigin="anonymous" referrerpolicy="no-referrer"
-    />
-    <link rel="stylesheet" href="./vendors/css/vendor.bundle.base.css">
-    <!-- endinject -->
-    <!-- Plugin css for this page -->
-    <link rel="stylesheet" href="./vendors/datatables.net-bs4/dataTables.bootstrap4.css">
-    <link rel="stylesheet" href="./js/select.dataTables.min.css">
-    <!-- End plugin css for this page -->
-    <!-- inject:css -->
-    <link rel="stylesheet" href="./css/vertical-layout-light/style.css">
-    <!-- endinject -->
-    <link rel="shortcut icon" href="./images/favicon.png" />
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Customer Dashboard </title>
+  <!-- plugins:css -->
+  <link rel="stylesheet" href="./vendors/feather/feather.css">
+  <link rel="stylesheet" href="./vendors/mdi/css/materialdesignicons.min.css">
+  <link rel="stylesheet" href="./vendors/ti-icons/css/themify-icons.css">
+  <link rel="stylesheet" href="./vendors/typicons/typicons.css">
+  <link rel="stylesheet" href="./vendors/simple-line-icons/css/simple-line-icons.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="./vendors/css/vendor.bundle.base.css">
+  <!-- endinject -->
+  <!-- Plugin css for this page -->
+  <link rel="stylesheet" href="./vendors/datatables.net-bs4/dataTables.bootstrap4.css">
+  <link rel="stylesheet" href="./js/select.dataTables.min.css">
+  <!-- End plugin css for this page -->
+  <!-- inject:css -->
+  <link rel="stylesheet" href="./css/vertical-layout-light/style.css">
+  <!-- endinject -->
+  <link rel="shortcut icon" href="./images/favicon.png" />
 </head>
 
 <body>
-    <div class="container-scroller">
-        <!-- partial:partials/_navbar.html -->
-        <%- include('../partials/navbar.ejs' , {user, user}); %>
+  <div class="container-scroller">
+    <!-- partial:partials/_navbar.html -->
+    <%- include('../partials/navbar.ejs' , {user, user}); %>
+      <!-- partial -->
+      <div class="container-fluid page-body-wrapper">
+        <!-- partial:partials/_settings-panel.html -->
+        <%- include('../partials/settings-panel.ejs', {user, user}); %>
+          <!-- partial -->
+          <!-- partial:partials/_sidebar.html -->
+          <%- include('../partials/sidebar.ejs', {user, user}); %>
             <!-- partial -->
-            <div class="container-fluid page-body-wrapper">
-                <!-- partial:partials/_settings-panel.html -->
-                <%- include('../partials/settings-panel.ejs', {user, user}); %>
-                    <!-- partial -->
-                    <!-- partial:partials/_sidebar.html -->
-                    <%- include('../partials/sidebar.ejs', {user, user}); %>
-                        <!-- partial -->
-                        <div class="main-panel">
-                            <div class="content-wrapper">
-                                <div class="row">
-                                    <div class="col-sm-12">
-                                        <div class="home-tab">
-                                            <div class="d-sm-flex align-items-center justify-content-between border-bottom">
-                                                <ul class="nav nav-tabs" role="tablist">
-                                                    <li class="nav-item">
-                                                        <a class="nav-link active ps-0" id="profile-tab" data-bs-toggle="tab" href="#plan" role="tab" aria-selected="true">My Plan</a>
-                                                    </li>
-                                                    <li class="nav-item">
+            <div class="main-panel">
+              <div class="content-wrapper">
+                <div class="row">
+                  <div class="col-sm-12">
+                    <div class="home-tab">
+                      <div class="d-sm-flex align-items-center justify-content-between border-bottom">
+                        <ul class="nav nav-tabs" role="tablist">
+                          <li class="nav-item">
+                            <a class="nav-link active ps-0" id="profile-tab" data-bs-toggle="tab" href="#plan"
+                              role="tab" aria-selected="true">My Plan</a>
+                          </li>
+                          <!-- <li class="nav-item">
                                                         <a class="nav-link" id="contact-tab" data-bs-toggle="tab" href="#activity" role="tab" aria-selected="false">Activity</a>
                                                     </li>
                                                     <li class="nav-item">
                                                         <a class="nav-link border-0" id="more-tab" data-bs-toggle="tab" href="#more" role="tab" aria-selected="false">More</a>
-                                                    </li>
-                                                </ul>
+                                                    </li> -->
+                        </ul>
 
-                                            </div>
-                                            <div class="tab-content tab-content-basic">
-                                                <div class="tab-pane show active" id="plan" role="tabpanel" aria-labelledby="plan">
-                                                    <div class="row">
-                                                        <div class="col-lg-12 d-flex flex-column">
-                                                            <div class="row flex-grow">
-                                                                <div class="col-12 col-lg-4 col-lg-12 grid-margin stretch-card">
-                                                                    <div class="card card-rounded">
-                                                                        <div class="card-body">
-                                                                            <%if (user.membershipInfo.plan=="none" ) { %>
-                                                                                <p class="lead">
-                                                                                    You are currently not on any plan. Purchase a subscription below.
-                                                                                </p>
-                                                                                <br>
-                                                                                <% for(const product of products) { %>
+                      </div>
+                      <div class="tab-content tab-content-basic">
+                        <div class="tab-pane show active" id="plan" role="tabpanel" aria-labelledby="plan">
+                          <div class="row">
+                            <div class="col-lg-12 d-flex flex-column">
+                              <div class="row flex-grow">
+                                <div class="col-12 col-lg-4 col-lg-12 grid-margin stretch-card">
+                                  <div class="card card-rounded">
+                                    <div class="card-body">
+                                      <%if (!hasSubscription) { %>
+                                        <p class="lead">
+                                          You are currently not on any plan. Purchase a subscription below.
+                                        </p>
+                                        <br>
+                                        <% for(const product of products) { %>
 
-                                                                                    <input type="radio" id="<%=product.metadata.productKey%>" name="product" value="<%=product.metadata.productKey%>" />
+                                          <input type="radio" id="<%=product.metadata.productKey%>" name="product"
+                                            value="<%=product.metadata.productKey%>" />
 
-                                                                                    <label for="<%=product.metadata.productKey%>"><%= product.name %> for <%= product.priceInfo[0].unit_amount%></label><br><br>
-                                                                                    <% }; %>
+                                          <label for="<%=product.metadata.productKey%>">
+                                            <%= product.name %> for <%= product.priceInfo[0].unit_amount%>
+                                          </label><br><br>
+                                          <% }; %>
 
-                                                                                        <button class="btn btn-primary upgrade-btn" id="checkout-button" type="submit" value="<%- user.billingID%>" email="<%- user.email%>">Buy now</button>
-                                                                                        <% } else{ %>
-                                                                                            <p class="lead">
-                                                                                                You are currently on the <b>
-                                                                                                <%- user.membershipInfo.plan %></b> plan. %>
-                                                                                            </p>
-                                                                                            <% if (user.membershipInfo.hasTrial) { %>
-                                                                                                <p class="lead">Trial active until
-                                                                                                    <%= moment(user.membershipInfo.endDate).isValid() ? moment(user.membershipInfo.endDate).format('MMMM DD, YYYY. h:mm:ss a') : 'N/A' %>
-                                                                                                </p>
-                                                                                                <% } else{ %>
-                                                                                                    <p class="lead">
-                                                                                                        Trial inactive. Plan will end on
-                                                                                                        <%- user.membershipInfo.endDate %>
-                                                                                                    </p>
-                                                                                                    <% } %>
-                                                                                                        <hr />
-                                                                                                        <p>You can access your content by clicking one of the buttons below.</p>
-                                                                                                        <ul>
-                                                                                                            <li><a href="/none">None</a></li>
-                                                                                                            <li><a href="/basic">Basic</a></li>
-                                                                                                            <li><a href="/pro">Pro</a></li>
-                                                                                                        </ul>
-                                                                                                        <hr />
-                                                                                                        <p class="mt-4 text-muted">
-                                                                                                            Not happy with your current plan? Cancel or Upgrade by clicking the button below.
-                                                                                                        </p>
-                                                                                                        <button class="btn btn-primary btn-lg text-white mb-0 me-0" id="manage-billing-button" type="submit" value="<%- user.billingID%>" email="<%- user.email%>">Manage Billing</button>
-                                                                                                        <% } %>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                        </div>
+                                            <button class="btn btn-primary upgrade-btn" id="checkout-button"
+                                              type="submit" value="<%- user.billingID%>" email="<%- user.email%>">Buy
+                                              now</button>
+                                            <% } else{ %>
+                                              <p class="lead">
+                                                You are currently on the <b>
+                                                  <%- product.name %>
+                                                </b> plan. %>
+                                              </p>
+                                              <br>
+                                              <p class="lead">Plan will end on
+                                                <%= moment(stripeSubscription.trial_end * 1000).isValid() ? moment(stripeSubscription.trial_end * 1000).format('MMMM DD, YYYY.h:mm:ss a') : 'N/A' %>
+                                              </p>
+                                              <hr />
+                                              <!-- <p>You can access your content by clicking one of the buttons below.</p>
+                                                                                            <ul>
+                                                                                                <li><a href="/none">None</a></li>
+                                                                                                <li><a href="/basic">Basic</a></li>
+                                                                                                <li><a href="/pro">Pro</a></li>
+                                                                                            </ul> -->
+                                              <p>Your Plan information.</p>
+                                              <ul>
+                                              <li></li>
+                                              </ul>
+                                              <hr />
+                                              <p class="mt-4 text-muted">
+                                                Not happy with your current plan? Cancel or Upgrade by clicking the
+                                                button below.
+                                              </p>
+                                              <button
+                                                class="btn btn-primary btn-lg text-white mb-0 me-0 manage-billing-button"
+                                                id="manage-billing-button" type="submit" value="<%- user.billingID%>"
+                                                email="<%- user.email%>">Manage Billing</button>
+                                              <% } %>
                                     </div>
+                                  </div>
                                 </div>
+                              </div>
                             </div>
-                            <!-- content-wrapper ends -->
-                            <!-- partial:partials/_footer.html -->
-                            <%- include('../partials/footer.ejs'); %>
-                                <!-- partial -->
+                          </div>
                         </div>
-                        <!-- main-panel ends -->
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- content-wrapper ends -->
+              <!-- partial:partials/_footer.html -->
+              <%- include('../partials/footer.ejs'); %>
+                <!-- partial -->
             </div>
-            <!-- page-body-wrapper ends -->
-    </div>
-    <!-- container-scroller -->
+            <!-- main-panel ends -->
+      </div>
+      <!-- page-body-wrapper ends -->
+  </div>
+  <!-- container-scroller -->
 
-    <!-- plugins:js -->
-    <script src="./vendors/js/vendor.bundle.base.js"></script>
-    <!-- endinject -->
-    <!-- Plugin js for this page -->
-    <script src="./vendors/chart.js/Chart.min.js"></script>
-    <script src="./vendors/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
-    <script src="./vendors/progressbar.js/progressbar.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+  <!-- plugins:js -->
+  <script src="./vendors/js/vendor.bundle.base.js"></script>
+  <!-- endinject -->
+  <!-- Plugin js for this page -->
+  <script src="./vendors/chart.js/Chart.min.js"></script>
+  <script src="./vendors/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
+  <script src="./vendors/progressbar.js/progressbar.min.js"></script>
+  <script type="text/javascript"
+    src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 
-    <!-- End plugin js for this page -->
-    <!-- inject:js -->
-    <script src="./js/off-canvas.js"></script>
-    <script src="./js/hoverable-collapse.js"></script>
-    <script src="./js/template.js"></script>
-    <script src="./js/settings.js"></script>
-    <script src="./js/todolist.js"></script>
-    <!-- endinject -->
-    <!-- Custom js for this page-->
-    <!-- <script>
+  <!-- End plugin js for this page -->
+  <!-- inject:js -->
+  <script src="./js/off-canvas.js"></script>
+  <script src="./js/hoverable-collapse.js"></script>
+  <script src="./js/template.js"></script>
+  <script src="./js/settings.js"></script>
+  <script src="./js/todolist.js"></script>
+  <!-- endinject -->
+  <!-- Custom js for this page-->
+  <!-- <script>
         // This variables is important for checkout and manage billing.
         var customer = <%# JSON.stringify(user) %>;
         console.debug(customer); -->
-    </script>
-    <script type="text/javascript" src="https://js.stripe.com/v3/"></script>
-    <script type="text/javascript" src="./js/account.js"></script>
-    <script src="./js/jquery.cookie.js" type="text/javascript"></script>
-    <script src="./js/dashboard.js"></script>
-    <script src="./js/Chart.roundedBarCharts.js"></script>
-    <!-- End custom js for this page-->
+  </script>
+  <script type="text/javascript" src="https://js.stripe.com/v3/"></script>
+  <script type="text/javascript" src="./js/account.js"></script>
+  <script src="./js/jquery.cookie.js" type="text/javascript"></script>
+  <script src="./js/dashboard.js"></script>
+  <script src="./js/Chart.roundedBarCharts.js"></script>
+  <!-- End custom js for this page-->
 
-    <!-- Alerts Code -->
-    <%- include('../partials/alerts.ejs', {message, alertType}); %>
+  <!-- Alerts Code -->
+  <%- include('../partials/alerts.ejs', {message, alertType}); %>
 </body>
 
 </html>
