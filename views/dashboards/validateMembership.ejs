@@ -34,9 +34,9 @@
 
 <body>
     <div class="container-scroller">
-        <%- include('../partials/navbar.ejs' , {user, user}); %>
+        <%- include('../partials/navbar.ejs' , {user}); %>
             <div class="container-fluid page-body-wrapper">
-                <%- include('../partials/sidebar.ejs' , {user, user}); %>
+                <%- include('../partials/sidebar.ejs' , {user}); %>
                     <div class="main-panel">
                         <div class="content-wrapper">
                             <div class="row">
@@ -46,7 +46,7 @@
                                             <div class="card card-rounded">
                                                 <div class="card-body">
                                                     <div class="row">
-                                                        <div class="col-lg-6">
+                                                        <div class="col-lg-4">
                                                             <h4>Validate</h4>
 
                                                             <form id="form-validate-membership" class="pt-3" method="post">
@@ -66,8 +66,7 @@
                                                                 </div>
                                                             </form>
                                                         </div>
-                                                        <div class="col-lg-6">
-                                                            <h4>Membership Status</h4>
+                                                        <div class="col-lg-8">
                                                             <div id="membershipDetails"></div>
                                                         </div>
                                                     </div>

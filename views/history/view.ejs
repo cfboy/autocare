@@ -30,12 +30,12 @@
 <body class="sidebar-icon-only">
     <div class="container-scroller">
         <!-- partial:partials/_navbar.html -->
-        <%- include('../partials/navbar.ejs' , {user, user}); %>
+        <%- include('../partials/navbar.ejs' , {user}); %>
 
             <!-- partial -->
             <div class="container-fluid page-body-wrapper">
                 <!-- partial:partials/_sidebar.html -->
-                <%- include('../partials/sidebar.ejs' , {user, user}); %>
+                <%- include('../partials/sidebar.ejs' , {user}); %>
                     <!-- partial -->
                     <div class="main-panel">
                         <div class="content-wrapper">
@@ -77,7 +77,7 @@
                                                                     <tr>
                                                                         <td>Date</td>
                                                                         <td>
-                                                                            <%= moment(history.date).isValid() ? moment(history.date).format('MMMM DD, YYYY. h:mm:ss a') : 'N/A' %>
+                                                                            <%= moment(history.date).isValid() ? moment(history.date).format(completeDateFormat) : 'N/A' %>
                                                                         </td>
                                                                     </tr>
                                                                     <tr>

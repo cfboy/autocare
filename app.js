@@ -50,6 +50,7 @@ app.set('view engine', 'ejs')
 // Used to format dates
 app.locals.moment = moment
 app.locals.shortDateFormat = formats.shortDateFormat
+app.locals.completeDateFormat = formats.completeDateFormat
 
 // Pass all available alertTypes to the app variable.
 app.locals.alertTypes = alertTypes //To use this on the client side is necessary to use JSON.stringify

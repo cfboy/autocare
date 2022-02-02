@@ -33945,6 +33945,7 @@ label.required:after {
 .valid {
     color: green;
 }
+
 .invalid {
     color: red;
 }

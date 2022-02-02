@@ -30,113 +30,47 @@
 <body>
   <div class="container-scroller">
     <!-- partial:partials/_navbar.html -->
-    <%- include('../partials/navbar.ejs' , {user, user}); %>
+    <%- include('../partials/navbar.ejs' , {user}); %>
+    <!-- partial -->
+    <div class="container-fluid page-body-wrapper">
+      <!-- partial:partials/_settings-panel.html -->
+      <%- include('../partials/settings-panel.ejs', {user}); %>
       <!-- partial -->
-      <div class="container-fluid page-body-wrapper">
-        <!-- partial:partials/_settings-panel.html -->
-        <%- include('../partials/settings-panel.ejs', {user, user}); %>
-          <!-- partial -->
-          <!-- partial:partials/_sidebar.html -->
-          <%- include('../partials/sidebar.ejs', {user, user}); %>
-            <!-- partial -->
-            <div class="main-panel">
-              <div class="content-wrapper">
-                <div class="row">
-                  <div class="col-sm-12">
-                    <div class="home-tab">
-                      <div class="d-sm-flex align-items-center justify-content-between border-bottom">
-                        <ul class="nav nav-tabs" role="tablist">
-                          <li class="nav-item">
-                            <a class="nav-link active ps-0" id="profile-tab" data-bs-toggle="tab" href="#plan"
-                              role="tab" aria-selected="true">My Plan</a>
-                          </li>
-                          <!-- <li class="nav-item">
-                                                        <a class="nav-link" id="contact-tab" data-bs-toggle="tab" href="#activity" role="tab" aria-selected="false">Activity</a>
-                                                    </li>
-                                                    <li class="nav-item">
-                                                        <a class="nav-link border-0" id="more-tab" data-bs-toggle="tab" href="#more" role="tab" aria-selected="false">More</a>
-                                                    </li> -->
-                        </ul>
+      <!-- partial:partials/_sidebar.html -->
+      <%- include('../partials/sidebar.ejs', {user}); %>
+      <!-- partial -->
+      <div class="main-panel">
+        <div class="content-wrapper">
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="home-tab">
+                <div class="d-sm-flex align-items-center justify-content-between border-bottom">
+                  <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item">
+                      <a class="nav-link active ps-0" id="profile-tab" data-bs-toggle="tab" href="#plan" role="tab"
+                        aria-selected="true">My Plan</a>
+                    </li>
+                  </ul>
 
-                      </div>
-                      <div class="tab-content tab-content-basic">
-                        <div class="tab-pane show active" id="plan" role="tabpanel" aria-labelledby="plan">
-                          <div class="row">
-                            <div class="col-lg-12 d-flex flex-column">
-                              <div class="row flex-grow">
-                                <div class="col-12 col-lg-4 col-lg-12 grid-margin stretch-card">
-                                  <div class="card card-rounded">
-                                    <div class="card-body">
-                                      <%if (!hasSubscription) { %>
-                                        <p class="lead">
-                                          You are currently not on any plan. Purchase a subscription below.
-                                        </p>
-                                        <br>
-                                        <% for(const product of products) { %>
-
-                                          <input type="radio" id="<%=product.metadata.productKey%>" name="product"
-                                            value="<%=product.metadata.productKey%>" />
-
-                                          <label for="<%=product.metadata.productKey%>">
-                                            <%= product.name %> for <%= product.priceInfo[0].unit_amount%>
-                                          </label><br><br>
-                                          <% }; %>
-
-                                            <button class="btn btn-primary upgrade-btn" id="checkout-button"
-                                              type="submit" value="<%- user.billingID%>" email="<%- user.email%>">Buy
-                                              now</button>
-                                            <% } else{ %>
-                                              <p class="lead">
-                                                You are currently on the <b>
-                                                  <%- product.name %>
-                                                </b> plan. %>
-                                              </p>
-                                              <br>
-                                              <p class="lead">Plan will end on
-                                                <%= moment(stripeSubscription.trial_end * 1000).isValid() ? moment(stripeSubscription.trial_end * 1000).format('MMMM DD, YYYY.h:mm:ss a') : 'N/A' %>
-                                              </p>
-                                              <hr />
-                                              <!-- <p>You can access your content by clicking one of the buttons below.</p>
-                                                                                            <ul>
-                                                                                                <li><a href="/none">None</a></li>
-                                                                                                <li><a href="/basic">Basic</a></li>
-                                                                                                <li><a href="/pro">Pro</a></li>
-                                                                                            </ul> -->
-                                              <p>Your Plan information.</p>
-                                              <ul>
-                                              <li></li>
-                                              </ul>
-                                              <hr />
-                                              <p class="mt-4 text-muted">
-                                                Not happy with your current plan? Cancel or Upgrade by clicking the
-                                                button below.
-                                              </p>
-                                              <button
-                                                class="btn btn-primary btn-lg text-white mb-0 me-0 manage-billing-button"
-                                                id="manage-billing-button" type="submit" value="<%- user.billingID%>"
-                                                email="<%- user.email%>">Manage Billing</button>
-                                              <% } %>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                    </div>
+                </div>
+                <div class="tab-content tab-content-basic">
+                  <div class="tab-pane show active" id="plan" role="tabpanel" aria-labelledby="plan">
+                    <%- include('../partials/subscriptions.ejs' , {user, hasSubscription, products, stripeSubscription}); %>
                   </div>
                 </div>
+
               </div>
-              <!-- content-wrapper ends -->
-              <!-- partial:partials/_footer.html -->
-              <%- include('../partials/footer.ejs'); %>
-                <!-- partial -->
             </div>
-            <!-- main-panel ends -->
+          </div>
+        </div>
+        <!-- content-wrapper ends -->
+        <!-- partial:partials/_footer.html -->
+        <%- include('../partials/footer.ejs'); %>
+        <!-- partial -->
       </div>
-      <!-- page-body-wrapper ends -->
+      <!-- main-panel ends -->
+    </div>
+    <!-- page-body-wrapper ends -->
   </div>
   <!-- container-scroller -->
 

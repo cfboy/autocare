@@ -21,9 +21,16 @@ exports.account = async (req, res) => {
         users, hasSubscription = false
 
     try {
+        products = await Stripe.getAllProducts()
+
         if (user.billingID) {
             stripeCustomer = await Stripe.getCustomerByID(user.billingID)
             stripeSubscription = stripeCustomer.subscriptions.data[0]
+            if (stripeSubscription) {
+                hasSubscription = true
+                // find Product on this sub.
+                stripeSubscription.product = products.find(({ id }) => id === stripeSubscription.plan.product)
+            }
         }
     } catch (error) {
         console.error("ERROR: dashboardController -> Tyring to find stripeInfo.")
@@ -32,25 +39,19 @@ exports.account = async (req, res) => {
 
     switch (role) {
         case ROLES.ADMIN:
-            products = await Stripe.getAllProducts()
             // Get Customers
             users = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
-            res.render('dashboards/admin.ejs', { user, products, users, message, alertType })
+            res.render('dashboards/admin.ejs', { user, stripeCustomer, stripeSubscription, product: stripeSubscription.product, hasSubscription, products, users, message, alertType })
             break;
         case ROLES.CUSTOMER:
-            products = await Stripe.getAllProducts()
-            if (stripeSubscription) {
-                hasSubscription = true
-                // find Product on this sub.
-                stripeSubscription.product = products.find(({ id }) => id === stripeSubscription.plan.product)
-            }
-            res.render('dashboards/customer.ejs', { user, stripeCustomer, stripeSubscription ,product : stripeSubscription.product ,hasSubscription, products, message, alertType })
+
+            res.render('dashboards/customer.ejs', { user, stripeCustomer, stripeSubscription, product: stripeSubscription.product, hasSubscription, products, message, alertType })
             break;
         case ROLES.MANAGER:
-            products = await Stripe.getAllProducts()
+
             // Get Customers
             users = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
-            res.render('dashboards/admin.ejs', { user, products, users, message, alertType })
+            res.render('dashboards/admin.ejs', { user, stripeCustomer, stripeSubscription, product: stripeSubscription?.product, hasSubscription, products, users, message, alertType })
             break;
         default:
             console.log('No ROLE detected.');
@@ -77,14 +78,14 @@ exports.validate = async (req, res) => {
     let carPlate = req.body.tagNumber
     let customer = await UserService.getUserByPlate(carPlate)
     let membershipStatus = Stripe.STATUS.NONE
-
+    let stripeSubscription
     if (customer) {
         let stripeUser = await Stripe.getCustomerByID(customer.billingID)
-
-        if (stripeUser?.subscriptions?.data[0]) {
-            membershipStatus = stripeUser?.subscriptions?.data[0]?.status
+        stripeSubscription = stripeUser?.subscriptions?.data[0]
+        if (stripeSubscription) {
+            membershipStatus = stripeSubscription?.status
         }
     }
 
-    res.render('ajaxSnippets/validationResult.ejs', { customer, membershipStatus })
+    res.render('ajaxSnippets/validationResult.ejs', { customer, stripeSubscription, membershipStatus })
 }

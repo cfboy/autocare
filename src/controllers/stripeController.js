@@ -120,20 +120,10 @@ exports.webhook = async(req, res) => {
 exports.checkout = async(req, res) => {
     const customer = req.user
     const { product, customerID } = req.body
-
-    const price = productToPriceMap[product]
+    const priceID = product
 
     try {
-        const session = await Stripe.createCheckoutSession(customerID, price)
-            // TODO: change this logic
-        const ms =
-            new Date().getTime() + 1000 * 60 * 60 * 24 * process.env.TRIAL_DAYS
-        const n = new Date(ms)
-
-        customer.membershipInfo.plan = product
-        customer.membershipInfo.hasTrial = true
-        customer.membershipInfo.endDate = n
-        customer.save()
+        const session = await Stripe.createCheckoutSession(customerID, priceID)
 
         res.send({
             sessionId: session.id

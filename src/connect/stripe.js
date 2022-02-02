@@ -23,11 +23,11 @@ const createCheckoutSession = async (customerID, price) => {
         customer: customerID,
         line_items: [{
             price,
-            quantity: 1
+            quantity: 1 //TODO: implement option for select qty.
         }],
-        subscription_data: {
-            trial_period_days: process.env.TRIAL_DAYS
-        },
+        // subscription_data: {
+        //     trial_period_days: process.env.TRIAL_DAYS
+        // },
 
         success_url: `${process.env.DOMAIN}?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${process.env.DOMAIN}`
@@ -50,7 +50,7 @@ const getCustomerByID = async (id) => {
         const customer = await Stripe.customers.retrieve(id, {
             expand: ['subscriptions'] //Expand the Customer Obj to get subscriptions info.
         })
-        console.log(`STRIPE: Customer Found: ${customer.email}`);
+        console.debug(`STRIPE: Customer Found: ${customer.email}`);
         return customer
 
     } catch (error) {

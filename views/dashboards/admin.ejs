@@ -13,8 +13,9 @@
     <link rel="stylesheet" href="./vendors/typicons/typicons.css">
     <link rel="stylesheet" href="./vendors/simple-line-icons/css/simple-line-icons.css">
     <link rel="stylesheet" href="./vendors/css/vendor.bundle.base.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA==" crossorigin="anonymous" referrerpolicy="no-referrer"
-    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+        integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <!-- endinject -->
     <!-- Plugin css for this page -->
@@ -32,207 +33,162 @@
 <body>
     <div class="container-scroller">
         <!-- partial:partials/_navbar.html -->
-        <%- include('../partials/navbar.ejs' , {user, user}); %>
+        <%- include('../partials/navbar.ejs' , {user}); %>
+        <!-- partial -->
+        <div class="container-fluid page-body-wrapper">
+            <!-- partial:partials/_settings-panel.html -->
+            <%- include('../partials/settings-panel.ejs' , {user}); %>
             <!-- partial -->
-            <div class="container-fluid page-body-wrapper">
-                <!-- partial:partials/_settings-panel.html -->
-                <%- include('../partials/settings-panel.ejs' , {user, user}); %>
-                    <!-- partial -->
-                    <!-- partial:partials/_sidebar.html -->
-                    <%- include('../partials/sidebar.ejs' , {user, user}); %>
-                        <!-- partial -->
-                        <div class="main-panel">
-                            <div class="content-wrapper">
-                                <div class="row">
-                                    <div class="col-sm-12">
-                                        <div class="home-tab">
-                                            <div class="d-sm-flex align-items-center justify-content-between border-bottom">
-                                                <ul class="nav nav-tabs" role="tablist">
-                                                    <li class="nav-item">
-                                                        <a class="nav-link active ps-0" id="home-tab" data-bs-toggle="tab" href="#members" role="tab" aria-controls="members" aria-selected="true">Members</a>
-                                                    </li>
-                                                    <li class="nav-item">
-                                                        <a class="nav-link" id="profile-tab" data-bs-toggle="tab" href="#plan" role="tab" aria-selected="false">My Plan</a>
-                                                    </li>
-                                                    <li class="nav-item">
-                                                        <a class="nav-link" id="contact-tab" data-bs-toggle="tab" href="#demographics" role="tab" aria-selected="false">Demographics</a>
-                                                    </li>
-                                                    <li class="nav-item">
-                                                        <a class="nav-link border-0" id="more-tab" data-bs-toggle="tab" href="#more" role="tab" aria-selected="false">More</a>
-                                                    </li>
-                                                </ul>
-                                                <!-- <div>
-                                                    <div class="btn-wrapper">
-                                                        <a href="#" class="btn btn-otline-dark align-items-center"><i class="icon-share"></i> Share</a>
-                                                        <a href="#" class="btn btn-otline-dark"><i class="icon-printer"></i> Print</a>
-                                                        <a href="#" class="btn btn-primary text-white me-0"><i class="icon-download"></i> Export</a>
-                                                    </div>
-                                                </div> -->
-                                            </div>
-                                            <div class="tab-content tab-content-basic">
-                                                <div class="tab-pane fade show active" id="members" role="tabpanel" aria-labelledby="members">
-                                                    <div class="row">
-                                                        <div class="col-lg-12 d-flex flex-column">
-                                                            <div class="row flex-grow">
-                                                                <div class="col-12 grid-margin stretch-card">
-                                                                    <div class="card card-rounded">
-                                                                        <div class="card-body">
-                                                                            <div class="d-sm-flex justify-content-between align-items-start">
-                                                                                <div>
-                                                                                    <h4 class="card-title card-title-dash">
-                                                                                        <%= lingua.members%>
-                                                                                    </h4>
-                                                                                </div>
-                                                                                <div>
-                                                                                    <a href="/create-user" class="btn btn-primary btn-lg text-white mb-0 me-0" type="button"><i class="mdi mdi-account-plus"></i><%= lingua.add%></a>
-                                                                                </div>
-                                                                            </div>
-                                                                            <br>
-                                                                            <div class="table-responsive  mt-1">
-                                                                                <table id="membersTable" class="table table-hover">
-                                                                                    <thead>
-                                                                                        <tr>
-                                                                                            <th>
-                                                                                                <%= lingua.name%>
-                                                                                            </th>
-                                                                                            <th>
-                                                                                                <%= lingua.phoneNumber%>
-                                                                                            </th>
-                                                                                            <th>
-                                                                                                <%= lingua.email%>
-                                                                                            </th>
-                                                                                            <th>
-                                                                                                <%= lingua.plan%>
-                                                                                            </th>
-                                                                                            <!-- <th>Expiration Date <br> <small>(MM/DD/YYYY)</small>
-                                                                                            </th> -->
-                                                                                            <th>
-                                                                                                <%= lingua.action%>
-                                                                                            </th>
-                                                                                        </tr>
-                                                                                    </thead>
-                                                                                    <tbody>
-                                                                                        <% for(const member of users) { %>
-                                                                                            <tr>
-                                                                                                <td>
-                                                                                                    <a class="btn-link" href="/view-user/<%- member.id%>">
-                                                                                                        <%- member.personalInfo.firstName + ' ' + member.personalInfo.lastName %>
-                                                                                                            <% if(!member.hasAllInformation) {%>
-                                                                                                                <i class="mdi mdi-alert text-warning" style="padding-left: 10px;"></i>
-                                                                                                                <%}%>
-                                                                                                    </a>
-                                                                                                </td>
-                                                                                                <td>
-                                                                                                    <%- member.personalInfo.phoneNumber %>
-                                                                                                </td>
-                                                                                                <td>
-                                                                                                    <%- member.email%>
-                                                                                                </td>
-                                                                                                <td>
-                                                                                                    <%- member.membershipInfo.plan%>
-                                                                                                </td>
-                                                                                                <!-- <td>
-                                                                                                    <%# moment(member.membershipInfo.endDate).isValid() ? moment(member.membershipInfo.endDate).utc().format(shortDateFormat) : 'N/A' %>
-                                                                                                </td> -->
-                                                                                                <td>
-                                                                                                    <a href="/edit-user/<%- member.id%>?url=/account" type="button" class="btn btn-icon btn-icon-no-border no-margin">
-                                                                                                        <i class="far fa-edit icon-sm"></i>
-                                                                                                    </a>
-                                                                                                    <!-- <a id="manage-billing-button" class="btn btn-icon btn-icon-no-border no-margin">
-                                                                                                        
-                                                                                                        <i class="fab fa-stripe"></i>
-                                                                                                    </a> -->
-                                                                                                    <a class="btn btn-icon btn-icon-no-border no-margin manage-billing-button" style="margin: 0;" type="submit" value="<%- member.billingID%>" email="<%- member.email%>">
-                                                                                                        <i class="fab fa-stripe-s icon-sm"></i>
-                                                                                                    </a>
-
-                                                                                                    <a id="deleteBtn" onclick="return confirmDelete('/delete-user', '<%- member.id%>')" class="btn btn-icon btn-icon-no-border no-margin">
-                                                                                                        <i class="fas fa-trash-alt icon-sm text-danger"></i>
-                                                                                                    </a>
-                                                                                                </td>
-                                                                                            </tr>
-                                                                                            <%}%>
-                                                                                    </tbody>
-                                                                                </table>
-                                                                            </div>
-                                                                        </div>
+            <!-- partial:partials/_sidebar.html -->
+            <%- include('../partials/sidebar.ejs' , {user}); %>
+            <!-- partial -->
+            <div class="main-panel">
+                <div class="content-wrapper">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="home-tab">
+                                <div class="d-sm-flex align-items-center justify-content-between border-bottom">
+                                    <ul class="nav nav-tabs" role="tablist">
+                                        <li class="nav-item">
+                                            <a class="nav-link active ps-0" id="home-tab" data-bs-toggle="tab"
+                                                href="#members" role="tab" aria-controls="members"
+                                                aria-selected="true">Members</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="profile-tab" data-bs-toggle="tab" href="#plan"
+                                                role="tab" aria-selected="false">My Plan</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="contact-tab" data-bs-toggle="tab"
+                                                href="#demographics" role="tab" aria-selected="false">Demographics</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link border-0" id="more-tab" data-bs-toggle="tab" href="#more"
+                                                role="tab" aria-selected="false">More</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="tab-content tab-content-basic">
+                                    <div class="tab-pane fade show active" id="members" role="tabpanel"
+                                        aria-labelledby="members">
+                                        <div class="row">
+                                            <div class="col-lg-12 d-flex flex-column">
+                                                <div class="row flex-grow">
+                                                    <div class="col-12 grid-margin stretch-card">
+                                                        <div class="card card-rounded">
+                                                            <div class="card-body">
+                                                                <div
+                                                                    class="d-sm-flex justify-content-between align-items-start">
+                                                                    <div>
+                                                                        <h4 class="card-title card-title-dash">
+                                                                            <%= lingua.members%>
+                                                                        </h4>
+                                                                    </div>
+                                                                    <div>
+                                                                        <a href="/create-user"
+                                                                            class="btn btn-primary btn-lg text-white mb-0 me-0"
+                                                                            type="button"><i
+                                                                                class="mdi mdi-account-plus"></i><%= lingua.add%></a>
                                                                     </div>
                                                                 </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="tab-pane" id="plan" role="tabpanel" aria-labelledby="plan">
-                                                    <div class="row">
-                                                        <div class="col-lg-12 d-flex flex-column">
-                                                            <div class="row flex-grow">
-                                                                <div class="col-12 col-lg-4 col-lg-12 grid-margin stretch-card">
-                                                                    <div class="card card-rounded">
-                                                                        <div class="card-body">
-                                                                            <%if (user.membershipInfo.plan=="none" ) { %>
-                                                                                <p class="lead">
-                                                                                    <%= lingua.membership.notPlan%>
-                                                                                </p>
-                                                                                <br>
-                                                                                <% for(const product of products) { %>
+                                                                <br>
+                                                                <div class="table-responsive mt-1">
+                                                                    <table id="membersTable" class="table table-hover">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th>
+                                                                                    <%= lingua.name%>
+                                                                                </th>
+                                                                                <th>
+                                                                                    <%= lingua.phoneNumber%>
+                                                                                </th>
+                                                                                <th>
+                                                                                    <%= lingua.email%>
+                                                                                </th>
+                                                                                <th>
+                                                                                    <%= lingua.plan%>
+                                                                                </th>
 
-                                                                                    <input type="radio" id="<%=product.metadata.productKey%>" name="product" value="<%=product.metadata.productKey%>" />
+                                                                                <th>
+                                                                                    <%= lingua.action%>
+                                                                                </th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            <% for(const member of users) { %>
+                                                                            <tr>
+                                                                                <td>
+                                                                                    <a class="btn-link"
+                                                                                        href="/view-user/<%- member.id%>">
+                                                                                        <%- member.personalInfo.firstName + ' ' + member.personalInfo.lastName %>
+                                                                                        <% if(!member.hasAllInformation) {%>
+                                                                                        <i class="mdi mdi-alert text-warning"
+                                                                                            style="padding-left: 10px;"></i>
+                                                                                        <% } %>
+                                                                                    </a>
+                                                                                </td>
+                                                                                <td>
+                                                                                    <%- member.personalInfo.phoneNumber %>
+                                                                                </td>
+                                                                                <td>
+                                                                                    <%- member.email%>
+                                                                                </td>
+                                                                                <td>
+                                                                                    <%- member.membershipInfo.plan%>
+                                                                                </td>
 
-                                                                                    <label for="<%=product.metadata.productKey%>"><%= product.name %> for <%= product.priceInfo[0].unit_amount%></label><br><br>
-                                                                                    <% }; %>
+                                                                                <td>
+                                                                                    <a href="/edit-user/<%- member.id%>?url=/account"
+                                                                                        type="button"
+                                                                                        class="btn btn-icon btn-icon-no-border no-margin">
+                                                                                        <i
+                                                                                            class="far fa-edit icon-sm"></i>
+                                                                                    </a>
 
-                                                                                        <button class="btn btn-primary upgrade-btn" id="checkout-button" type="submit" value="<%- user.billingID%>" email="<%- user.email%>">Buy now</button>
+                                                                                    <a class="btn btn-icon btn-icon-no-border no-margin manage-billing-button"
+                                                                                        style="margin: 0;" type="submit"
+                                                                                        value="<%- member.billingID%>"
+                                                                                        email="<%- member.email%>">
+                                                                                        <i
+                                                                                            class="fab fa-stripe-s icon-sm"></i>
+                                                                                    </a>
 
-                                                                                        <% } else{ %>
-                                                                                            <p class="lead">
-                                                                                                You are currently on the
-                                                                                                <%- user.membershipInfo.plan %> plan. %>
-                                                                                            </p>
-                                                                                            <% if (user.membershipInfo.hasTrial) { %>
-                                                                                                <p class="lead">Trial active until
-                                                                                                    <%- user.membershipInfo.endDate %>
-                                                                                                </p>
-                                                                                                <% } else{ %>
-                                                                                                    <p class="lead">
-                                                                                                        Trial inactive. Plan will end on
-                                                                                                        <%- user.membershipInfo.endDate %>
-                                                                                                    </p>
-                                                                                                    <% } %>
-                                                                                                        <hr />
-                                                                                                        <p>You can access your content by clicking one of the buttons below.</p>
-                                                                                                        <ul>
-                                                                                                            <li><a href="/none">None</a></li>
-                                                                                                            <li><a href="/basic">Basic</a></li>
-                                                                                                            <li><a href="/pro">Pro</a></li>
-                                                                                                        </ul>
-                                                                                                        <hr />
-                                                                                                        <p class="mt-4 text-muted">
-                                                                                                            <%= lingua.membership.notHappy%>
-                                                                                                        </p>
-
-                                                                                                        <button class="btn btn-primary btn-lg text-white mb-0 me-0 manage-billing-button" id="manage-billing-button" type="submit" value="<%- user.billingID%>" email="<%- user.email%>">Manage Billing</button>
-                                                                                                        <% } %>
-                                                                        </div>
-                                                                    </div>
+                                                                                    <a id="deleteBtn"
+                                                                                        onclick="return confirmDelete('/delete-user', '<%- member.id%>')"
+                                                                                        class="btn btn-icon btn-icon-no-border no-margin">
+                                                                                        <i
+                                                                                            class="fas fa-trash-alt icon-sm text-danger"></i>
+                                                                                    </a>
+                                                                                </td>
+                                                                            </tr>
+                                                                            <% } %>
+                                                                        </tbody>
+                                                                    </table>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-
                                         </div>
                                     </div>
+                                    <div class="tab-pane" id="plan" role="tabpanel" aria-labelledby="plan">
+                                        <%- include('../partials/subscriptions.ejs' , {user, hasSubscription, products, stripeSubscription}); %>
+                                    </div>
                                 </div>
+
                             </div>
-                            <!-- content-wrapper ends -->
-                            <!-- partial:partials/_footer.html -->
-                            <%- include('../partials/footer.ejs'); %>
-                                <!-- partial -->
                         </div>
-                        <!-- main-panel ends -->
+                    </div>
+                </div>
+                <!-- content-wrapper ends -->
+                <!-- partial:partials/_footer.html -->
+                <%- include('../partials/footer.ejs'); %>
+                <!-- partial -->
             </div>
-            <!-- page-body-wrapper ends -->
+            <!-- main-panel ends -->
+        </div>
+        <!-- page-body-wrapper ends -->
     </div>
     <!-- container-scroller -->
 
@@ -243,7 +199,8 @@
     <script src="./vendors/chart.js/Chart.min.js"></script>
     <script src="./vendors/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
     <script src="./vendors/progressbar.js/progressbar.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 
     <!-- End plugin js for this page -->
     <!-- inject:js -->
@@ -272,31 +229,31 @@
     <!-- Alerts Code -->
     <%- include('../partials/alerts.ejs', {message, alertType}); %>
 
-        <script>
-            $(document).ready(function() {
-                $('#membersTable').DataTable({
-                    "language": {
-                        "emptyTable": "<%= lingua.emptyTable%>",
-                        "info": "<%= lingua.infoNotEmpty%>",
-                        "infoEmpty": "<%= lingua.infoEmpty%>",
-                        "infoFiltered": "(filtered from _MAX_ total entries)",
-                        "infoPostFix": "",
-                        "thousands": ",",
-                        "lengthMenu": "Show _MENU_ entries",
-                        "loadingRecords": "Loading...",
-                        "processing": "Processing...",
-                        "search": "<%= lingua.search%>:",
-                        "zeroRecords": "No matching records found",
-                        "paginate": {
-                            "first": "First",
-                            "last": "Last",
-                            "next": "<%= lingua.next%>",
-                            "previous": "<%= lingua.previous%>"
-                        },
-                    }
-                });
+    <script>
+        $(document).ready(function () {
+            $('#membersTable').DataTable({
+                "language": {
+                    "emptyTable": "<%= lingua.emptyTable%>",
+                    "info": "<%= lingua.infoNotEmpty%>",
+                    "infoEmpty": "<%= lingua.infoEmpty%>",
+                    "infoFiltered": "(filtered from _MAX_ total entries)",
+                    "infoPostFix": "",
+                    "thousands": ",",
+                    "lengthMenu": "Show _MENU_ entries",
+                    "loadingRecords": "Loading...",
+                    "processing": "Processing...",
+                    "search": "<%= lingua.search%>:",
+                    "zeroRecords": "No matching records found",
+                    "paginate": {
+                        "first": "First",
+                        "last": "Last",
+                        "next": "<%= lingua.next%>",
+                        "previous": "<%= lingua.previous%>"
+                    },
+                }
             });
-        </script>
+        });
+    </script>
 </body>
 
 </html>

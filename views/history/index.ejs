@@ -35,9 +35,9 @@
 
 <body>
     <div class="container-scroller">
-        <%- include('../partials/navbar.ejs' , {user, user}); %>
+        <%- include('../partials/navbar.ejs' , {user}); %>
             <div class="container-fluid page-body-wrapper">
-                <%- include('../partials/sidebar.ejs' , {user, user}); %>
+                <%- include('../partials/sidebar.ejs' , {user}); %>
                     <div class="main-panel">
                         <div class="content-wrapper">
                             <div class="row">
@@ -88,7 +88,7 @@
                                                                                 <%- history.type%>
                                                                             </td>
                                                                             <td>
-                                                                                <%= moment(history.date).isValid() ? moment(history.date).format('MMMM DD, YYYY. h:mm:ss a') : 'N/A' %>
+                                                                                <%= moment(history.date).isValid() ? moment(history.date).format(completeDateFormat) : 'N/A' %>
 
                                                                             </td>
                                                                             <td>

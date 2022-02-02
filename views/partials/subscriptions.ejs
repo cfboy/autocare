@@ -1,0 +1,62 @@
+<div class="row">
+    <div class="col-lg-12 d-flex flex-column">
+        <div class="row flex-grow">
+            <div class="col-12 col-lg-4 col-lg-12 grid-margin stretch-card">
+                <div class="card card-rounded">
+                    <div class="card-body">
+                        <%if (!hasSubscription) { %>
+                        <p class="lead">
+                            <%= lingua.membership.notPlan%>
+                        </p>
+                        <br>
+                        <% for(const product of products) { %>
+                        <% for(const price of product.priceInfo) { %>
+
+                        <input type="radio" id="<%= price?.id%>" name="product" value="<%= price?.id%>" />
+
+                        <label for="<%= price?.id%>">
+                            <%= product.name %>
+                            for
+                            <%= price.unit_amount%>
+                            <% if(price?.transform_quantity){%>
+                            per group of
+                            <%=  price.transform_quantity?.divide_by%> / <%= price.recurring.interval%>
+                            <% } %>
+                        </label><br><br>
+                        <% }; %>
+
+                        <% }; %>
+
+                        <button class="btn btn-primary upgrade-btn" id="checkout-button" type="submit"
+                            value="<%- user.billingID%>" email="<%- user.email%>">Buy
+                            now</button>
+
+                        <% } else{ %>
+                        <p class="lead">
+                            You are currently on the <b><%- product.name %></b> plan.
+                        </p>
+                        <br>
+                        <p class="lead">Plan will end on
+                            <%= moment(stripeSubscription.current_period_end * 1000).isValid() ? moment(stripeSubscription.current_period_end * 1000).format(completeDateFormat) : 'N/A' %>
+                        </p>
+                        <hr />
+
+                        <p>Your Plan information.</p>
+                        <ul>
+                            <li></li>
+                        </ul>
+                        <hr />
+                        <p class="mt-4 text-muted">
+                            Not happy with your current plan? Cancel or Upgrade by clicking the
+                            button below.
+                        </p>
+                        <button class="btn btn-primary btn-lg text-white mb-0 me-0 manage-billing-button"
+                            id="manage-billing-button" type="submit" value="<%- user.billingID%>"
+                            email="<%- user.email%>">Manage Billing</button>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

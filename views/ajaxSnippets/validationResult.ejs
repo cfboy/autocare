@@ -1,63 +1,95 @@
+<h4>Membership Status</h4>
 <div class="row">
     <div class="col-lg-12">
-        <%if(customer) {%>
+        <% if(customer) { %>
 
-            <div class="row">
-                <div class="col-md-8">
-                    <p>
+        <div class="row">
+            <div class="col-md-8">
+                <p>
+                    <b>
                         Name:
-                        <%- customer?.personalInfo.firstName%>
-                    </p>
+                    </b>
+                    <%- customer?.personalInfo.firstName%>
+                </p>
 
-                    <p>
+                <p>
+                    <b>
                         Email:
-                        <%- customer?.email%>
-                    </p>
+                    </b>
+                    <%- customer?.email%>
+                </p>
+                <p>
+                    <b>
+                        Car Brand:
+                    </b>
+                    <%- customer.carInfo.brand%>
 
-                    <p>
+                </p>
+                <p>
+                    <b>
+                        Model:
+                    </b>
+                    <%- customer.carInfo.model%>
+                </p>
+                <p>
+                    <b>
+                        Plate:
+                    </b>
+                    <%- customer.carInfo.plate%>
+                </p>
+
+                <p>
+                    <b>
                         Membership:
-                        <%- customer?.membershipInfo.plan%>
-                    </p>
+                    </b>
+                    <span style="text-transform: uppercase;">
+                        <%- membershipStatus%>
+                    </span>
+                </p>
+                <p>
+                    <b>
+                        Current Period End Start:
+                    </b>
+                    <%= moment(stripeSubscription?.current_period_start * 1000).isValid() ? moment(stripeSubscription?.current_period_start * 1000).format(completeDateFormat) : 'N/A' %>
 
-                    <p>
-                        Expiration Date:
-                        <%= moment(customer.membershipInfo.endDate).isValid() ?
-                            moment(customer.membershipInfo.endDate).utc().format(shortDateFormat) : 'N/A' %>
-                    </p>
+                </p>
+                <p>
+                    <b>
+                        Current Period End Date:
+                    </b>
+                    <%= moment(stripeSubscription?.current_period_end * 1000).isValid() ? moment(stripeSubscription?.current_period_end * 1000).format(completeDateFormat) : 'N/A' %>
 
-                    <p>
-                        Car Brand
-                        <%- customer.carInfo.brand%>
+                </p>
 
-                    </p>
-                    <p>Model :
-                        <%- customer.carInfo.model%>
-                    </p>
-                    <p>Plate:
-                        <%- customer.carInfo.plate%>
-                    </p>
+                <% if(stripeSubscription?.trial_end) { %>
+                <p>
+                    <b>
+                        Trial Expiration Date:
+                    </b>
+                    <%= moment(stripeSubscription?.trial_end * 1000).isValid() ? moment(stripeSubscription?.trial_end * 1000).format(completeDateFormat) : 'N/A' %>
 
-                </div>
-                <div class="col-md-4 text-center">
-                    <%if([stripeStatus.ACTIVE, stripeStatus.TRIALING].includes(membershipStatus)){%>
-                        <i class="fas fa-4x fa-check-circle valid"></i>
-                        <p>Valid Membership</p>
-                        <%}else if(membershipStatus==stripeStatus.CANCELED){%>
-                            <i class="far fa-4x fa-times-circle invalid"></i>
-                            <p>Canceled Membership</p>
-                            <%}else if(membershipStatus==stripeStatus.UNPAID){%>
-                                <i class="far fa-4x fa-times-circle invalid"></i>
-                                <p>Unpaid Membership</p>
-                                <%}else if(membershipStatus==stripeStatus.NONE){%>
-                                    <i class="far fa-4x fa-times-circle invalid"></i>
-                                    <p>This user don't have Membership</p>
-                                    <%}%>
+                </p>
+                <% } %>
 
-                </div>
             </div>
-            <%} else{%>
-
-                <p>Customer not found.</p>
+            <div class="col-md-4 text-center">
+                <% if([stripeStatus.ACTIVE, stripeStatus.TRIALING].includes(membershipStatus)) { %>
+                <i class="fas fa-4x fa-check-circle valid"></i>
+                <p>Valid Membership</p>
+                <%}else if(membershipStatus==stripeStatus.CANCELED){%>
+                <i class="far fa-4x fa-times-circle invalid"></i>
+                <p>Canceled Membership</p>
+                <%}else if(membershipStatus==stripeStatus.UNPAID){%>
+                <i class="far fa-4x fa-times-circle invalid"></i>
+                <p>Unpaid Membership</p>
+                <%}else if(membershipStatus==stripeStatus.NONE){%>
+                <i class="far fa-4x fa-times-circle invalid"></i>
+                <p>This user don't have Membership</p>
                 <%}%>
-    </div>
-</div>
+            </div>
+        </div>
+            <% } else { %>
+                <p>Customer not found.</p>
+                <% } %>
+            </div>
+        </div>
