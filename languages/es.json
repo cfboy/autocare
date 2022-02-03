@@ -35,6 +35,7 @@
     "emptyTable": "No hay información disponible para esta tabla.",
     "infoNotEmpty": "Mostrando _START_ a _END_ de _TOTAL_ entradas",
     "infoEmpty": "Mostrando 0 a 0 de 0 entradas",
+    "lengthMenu": "Muestra _MENU_ entradas",
     "selectLanguage": "Seleccionar Lenguaje",
     "content": {
         "description": "Descripción"

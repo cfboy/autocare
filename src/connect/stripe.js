@@ -46,7 +46,7 @@ const createBillingSession = async (customer) => {
 
 const getCustomerByID = async (id) => {
     try {
-        console.debug(`STRIPE: getCustomerByID(${id})`);
+        // console.debug(`STRIPE: getCustomerByID(${id})`);
         const customer = await Stripe.customers.retrieve(id, {
             expand: ['subscriptions'] //Expand the Customer Obj to get subscriptions info.
         })

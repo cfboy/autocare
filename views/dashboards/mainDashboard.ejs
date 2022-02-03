@@ -58,14 +58,14 @@
                                             <a class="nav-link" id="profile-tab" data-bs-toggle="tab" href="#plan"
                                                 role="tab" aria-selected="false">My Plan</a>
                                         </li>
-                                        <li class="nav-item">
+                                        <!-- <li class="nav-item">
                                             <a class="nav-link" id="contact-tab" data-bs-toggle="tab"
                                                 href="#demographics" role="tab" aria-selected="false">Demographics</a>
                                         </li>
                                         <li class="nav-item">
                                             <a class="nav-link border-0" id="more-tab" data-bs-toggle="tab" href="#more"
                                                 role="tab" aria-selected="false">More</a>
-                                        </li>
+                                        </li> -->
                                     </ul>
                                 </div>
                                 <div class="tab-content tab-content-basic">
@@ -84,12 +84,14 @@
                                                                             <%= lingua.members%>
                                                                         </h4>
                                                                     </div>
+                                                                    <% if([roles.ADMIN, roles.MANAGER].includes(user.role)) { %>
                                                                     <div>
                                                                         <a href="/create-user"
                                                                             class="btn btn-primary btn-lg text-white mb-0 me-0"
                                                                             type="button"><i
                                                                                 class="mdi mdi-account-plus"></i><%= lingua.add%></a>
                                                                     </div>
+                                                                    <% } %>
                                                                 </div>
                                                                 <br>
                                                                 <div class="table-responsive mt-1">
@@ -115,30 +117,30 @@
                                                                             </tr>
                                                                         </thead>
                                                                         <tbody>
-                                                                            <% for(const member of users) { %>
+                                                                            <% for(const customer of customers) { %>
                                                                             <tr>
                                                                                 <td>
                                                                                     <a class="btn-link"
-                                                                                        href="/view-user/<%- member.id%>">
-                                                                                        <%- member.personalInfo.firstName + ' ' + member.personalInfo.lastName %>
-                                                                                        <% if(!member.hasAllInformation) {%>
+                                                                                        href="/view-user/<%- customer.id%>">
+                                                                                        <%- customer.personalInfo.firstName + ' ' + customer.personalInfo.lastName %>
+                                                                                        <% if(!customer.hasAllInformation) {%>
                                                                                         <i class="mdi mdi-alert text-warning"
                                                                                             style="padding-left: 10px;"></i>
                                                                                         <% } %>
                                                                                     </a>
                                                                                 </td>
                                                                                 <td>
-                                                                                    <%- member.personalInfo.phoneNumber %>
+                                                                                    <%- customer.personalInfo.phoneNumber %>
                                                                                 </td>
                                                                                 <td>
-                                                                                    <%- member.email%>
+                                                                                    <%- customer.email%>
                                                                                 </td>
                                                                                 <td>
-                                                                                    <%- member.membershipInfo.plan%>
+                                                                                    <%- customer.membershipInfo.plan%>
                                                                                 </td>
 
                                                                                 <td>
-                                                                                    <a href="/edit-user/<%- member.id%>?url=/account"
+                                                                                    <a href="/edit-user/<%- customer.id%>?url=/account"
                                                                                         type="button"
                                                                                         class="btn btn-icon btn-icon-no-border no-margin">
                                                                                         <i
@@ -147,14 +149,14 @@
 
                                                                                     <a class="btn btn-icon btn-icon-no-border no-margin manage-billing-button"
                                                                                         style="margin: 0;" type="submit"
-                                                                                        value="<%- member.billingID%>"
-                                                                                        email="<%- member.email%>">
+                                                                                        value="<%- customer.billingID%>"
+                                                                                        email="<%- customer.email%>">
                                                                                         <i
                                                                                             class="fab fa-stripe-s icon-sm"></i>
                                                                                     </a>
 
                                                                                     <a id="deleteBtn"
-                                                                                        onclick="return confirmDelete('/delete-user', '<%- member.id%>')"
+                                                                                        onclick="return confirmDelete('/delete-user', '<%- customer.id%>')"
                                                                                         class="btn btn-icon btn-icon-no-border no-margin">
                                                                                         <i
                                                                                             class="fas fa-trash-alt icon-sm text-danger"></i>
@@ -228,32 +230,7 @@
     <script src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap5.min.js"></script>
     <!-- Alerts Code -->
     <%- include('../partials/alerts.ejs', {message, alertType}); %>
-
-    <script>
-        $(document).ready(function () {
-            $('#membersTable').DataTable({
-                "language": {
-                    "emptyTable": "<%= lingua.emptyTable%>",
-                    "info": "<%= lingua.infoNotEmpty%>",
-                    "infoEmpty": "<%= lingua.infoEmpty%>",
-                    "infoFiltered": "(filtered from _MAX_ total entries)",
-                    "infoPostFix": "",
-                    "thousands": ",",
-                    "lengthMenu": "Show _MENU_ entries",
-                    "loadingRecords": "Loading...",
-                    "processing": "Processing...",
-                    "search": "<%= lingua.search%>:",
-                    "zeroRecords": "No matching records found",
-                    "paginate": {
-                        "first": "First",
-                        "last": "Last",
-                        "next": "<%= lingua.next%>",
-                        "previous": "<%= lingua.previous%>"
-                    },
-                }
-            });
-        });
-    </script>
+    <%- include('../partials/dataTable.ejs', {tableID : '#membersTable'}); %>
 </body>
 
 </html>

@@ -1,0 +1,25 @@
+<script>
+    $(document).ready(function () {
+        $('<%= tableID %>').DataTable({
+            "language": {
+                "emptyTable": "<%= lingua.emptyTable%>",
+                "info": "<%= lingua.infoNotEmpty%>",
+                "infoEmpty": "<%= lingua.infoEmpty%>",
+                "infoFiltered": "(filtered from _MAX_ total entries)",
+                "infoPostFix": "",
+                "thousands": ",",
+                "lengthMenu": "<%= lingua.lengthMenu%>",
+                "loadingRecords": "Loading...",
+                "processing": "Processing...",
+                "search": "<%= lingua.search%>:",
+                "zeroRecords": "No matching records found",
+                "paginate": {
+                    "first": "First",
+                    "last": "Last",
+                    "next": "<%= lingua.next%>",
+                    "previous": "<%= lingua.previous%>"
+                },
+            }
+        });
+    });
+</script>

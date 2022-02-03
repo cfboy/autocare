@@ -18,20 +18,26 @@ exports.account = async (req, res) => {
         stripeSubscription,
         stripeCustomer,
         products,
-        users, hasSubscription = false
+        users, hasSubscription = false,
+        params
+
+    params = { user, message, alertType }
 
     try {
         products = await Stripe.getAllProducts()
 
         if (user.billingID) {
             stripeCustomer = await Stripe.getCustomerByID(user.billingID)
-            stripeSubscription = stripeCustomer.subscriptions.data[0]
-            if (stripeSubscription) {
-                hasSubscription = true
-                // find Product on this sub.
-                stripeSubscription.product = products.find(({ id }) => id === stripeSubscription.plan.product)
+            if (stripeCustomer) {
+                stripeSubscription = stripeCustomer?.subscriptions?.data[0]
+                if (stripeSubscription) {
+                    hasSubscription = true
+                    // find Product on this sub.
+                    stripeSubscription.product = products.find(({ id }) => id === stripeSubscription.plan.product)
+                }
             }
         }
+        params = { ...params, stripeCustomer, stripeSubscription, product: stripeSubscription?.product, hasSubscription, products }
     } catch (error) {
         console.error("ERROR: dashboardController -> Tyring to find stripeInfo.")
         console.error(error.message)
@@ -40,21 +46,31 @@ exports.account = async (req, res) => {
     switch (role) {
         case ROLES.ADMIN:
             // Get Customers
-            users = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
-            res.render('dashboards/admin.ejs', { user, stripeCustomer, stripeSubscription, product: stripeSubscription.product, hasSubscription, products, users, message, alertType })
+            customers = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
+            params = { ...params, customers }
+            res.render('dashboards/mainDashboard.ejs', params)
             break;
         case ROLES.CUSTOMER:
-
-            res.render('dashboards/customer.ejs', { user, stripeCustomer, stripeSubscription, product: stripeSubscription.product, hasSubscription, products, message, alertType })
+            res.render('dashboards/customer.ejs', params)
             break;
         case ROLES.MANAGER:
-
             // Get Customers
-            users = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
-            res.render('dashboards/admin.ejs', { user, stripeCustomer, stripeSubscription, product: stripeSubscription?.product, hasSubscription, products, users, message, alertType })
+            customers = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
+            params = { ...params, customers }
+
+            res.render('dashboards/mainDashboard.ejs', params)
+            break;
+
+        case ROLES.CASHIER:
+            // Get Customers
+            customers = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
+            params = { ...params, customers }
+            res.render('dashboards/mainDashboard.ejs', params)
             break;
         default:
             console.log('No ROLE detected.');
+            res.redirect('/logout')
+
     }
 }
 
