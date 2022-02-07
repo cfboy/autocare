@@ -184,6 +184,7 @@ const getCustomerSubscription = async (customerID) => {
     }
 }
 
+// This method set the stripe infor and if has or not subscription but this vairables are temporary.
 const setStripeInfoToUser = async (customerObj, products) => {
     try {
         let customer = customerObj

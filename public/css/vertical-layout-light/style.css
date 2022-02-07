@@ -33955,8 +33955,14 @@ label.required:after {
     color: red;
 }
 
-.paginate_button .page-item .active {
-
+.warning {
+    color: orange;
 }
 
+.validation-msgs > p {
+    margin-top: 0.5rem;
+    font-size: 1.30rem;
+}
+ 
+ 
 /*# sourceMappingURL=../maps/vertical-layout-light/style.css.map */

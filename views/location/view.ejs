@@ -95,8 +95,7 @@
                                                                 <ul>
                                                                     <% for(user of location.users){ %>
                                                                     <li>
-                                                                        <%- user.personalInfo.firstName + ' ' + user.personalInfo.lastName %>
-                                                                        - <%- user.role%>
+                                                                        <%- user.personalInfo.firstName + ' ' + user.personalInfo.lastName %> (<%- user.role%>)
                                                                     </li>
                                                                     <% } %>
                                                                 </ul>
