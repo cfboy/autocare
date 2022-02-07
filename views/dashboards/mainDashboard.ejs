@@ -107,9 +107,9 @@
                                                                                 <th>
                                                                                     <%= lingua.email%>
                                                                                 </th>
-                                                                                <th>
-                                                                                    <%= lingua.plan%>
-                                                                                </th>
+                                                                                <!-- <th>
+                                                                                    <%# lingua.plan%>
+                                                                                </th> -->
 
                                                                                 <th>
                                                                                     <%= lingua.action%>
@@ -135,9 +135,14 @@
                                                                                 <td>
                                                                                     <%- customer.email%>
                                                                                 </td>
-                                                                                <td>
-                                                                                    <%- customer.membershipInfo.plan%>
-                                                                                </td>
+                                                                                <!-- <td>
+                                                                                    <%# customer?.stripe?.subscription?.product?.name%>
+                                                                                    <br>
+                                                                                    <span
+                                                                                        style="text-transform: uppercase;">
+                                                                                        (<%# customer?.stripe?.subscription?.status ? customer?.stripe?.subscription?.status : stripeStatus.NONE%>)
+                                                                                    </span>
+                                                                                </td> -->
 
                                                                                 <td>
                                                                                     <a href="/edit-user/<%- customer.id%>?url=/account"
@@ -175,7 +180,8 @@
                                         </div>
                                     </div>
                                     <div class="tab-pane" id="plan" role="tabpanel" aria-labelledby="plan">
-                                        <%- include('../partials/subscriptions.ejs' , {user, hasSubscription, products, stripeSubscription}); %>
+                                        <%- include('../partials/subscriptions/subscriptions.ejs' , {user, hasSubscription : user?.hasSubscription, 
+                                            products, stripeSubscription, membershipStatus, products}); %>
                                     </div>
                                 </div>
 

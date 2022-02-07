@@ -12,6 +12,9 @@
     <link rel="stylesheet" href="../vendors/ti-icons/css/themify-icons.css">
     <link rel="stylesheet" href="../vendors/typicons/typicons.css">
     <link rel="stylesheet" href="../vendors/simple-line-icons/css/simple-line-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+        integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="../vendors/css/vendor.bundle.base.css">
 
     <!-- endinject -->
@@ -28,74 +31,93 @@
 <body class="sidebar-icon-only">
     <div class="container-scroller">
         <%- include('../partials/navbar.ejs' , {user}); %>
-            <div class="container-fluid page-body-wrapper">
-                <%- include('../partials/sidebar.ejs' , {user}); %>
-                    <div class="main-panel">
-                        <div class="content-wrapper">
-                            <% if(location) {%>
-                                <div class="row text-left">
-                                    <div class="col-lg-12 d-flex flex-column">
-                                        <div class="row flex-grow">
-                                            <div class="col-8 grid-margin stretch-card">
-                                                <div class="card card-rounded">
-                                                    <div class="card-body">
-                                                        <div class="table-responsive mt-1">
-                                                            <div class="d-sm-flex justify-content-between align-items-start float-end">
-                                                                <a href="/edit-location/<%- location.id%>?url=/view-location" data-id="location" type="button" class="btn btn-primary btn-icon-text">
-                                                                    <i class=" mdi mdi-square-edit-outline"></i> Edit
-                                                                </a>
-                                                            </div>
-                                                            <table class="table table-hover">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th>Location Datails</th>
-                                                                        <th></th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    <tr>
-                                                                        <td>Name</td>
-                                                                        <td>
-                                                                            <%- location.name%>
-                                                                        </td>
-                                                                    </tr>
-
-                                                                    <tr>
-                                                                        <td>Active</td>
-                                                                        <td>
-                                                                            <%- location.isActive ? "Yes" : "No"%>
-                                                                        </td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>Services</td>
-                                                                        <td>
-                                                                            <% if(location.services.length > 0){%>
-                                                                                <ul>
-                                                                                    <% for(service of location.services){ %>
-                                                                                        <li>
-                                                                                            <%-service.name %>
-                                                                                        </li>
-                                                                                        <%}%>
-                                                                                </ul>
-                                                                                <%}else{%>
-                                                                                    N/A
-                                                                                    <%}%>
-                                                                        </td>
-                                                                    </tr>
-
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
+        <div class="container-fluid page-body-wrapper">
+            <%- include('../partials/sidebar.ejs' , {user}); %>
+            <div class="main-panel">
+                <div class="content-wrapper">
+                    <% if(location) { %>
+                    <div class="row text-left">
+                        <div class="col-lg-12 d-flex flex-column">
+                            <div class="row flex-grow">
+                                <div class="col-8 grid-margin stretch-card">
+                                    <div class="card card-rounded">
+                                        <div class="card-body">
+                                            <div class="table-responsive mt-1">
+                                                <div
+                                                    class="d-sm-flex justify-content-between align-items-start float-end">
+                                                    <a href="/edit-location/<%- location.id%>?url=/view-location"
+                                                        data-id="location" type="button"
+                                                        class="btn btn-primary btn-icon-text">
+                                                        <i class=" mdi mdi-square-edit-outline"></i> Edit
+                                                    </a>
                                                 </div>
+                                                <table class="table table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Location Datails</th>
+                                                            <th></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>Name</td>
+                                                            <td>
+                                                                <%- location.name%>
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>Active</td>
+                                                            <td>
+                                                                <%- location.isActive ? "Yes" : "No"%>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Services</td>
+                                                            <td>
+                                                                <% if(location.services.length > 0){ %>
+                                                                <ul>
+                                                                    <% for(service of location.services){ %>
+                                                                    <li>
+                                                                        <%-service.name %>
+                                                                    </li>
+                                                                    <% } %>
+                                                                </ul>
+                                                                <% }else { %>
+                                                                N/A
+                                                                <% } %>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Users</td>
+                                                            <td>
+                                                                <% if(location?.users?.length > 0){ %>
+                                                                <ul>
+                                                                    <% for(user of location.users){ %>
+                                                                    <li>
+                                                                        <%- user.personalInfo.firstName + ' ' + user.personalInfo.lastName %>
+                                                                        - <%- user.role%>
+                                                                    </li>
+                                                                    <% } %>
+                                                                </ul>
+                                                                <% }else{ %>
+                                                                N/A
+                                                                <% } %>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <% }%>
+                            </div>
                         </div>
                     </div>
+                    <% }%>
+                </div>
             </div>
+        </div>
     </div>
 
     <script src="../vendors/js/vendor.bundle.base.js"></script>
@@ -104,7 +126,8 @@
     <script src="../vendors/chart.js/Chart.min.js"></script>
     <script src="../vendors/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
     <script src="../vendors/progressbar.js/progressbar.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 
     <!-- End plugin js for this page -->
     <!-- inject:js -->

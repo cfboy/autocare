@@ -48,7 +48,7 @@
                 </p>
                 <p>
                     <b>
-                        Current Period End Start:
+                        Current Period Start:
                     </b>
                     <%= moment(stripeSubscription?.current_period_start * 1000).isValid() ? moment(stripeSubscription?.current_period_start * 1000).format(completeDateFormat) : 'N/A' %>
 

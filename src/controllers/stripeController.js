@@ -53,61 +53,61 @@ exports.webhook = async(req, res) => {
         case 'customer.subscription.created':
             {
                 // TODO: move all logic to user.service
-                const user = await UserService.getUserByBillingID(data.customer)
+                // const user = await UserService.getUserByBillingID(data.customer)
 
-                if (data.plan.id === process.env.PRODUCT_BASIC) {
-                    console.log('You are talking about basic product')
-                    user.membershipInfo.plan = 'basic'
-                }
+                // if (data.plan.id === process.env.PRODUCT_BASIC) {
+                //     console.log('You are talking about basic product')
+                //     user.membershipInfo.plan = 'basic'
+                // }
 
-                if (data.plan.id === process.env.PRODUCT_PRO) {
-                    console.log('You are talking about pro product')
-                    user.membershipInfo.plan = 'pro'
-                }
+                // if (data.plan.id === process.env.PRODUCT_PRO) {
+                //     console.log('You are talking about pro product')
+                //     user.membershipInfo.plan = 'pro'
+                // }
 
-                user.membershipInfo.hasTrial = true
-                user.membershipInfo.endDate = new Date(data.current_period_end * 1000)
+                // user.membershipInfo.hasTrial = true
+                // user.membershipInfo.endDate = new Date(data.current_period_end * 1000)
 
-                await user.save()
+                // await user.save()
 
                 break
             }
         case 'customer.subscription.updated':
             {
                 // started trial
-                const user = await UserService.getUserByBillingID(data.customer)
+                // const user = await UserService.getUserByBillingID(data.customer)
 
-                if (data.plan.id == process.env.PRODUCT_BASIC) {
-                    console.log('You are talking about basic product')
-                    user.membershipInfo.plan = 'basic'
-                }
+                // if (data.plan.id == process.env.PRODUCT_BASIC) {
+                //     console.log('You are talking about basic product')
+                //     user.membershipInfo.plan = 'basic'
+                // }
 
-                if (data.plan.id === process.env.PRODUCT_PRO) {
-                    console.log('You are talking about pro product')
-                    user.membershipInfo.plan = 'pro'
-                }
+                // if (data.plan.id === process.env.PRODUCT_PRO) {
+                //     console.log('You are talking about pro product')
+                //     user.membershipInfo.plan = 'pro'
+                // }
 
-                const isOnTrial = data.status === 'trialing'
+                // const isOnTrial = data.status === 'trialing'
 
-                if (isOnTrial) {
-                    user.membershipInfo.hasTrial = true
-                    user.membershipInfo.endDate = new Date(data.current_period_end * 1000)
-                } else if (data.status === 'active') {
-                    user.membershipInfo.hasTrial = false
-                    user.membershipInfo.endDate = new Date(data.current_period_end * 1000)
-                }
+                // if (isOnTrial) {
+                //     user.membershipInfo.hasTrial = true
+                //     user.membershipInfo.endDate = new Date(data.current_period_end * 1000)
+                // } else if (data.status === 'active') {
+                //     user.membershipInfo.hasTrial = false
+                //     user.membershipInfo.endDate = new Date(data.current_period_end * 1000)
+                // }
 
-                if (data.canceled_at) {
-                    // cancelled
-                    console.log('You just canceled the subscription' + data.canceled_at)
-                    user.membershipInfo.plan = 'none'
-                    user.membershipInfo.hasTrial = false
-                    user.membershipInfo.endDate = null
-                }
-                console.debug(`Actual: hasTrial: ${user.membershipInfo.hasTrial}, current_period_end ${data.current_period_end}, User Plan: ${user.membershipInfo.plan}`)
+                // if (data.canceled_at) {
+                //     // cancelled
+                //     console.log('You just canceled the subscription' + data.canceled_at)
+                //     user.membershipInfo.plan = 'none'
+                //     user.membershipInfo.hasTrial = false
+                //     user.membershipInfo.endDate = null
+                // }
+                // console.debug(`Actual: hasTrial: ${user.membershipInfo.hasTrial}, current_period_end ${data.current_period_end}, User Plan: ${user.membershipInfo.plan}`)
 
-                await user.save()
-                console.log('Customer Changed', JSON.stringify(data))
+                // await user.save()
+                // console.log('Customer Changed', JSON.stringify(data))
                 break
             }
         case 'customer.subscription.deleted':

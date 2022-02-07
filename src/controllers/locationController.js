@@ -1,7 +1,8 @@
 const LocationService = require('../collections/location')
+const UserService = require('../collections/user')
 const HistoryService = require('../collections/history')
-const {historyTypes} = require('../collections/history/history.model')
-
+const { historyTypes } = require('../collections/history/history.model')
+const { ROLES } = require('../collections/user/user.model')
 const Stripe = require('../connect/stripe')
 const alertTypes = require('../helpers/alertTypes')
 
@@ -9,10 +10,10 @@ const alertTypes = require('../helpers/alertTypes')
 
 // ------------------------------- Create -------------------------------
 
-exports.locations = async(req, res) => {
+exports.locations = async (req, res) => {
     // Message for alerts
     let { message, alertType } = req.session
-        // clear message y alertType
+    // clear message y alertType
     if (message) {
         req.session.message = ''
         req.session.alertType = ''
@@ -31,18 +32,20 @@ exports.locations = async(req, res) => {
 }
 
 // Route for create location.
-exports.createLocation = async(req, res) => {
+exports.createLocation = async (req, res) => {
     let { message, alertType } = req.session
 
     // clear message y alertType
     req.session.message = ''
     req.session.alertType = ''
-        // TODO: Find all products to link with location
-    const products = await Stripe.getAllProducts()
-    res.render('location/create.ejs', { user: req.user, products, message, alertType })
+    // TODO: Find all products to link with location
+    const products = await Stripe.getAllProducts(),
+        users = await UserService.getUsersPerRoles([ROLES.ADMIN, ROLES.MANAGER, ROLES.CASHIER])
+
+    res.render('location/create.ejs', { user: req.user, products, users, message, alertType })
 }
 
-exports.save = async(req, res) => {
+exports.save = async (req, res) => {
     const fields = req.body
     try {
         console.log('Creating New Location: ', fields.name)
@@ -50,8 +53,8 @@ exports.save = async(req, res) => {
         let location = await LocationService.getLocationByName(fields.name)
         if (!location) {
             console.log(`Location ${fields.name} does not exist. Making one...`)
-                // TODO: Add Location to DB
-            location = await LocationService.addLocation({ name: fields.name, services: fields.services })
+            // TODO: Add Location to DB
+            location = await LocationService.addLocation({ name: fields.name, services: fields.services, users: fields.users })
 
             console.log(
                 `A new Location to DB. The ID for ${location.name} is ${location.id}`
@@ -75,13 +78,13 @@ exports.save = async(req, res) => {
         // console.error(error.message)
         req.session.message = error.message
         req.session.alertType = alertTypes.ErrorAlert
-            // res.status(400).send(error)
+        // res.status(400).send(error)
         res.redirect('/locations')
     }
 }
 
 // ------------------------------- Read -------------------------------
-exports.viewLocation = async(req, res) => {
+exports.viewLocation = async (req, res) => {
     try {
         let { message, alertType } = req.session
         let services = []
@@ -97,16 +100,20 @@ exports.viewLocation = async(req, res) => {
             //On location.services the values is the stripe product id.
 
             for (const service of location.services) {
-                console.debug(`Service: ${service}`)
+                console.debug(`LOCATION-CONTROLLER: Service: ${service}`)
                 let serviceInfo = await Stripe.getProductInfoById(service)
                 if (serviceInfo)
                     services.push(serviceInfo)
             }
 
             location.services = services
+
+            const locationUsers = await UserService.getLocationUsers(location?.users?.toObject())
+            // const testGetMultipleUsers = await UserService.getUsersPerRoles([ROLES.ADMIN, ROLES.MANAGER, ROLES.CASHIER])
+            location.users = locationUsers
             res.status(200).render('location/view.ejs', { user: req.user, location, message, alertType })
         } else {
-            console.log('Location not found.')
+            console.log('LOCATION-CONTROLLER: Location not found.')
             res.redirect('/locations')
         }
     } catch (error) {
@@ -119,18 +126,19 @@ exports.viewLocation = async(req, res) => {
 // ------------------------------- Update -------------------------------
 
 // Route for view/edit location info.
-exports.editLocation = async(req, res) => {
+exports.editLocation = async (req, res) => {
     try {
         const id = req.params.id;
         const url = req.query.url ? req.query.url : '/locations'
-        const location = await LocationService.getLocationById(id)
+        let location = await LocationService.getLocationById(id)
 
         if (location) {
-            const products = await Stripe.getAllProducts()
+            const products = await Stripe.getAllProducts(),
+                users = await UserService.getUsersPerRoles([ROLES.ADMIN, ROLES.MANAGER, ROLES.CASHIER])
 
-            res.status(200).render('location/edit.ejs', { user: req.user, products, location, url: url == '/locations' ? url : `${url}/${id}` })
+            res.status(200).render('location/edit.ejs', { user: req.user, products, users, location, url: url == '/locations' ? url : `${url}/${id}` })
         } else {
-            console.log('Location not found.')
+            console.log('LOCATION-CONTROLLER: Location not found.')
             res.redirect(`${url}`)
         }
     } catch (error) {
@@ -140,12 +148,15 @@ exports.editLocation = async(req, res) => {
     }
 }
 
-exports.update = async(req, res) => {
+exports.update = async (req, res) => {
 
     const url = req.query.url
     try {
         // Handle checkbox value.
         req.body.isActive = req.body.isActive == 'on' ? true : false
+        req.body.services = req.body.services ? req.body.services : []
+        req.body.users = req.body.users ? req.body.users : []
+        let unselectedUsers = req.body.unselectedUsers ? req.body.unselectedUsers.split(',') : []
 
         const location = await LocationService.updateLocation(req.body.id, req.body)
 
@@ -157,6 +168,33 @@ exports.update = async(req, res) => {
             req.flash('info', 'Update Completed.')
             req.session.message = `Location updated ${location.name}`
             req.session.alertType = alertTypes.CompletedActionAlert
+
+            if (location.users) {
+                // Update user locations.
+                for (user of location.users) {
+
+                    let updatedUser = await UserService.updateUser(user, { location: location })
+
+                    if (!updatedUser) {
+                        console.debug(`LOCATION-CONTROLLER: Can't update User  ${user?.email}.`)
+
+                    } else {
+                        console.debug(`LOCATION-CONTROLLER: Updated User  ${user?.email}.`)
+                    }
+                }
+            }
+            if (unselectedUsers){
+                for (user of unselectedUsers) {
+                    let updatedUser = await UserService.updateUser(user, { location: null })
+
+                    if (!updatedUser) {
+                        req.session.message += `Cant Remove User from Location  ${user?.email}.`
+
+                    } else {
+                        req.session.message += `Removed User from updated ${user.email}.`
+                    }
+                }
+            }
         }
         res.redirect(`${url}`)
 
@@ -168,7 +206,7 @@ exports.update = async(req, res) => {
 }
 
 // ------------------------------- Delete -------------------------------
-exports.delete = async(req, res) => {
+exports.delete = async (req, res) => {
     console.log('Deleting Location...')
     const id = req.params.id
 
@@ -180,7 +218,7 @@ exports.delete = async(req, res) => {
         req.session.alertType = alertTypes.CompletedActionAlert
 
     } catch (error) {
-        console.log(`ERROR-locationController: ${error.message}`)
+        console.log(`ERROR-LOCATION-CONTROLLER : ${error.message}`)
         req.session.message = "Can't delete location."
         req.session.alertType = alertTypes.ErrorAlert
     }
@@ -188,7 +226,7 @@ exports.delete = async(req, res) => {
     try {
         HistoryService.addHistory("Location deleted", historyTypes.USER_ACTION, req.user, null)
     } catch (error) {
-        console.debug(`ERROR-locationController: ${error.message}`)
+        console.debug(`ERROR-LOCATION-CONTROLLER : ${error.message}`)
         req.session.message = "Can't add to History."
         req.session.alertType = alertTypes.ErrorAlert
     }

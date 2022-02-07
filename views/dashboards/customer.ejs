@@ -55,7 +55,7 @@
                 </div>
                 <div class="tab-content tab-content-basic">
                   <div class="tab-pane show active" id="plan" role="tabpanel" aria-labelledby="plan">
-                    <%- include('../partials/subscriptions.ejs' , {user, hasSubscription, products, stripeSubscription}); %>
+                    <%- include('../partials/subscriptions/subscriptions.ejs' , {user, hasSubscription : user?.hasSubscription, products, stripeSubscription, membershipStatus}); %>
                   </div>
                 </div>
 

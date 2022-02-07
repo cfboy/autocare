@@ -12,6 +12,9 @@
     <link rel="stylesheet" href="../vendors/ti-icons/css/themify-icons.css">
     <link rel="stylesheet" href="../vendors/typicons/typicons.css">
     <link rel="stylesheet" href="../vendors/simple-line-icons/css/simple-line-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+        integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="../vendors/css/vendor.bundle.base.css">
     <!-- <link rel="stylesheet" href="../../css/register.css"> -->
 
@@ -31,67 +34,92 @@
 <body class="sidebar-icon-only">
     <div class="container-scroller">
         <%- include('../partials/navbar.ejs' , {user}); %>
-            <div class="container-fluid page-body-wrapper">
-                <%- include('../partials/sidebar.ejs' , {user}); %>
-                    <!-- partial -->
-                    <div class="main-panel">
-                        <div class="content-wrapper">
-                            <div class="row">
-                                <div class="col-lg-12 d-flex flex-column">
-                                    <div class="row flex-grow">
-                                        <div class="col-12 grid-margin stretch-card">
-                                            <div class="card card-rounded">
-                                                <div class="card-body">
-                                                    <h4>Edit Location</h4>
-                                                    <% if(location) {%>
-                                                        <form id="form-register" class="pt-3" action="/edit-location/?url=<%- url%>" method="post">
-                                                            <input type="text" id="id" name="id" value="<%- location.id%>" hidden />
-                                                            <div class="row">
-                                                                <div class="col-lg-6">
-                                                                    <div class="form-group">
-                                                                        <label class="required" for="name">Name</label>
-                                                                        <input autocomplete="off" value="<%-location.name%>" type="text" id="name" name="name" class="form-control form-control-lg" required />
-                                                                    </div>
+        <div class="container-fluid page-body-wrapper">
+            <%- include('../partials/sidebar.ejs' , {user}); %>
+            <!-- partial -->
+            <div class="main-panel">
+                <div class="content-wrapper">
+                    <div class="row">
+                        <div class="col-lg-12 d-flex flex-column">
+                            <div class="row flex-grow">
+                                <div class="col-12 grid-margin stretch-card">
+                                    <div class="card card-rounded">
+                                        <div class="card-body">
+                                            <h4>Edit Location</h4>
+                                            <% if(location) { %>
+                                            <form id="form-register" class="pt-3" action="/edit-location/?url=<%- url%>"
+                                                method="post">
+                                                <input type="text" id="id" name="id" value="<%- location.id%>" hidden />
+                                                <input type="text" id="unselectedUsers" name="unselectedUsers" value="" hidden>
+                                                <div class="row">
+                                                    <div class="col-lg-6">
+                                                        <div class="form-group">
+                                                            <label class="required" for="name">Name</label>
+                                                            <input autocomplete="off" value="<%-location.name%>"
+                                                                type="text" id="name" name="name"
+                                                                class="form-control form-control-lg" required />
+                                                        </div>
 
-                                                                    <div class="form-group">
-                                                                        <label>Select Services</label>
-                                                                        <select name="services" id="services" class="form-control form-control-lg js-example-basic-multiple w-100" multiple="multiple">
-                                                                            <% for(const product of products) { %>    
-                                                                                <% var selected = (location.services.includes(product.id)) ? "selected" : "";   %>
-                                                                                <option value="<%= product.id%>" <%=selected%>><%= product.name %></option>
-                                                                            <% }%>
-                                                                        </select>
-                                                                    </div>
-                                                                    <div class="form-check form-check-flat form-check-primary">
-                                                                        <label class="form-check-label">
-                                                                            <% var checked = (location.isActive) ? "checked" : "";   %>
+                                                        <div class="form-group">
+                                                            <label>Select Services</label>
+                                                            <select name="services" id="services"
+                                                                class="form-control form-control-lg js-example-basic-multiple w-100"
+                                                                multiple="multiple">
+                                                                <% for(const product of products) { %>
+                                                                <% var selected = (location.services.includes(product.id)) ? "selected" : "";   %>
+                                                                <option value="<%= product.id%>" <%=selected%>>
+                                                                    <%= product.name %></option>
+                                                                <% } %>
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-check form-check-flat form-check-primary">
+                                                            <label class="form-check-label">
+                                                                <% var checked = (location.isActive) ? "checked" : "";   %>
 
-                                                                          <input name="isActive" type="checkbox" class="form-check-input" <%= checked%>>Active
-                                                                        <i class="input-helper"></i></label>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="row">
-                                                                <div class="mt-3">
+                                                                <input name="isActive" type="checkbox"
+                                                                    class="form-check-input" <%= checked%>>Active
+                                                                <i class="input-helper"></i></label>
+                                                        </div>
 
-                                                                    <a href="<%- url%>" class="btn btn-block btn-light btn-lg font-weight-medium auth-form-btn float-end">Cancel</a>
-
-                                                                    <button class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn float-end" type="submit">Save</button>
-                                                                </div>
-                                                            </div>
-                                                        </form>
-
-                                                        <% }%>
+                                                        <div class="form-group">
+                                                            <label>Select Users</label>
+                                                            <select name="users" id="users"
+                                                                class="form-control form-control-lg js-example-basic-multiple w-100"
+                                                                multiple="multiple">
+                                                                <% for(const user of users) { %>
+                                                                <% var selected = (location.users.includes(user.id)) ? "selected" : "";   %>
+                                                                <option value="<%= user.id%>" <%=selected%>>
+                                                                    <%= user.personalInfo.firstName +' '+ user.personalInfo.lastName %>
+                                                                </option>
+                                                                <% } %>
+                                                            </select>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            </div>
+                                                <div class="row">
+                                                    <div class="mt-3">
+
+                                                        <a href="<%- url%>"
+                                                            class="btn btn-block btn-light btn-lg font-weight-medium auth-form-btn float-end">Cancel</a>
+
+                                                        <button
+                                                            class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn float-end"
+                                                            type="submit">Save</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+
+                                            <% } %>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
             </div>
-            <!-- page-body-wrapper ends -->
+        </div>
+        <!-- page-body-wrapper ends -->
     </div>
     <!-- container-scroller -->
 
@@ -103,7 +131,8 @@
     <script src="../vendors/select2/select2.min.js"></script>
     <script src="../vendors/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
     <script src="../vendors/progressbar.js/progressbar.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 
     <!-- End plugin js for this page -->
     <!-- inject:js -->
@@ -124,6 +153,24 @@
     <!-- <script src="../../js/register.js"></script> -->
 
     <!-- End custom js for this page-->
+    <script>
+        let unselectedValues = [];
+
+        $('#users').on("select2:unselecting", function (e) {
+            console.log(e.params.args.data.id);
+            let unselected = e.params.args.data.id;
+            unselectedValues.push(unselected);
+            document.getElementById("unselectedUsers").value = unselectedValues;
+            
+        }).trigger('change');
+
+        $('#users').on("select2:selecting", function (e) {
+            console.log("selected: " + e.params.args.data.id);
+            let selected = e.params.args.data.id;
+            unselectedValues.pop(selected);
+            document.getElementById("unselectedUsers").value = unselectedValues;
+        }).trigger('change');
+    </script>
 
 </body>
 

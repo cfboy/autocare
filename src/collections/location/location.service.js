@@ -1,4 +1,4 @@
-const addLocation = (Location) => async({ name, services }) => {
+const addLocation = (Location) => async({ name, services, users }) => {
     if (!name) {
         throw new Error(`Missing Data. Please provide the name of the location.`)
     }
@@ -7,7 +7,8 @@ const addLocation = (Location) => async({ name, services }) => {
 
     const location = new Location({
         name,
-        services: services
+        services: services,
+        users : users
     })
 
     return await location.save()
@@ -19,7 +20,7 @@ const updateLocation = (Location) => async(id, updates) => {
         if (err) {
             console.error(err.message)
         } else {
-            console.debug("Updated : ", doc.email);
+            console.debug("Updated : ", doc.name);
         }
     })
 }
@@ -48,7 +49,7 @@ const getLocationById = (Location) => (id) => {
         if (err) {
             console.error(err)
         } else {
-            console.debug("Founded location to edit: ", docs);
+            console.debug("Found location to edit: ", docs);
         }
     })
 }

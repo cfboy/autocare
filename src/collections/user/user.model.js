@@ -13,6 +13,7 @@ const userSchema = new Schema({
     password: String,
     billingID: String, //Stripe ID
     role: { type: String, enum: Object.values(ROLES), default: ROLES.CUSTOMER },
+    location: { type: Schema.Types.ObjectId, ref: 'location', default: null },
     hasAllInformation: { type: Boolean, default: false },
 
     personalInfo: {

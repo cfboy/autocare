@@ -184,6 +184,35 @@ const getCustomerSubscription = async (customerID) => {
     }
 }
 
+const setStripeInfoToUser = async (customerObj, products) => {
+    try {
+        let customer = customerObj
+
+        customer.hasSubscription = false
+
+        customer.stripe = await getCustomerByID(customer.billingID)
+        if (customer.stripe) {
+            customer.stripe.subscription = customer.stripe?.subscriptions?.data[0]
+            if (customer.stripe.subscription) {
+                customer.hasSubscription = true
+                if (!products)
+                    products = await getAllProducts()
+                // find Product on this sub.
+                customer.stripe.subscription.product = products.find(({ id }) => id === customer.stripe.subscription.plan.product)
+            }
+        }
+
+        console.debug(`STRIPE: Set Stripe Info to User done.`);
+        return customer
+
+    } catch (error) {
+        console.debug(`ERROR-STRIPE: setStripeInfoToUser()`);
+        console.debug(`ERROR-STRIPE: ${error.message}`);
+
+        return null
+    }
+}
+
 module.exports = {
     STATUS,
     getCustomerByID,
@@ -196,5 +225,6 @@ module.exports = {
     getAllPrices,
     getProductPrice,
     getProductInfoById,
-    getCustomerSubscription
+    getCustomerSubscription,
+    setStripeInfoToUser
 }

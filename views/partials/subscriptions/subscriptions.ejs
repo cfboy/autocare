@@ -4,7 +4,7 @@
             <div class="col-12 col-lg-4 col-lg-12 grid-margin stretch-card">
                 <div class="card card-rounded">
                     <div class="card-body">
-                        <%if (!hasSubscription) { %>
+                        <% if (!hasSubscription) { %>
                         <p class="lead">
                             <%= lingua.membership.notPlan%>
                         </p>
@@ -18,7 +18,7 @@
                             <%= product.name %>
                             for
                             <%= price.unit_amount%>
-                            <% if(price?.transform_quantity){%>
+                            <% if(price?.transform_quantity){ %>
                             per group of
                             <%=  price.transform_quantity?.divide_by%> / <%= price.recurring.interval%>
                             <% } %>
@@ -31,20 +31,18 @@
                             value="<%- user.billingID%>" email="<%- user.email%>">Buy
                             now</button>
 
-                        <% } else{ %>
+                        <% } else { %>
                         <p class="lead">
-                            You are currently on the <b><%- product.name %></b> plan.
+                            You are currently on the <b><%- stripeSubscription?.product.name %></b> plan.
                         </p>
                         <br>
                         <p class="lead">Plan will end on
-                            <%= moment(stripeSubscription.current_period_end * 1000).isValid() ? moment(stripeSubscription.current_period_end * 1000).format(completeDateFormat) : 'N/A' %>
+                            <%= moment(stripeSubscription?.current_period_end * 1000).isValid() ? moment(stripeSubscription?.current_period_end * 1000).format(completeDateFormat) : 'N/A' %>
                         </p>
                         <hr />
 
-                        <p>Your Plan information.</p>
-                        <ul>
-                            <li></li>
-                        </ul>
+                        <%- include('./information.ejs' , {showManageBtn : false, customer : user, stripeSubscription, membershipStatus}); %>
+
                         <hr />
                         <p class="mt-4 text-muted">
                             Not happy with your current plan? Cancel or Upgrade by clicking the

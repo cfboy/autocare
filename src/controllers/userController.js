@@ -1,7 +1,7 @@
 const UserService = require('../collections/user')
-const {ROLES} = require('../collections/user/user.model')
+const { ROLES } = require('../collections/user/user.model')
 const HistoryService = require('../collections/history')
-const {historyTypes} = require('../collections/history/history.model')
+const { historyTypes } = require('../collections/history/history.model')
 const Stripe = require('../connect/stripe')
 const alertTypes = require('../helpers/alertTypes')
 const bcrypt = require('bcrypt');
@@ -10,7 +10,7 @@ const bcrypt = require('bcrypt');
 
 
 // ------------------------------- Create -------------------------------
-exports.users = async(req, res) => {
+exports.users = async (req, res) => {
     // Message for alerts
     let { message, alertType } = req.session
 
@@ -29,8 +29,8 @@ exports.users = async(req, res) => {
         if (user.role == ROLES.MANAGER)
             users = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
         else
-        if (user.role == ROLES.ADMIN)
-            users = await UserService.getUsers(req)
+            if (user.role == ROLES.ADMIN)
+                users = await UserService.getUsers(req)
 
 
         res.render('user/index.ejs', { user, users, message, alertType })
@@ -39,10 +39,10 @@ exports.users = async(req, res) => {
 }
 
 // Route for create user.
-exports.createUser = async(req, res) => {
+exports.createUser = async (req, res) => {
     let { message, alertType } = req.session
     let selectRoles = []
-        // clear message y alertType
+    // clear message y alertType
     req.session.message = ''
     req.session.alertType = ''
     const isAdmin = req.user.role === ROLES.ADMIN
@@ -62,7 +62,7 @@ exports.createUser = async(req, res) => {
 }
 
 // TODO: Test this method. NOT FINISHED
-exports.save = async(req, res) => {
+exports.save = async (req, res) => {
     const fields = req.body
     try {
         console.log('Creating New User: ', fields.email)
@@ -121,14 +121,14 @@ exports.save = async(req, res) => {
         // console.error(error.message)
         req.session.message = error.message
         req.session.alertType = alertTypes.ErrorAlert
-            // res.status(400).send(error)
+        // res.status(400).send(error)
         res.redirect('/account')
     }
 }
 
 // ------------------------------- Read -------------------------------
 // Route for view user info.
-exports.viewUser = async(req, res) => {
+exports.viewUser = async (req, res) => {
     try {
         let { message, alertType } = req.session
 
@@ -136,20 +136,35 @@ exports.viewUser = async(req, res) => {
             req.session.message = ''
             req.session.alertType = ''
         }
-        const id = req.params.id;
-        const customer = await UserService.getUserById(id)
-        var isMyProfile = false
+        let id = req.params.id,
+            customer = await UserService.getUserById(id),
+            isMyProfile = false
+
         if (customer) {
             isMyProfile = (req.user.id === customer.id)
-            res.status(200).render('user/view.ejs', { user: req.user, isMyProfile, customer, message, alertType })
+            if (customer.billingID) {
+                customer = await Stripe.setStripeInfoToUser(customer)
+            }
+
+            res.status(200).render('user/view.ejs', {
+                user: req.user,
+                isMyProfile,
+                customer,
+                stripeSubscription: customer?.stripe?.subscription,
+                membershipStatus: customer?.stripe?.subscription ? customer?.stripe?.subscription?.status : Stripe.STATUS.NONE,
+                message,
+                alertType
+            })
         } else {
+            message = 'Customer not found.'
+            alertType = alertTypes.ErrorAlert
             console.log('Customer not found.')
-            res.redirect('/users')
+            res.redirect('/users', { message, alertType })
         }
     } catch (error) {
         req.session.message = error.message
         req.session.alertType = alertTypes.ErrorAlert
-            // res.status(400).send(error)
+        // res.status(400).send(error)
         res.redirect('/account')
 
     }
@@ -158,7 +173,7 @@ exports.viewUser = async(req, res) => {
 // ------------------------------- Update -------------------------------
 
 // Route for view/edit user info.
-exports.editUser = async(req, res) => {
+exports.editUser = async (req, res) => {
     try {
         const id = req.params.id;
         const url = req.query.url ? req.query.url : '/account'
@@ -176,18 +191,18 @@ exports.editUser = async(req, res) => {
     } catch (error) {
         req.session.message = error.message
         req.session.alertType = alertTypes.ErrorAlert
-            // res.status(400).send(error)
+        // res.status(400).send(error)
         res.redirect('/account')
     }
 }
 
 // TODO: Manage membership 
-exports.update = async(req, res) => {
+exports.update = async (req, res) => {
     const updates = Object.keys(req.body)
-        // TODO: Implement allowedUpdates per ROLE.
-        // const allowedUpdates = ['name', 'email']
-        // const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
-        // if (!isValidOperation) {
+    // TODO: Implement allowedUpdates per ROLE.
+    // const allowedUpdates = ['name', 'email']
+    // const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
+    // if (!isValidOperation) {
 
     // return res.status(400).send('Invalid updates!')
     // }
@@ -198,7 +213,7 @@ exports.update = async(req, res) => {
         if (!user) {
             req.session.message = `Can't update User  ${req.body.email}`
             req.session.alertType = alertTypes.WarningAlert
-                // return res.status(404).send()
+            // return res.status(404).send()
 
         } else {
             req.flash('info', 'Update Completed.')
@@ -212,20 +227,20 @@ exports.update = async(req, res) => {
     } catch (error) {
         req.session.message = error.message
         req.session.alertType = alertTypes.ErrorAlert
-            // res.status(400).send(error)
+        // res.status(400).send(error)
         res.redirect(`${url}`)
 
     }
 }
 
 // ------------------------------- Delete -------------------------------
-exports.delete = async(req, res) => {
+exports.delete = async (req, res) => {
     console.debug('Deleting User...')
     const id = req.params.id
 
     try {
         UserService.deleteUser(id)
-            // Set the message for alert. 
+        // Set the message for alert. 
         req.session.message = `User Deleted.`
         req.session.alertType = alertTypes.CompletedActionAlert
     } catch (error) {
