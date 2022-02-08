@@ -33964,10 +33964,17 @@ label.required:after {
     text-decoration: none;
 }
 
+.validation-msgs {
+    margin: 50px 0;
+}
+
 .validation-msgs > p {
     margin-top: 0.5rem;
     font-size: 1.30rem;
 }
  
- 
+.membershipDetails,
+.membershipDetails .row {
+    height: 100%;
+}
 /*# sourceMappingURL=../maps/vertical-layout-light/style.css.map */

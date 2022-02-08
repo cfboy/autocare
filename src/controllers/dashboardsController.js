@@ -1,5 +1,7 @@
 const UserService = require('../collections/user')
 const { ROLES } = require('../collections/user/user.model')
+const HistoryService = require('../collections/history')
+const { historyTypes } = require('../collections/history/history.model')
 const Stripe = require('../connect/stripe')
 
 /**
@@ -101,7 +103,11 @@ exports.validate = async (req, res) => {
 
         if (customer) {
             customer = await Stripe.setStripeInfoToUser(customer)
+            // TODO: use selected location 
+            //Log this action.
+            HistoryService.addHistory(`Validate Membership: ${carPlate}`, historyTypes.USER_ACTION, req.user, req?.user?.locations[0])
         }
+
 
         res.render('ajaxSnippets/validationResult.ejs', {
             customer,

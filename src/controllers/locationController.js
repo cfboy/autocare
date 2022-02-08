@@ -81,6 +81,17 @@ exports.save = async (req, res) => {
             // TODO: Add Location to DB
             location = await LocationService.addLocation({ name: fields.name, services: fields.services, users: fields.users })
 
+            if (location.users) {
+                // Update user locations.
+                for (user of location.users) {
+                    let updatedUser = await UserService.addUserLocation(user, location)
+                    if (!updatedUser)
+                        console.debug(`ERROR: LOCATION-CONTROLLER: Can't update User ${updatedUser?.email}.`)
+                    else
+                        console.debug(`LOCATION-CONTROLLER: Updated User ${updatedUser?.email}.`)
+                }
+            }
+
             console.log(
                 `A new Location to DB. The ID for ${location.name} is ${location.id}`
             )
@@ -199,7 +210,7 @@ exports.update = async (req, res) => {
             newSelectedUsers = req.body.newSelectedUsers ? req.body.newSelectedUsers.split(',') : []
 
 
-        const location = await LocationService.updateLocation(req.body.id, req.body)
+        let location = await LocationService.updateLocation(req.body.id, req.body)
 
         if (!location) {
             req.session.message = `Can't update Location  ${req.body.name}`
@@ -210,26 +221,23 @@ exports.update = async (req, res) => {
                 // Update user locations.
                 for (user of location.users) {
 
-                    let updatedUser = await UserService.updateUser(user, { location: location })
-
-                    if (!updatedUser) {
+                    // let updatedUser = await UserService.updateUser(user, { location: location })
+                    let updatedUser = await UserService.addUserLocation(user, location)
+                    if (!updatedUser)
                         console.debug(`ERROR: LOCATION-CONTROLLER: Can't update User ${updatedUser?.email}.`)
-
-                    } else {
+                    else
                         console.debug(`LOCATION-CONTROLLER: Updated User ${updatedUser?.email}.`)
-                    }
+
                 }
             }
             if (unselectedUsers.length > 0) {
                 for (user of unselectedUsers) {
-                    let updatedUser = await UserService.updateUser(user, { location: null })
-
-                    if (!updatedUser) {
+                    let updatedUser = await UserService.removeUserLocation(user, location)
+                    if (!updatedUser)
                         console.debug(`ERROR: LOCATION-CONTROLLER: Can't remove User ${updatedUser?.email}.`)
-
-                    } else {
+                    else
                         console.debug(`LOCATION-CONTROLLER: Removed user ${updatedUser?.email}.`)
-                    }
+
                 }
             }
 

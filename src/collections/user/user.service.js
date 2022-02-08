@@ -68,6 +68,32 @@ const updateUser = (User) => async (id, updates) => {
     })
 }
 
+const addUserLocation = (User) => async (id, location) => {
+    console.log(`addUserLocation() ID: ${id}`)
+    // findByIdAndUpdate returns the user
+    // updateOne is more quickly but not return the user.
+    return await User.findByIdAndUpdate({ _id: id }, { $addToSet: { locations: location } }, function (err, doc) {
+        if (err) {
+            console.error(err.message)
+        } else {
+            console.debug("Location Added : ", doc.email);
+        }
+    })
+}
+
+const removeUserLocation = (User) => async (id, location) => {
+    console.log(`removeUserLocation() ID: ${id}`)
+    // findByIdAndUpdate returns the user
+    // updateOne is more quickly but not return the user.
+    return await User.findByIdAndUpdate({ _id: id }, { $pull: { locations: location } }, function (err, doc) {
+        if (err) {
+            console.error(err.message)
+        } else {
+            console.debug("Location Removed : ", doc.email);
+        }
+    })
+}
+
 // TODO: maybe need delete customer on Stripe 
 /**
  * This function delete the user on DB.
@@ -175,7 +201,7 @@ const updateBillingID = (User) => async (id, billingID) => {
  * @returns user
  */
 const getUserByPlate = (User) => async (plate) => {
-    return User.findOne({ $and: [{ 'carInfo.plate': plate }, { 'carInfo.plate': { $ne: '' } }] }, function (err, docs) {
+    return User.findOne({ $and: [{ 'carInfo.plate': new RegExp(`^${plate}$`, 'i') }, { 'carInfo.plate': { $ne: '' } }] }, function (err, docs) {
         if (err) {
             console.error(err)
         } else {
@@ -217,6 +243,8 @@ module.exports = (User) => {
     return {
         addUser: addUser(User),
         updateUser: updateUser(User),
+        addUserLocation: addUserLocation(User),
+        removeUserLocation: removeUserLocation(User),
         deleteUser: deleteUser(User),
         getUsers: getUsers(User),
         getUsersPerRole: getUsersPerRole(User),
