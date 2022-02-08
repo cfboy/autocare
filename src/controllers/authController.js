@@ -7,6 +7,10 @@ const passport = require('passport');
 require("../config/passport");
 require("../config/local");
 
+/**
+ * Authenticate the user. Store the user object on req.user.
+ * 
+ */
 exports.login =
     passport.authenticate('local', {
         successRedirect: '/account',
@@ -14,8 +18,13 @@ exports.login =
         failureFlash: true
     })
 
+/**
+ * This function verify if the user exist on the DB, if not then create new user. 
+ * @param {*} req 
+ * @param {*} res 
+ */
 exports.register = async (req, res) => {
-    // TODO: Finish this method.
+    // TODO: Optimize this method.
     try {
         const {
             email,
@@ -31,13 +40,13 @@ exports.register = async (req, res) => {
 
         var { password } = req.body
 
-        console.log('email', email)
+        console.debug('email', email)
 
         let customer = await UserService.getUserByEmail(email)
         let customerInfo = {}
 
         if (!customer) {
-            console.debug(`Email ${email} does not exist. Making one. `)
+            console.debug(`Email ${email} does not exist. Making one.`)
 
             customerInfo = await Stripe.getCustomerByEmail(email)
             if (!customerInfo) {
@@ -70,13 +79,13 @@ exports.register = async (req, res) => {
                 `A new user added to DB. The ID for ${customer.email} is ${customer.id}`
             )
 
-            // req.session.user = email
             req.session.message = `Account Created.`
             req.session.alertType = alertTypes.CompletedActionAlert
             req.flash('info', 'Account Created!');
             res.redirect('/account')
         } else {
             let message = `That email already exist, please login.`
+            req.flash('info', message);
             console.log(
                 `The existing ID for ${email} is ${JSON.stringify(customerInfo)}`
             )
@@ -95,8 +104,13 @@ exports.register = async (req, res) => {
     }
 }
 
+/**
+ * This method clean the session and remove the authenticated user.
+ * @param {*} req 
+ * @param {*} res 
+ */
 exports.logout = async (req, res) => {
-    console.log('Log out...')
+    console.debug('Log out...')
     req.logOut()
     res.redirect("/");
 }

@@ -44,6 +44,12 @@ const createBillingSession = async (customer) => {
     return session
 }
 
+/**
+ * This function get the customer on stripe by ID.
+ * Expand subscriptions property to get the subs information.
+ * @param {*} id 
+ * @returns customer object
+ */
 const getCustomerByID = async (id) => {
     try {
         // console.debug(`STRIPE: getCustomerByID(${id})`);
@@ -60,6 +66,11 @@ const getCustomerByID = async (id) => {
 
 }
 
+/**
+ * This function get the customer on stripe by email.
+ * @param {*} email 
+ * @returns customer object
+ */
 const getCustomerByEmail = async (email) => {
     try {
         console.debug(`STRIPE: getCustomerByEmail(${email})`);
@@ -77,6 +88,15 @@ const getCustomerByEmail = async (email) => {
     }
 }
 
+/**
+ * This function add new customer to stripe.
+ * @param {*} email 
+ * @param {*} firstName 
+ * @param {*} lastName 
+ * @param {*} phoneNumber 
+ * @param {*} city 
+ * @returns customer object
+ */
 const addNewCustomer = async (email,
     firstName,
     lastName,
@@ -103,6 +123,12 @@ const addNewCustomer = async (email,
     }
 }
 
+/**
+ * This function create a webhook event with stripe.
+ * @param {*} rawBody 
+ * @param {*} sig 
+ * @returns event
+ */
 const createWebhook = (rawBody, sig) => {
     const event = Stripe.webhooks.constructEvent(
         rawBody,
@@ -112,6 +138,11 @@ const createWebhook = (rawBody, sig) => {
     return event
 }
 
+/**
+ * This function get all stripe products where the active field is true.
+ * Aditionally get the price per product.
+ * @returns product list
+ */
 async function getAllProducts() {
     // On Stripe All products need a productKey Metadata field.
     const products = await Stripe.products.list({
@@ -128,6 +159,10 @@ async function getAllProducts() {
     return products.data
 }
 
+/**
+ * This function get all prices.
+ * @returns price list
+ */
 async function getAllPrices() {
     const prices = await Stripe.prices.list({
         active: true
@@ -136,6 +171,11 @@ async function getAllPrices() {
     return prices.data
 }
 
+/**
+ * This function que the price per productID
+ * @param {*} productID 
+ * @returns prices list
+ */
 const getProductPrice = async (productID) => {
     const productPrices = await Stripe.prices.list({
         product: productID
@@ -150,6 +190,11 @@ const getProductPrice = async (productID) => {
     return productPrices.data
 }
 
+/**
+ * This function get the product information by id.
+ * @param {*} id 
+ * @returns product object
+ */
 const getProductInfoById = async (id) => {
     try {
         const product = await Stripe.products.retrieve(id)
@@ -166,6 +211,11 @@ const getProductInfoById = async (id) => {
 }
 
 
+/**
+ * This function que the customer subscriptions.
+ * @param {*} customerID 
+ * @returns subscription list
+ */
 const getCustomerSubscription = async (customerID) => {
     try {
         console.debug(`STRIPE: getCustomerSubscription(${customerID})`);
@@ -184,7 +234,12 @@ const getCustomerSubscription = async (customerID) => {
     }
 }
 
-// This method set the stripe infor and if has or not subscription but this vairables are temporary.
+/**
+ * This function set the stripe information temporary on .stripe property in the user object.
+ * @param {*} customerObj 
+ * @param {*} products 
+ * @returns customer object
+ */
 const setStripeInfoToUser = async (customerObj, products) => {
     try {
         let customer = customerObj

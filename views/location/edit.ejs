@@ -50,7 +50,11 @@
                                             <form id="form-register" class="pt-3" action="/edit-location/?url=<%- url%>"
                                                 method="post">
                                                 <input type="text" id="id" name="id" value="<%- location.id%>" hidden />
-                                                <input type="text" id="unselectedUsers" name="unselectedUsers" value="" hidden>
+                                                <input type="text" id="unselectedUsers" name="unselectedUsers" value=""
+                                                    hidden>
+                                                <input type="text" id="newSelectedUsers" name="newSelectedUsers"
+                                                    value="" hidden>
+
                                                 <div class="row">
                                                     <div class="col-lg-6">
                                                         <div class="form-group">
@@ -155,20 +159,25 @@
     <!-- End custom js for this page-->
     <script>
         let unselectedValues = [];
+        let newSelectedUsers = [];
 
         $('#users').on("select2:unselecting", function (e) {
             console.log(e.params.args.data.id);
             let unselected = e.params.args.data.id;
             unselectedValues.push(unselected);
             document.getElementById("unselectedUsers").value = unselectedValues;
-            
+
         }).trigger('change');
 
         $('#users').on("select2:selecting", function (e) {
             console.log("selected: " + e.params.args.data.id);
             let selected = e.params.args.data.id;
+            newSelectedUsers.push(selected);
+            document.getElementById("newSelectedUsers").value = newSelectedUsers;
+
             unselectedValues.pop(selected);
             document.getElementById("unselectedUsers").value = unselectedValues;
+
         }).trigger('change');
     </script>
 

@@ -1,9 +1,12 @@
 const UserService = require('../collections/user')
 const { ROLES } = require('../collections/user/user.model')
 const Stripe = require('../connect/stripe')
-const hasPlan = require('../middleware/hasPlan')
 
-// TODO: Use User Role to redirect to different dashboards.
+/**
+ * This function handle the dashboards of the different roles. 
+ * @param {*} req 
+ * @param {*} res 
+ */
 exports.account = async (req, res) => {
     try {
         // Message for alerts
@@ -64,6 +67,11 @@ exports.account = async (req, res) => {
     }
 }
 
+/**
+ * This function render the validateMembership template. 
+ * @param {*} req 
+ * @param {*} res 
+ */
 exports.validateMembership = async (req, res) => {
     // Message for alerts
     let { message, alertType } = req.session
@@ -79,18 +87,30 @@ exports.validateMembership = async (req, res) => {
 
 }
 
+/**
+ * This function search the user by car plate number and return the membership status.
+ * This function is called by ajax function.
+ * The result is rendered in the validateMembership page.
+ * @param {*} req 
+ * @param {*} res 
+ */
 exports.validate = async (req, res) => {
+    try {
+        let carPlate = req.body.tagNumber,
+            customer = await UserService.getUserByPlate(carPlate)
 
-    let carPlate = req.body.tagNumber,
-        customer = await UserService.getUserByPlate(carPlate)
+        if (customer) {
+            customer = await Stripe.setStripeInfoToUser(customer)
+        }
 
-    if (customer) {
-        customer = await Stripe.setStripeInfoToUser(customer)
+        res.render('ajaxSnippets/validationResult.ejs', {
+            customer,
+            stripeSubscription: customer?.stripe?.subscription,
+            membershipStatus: customer?.stripe?.subscription ? customer?.stripe?.subscription?.status : Stripe.STATUS.NONE
+        })
+    } catch (error) {
+        console.error("ERROR: dashboardController -> Tyring to validate membership.")
+        console.error(error.message)
+        res.render('Error validating membership.')
     }
-
-    res.render('ajaxSnippets/validationResult.ejs', {
-        customer,
-        stripeSubscription: customer?.stripe?.subscription,
-        membershipStatus: customer?.stripe?.subscription ? customer?.stripe?.subscription?.status : Stripe.STATUS.NONE
-    })
 }

@@ -6,39 +6,56 @@ const Stripe = require('../connect/stripe')
 const alertTypes = require('../helpers/alertTypes')
 const bcrypt = require('bcrypt');
 
-// ------------------------------- CRUDS ------------------------------- 
-
 
 // ------------------------------- Create -------------------------------
+
+/**
+ * This function render all users except the current user.
+ * If the current user is ROLE.MANAGER then find only CUSTOMERS users.
+ * @param {*} req 
+ * @param {*} res 
+ */
 exports.users = async (req, res) => {
-    // Message for alerts
-    let { message, alertType } = req.session
+    try {
+        // Message for alerts
+        let { message, alertType } = req.session
 
-    // clear message y alertType
-    if (message) {
-        req.session.message = ''
-        req.session.alertType = ''
-    }
-    // Passport store the user in req.user
-    let user = req.user
+        // clear message y alertType
+        if (message) {
+            req.session.message = ''
+            req.session.alertType = ''
+        }
+        // Passport store the user in req.user
+        let user = req.user
 
-    if (!user) {
-        res.redirect('/')
-    } else {
-        let users
-        if (user.role == ROLES.MANAGER)
-            users = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
-        else
-            if (user.role == ROLES.ADMIN)
-                users = await UserService.getUsers(req)
+        if (!user) {
+            res.redirect('/')
+        } else {
+            let users
+            if (user.role == ROLES.MANAGER)
+                users = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
+            else
+                if (user.role == ROLES.ADMIN)
+                    users = await UserService.getUsers(req)
 
 
-        res.render('user/index.ejs', { user, users, message, alertType })
+            res.render('user/index.ejs', { user, users, message, alertType })
 
+        }
+    } catch (error) {
+        console.error("ERROR: userController -> Tyring to find users.")
+        console.error(error.message)
+        req.session.message = 'Error tyring to find users.'
+        req.session.alertType = alertTypes.ErrorAlert
+        res.redirect('/account')
     }
 }
 
-// Route for create user.
+/**
+ * This function renders the create user form.
+ * @param {*} req 
+ * @param {*} res 
+ */
 exports.createUser = async (req, res) => {
     let { message, alertType } = req.session
     let selectRoles = []
@@ -51,7 +68,7 @@ exports.createUser = async (req, res) => {
         if (isAdmin)
             selectRoles = Object.entries(ROLES)
         else {
-            // If User Role is not ADMIN, then the only users they can create are Customers.
+            // If the current user role is not ADMIN, then the only users they can create are Customers.
             const { CUSTOMER } = ROLES
             const subset = { CUSTOMER }
             selectRoles = Object.entries(subset)
@@ -61,7 +78,11 @@ exports.createUser = async (req, res) => {
     }
 }
 
-// TODO: Test this method. NOT FINISHED
+/**
+ * This function save/create the new user.
+ * @param {*} req 
+ * @param {*} res 
+ */
 exports.save = async (req, res) => {
     const fields = req.body
     try {
@@ -99,13 +120,11 @@ exports.save = async (req, res) => {
                 endDate: null
             })
 
-            console.log(
-                `A new user added to DB. The ID for ${user.email} is ${user.id}`
-            )
+            console.log(`A new user added to DB. The ID for ${user.email} is ${user.id}`)
 
             req.session.message = `User Created ${user.email}.`
             req.session.alertType = alertTypes.CompletedActionAlert
-
+            req.flash('info', 'User created.')
             res.redirect('/users')
 
         } else {
@@ -118,16 +137,19 @@ exports.save = async (req, res) => {
             res.redirect('/create-user')
         }
     } catch (error) {
-        // console.error(error.message)
-        req.session.message = error.message
+        console.error(error.message)
+        req.session.message = "Error trying to create user."
         req.session.alertType = alertTypes.ErrorAlert
         // res.status(400).send(error)
         res.redirect('/account')
     }
 }
 
-// ------------------------------- Read -------------------------------
-// Route for view user info.
+/**
+ * This function renders the user information.
+ * @param {*} req 
+ * @param {*} res 
+ */
 exports.viewUser = async (req, res) => {
     try {
         let { message, alertType } = req.session
@@ -162,7 +184,8 @@ exports.viewUser = async (req, res) => {
             res.redirect('/users', { message, alertType })
         }
     } catch (error) {
-        req.session.message = error.message
+        console.error(error.message)
+        req.session.message = "Error trying to render the user information."
         req.session.alertType = alertTypes.ErrorAlert
         // res.status(400).send(error)
         res.redirect('/account')
@@ -170,9 +193,11 @@ exports.viewUser = async (req, res) => {
     }
 }
 
-// ------------------------------- Update -------------------------------
-
-// Route for view/edit user info.
+/**
+ * This function renders the edit user form.
+ * @param {*} req 
+ * @param {*} res 
+ */
 exports.editUser = async (req, res) => {
     try {
         const id = req.params.id;
@@ -189,14 +214,19 @@ exports.editUser = async (req, res) => {
             res.redirect(`${url}`)
         }
     } catch (error) {
-        req.session.message = error.message
+        console.error(error.message)
+        req.session.message = "Error trying to render edit user form."
         req.session.alertType = alertTypes.ErrorAlert
         // res.status(400).send(error)
         res.redirect('/account')
     }
 }
 
-// TODO: Manage membership 
+/**
+ * This function updates the user object with new properties.
+ * @param {*} req 
+ * @param {*} res 
+ */
 exports.update = async (req, res) => {
     const updates = Object.keys(req.body)
     // TODO: Implement allowedUpdates per ROLE.
@@ -233,7 +263,11 @@ exports.update = async (req, res) => {
     }
 }
 
-// ------------------------------- Delete -------------------------------
+/**
+ * This function delete the user object.
+ * @param {*} req 
+ * @param {*} res 
+ */
 exports.delete = async (req, res) => {
     console.debug('Deleting User...')
     const id = req.params.id
@@ -244,18 +278,17 @@ exports.delete = async (req, res) => {
         req.session.message = `User Deleted.`
         req.session.alertType = alertTypes.CompletedActionAlert
     } catch (error) {
-        console.log(`ERROR on user.js delete: ${error.message}`)
-        req.session.message = "Can't delete user."
+        console.log(`ERROR: ${error.message}`)
+        req.session.message = "Error trying to delete user."
         req.session.alertType = alertTypes.ErrorAlert
     }
 
     try {
         HistoryService.addHistory("User deleted", historyTypes.USER_ACTION, req.user, null)
     } catch (error) {
-        console.debug(`ERROR-userController: ${error.message}`)
-        req.session.message = "Can't add to History."
+        console.debug(`ERROR: userController: ${error.message}`)
+        req.session.message = "Can't add delete user action to History."
         req.session.alertType = alertTypes.ErrorAlert
     }
     res.redirect('/users')
-
 }

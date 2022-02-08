@@ -1,14 +1,20 @@
 const Stripe = require('../connect/stripe')
-const UserService = require('../collections/user')
-const {ROLES} = require('../collections/user/user.model')
+// const UserService = require('../collections/user')
+// const { ROLES } = require('../collections/user/user.model')
 
 const productToPriceMap = {
     basic: process.env.PRODUCT_BASIC,
     pro: process.env.PRODUCT_PRO
 }
 
-// This function handle all Stripe events.
-exports.webhook = async(req, res) => {
+/**
+ * This function handle all Stripe events.
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
+exports.webhook = async (req, res) => {
+    //    TODO: implement all necessary webhooks
     let event
 
     try {
@@ -21,28 +27,27 @@ exports.webhook = async(req, res) => {
     const data = event.data.object
 
     console.log(event.type, data)
-        // TODO: Develop necessary events
     switch (event.type) {
         case 'customer.created':
             console.log(JSON.stringify(data))
-                // if (data) {
-                //     let user = await UserService.addUser({
-                //         email: data.email,
-                //         password: 'Test1234', //TODO: optimize
-                //         billingID: data.id,
-                //         role: Roles.CUSTOMER,
-                //         firstName: data.name.split(' ')[0],
-                //         lastName: data.name.split(' ')[1],
-                //         phoneNumber: data.phone,
-                //         dateOfBirth: null,
-                //         city: data.address ? data.address.city : null,
-                //         brand: null,
-                //         model: null,
-                //         plate: null,
-                //         plan: 'none',
-                //         endDate: null
-                //     })
-                // }
+            // if (data) {
+            //     let user = await UserService.addUser({
+            //         email: data.email,
+            //         password: 'Test1234', //TODO: optimize
+            //         billingID: data.id,
+            //         role: Roles.CUSTOMER,
+            //         firstName: data.name.split(' ')[0],
+            //         lastName: data.name.split(' ')[1],
+            //         phoneNumber: data.phone,
+            //         dateOfBirth: null,
+            //         city: data.address ? data.address.city : null,
+            //         brand: null,
+            //         model: null,
+            //         plate: null,
+            //         plan: 'none',
+            //         endDate: null
+            //     })
+            // }
             break
         case 'customer.deleted':
             break
@@ -117,8 +122,13 @@ exports.webhook = async(req, res) => {
     res.sendStatus(200)
 }
 
-exports.checkout = async(req, res) => {
-    const customer = req.user
+/**
+ * This function creates a checkout session on stripe.
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
+exports.checkout = async (req, res) => {
     const { product, customerID } = req.body
     const priceID = product
 
@@ -139,7 +149,13 @@ exports.checkout = async(req, res) => {
     }
 }
 
-exports.billing = async(req, res) => {
+/**
+ * This function creates a billing session on stripe to manage payments/subscriptions.
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
+exports.billing = async (req, res) => {
     const { customer } = req.body
     console.log('customer', customer)
 

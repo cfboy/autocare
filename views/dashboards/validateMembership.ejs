@@ -47,7 +47,7 @@
                                     <div class="card card-rounded">
                                         <div class="card-body">
                                             <div class="row">
-                                                <div class="col-lg-4">
+                                                <div class="col-lg-4 p-3">
                                                     <h4>Validate</h4>
 
                                                     <form id="form-validate-membership" class="pt-3" method="post">
@@ -73,10 +73,7 @@
                                                     </form>
                                                 </div>
                                                 <div class="col-lg-8">
-                                                    <!-- <div class="lds-ring text-center" style="display: none;">
-                                                        <img src="/images/loading-spinner.gif" width="10%"
-                                                            alt="spinner">
-                                                    </div> -->
+                                                    <!-- Render results in membershipDetails div -->
                                                     <div id="membershipDetails"></div>
                                                 </div>
                                             </div>
@@ -130,9 +127,6 @@
     <%- include('../partials/alerts.ejs', {message, alertType}); %>
 
     <script>
-        // $(document).ajaxSend(function () {
-        //     $("#overlay").fadeIn(300);
-        // });
         $("#validateMembershipBtn").on("click", function (event) {
             event.preventDefault();
             event.stopPropagation();
@@ -148,17 +142,13 @@
                         tagNumber: valueToValidate.val()
                     }),
                     beforeSend: function () {
-                        showResult(`
-                        <div class="lds-ring text-center">
-                            <img src="/images/loading-spinner.gif" width="15%" alt="spinner">
-                        </div>`
+                        showResult(
+                            `<div class="spinner text-center p-5">
+                                <div class="spinner-grow"></div>
+                            </div>`
                         );
 
-                        // $(".lds-ring").fadeIn(300);
-                    },
-                    // success: function () {
-                        // $(".lds-ring").fadeOut(300);
-                    // }
+                    }
                 }).done(function (result) {
                     showResult(result);
                     cleanInput("tagNumber");

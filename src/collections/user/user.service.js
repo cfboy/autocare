@@ -1,3 +1,8 @@
+/**
+ * This function add new user to DB.
+ * @param {*} User 
+ * @returns user
+ */
 const addUser = (User) => async ({
     email,
     password,
@@ -45,6 +50,11 @@ const addUser = (User) => async ({
 }
 
 // TODO: Finish this
+/**
+ * This function updates the user properties.
+ * @param {*} User 
+ * @returns user
+ */
 const updateUser = (User) => async (id, updates) => {
     console.log(`updateUser() ID: ${id}`)
     // findByIdAndUpdate returns the user
@@ -59,6 +69,11 @@ const updateUser = (User) => async (id, updates) => {
 }
 
 // TODO: maybe need delete customer on Stripe 
+/**
+ * This function delete the user on DB.
+ * @param {*} User 
+ * @returns promise
+ */
 const deleteUser = (User) => (id) => {
     console.log(`deleteUser() by ID: ${id}`)
 
@@ -71,22 +86,39 @@ const deleteUser = (User) => (id) => {
     })
 }
 
-// Get All users from User Collection.
+/**
+ * This function get all users from DB and populate the location information.
+ * @param {*} User 
+ * @returns 
+ */
 const getUsers = (User) => (req) => {
     return User.find({ _id: { $ne: req.user.id } }).populate('location')
 }
 
 // Get All users from User Collection.
+/**
+ * This function get users by roles.
+ * @param {*} User 
+ * @returns user
+ */
 const getUsersPerRole = (User) => (req, role) => {
     return User.find({ role: role }).populate('location')
 }
 
-// Get All users from User Collection.
+/**
+ * This function get users by list of roles.
+ * @param {*} User 
+ * @returns user
+ */
 const getUsersPerRoles = (User) => (roles) => {
     return User.find({ role: { $in: roles } }).populate('location')
 }
 
-// Get User by ID. 
+/**
+ * This function get user by id.
+ * @param {*} User 
+ * @returns user
+ */
 const getUserById = (User) => (id) => {
     console.log(`getUserById() by ID: ${id}`)
 
@@ -99,19 +131,31 @@ const getUserById = (User) => (id) => {
     }).populate('location')
 }
 
-// Get User by email.
+/**
+ * This function get user by email.
+ * @param {*} User 
+ * @returns user
+ */
 const getUserByEmail = (User) => async (email) => {
     console.log(`getUserByEmail(): ${email}`)
 
     return await User.findOne({ email })
 }
 
-// Get User By Billing ID / Stripe ID
+/**
+ * This function get user by billingID/Stripe ID.
+ * @param {*} User 
+ * @returns user
+ */
 const getUserByBillingID = (User) => async (billingID) => {
     return await User.findOne({ billingID })
 }
 
-// TODO add error handler and logs
+/**
+ * This function updates the user billingID by id.
+ * @param {*} User 
+ * @returns user
+ */
 const updateBillingID = (User) => async (id, billingID) => {
     console.log(`updateBilligID() ID: ${id}`)
 
@@ -125,6 +169,11 @@ const updateBillingID = (User) => async (id, billingID) => {
 }
 
 // Get User By Car Plate
+/**
+ * This function get user by plate number.
+ * @param {*} User 
+ * @returns user
+ */
 const getUserByPlate = (User) => async (plate) => {
     return User.findOne({ $and: [{ 'carInfo.plate': plate }, { 'carInfo.plate': { $ne: '' } }] }, function (err, docs) {
         if (err) {
@@ -140,13 +189,21 @@ const updatePlan = (User) => (email, plan) => {
     return User.findOneAndUpdate({ email, membershipInfo: { plan } })
 }
 
-// Get All users from User Collection.
+/**
+ * This function get all users by location.
+ * @param {*} User 
+ * @returns user list
+ */
 const getUsersByLocationID = (User) => async (location) => {
     return await User.find({ location })
 }
 
-// Get All users from User Collection.
-const getLocationUsers = (User) => async (users) => {
+/**
+ * This functions get all users by user list.
+ * @param {*} User 
+ * @returns user list
+ */
+const getUsersByList = (User) => async (users) => {
     return await User.find({ _id: { $in: users } }, function (err, doc) {
         if (err) {
             console.log(err.message)
@@ -171,6 +228,6 @@ module.exports = (User) => {
         updateBillingID: updateBillingID(User),
         getUserByPlate: getUserByPlate(User),
         getUsersByLocationID: getUsersByLocationID(User),
-        getLocationUsers: getLocationUsers(User)
+        getUsersByList: getUsersByList(User)
     }
 }

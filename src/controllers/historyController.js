@@ -1,58 +1,84 @@
 const HistoryService = require('../collections/history')
 const alertTypes = require('../helpers/alertTypes')
-const {ROLES} = require('../collections/user/user.model')
+const { ROLES } = require('../collections/user/user.model')
 
-// ------------------------------- CRUDS ------------------------------- 
+/**
+ * This function render the current user history.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.activity = async (req, res) => {
+    try {
+        // Message for alerts
+        let { message, alertType } = req.session
 
-exports.activity = async(req, res) => {
-    // Message for alerts
-    let { message, alertType } = req.session
+        // clear message y alertType
+        if (message) {
+            req.session.message = ''
+            req.session.alertType = ''
+        }
+        // Passport store the user in req.user
+        let user = req.user
 
-    // clear message y alertType
-    if (message) {
-        req.session.message = ''
-        req.session.alertType = ''
-    }
-    // Passport store the user in req.user
-    let user = req.user
+        if (!user) {
+            res.redirect('/')
+        } else {
 
-    if (!user) {
-        res.redirect('/')
-    } else {
+            let historial = await HistoryService.getMyHistory(req.user)
 
-        let historial = await HistoryService.getMyHistory(req.user)
+            res.render('history/index.ejs', { user, historial, message, alertType })
 
-        res.render('history/index.ejs', { user, historial, message, alertType })
-
-    }
-}
-
-// ------------------------------- Create -------------------------------
-exports.history = async(req, res) => {
-    // Message for alerts
-    let { message, alertType } = req.session
-
-    // clear message y alertType
-    if (message) {
-        req.session.message = ''
-        req.session.alertType = ''
-    }
-    // Passport store the user in req.user
-    let user = req.user
-
-    if (!user) {
-        res.redirect('/')
-    } else {
-        let historial = await HistoryService.getHistory()
-
-        res.render('history/index.ejs', { user, historial, message, alertType })
-
+        }
+    } catch (error) {
+        console.error("ERROR: historyController -> Tyring to find My Activity.")
+        console.error(error.message)
+        req.session.message = 'Error tyring to find My Activity.'
+        req.session.alertType = alertTypes.ErrorAlert
+        res.redirect('/account')
     }
 }
 
-// ------------------------------- Read -------------------------------
-// Route for view user info.
-exports.viewHistory = async(req, res) => {
+/**
+ * This function render all history log.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.history = async (req, res) => {
+    try {
+        // Message for alerts
+        let { message, alertType } = req.session
+
+        // clear message y alertType
+        if (message) {
+            req.session.message = ''
+            req.session.alertType = ''
+        }
+        // Passport store the user in req.user
+        let user = req.user
+
+        if (!user) {
+            res.redirect('/')
+        } else {
+            let historial = await HistoryService.getHistory()
+
+            res.render('history/index.ejs', { user, historial, message, alertType })
+
+        }
+    } catch (error) {
+        console.error("ERROR: historyController -> Tyring to find History Log.")
+        console.error(error.message)
+        req.session.message = 'Error tyring to find History Log.'
+        req.session.alertType = alertTypes.ErrorAlert
+        res.redirect('/account')
+    }
+}
+
+/**
+ * This function render the specific Hisitory details.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.viewHistory = async (req, res) => {
     try {
         let { message, alertType } = req.session
 
@@ -79,25 +105,30 @@ exports.viewHistory = async(req, res) => {
             res.redirect('/account')
         }
     } catch (error) {
-        req.session.message = error.message
+        console.error("ERROR: historyController -> Tyring to view History details.")
+        req.session.message = 'Error tyring to view History details.'
         req.session.alertType = alertTypes.ErrorAlert
         res.redirect('/account')
     }
 }
 
-// ------------------------------- Delete -------------------------------
-exports.delete = async(req, res) => {
-    console.log('Deleting User...')
+/**
+ * This function is for delete history object.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.delete = async (req, res) => {
+    console.debug('Deleting User...')
     const id = req.params.id
 
     try {
         UserService.deleteUser(id)
-            // Set the message for alert. 
+        // Set the message for alert. 
         req.session.message = `User Deleted.`
         req.session.alertType = alertTypes.CompletedActionAlert
         res.redirect('/account')
     } catch (error) {
-        console.log(`ERROR on user.js delete: ${error.message}`)
+        console.log(`ERROR: historyController -> ${error.message}`)
         req.session.message = "Can't delete user."
         req.session.alertType = alertTypes.ErrorAlert
         res.redirect('/account')

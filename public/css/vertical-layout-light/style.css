@@ -15997,10 +15997,10 @@ fieldset:disabled .swal2-modal .swal2-buttonswrapper .swal2-styled,
 
 .spinner-grow {
     display: inline-block;
-    width: 2rem;
-    height: 2rem;
+    width: 4rem;
+    height: 4rem;
     vertical-align: -0.125em;
-    background-color: currentColor;
+    background-color: #0c4083;
     border-radius: 50%;
     opacity: 0;
     animation: 0.75s linear infinite spinner-grow;
@@ -33957,6 +33957,11 @@ label.required:after {
 
 .warning {
     color: orange;
+}
+
+.warning a {
+    color: black!important;
+    text-decoration: none;
 }
 
 .validation-msgs > p {

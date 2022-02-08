@@ -1,4 +1,9 @@
-const addLocation = (Location) => async({ name, services, users }) => {
+/**
+ * This function add new location to DB
+ * @param {*} Location 
+ * @returns location object
+ */
+const addLocation = (Location) => async ({ name, services, users }) => {
     if (!name) {
         throw new Error(`Missing Data. Please provide the name of the location.`)
     }
@@ -8,15 +13,20 @@ const addLocation = (Location) => async({ name, services, users }) => {
     const location = new Location({
         name,
         services: services,
-        users : users
+        users: users
     })
 
     return await location.save()
 }
 
-const updateLocation = (Location) => async(id, updates) => {
+/**
+ * This function update the location properties by id.
+ * @param {*} Location 
+ * @returns location object
+ */
+const updateLocation = (Location) => async (id, updates) => {
     console.log(`updateLocation() ID: ${id}`)
-    return await Location.findByIdAndUpdate({ _id: id }, updates, function(err, doc) {
+    return await Location.findByIdAndUpdate({ _id: id }, updates, function (err, doc) {
         if (err) {
             console.error(err.message)
         } else {
@@ -25,10 +35,15 @@ const updateLocation = (Location) => async(id, updates) => {
     })
 }
 
-const deleteLocation = (Location) => async(id) => {
+/**
+ * This function delete a location from DB.
+ * @param {*} Location 
+ * @returns promise
+ */
+const deleteLocation = (Location) => async (id) => {
     console.log(`deleteLocation() by ID: ${id}`)
 
-    return Location.deleteOne({ _id: id }, function(err, docs) {
+    return Location.deleteOne({ _id: id }, function (err, docs) {
         if (err) {
             console.error(err)
         } else {
@@ -37,15 +52,24 @@ const deleteLocation = (Location) => async(id) => {
     })
 }
 
+/**
+ * This function get all locations on DB.
+ * @param {*} Location 
+ * @returns location list
+ */
 const getLocations = (Location) => () => {
     return Location.find({})
 }
 
-// Get Location by ID. 
+/**
+ * This function get a location by id.
+ * @param {*} Location 
+ * @returns location object
+ */
 const getLocationById = (Location) => (id) => {
     console.log(`getLocationById() by ID: ${id}`)
 
-    return Location.findOne({ _id: id }, function(err, docs) {
+    return Location.findOne({ _id: id }, function (err, docs) {
         if (err) {
             console.error(err)
         } else {
@@ -54,8 +78,12 @@ const getLocationById = (Location) => (id) => {
     })
 }
 
-
-const getLocationByName = (Location) => async(name) => {
+/**
+ * This function get a location by name.
+ * @param {*} Location 
+ * @returns location object
+ */
+const getLocationByName = (Location) => async (name) => {
     console.debug(`getLocationByName(): ${name}`)
 
     return await Location.findOne({ name })

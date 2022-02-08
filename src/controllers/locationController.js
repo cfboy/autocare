@@ -6,45 +6,70 @@ const { ROLES } = require('../collections/user/user.model')
 const Stripe = require('../connect/stripe')
 const alertTypes = require('../helpers/alertTypes')
 
-// ------------------------------- CRUDS ------------------------------- 
-
-// ------------------------------- Create -------------------------------
-
+/**
+ * This function render all locations.
+ * @param {*} req 
+ * @param {*} res 
+ */
 exports.locations = async (req, res) => {
-    // Message for alerts
-    let { message, alertType } = req.session
-    // clear message y alertType
-    if (message) {
-        req.session.message = ''
-        req.session.alertType = ''
-    }
-    // Passport store the user in req.user
-    let user = req.user
+    try {
+        // Message for alerts
+        let { message, alertType } = req.session
+        // clear message y alertType
+        if (message) {
+            req.session.message = ''
+            req.session.alertType = ''
+        }
+        // Passport store the user in req.user
+        let user = req.user
 
-    if (!user) {
-        res.redirect('/')
-    } else {
-        let locations = await LocationService.getLocations()
+        if (!user) {
+            res.redirect('/')
+        } else {
+            let locations = await LocationService.getLocations()
+            res.render('location/index.ejs', { user, locations, message, alertType })
 
-        res.render('location/index.ejs', { user, locations, message, alertType })
-
+        }
+    } catch (error) {
+        console.error("ERROR: locationController -> Tyring to find locations.")
+        console.error(error.message)
+        req.session.message = 'Error tyring to find locations.'
+        req.session.alertType = alertTypes.ErrorAlert
+        res.redirect('/account')
     }
 }
 
-// Route for create location.
+/**
+ * This function render the form to create a new location.
+ * @param {*} req 
+ * @param {*} res 
+ */
 exports.createLocation = async (req, res) => {
     let { message, alertType } = req.session
 
     // clear message y alertType
     req.session.message = ''
     req.session.alertType = ''
-    // TODO: Find all products to link with location
-    const products = await Stripe.getAllProducts(),
-        users = await UserService.getUsersPerRoles([ROLES.ADMIN, ROLES.MANAGER, ROLES.CASHIER])
+    try {
+        const products = await Stripe.getAllProducts(),
+            // Exclude users with customer role for location users relationship.
+            users = await UserService.getUsersPerRoles([ROLES.ADMIN, ROLES.MANAGER, ROLES.CASHIER])
 
-    res.render('location/create.ejs', { user: req.user, products, users, message, alertType })
+        res.render('location/create.ejs', { user: req.user, products, users, message, alertType })
+    } catch (error) {
+        console.error("ERROR: locationController -> Tyring to render create location form.")
+        console.error(error.message)
+        req.session.message = 'Error tyring to render create location form.'
+        req.session.alertType = alertTypes.ErrorAlert
+        res.redirect('/locations')
+    }
 }
 
+/**
+ * This function save/create the new location with their properties.
+ * @param {*} req 
+ * @param {*} res 
+ */
 exports.save = async (req, res) => {
     const fields = req.body
     try {
@@ -52,7 +77,7 @@ exports.save = async (req, res) => {
 
         let location = await LocationService.getLocationByName(fields.name)
         if (!location) {
-            console.log(`Location ${fields.name} does not exist. Making one...`)
+            console.debug(`Location ${fields.name} does not exist. Making one...`)
             // TODO: Add Location to DB
             location = await LocationService.addLocation({ name: fields.name, services: fields.services, users: fields.users })
 
@@ -62,12 +87,13 @@ exports.save = async (req, res) => {
 
             req.session.message = `Location Created ${location.name}.`
             req.session.alertType = alertTypes.CompletedActionAlert
+            req.flash('info', 'Location created.')
 
             res.redirect('/locations')
 
         } else {
             let message = `That Location ${location.name} already exist.`
-            console.log(message)
+            console.error(message)
 
             // Set the message for alert. 
             req.session.message = message
@@ -75,15 +101,19 @@ exports.save = async (req, res) => {
             res.redirect('/locations')
         }
     } catch (error) {
-        // console.error(error.message)
-        req.session.message = error.message
+        console.error(error.message)
+        req.session.message = 'Error trying to create new location.'
         req.session.alertType = alertTypes.ErrorAlert
         // res.status(400).send(error)
         res.redirect('/locations')
     }
 }
 
-// ------------------------------- Read -------------------------------
+/**
+ * This function render the specific location details.
+ * @param {*} req 
+ * @param {*} res 
+ */
 exports.viewLocation = async (req, res) => {
     try {
         let { message, alertType } = req.session
@@ -98,7 +128,6 @@ exports.viewLocation = async (req, res) => {
 
         if (location) {
             //On location.services the values is the stripe product id.
-
             for (const service of location.services) {
                 console.debug(`LOCATION-CONTROLLER: Service: ${service}`)
                 let serviceInfo = await Stripe.getProductInfoById(service)
@@ -108,8 +137,7 @@ exports.viewLocation = async (req, res) => {
 
             location.services = services
 
-            const locationUsers = await UserService.getLocationUsers(location?.users?.toObject())
-            // const testGetMultipleUsers = await UserService.getUsersPerRoles([ROLES.ADMIN, ROLES.MANAGER, ROLES.CASHIER])
+            const locationUsers = await UserService.getUsersByList(location?.users?.toObject())
             location.users = locationUsers
             res.status(200).render('location/view.ejs', { user: req.user, location, message, alertType })
         } else {
@@ -117,15 +145,18 @@ exports.viewLocation = async (req, res) => {
             res.redirect('/locations')
         }
     } catch (error) {
-        req.session.message = error.message
+        console.error(error.message)
+        req.session.message = 'Error trying to view location details.'
         req.session.alertType = alertTypes.ErrorAlert
         res.redirect('/locations')
     }
 }
 
-// ------------------------------- Update -------------------------------
-
-// Route for view/edit location info.
+/**
+ * This function render the form to edit the location info.
+ * @param {*} req 
+ * @param {*} res 
+ */
 exports.editLocation = async (req, res) => {
     try {
         const id = req.params.id;
@@ -142,21 +173,31 @@ exports.editLocation = async (req, res) => {
             res.redirect(`${url}`)
         }
     } catch (error) {
-        req.session.message = error.message
+        console.error(error.message)
+        req.session.message = 'Error trying to render edit location form.'
         req.session.alertType = alertTypes.ErrorAlert
         res.redirect('/locations')
     }
 }
 
+/**
+ * This function update the existing location properties.
+ * @param {*} req 
+ * @param {*} res 
+ */
 exports.update = async (req, res) => {
 
     const url = req.query.url
     try {
         // Handle checkbox value.
         req.body.isActive = req.body.isActive == 'on' ? true : false
+        // Handle empty values.
         req.body.services = req.body.services ? req.body.services : []
         req.body.users = req.body.users ? req.body.users : []
-        let unselectedUsers = req.body.unselectedUsers ? req.body.unselectedUsers.split(',') : []
+        // Indentify the removed users to update their relationsip.
+        let unselectedUsers = req.body.unselectedUsers ? req.body.unselectedUsers.split(',') : [],
+            newSelectedUsers = req.body.newSelectedUsers ? req.body.newSelectedUsers.split(',') : []
+
 
         const location = await LocationService.updateLocation(req.body.id, req.body)
 
@@ -165,47 +206,53 @@ exports.update = async (req, res) => {
             req.session.alertType = alertTypes.WarningAlert
 
         } else {
-            req.flash('info', 'Update Completed.')
-            req.session.message = `Location updated ${location.name}`
-            req.session.alertType = alertTypes.CompletedActionAlert
-
-            if (location.users) {
+            if (location.users && newSelectedUsers.length > 0) {
                 // Update user locations.
                 for (user of location.users) {
 
                     let updatedUser = await UserService.updateUser(user, { location: location })
 
                     if (!updatedUser) {
-                        console.debug(`LOCATION-CONTROLLER: Can't update User  ${user?.email}.`)
+                        console.debug(`ERROR: LOCATION-CONTROLLER: Can't update User ${updatedUser?.email}.`)
 
                     } else {
-                        console.debug(`LOCATION-CONTROLLER: Updated User  ${user?.email}.`)
+                        console.debug(`LOCATION-CONTROLLER: Updated User ${updatedUser?.email}.`)
                     }
                 }
             }
-            if (unselectedUsers){
+            if (unselectedUsers.length > 0) {
                 for (user of unselectedUsers) {
                     let updatedUser = await UserService.updateUser(user, { location: null })
 
                     if (!updatedUser) {
-                        req.session.message += `Cant Remove User from Location  ${user?.email}.`
+                        console.debug(`ERROR: LOCATION-CONTROLLER: Can't remove User ${updatedUser?.email}.`)
 
                     } else {
-                        req.session.message += `Removed User from updated ${user.email}.`
+                        console.debug(`LOCATION-CONTROLLER: Removed user ${updatedUser?.email}.`)
                     }
                 }
             }
+
+            req.flash('info', 'Location Updated.')
+            req.session.message = `Location updated ${location.name}`
+            req.session.alertType = alertTypes.CompletedActionAlert
         }
         res.redirect(`${url}`)
 
     } catch (error) {
-        req.session.message = error.message
+        console.error(error.message)
+        req.session.message = "Error trying to update the location information."
         req.session.alertType = alertTypes.ErrorAlert
         res.redirect(`${url}`)
     }
 }
 
 // ------------------------------- Delete -------------------------------
+/**
+ * This function deletes existing loction.
+ * @param {*} req 
+ * @param {*} res 
+ */
 exports.delete = async (req, res) => {
     console.log('Deleting Location...')
     const id = req.params.id
@@ -223,11 +270,12 @@ exports.delete = async (req, res) => {
         req.session.alertType = alertTypes.ErrorAlert
     }
 
+    //Log this action.
     try {
         HistoryService.addHistory("Location deleted", historyTypes.USER_ACTION, req.user, null)
     } catch (error) {
         console.debug(`ERROR-LOCATION-CONTROLLER : ${error.message}`)
-        req.session.message = "Can't add to History."
+        req.session.message = "Can't add to History Log."
         req.session.alertType = alertTypes.ErrorAlert
     }
     res.redirect('/locations')
