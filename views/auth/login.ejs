@@ -79,20 +79,27 @@
                                 </div>
                             </form>
                             <br>
-                            <div class="btn-group">
-                                <button type="button"
-                                    class="btn btn-sm btn-secondary dropdown-toggle dropdown-toggle-split"
-                                    id="dropdownMenuSplitButton1" data-bs-toggle="dropdown" aria-haspopup="true"
-                                    aria-expanded="false">
-                                    <%= lingua.selectLanguage%>
+                            <div class="dropdown">
+                                <button type="button" class="btn btn-secondary dropdown-toggle" id="dropdownMenuLang"
+                                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <div id="showLang" style="display: contents;">
+                                        <span id="es-lang">
+
+                                            <span class="flag-icon flag-icon-pr "></span> ESPAÑOL
+                                        </span>
+                                        <span id="en-lang">
+                                            <span class="flag-icon flag-icon-um "></span> ENGLISH
+                                        </span>
+                                    </div>
+                                    <%# lingua.selectLanguage%>
                                 </button>
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuSplitButton1">
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuLang">
                                     <a id="es-lang" href="?lang=es" class="dropdown-item">
 
-                                        <span class="flag-icon flag-icon-pr "></span> ES
+                                        <span class="flag-icon flag-icon-pr "></span> ESPAÑOL
                                     </a>
                                     <a id="en-lang" href="?lang=en" class="dropdown-item">
-                                        <span class="flag-icon flag-icon-um "></span> EN
+                                        <span class="flag-icon flag-icon-um "></span> ENGLISH
                                     </a>
                                 </div>
                             </div>
@@ -120,6 +127,7 @@
 
     <!-- endinject -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.3.3/dist/sweetalert2.all.min.js "></script>
+    <script src="./js/jquery.cookie.js" type="text/javascript"></script>
 
     <!-- Alerts Code -->
     <script type="text/javascript " src="./js/sweet-alerts.js "></script>

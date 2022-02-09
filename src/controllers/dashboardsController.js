@@ -136,10 +136,11 @@ exports.useService = async (req, res) => {
         let userID = req.body.userID
 
         if (userID) {
+            // TODO: Change location
             let [customer, service] = await UserService.addNewService(userID, req.user, req?.user?.locations[0])
             if (customer && service)
                 //Log this action.
-                HistoryService.addHistory(`Use Service: ${service.id}`, historyTypes.SERVICE, service.user, service.location)
+                HistoryService.addHistory(`Use Service: ${service.id}`, historyTypes.SERVICE, customer, service.location)
 
             res.render('ajaxSnippets/useServiceResult.ejs', { customer, service })
         } else {

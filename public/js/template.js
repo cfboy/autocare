@@ -122,8 +122,8 @@
             document.querySelector('.navbar').classList.remove('pt-5');
         } else {
             document.querySelector('.page-body-wrapper').classList.add('pt-0');
-            document.querySelector('.navbar').classList.add('pt-5');
-            document.querySelector('.navbar').classList.add('mt-3');
+            document.querySelector('.navbar')?.classList.add('pt-5');
+            document.querySelector('.navbar')?.classList.add('mt-3');
 
         }
         document.querySelector('#bannerClose')?.addEventListener('click', function() {

@@ -16525,6 +16525,10 @@ fieldset:disabled .swal2-modal .swal2-buttonswrapper .swal2-styled,
     display: flex !important;
 }
 
+.navbar .navbar-menu-wrapper .navbar-nav .nav-item.dropdown .navbar-dropdown .dropdown-item[hidden]{
+    display: none !important;
+}
+
 .d-inline-flex,
 .email-wrapper .message-body .attachments-sections ul li {
     display: inline-flex !important;

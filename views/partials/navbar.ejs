@@ -174,9 +174,17 @@
                 <a class="nav-link count-indicator" id="languageDropdown" href="#" data-bs-toggle="dropdown"
                     aria-expanded="false">
                     <!-- <i class="icon-globe"></i> -->
-                    <i class="fas fa-globe-americas"></i>
+                    <!-- <i class="fas fa-globe-americas"></i> -->
+                    <div id="showLang" style="display: contents;">
+                        <span id="es-lang" hidden>
+                            <span class="flag-icon flag-icon-pr "></span> ESPAÑOL
+                        </span>
+                        <span id="en-lang" hidden>
+                            <span class="flag-icon flag-icon-um "></span> ENGLISH
+                        </span>
+                    </div>
                 </a>
-                <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list pb-0"
+                <div id="languageDropdown" class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list pb-0"
                     aria-labelledby="languageDropdown">
                     <a id="es-lang" href="?lang=es" class="dropdown-item py-3">
                         ES <span class="flag-icon flag-icon-pr" style="margin-left: 5px;"></span>

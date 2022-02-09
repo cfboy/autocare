@@ -34,13 +34,26 @@ function manageLangDropdown() {
     var lang = getCookie('lang');
     if (lang !== '') {
         if (lang === 'es') {
-            $('#es-lang').addClass('active');
-            $('#en-lang').removeClass('active');
+            $('#showLang #es-lang').attr('hidden', false);
+            $('#showLang #en-lang').attr('hidden', true);
+
+            $('.dropdown-menu #es-lang').addClass('active').attr('hidden', true)
+            $('.dropdown-menu #en-lang').removeClass('active').attr('hidden', false);
+
         }
 
         if (lang === 'en') {
-            $('#en-lang').addClass('active');
-            $('#es-lang').removeClass('active');
+            $('#showLang #es-lang').attr('hidden', true);
+            $('#showLang #en-lang').attr('hidden', false);
+
+            $('.dropdown-menu #en-lang').addClass('active').attr('hidden', true);
+            $('.dropdown-menu #es-lang').removeClass('active').attr('hidden', false);
         }
+    } else {
+        $('#showLang #es-lang').attr('hidden', true);
+        $('#showLang #en-lang').attr('hidden', false);
+
+        $('.dropdown-menu #en-lang').addClass('active').attr('hidden', true);
+        $('.dropdown-menu #es-lang').removeClass('active').attr('hidden', false);
     }
 }
