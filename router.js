@@ -89,6 +89,7 @@ router.get('/account', checkAuthenticated, dashboardsController.account)
 
 router.get('/validateMembership', checkAuthenticated, authValidateMembership, dashboardsController.validateMembership)
 router.post('/validateMembership', checkAuthenticated, authValidateMembership, dashboardsController.validate)
+router.post('/useService', checkAuthenticated, authValidateMembership, dashboardsController.useService)
 
 // ---------------------------------------
 

@@ -3,6 +3,7 @@ const { ROLES } = require('../collections/user/user.model')
 const HistoryService = require('../collections/history')
 const { historyTypes } = require('../collections/history/history.model')
 const Stripe = require('../connect/stripe')
+const alertTypes = require('../helpers/alertTypes')
 
 /**
  * This function handle the dashboards of the different roles. 
@@ -105,7 +106,7 @@ exports.validate = async (req, res) => {
             customer = await Stripe.setStripeInfoToUser(customer)
             // TODO: use selected location 
             //Log this action.
-            HistoryService.addHistory(`Validate Membership: ${carPlate}`, historyTypes.USER_ACTION, req.user, req?.user?.locations[0])
+            // HistoryService.addHistory(`Validate Membership: ${carPlate}`, historyTypes.USER_ACTION, req.user, req?.user?.locations[0])
         }
 
 
@@ -118,5 +119,40 @@ exports.validate = async (req, res) => {
         console.error("ERROR: dashboardController -> Tyring to validate membership.")
         console.error(error.message)
         res.render('Error validating membership.')
+    }
+}
+
+/**
+ * This function is to handle use service action. 
+ * This function is called by ajax function.
+ * Make a call to add new service on user schema.
+ * Log the service to the history.
+ * Then render the resuls of customer and service added.
+ * @param {body.userID} req 
+ * @param {*} res 
+ */
+exports.useService = async (req, res) => {
+    try {
+        let userID = req.body.userID
+
+        if (userID) {
+            let [customer, service] = await UserService.addNewService(userID, req.user, req?.user?.locations[0])
+            if (customer && service)
+                //Log this action.
+                HistoryService.addHistory(`Use Service: ${service.id}`, historyTypes.SERVICE, service.user, service.location)
+
+            res.render('ajaxSnippets/useServiceResult.ejs', { customer, service })
+        } else {
+            req.session.message = `USER ID UNDEFINED`
+            req.session.alertType = alertTypes.ErrorAlert
+            console.debug(`userID is undefined.`)
+            res.redirect('/validateMembership')
+        }
+    } catch (error) {
+        console.debug("ERROR: dashboardController -> Tyring to log use service.")
+        console.debug(error.message)
+        req.session.message = `ERROR: ${error.message}`
+        req.session.alertType = alertTypes.ErrorAlert
+        res.redirect('/validateMembership')
     }
 }

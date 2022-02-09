@@ -1,0 +1,34 @@
+<div class="p-3">
+    <h4 class="text-center">Service Recipe</h4>
+    <br>
+    <% if(service) { %>
+    <div class="col-md-12">
+        <ul>
+            <li>
+                <p>Service ID : <%= service.id%></p>
+            </li>
+            <li>
+                <p>Approved By: <%= service?.authorizedBy?.email%></p>
+            </li>
+            <li>
+                <p>Date :
+                    <%= moment(service.date).isValid() ? moment(service.date).format(completeDateFormat) : 'N/A' %>
+                </p>
+            </li>
+            <li>
+                <p>
+                    Location : <%= service.location.name%>
+                </p>
+            </li>
+        </ul>
+
+
+    </div>
+    <% } else { %>
+    <div class="col-md-12 text-center validation-msgs">
+        <i class="fas fa-8x fa-exclamation-triangle warning"></i>
+        <p>Service not found.</p>
+
+        <% } %>
+    </div>
+</div>

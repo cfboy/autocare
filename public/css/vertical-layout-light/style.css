@@ -15968,6 +15968,10 @@ fieldset:disabled .swal2-modal .swal2-buttonswrapper .swal2-styled,
     }
 }
 
+.spinner {
+    margin: 50px;
+}
+
 .spinner-border {
     display: inline-block;
     width: 2rem;

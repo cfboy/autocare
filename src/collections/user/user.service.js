@@ -239,6 +239,37 @@ const getUsersByList = (User) => async (users) => {
     })
 }
 
+/**
+ * This function add new service to user.
+ * Find the user and add new service.
+ * @param {userID, authorizedBy, location} User 
+ * @returns user object, service object
+ */
+const addNewService = (User) => async (userID, authorizedBy, location) => {
+    console.log(`addNewService() ID: ${userID}`)
+
+    let service = {
+        // id is a random ID genetated with letters and numbers. 
+        id: 'AC-' + Math.random().toString(36).toUpperCase().substring(2, 6),
+        date: Date.now(),
+        location: location,
+        authorizedBy: authorizedBy?._id
+
+    }, customer = await User.findByIdAndUpdate({ _id: userID }, { $addToSet: { services: service } },
+        { new: true }, function (err, doc) {
+            if (err) {
+                console.error(err)
+                console.error(err.message)
+            } else {
+                console.debug("Service Added : ", service?.id);
+            }
+        }).populate({ path: 'services.location', model: 'location' }).populate({ path: 'services.authorizedBy', model: 'user' })
+
+    service = (customer.services.find(({ id }) => id === service.id))
+
+    return [customer, service]
+}
+
 module.exports = (User) => {
     return {
         addUser: addUser(User),
@@ -256,6 +287,7 @@ module.exports = (User) => {
         updateBillingID: updateBillingID(User),
         getUserByPlate: getUserByPlate(User),
         getUsersByLocationID: getUsersByLocationID(User),
-        getUsersByList: getUsersByList(User)
+        getUsersByList: getUsersByList(User),
+        addNewService: addNewService(User)
     }
 }

@@ -24,7 +24,12 @@ const userSchema = new Schema({
         dateOfBirth: { type: Date, default: null },
         city: String
     },
-
+    services: [{
+        id: String,
+        date: { type: Date, default: Date.now },
+        location: { type: Schema.Types.ObjectId, ref: 'location', default: null },
+        authorizedBy: { type: Schema.Types.ObjectId, ref: 'user', default: null },
+    }],
     carInfo: {
         brand: String,
         model: String,

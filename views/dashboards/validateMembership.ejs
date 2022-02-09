@@ -58,7 +58,8 @@
                                                                         Number</label>
                                                                     <input autocomplete="off" type="text" id="tagNumber"
                                                                         name="tagNumber"
-                                                                        class="form-control form-control-lg" required />
+                                                                        class="form-control form-control-lg text-uppercase"
+                                                                        required />
 
                                                                 </div>
                                                             </div>
@@ -142,7 +143,7 @@
                         tagNumber: valueToValidate.val()
                     }),
                     beforeSend: function () {
-                        showResult(
+                        showResult('#membershipDetails',
                             `<div class="spinner text-center p-5">
                                 <div class="spinner-grow"></div>
                             </div>`
@@ -150,7 +151,7 @@
 
                     }
                 }).done(function (result) {
-                    showResult(result);
+                    showResult('#membershipDetails', result);
                     cleanInput("tagNumber");
                 }).fail(function (err) {
                     console.log(err);
@@ -159,8 +160,8 @@
         });
 
 
-        var showResult = function (result) {
-            $("#membershipDetails").html(result);
+        var showResult = function (updateDiv, result) {
+            $(updateDiv).html(result);
         }
         var cleanInput = function (input) {
             var removeThis = document.getElementById(input);
