@@ -1,5 +1,6 @@
 const stripe = require('stripe')
 const Dinero = require('dinero.js')
+const { ROLES } = require('../collections/user/user.model')
 
 const STATUS = {
     NONE: "none",
@@ -233,6 +234,58 @@ const getCustomerSubscription = async (customerID) => {
         return null
     }
 }
+/**
+ * This function que the customer subscriptions.
+ * @param {*} customerID 
+ * @returns subscription list
+ */
+const getCustomerEvents = async (customerID) => {
+    try {
+        console.debug(`STRIPE: getCustomerEvents(${customerID})`);
+        let eventsToReturn = []
+        let events = await Stripe.events.list({ limit: 50 });
+
+        eventsToReturn = events.data.filter((event) => event.data.object.id === customerID)
+        console.debug(`STRIPE: Events Found ${eventsToReturn}`);
+
+        return eventsToReturn
+    } catch (error) {
+        console.debug(`ERROR-STRIPE: Stripe Events Not Found`);
+        console.debug(`ERROR-STRIPE: ${error.message}`);
+
+        return null
+    }
+}
+
+const getCustomerCharges = async (user) => {
+    try {
+        let customerID = user.billingID,
+            role = user.role
+
+        console.debug(`STRIPE: getCustomerCharges(${customerID})`);
+        let chargesToReturn = []
+        let charges = await Stripe.charges.list({ limit: 50 });
+
+        if ([ROLES.ADMIN, ROLES.MANAGER].includes(role))
+            chargesToReturn = charges.data
+        else
+            chargesToReturn = charges.data.filter(charge => charge?.customer === customerID)
+
+
+        console.debug(`STRIPE: Charges Found ${chargesToReturn.length}`);
+        if (chargesToReturn.length > 0) {
+            for (charge of chargesToReturn) {
+                charge.amount = Dinero({ amount: charge.amount }).toFormat('$0,0.00')
+            }
+        }
+        return chargesToReturn
+    } catch (error) {
+        console.debug(`ERROR-STRIPE: Stripe Charges Not Found`);
+        console.debug(`ERROR-STRIPE: ${error.message}`);
+
+        return null
+    }
+}
 
 /**
  * This function set the stripe information temporary on .stripe property in the user object.
@@ -282,5 +335,7 @@ module.exports = {
     getProductPrice,
     getProductInfoById,
     getCustomerSubscription,
+    getCustomerEvents,
+    getCustomerCharges,
     setStripeInfoToUser
 }

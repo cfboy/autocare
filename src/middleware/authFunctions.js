@@ -34,7 +34,7 @@ async function authDeleteCar(req, res, next) {
 }
 
 async function authEditCar(req, res, next) {
-    let carID = req.params.id
+    let carID = req.body.id ? req.body.id : req.params.id ? req.params.id : ''
 
     if (carID && canEditCar(req.user, carID)) {
         return next()

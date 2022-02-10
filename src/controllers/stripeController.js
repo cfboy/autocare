@@ -1,6 +1,7 @@
 const Stripe = require('../connect/stripe')
 // const UserService = require('../collections/user')
 // const { ROLES } = require('../collections/user/user.model')
+const alertTypes = require('../helpers/alertTypes')
 
 const productToPriceMap = {
     basic: process.env.PRODUCT_BASIC,
@@ -163,4 +164,76 @@ exports.billing = async (req, res) => {
     console.log('session', session)
 
     res.json({ url: session.url })
+}
+
+exports.charges = async (req, res) => {
+    try {
+        let user = req.user,
+            { message, alertType } = req.session
+
+        if (message) {
+            req.session.message = ''
+            req.session.alertType = ''
+        }
+        if (user) {
+            const charges = await Stripe.getCustomerCharges(user)
+
+            res.status(200).render('charges/index.ejs', {
+                user,
+                charges,
+                message,
+                alertType
+            })
+        } else {
+            message = 'User ID not found.'
+            alertType = alertTypes.ErrorAlert
+            console.log('User ID not found.')
+            res.redirect('/account')
+        }
+
+    } catch (error) {
+        console.error(error.message)
+        req.session.message = "Error trying to render the user events."
+        req.session.alertType = alertTypes.ErrorAlert
+        res.redirect('/account')
+
+    }
+
+}
+
+
+exports.events = async (req, res) => {
+    try {
+        let user = req.user,
+            { message, alertType } = req.session
+
+        if (message) {
+            req.session.message = ''
+            req.session.alertType = ''
+        }
+
+        if (user?.billingID) {
+            // const events = await Stripe.getCustomerEvents(user?.billingID)
+            const charges = await Stripe.getCustomerCharges(user?.billingID)
+
+
+            res.status(200).render('events/index.ejs', {
+                user,
+                charges, message, alertType
+            })
+        } else {
+            message = 'Billing ID not found.'
+            alertType = alertTypes.ErrorAlert
+            console.log('Billing ID not found.')
+            res.redirect('/account')
+        }
+
+    } catch (error) {
+        console.error(error.message)
+        req.session.message = "Error trying to render the user events."
+        req.session.alertType = alertTypes.ErrorAlert
+        res.redirect('/account')
+
+    }
+
 }

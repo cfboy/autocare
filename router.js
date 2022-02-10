@@ -107,6 +107,8 @@ router.post('/useService', checkAuthenticated, authValidateMembership, dashboard
 // ---------------------------------------
 
 //------ Stripe and Payment Routes ------
+router.get('/charges', stripeController.charges)
+
 router.post('/webhook', stripeController.webhook)
 
 router.post('/checkout', checkAuthenticated, stripeController.checkout)

@@ -147,15 +147,20 @@ exports.save = async (req, res) => {
  */
 exports.viewUser = async (req, res) => {
     try {
-        let { message, alertType } = req.session
+        let { message, alertType } = req.session,
+            findByBillingID = req?.query?.billingID ? true : false
 
         if (message) {
             req.session.message = ''
             req.session.alertType = ''
         }
-        let id = req.params.id,
-            customer = await UserService.getUserById(id),
-            isMyProfile = false
+        let id = req.params.id, customer
+        if (findByBillingID)
+            customer = await UserService.getUserByBillingID(id)
+        else
+            customer = await UserService.getUserById(id)
+
+        let isMyProfile = false
 
         if (customer) {
             isMyProfile = (req.user.id === customer.id)
