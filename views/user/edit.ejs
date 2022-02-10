@@ -24,18 +24,21 @@
     <link rel="stylesheet" href="../css/vertical-layout-light/style.css">
     <!-- endinject -->
     <link rel="shortcut icon" href="../images/favicon.png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+        integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
 <body class="sidebar-icon-only">
     <div class="container-scroller">
         <!-- partial:partials/_navbar.html -->
         <%- include('../partials/navbar.ejs' , {user}); %>
-            <!-- partial -->
-            <div class="container-fluid page-body-wrapper">
-                <!-- partial:partials/_sidebar.html -->
-                <%- include('../partials/sidebar.ejs' , {user}); %>
+        <!-- partial -->
+        <div class="container-fluid page-body-wrapper">
+            <!-- partial:partials/_sidebar.html -->
+            <%- include('../partials/sidebar.ejs' , {user}); %>
 
-                    <!-- <nav class="sidebar sidebar-offcanvas" id="sidebar">
+            <!-- <nav class="sidebar sidebar-offcanvas" id="sidebar">
                 <ul class="nav">
                     <li class="nav-item">
                         <a class="nav-link" href="/account">
@@ -45,121 +48,143 @@
                     </li>
                 </ul>
             </nav> -->
-                    <!-- partial -->
-                    <div class="main-panel">
-                        <div class="content-wrapper">
-                            <div class="row">
-                                <div class="col-lg-12 d-flex flex-column">
-                                    <div class="row flex-grow">
-                                        <div class="col-12 grid-margin stretch-card">
-                                            <div class="card card-rounded">
-                                                <div class="card-body">
-                                                    <h4>Edit User</h4>
-                                                    <!-- <h6 class="fw-light">Sign in to continue.</h6> -->
-                                                    <% if(customer) {%>
-                                                        <form id="form-register" class="pt-3" action="/edit-user/?url=<%- url%>" method="post">
-                                                            <input type="text" id="id" name="id" value="<%- customer.id%>" hidden />
-                                                            <div class="row">
-                                                                <div class="col-lg-6">
-                                                                    <div class="form-group">
-                                                                        <label class="required" for="email">Email</label>
-                                                                        <input value="<%- customer.email%>" type="email" id="email" name="email" class="form-control form-control-lg" placeholder="example@gmail.com" required />
+            <!-- partial -->
+            <div class="main-panel">
+                <div class="content-wrapper">
+                    <div class="row">
+                        <div class="col-lg-12 d-flex flex-column">
+                            <div class="row flex-grow">
+                                <div class="col-12 grid-margin stretch-card">
+                                    <div class="card card-rounded">
+                                        <div class="card-body">
+                                            <h4>Edit User</h4>
+                                            <!-- <h6 class="fw-light">Sign in to continue.</h6> -->
+                                            <% if(customer) { %>
+                                            <form id="form-register" class="pt-3" action="/edit-user/?url=<%- url%>"
+                                                method="post">
+                                                <input type="text" id="id" name="id" value="<%- customer.id%>" hidden />
+                                                <div class="row">
+                                                    <div class="col-lg-6">
+                                                        <div class="form-group">
+                                                            <label class="required" for="email">Email</label>
+                                                            <input value="<%- customer.email%>" type="email" id="email"
+                                                                name="email" class="form-control form-control-lg"
+                                                                placeholder="example@gmail.com" required />
 
-                                                                    </div>
+                                                        </div>
 
-                                                                    <div class="form-group">
-                                                                        <label for="password" class="required">Password</label>
+                                                        <div class="form-group">
+                                                            <label for="password" class="required">Password</label>
 
-                                                                        <input value="<%- customer.password%>" type="password" id="password" name="password" class="form-control mb-3 form-control-lg" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters"
-                                                                            placeholder="Password" required disabled/>
-                                                                        <div id="message">
-                                                                            <p>Password must contain the following:</p>
-                                                                            <p> <span id="letter" class="invalid"> <b>1 lowercase letter</b> </span>, <span id="capital" class="invalid"><b>1 capital (uppercase) letter</b></span>, <span id="number" class="invalid"> <b>1 number</b></span>,
-                                                                                <span id="length" class="invalid"> <b>8 characters</b></span>
-                                                                            </p>
-                                                                        </div>
-                                                                    </div>
-                                                                    <%if(user.role === roles.ADMIN){%>
-                                                                        <div class="form-group">
-                                                                            <label class="required" for="role">Role</label>
-                                                                            <select name="role" id="role" class="form-control form-control-lg">
-                                                                            <option value="">Select Role</option>
-                                                                            <% for(const [key, value] of selectRoles) { %>    
-                                                                                <% var selected = (value == customer.role) ? "selected" : "";   %>
-   
-                                                                                <option value="<%= value %>" <%=selected%>><%= key %></option>
-                                                                            <% }%>
-                                                                        </select>
-                                                                        </div>
-                                                                        <%}%>
-
-                                                                            <div class="form-group">
-                                                                                <label for="firstName" class="required">First Name</label>
-
-                                                                                <input value="<%- customer.personalInfo.firstName%>" type="text" id="firstName" name="personalInfo.firstName" class="form-control mb-3 form-control-lg" placeholder="First Name" required autofocus />
-                                                                            </div>
-
-                                                                            <div class="form-group">
-                                                                                <label for="lastName" class="required">Last Name</label>
-
-                                                                                <input value="<%- customer.personalInfo.lastName%>" type="text" id="lastName" name="personalInfo.lastName" class="form-control mb-3 form-control-lg" placeholder="LastName" required autofocus />
-                                                                            </div>
-
-                                                                            <div class="form-group">
-                                                                                <label for="phoneNumber" class="required">Phone Number</label>
-
-                                                                                <input value="<%- customer.personalInfo.phoneNumber%>" type="tel" id="phoneNumber" name="personalInfo.phoneNumber" class="form-control mb-3 form-control-lg" placeholder="XXX-XXX-XXXX" required autofocus />
-                                                                            </div>
-                                                                </div>
-                                                                <div class="col-lg-6">
-                                                                    <div class="form-group">
-                                                                        <label for="dateOfBirth" class="required">Date Of Birth</label>
-
-                                                                        <input value="<%- moment(customer.personalInfo.dateOfBirth).utc().format('YYYY-MM-DD')%>" type="date" id="dateOfBirth" name="personalInfo.dateOfBirth" class="form-control mb-3 form-control-lg" required autofocus />
-                                                                    </div>
-                                                                    <div class="form-group">
-                                                                        <label for="city" class="required">City</label>
-
-                                                                        <input value="<%- customer.personalInfo.city%>" type="text" id="city" name="personalInfo.city" class="form-control form-control-lg" placeholder="City" required autofocus />
-                                                                    </div>
-                                                                    <div class="form-group">
-                                                                        <label for="carBrand" class="sr-only">Car Brand</label>
-
-                                                                        <input value="<%- customer.carInfo.brand%>" type="text" id="carBrand" name="carInfo.brand" class="form-control mb-3 form-control-lg" placeholder="Car Brand" autofocus />
-                                                                    </div>
-                                                                    <div class="form-group">
-                                                                        <label for="carModel" class="sr-only">Car Model</label>
-
-                                                                        <input value="<%- customer.carInfo.model%>" type="text" id="carModel" name="carInfo.model" class="form-control mb-3 form-control-lg" placeholder="Car Model" autofocus />
-                                                                    </div>
-                                                                    <div class="form-group">
-                                                                        <label for="carPlate" class="sr-only">Car Plate</label>
-
-                                                                        <input value="<%- customer.carInfo.plate%>" type="text" id="carPlate" name="carInfo.plate" class="form-control mb-3 form-control-lg" placeholder="Car Plate" autofocus />
-                                                                    </div>
-                                                                </div>
+                                                            <input value="<%- customer.password%>" type="password"
+                                                                id="password" name="password"
+                                                                class="form-control mb-3 form-control-lg"
+                                                                pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+                                                                title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters"
+                                                                placeholder="Password" required disabled />
+                                                            <div id="message">
+                                                                <p>Password must contain the following:</p>
+                                                                <p> <span id="letter" class="invalid"> <b>1 lowercase
+                                                                            letter</b> </span>, <span id="capital"
+                                                                        class="invalid"><b>1 capital (uppercase)
+                                                                            letter</b></span>, <span id="number"
+                                                                        class="invalid"> <b>1 number</b></span>,
+                                                                    <span id="length" class="invalid"> <b>8
+                                                                            characters</b></span>
+                                                                </p>
                                                             </div>
-                                                            <div class="row">
-                                                                <div class="mt-3">
+                                                        </div>
+                                                        <% if(user.role === roles.ADMIN){ %>
+                                                        <div class="form-group">
+                                                            <label class="required" for="role">Role</label>
+                                                            <select name="role" id="role"
+                                                                class="form-control form-control-lg">
+                                                                <option value="">Select Role</option>
+                                                                <% for(const [key, value] of selectRoles) { %>
+                                                                <% var selected = (value == customer.role) ? "selected" : "";   %>
 
-                                                                    <a href="<%- url%>" class="btn btn-block btn-light btn-lg font-weight-medium auth-form-btn float-end">Cancel</a>
+                                                                <option value="<%= value %>" <%=selected%>><%= key %>
+                                                                </option>
+                                                                <% }%>
+                                                            </select>
+                                                        </div>
+                                                        <% } %>
 
-                                                                    <button class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn float-end" type="submit">Save</button>
-                                                                </div>
-                                                            </div>
-                                                        </form>
+                                                        <div class="form-group">
+                                                            <label for="firstName" class="required">First Name</label>
 
-                                                        <% }%>
-                                                </div>
-                                            </div>
+                                                            <input value="<%- customer.personalInfo.firstName%>"
+                                                                type="text" id="firstName" name="personalInfo.firstName"
+                                                                class="form-control mb-3 form-control-lg"
+                                                                placeholder="First Name" required autofocus />
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <label for="lastName" class="required">Last Name</label>
+
+                                                            <input value="<%- customer.personalInfo.lastName%>"
+                                                                type="text" id="lastName" name="personalInfo.lastName"
+                                                                class="form-control mb-3 form-control-lg"
+                                                                placeholder="LastName" required autofocus />
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <label for="phoneNumber" class="required">Phone
+                                                                Number</label>
+
+                                                            <input value="<%- customer.personalInfo.phoneNumber%>"
+                                                                type="tel" id="phoneNumber"
+                                                                name="personalInfo.phoneNumber"
+                                                                class="form-control mb-3 form-control-lg"
+                                                                placeholder="XXX-XXX-XXXX" required autofocus />
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-6">
+                                                        <div class="form-group">
+                                                            <label for="dateOfBirth" class="required">Date Of
+                                                                Birth</label>
+
+                                                            <input
+                                                                value="<%- moment(customer.personalInfo.dateOfBirth).utc().format('YYYY-MM-DD')%>"
+                                                                type="date" id="dateOfBirth"
+                                                                name="personalInfo.dateOfBirth"
+                                                                class="form-control mb-3 form-control-lg" required
+                                                                autofocus />
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="city" class="required">City</label>
+
+                                                            <input value="<%- customer.personalInfo.city%>" type="text"
+                                                                id="city" name="personalInfo.city"
+                                                                class="form-control form-control-lg" placeholder="City"
+                                                                required autofocus />
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="mt-3">
+
+                                                            <a href="<%- url%>"
+                                                                class="btn btn-block btn-light btn-lg font-weight-medium auth-form-btn float-end">Cancel</a>
+
+                                                            <button
+                                                                class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn float-end"
+                                                                type="submit">Save</button>
+                                                        </div>
+                                                    </div>
+                                            </form>
+
+                                            <% }%>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
             </div>
-            <!-- page-body-wrapper ends -->
+        </div>
+        <!-- page-body-wrapper ends -->
     </div>
     <!-- container-scroller -->
 
@@ -170,7 +195,8 @@
     <script src="../vendors/chart.js/Chart.min.js"></script>
     <script src="../vendors/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
     <script src="../vendors/progressbar.js/progressbar.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 
     <!-- End plugin js for this page -->
     <!-- inject:js -->
@@ -182,7 +208,7 @@
     <!-- endinject -->
     <!-- Custom js for this page-->
     <script>
-        var customer = <%- JSON.stringify(customer) %>;
+        var customer = <% - JSON.stringify(customer) %>;
         console.log(customer);
     </script>
     <script type="text/javascript" src="https://js.stripe.com/v3/"></script>
@@ -191,7 +217,6 @@
     <script src="../js/dashboard.js"></script>
     <script src="../js/Chart.roundedBarCharts.js"></script>
     <script src="../../js/register.js"></script>
-
     <!-- End custom js for this page-->
 
 </body>

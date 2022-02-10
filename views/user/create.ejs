@@ -30,118 +30,140 @@
     <div class="container-scroller">
         <!-- partial:partials/_navbar.html -->
         <%- include('../partials/navbar.ejs' , {user}); %>
+        <!-- partial -->
+
+        <div class="container-fluid page-body-wrapper">
+            <!-- partial:partials/_sidebar.html -->
+            <%- include('../partials/sidebar.ejs' , {user}); %>
             <!-- partial -->
+            <div class="main-panel">
+                <div class="content-wrapper">
+                    <div class="row">
+                        <div class="col-lg-12 d-flex flex-column">
+                            <div class="row flex-grow">
+                                <div class="col-12 grid-margin stretch-card">
+                                    <div class="card card-rounded">
+                                        <div class="card-body">
+                                            <h4>Create User</h4>
+                                            <form id="form-create-user" class="pt-3" action="/create-user"
+                                                method="post">
+                                                <div class="row">
+                                                    <div class="col-lg-6">
+                                                        <div class="form-group">
+                                                            <label class="required" for="email">Email</label>
+                                                            <input autocomplete="off" type="email" id="email"
+                                                                name="email" class="form-control form-control-lg"
+                                                                placeholder="example@gmail.com" required />
 
-            <div class="container-fluid page-body-wrapper">
-                <!-- partial:partials/_sidebar.html -->
-                <%- include('../partials/sidebar.ejs' , {user}); %>
-                    <!-- partial -->
-                    <div class="main-panel">
-                        <div class="content-wrapper">
-                            <div class="row">
-                                <div class="col-lg-12 d-flex flex-column">
-                                    <div class="row flex-grow">
-                                        <div class="col-12 grid-margin stretch-card">
-                                            <div class="card card-rounded">
-                                                <div class="card-body">
-                                                    <h4>Create User</h4>
-                                                    <form id="form-create-user" class="pt-3" action="/create-user" method="post">
-                                                        <div class="row">
-                                                            <div class="col-lg-6">
-                                                                <div class="form-group">
-                                                                    <label class="required" for="role">Role</label>
-                                                                    <select name="role" id="role" class="form-control form-control-lg">
-                                                                        <option value="">Select Role</option>
-                                                                        <% for(const [key, value] of selectRoles) { %>       
-                                                                            <option value="<%= value %>"><%= key %></option>
-                                                                        <% }%>
-                                                                    </select>
-                                                                </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-6">
+                                                        <div class="form-group">
+                                                            <label for="password" class="required">Password</label>
 
-                                                                <div class="form-group">
-                                                                    <label class="required" for="email">Email</label>
-                                                                    <input autocomplete="off" type="email" id="email" name="email" class="form-control form-control-lg" placeholder="example@gmail.com" required />
-
-                                                                </div>
-
-                                                                <div class="form-group">
-                                                                    <label for="password" class="required">Password</label>
-
-                                                                    <input autocomplete="off" type="password" id="password" name="password" class="form-control mb-3 form-control-lg" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters"
-                                                                        placeholder="Password" required/>
-                                                                    <div id="message">
-                                                                        <p>Password must contain the following:</p>
-                                                                        <p> <span id="letter" class="invalid"> <b>1 lowercase letter</b> </span>, <span id="capital" class="invalid"><b>1 capital (uppercase) letter</b></span>, <span id="number" class="invalid"> <b>1 number</b></span>,
-                                                                            <span id="length" class="invalid"> <b>8 characters</b></span>
-                                                                        </p>
-                                                                    </div>
-                                                                </div>
-
-                                                                <div class="form-group">
-                                                                    <label for="firstName" class="required">First Name</label>
-
-                                                                    <input type="text" id="firstName" name="firstName" class="form-control mb-3 form-control-lg" placeholder="First Name" required autofocus />
-                                                                </div>
-
-                                                                <div class="form-group">
-                                                                    <label for="lastName" class="required">Last Name</label>
-
-                                                                    <input type="text" id="lastName" name="lastName" class="form-control mb-3 form-control-lg" placeholder="LastName" required autofocus />
-                                                                </div>
-
-                                                                <div class="form-group">
-                                                                    <label for="phoneNumber" class="required">Phone Number</label>
-
-                                                                    <input type="tel" id="phoneNumber" name="phoneNumber" class="form-control mb-3 form-control-lg" placeholder="XXX-XXX-XXXX" required autofocus />
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-lg-6">
-                                                                <div class="form-group">
-                                                                    <label for="dateOfBirth" class="required">Date Of Birth</label>
-
-                                                                    <input type="date" id="dateOfBirth" name="dateOfBirth" class="form-control mb-3 form-control-lg" required autofocus />
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="city" class="required">City</label>
-
-                                                                    <input type="text" id="city" name="city" class="form-control form-control-lg" placeholder="City" required autofocus />
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="carBrand" class="sr-only">Car Brand</label>
-
-                                                                    <input type="text" id="carBrand" name="brand" class="form-control mb-3 form-control-lg" placeholder="Car Brand" autofocus />
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="carModel" class="sr-only">Car Model</label>
-
-                                                                    <input type="text" id="carModel" name="model" class="form-control mb-3 form-control-lg" placeholder="Car Model" autofocus />
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="carPlate" class="sr-only">Car Plate</label>
-
-                                                                    <input type="text" id="carPlate" name="plate" class="form-control mb-3 form-control-lg" placeholder="Car Plate" autofocus />
-                                                                </div>
+                                                            <input autocomplete="off" type="password" id="password"
+                                                                name="password"
+                                                                class="form-control mb-3 form-control-lg"
+                                                                pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+                                                                title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters"
+                                                                placeholder="Password" required />
+                                                            <div id="message">
+                                                                <p>Password must contain the following:</p>
+                                                                <p> <span id="letter" class="invalid"> <b>1 lowercase
+                                                                            letter</b> </span>, <span id="capital"
+                                                                        class="invalid"><b>1 capital (uppercase)
+                                                                            letter</b></span>, <span id="number"
+                                                                        class="invalid"> <b>1 number</b></span>,
+                                                                    <span id="length" class="invalid"> <b>8
+                                                                            characters</b></span>
+                                                                </p>
                                                             </div>
                                                         </div>
-                                                        <div class="row">
-                                                            <div class="mt-3">
+                                                    </div>
+                                                    <div class="col-lg-6">
 
-                                                                <a href="/account" class="btn btn-block btn-light btn-lg font-weight-medium auth-form-btn float-end">Cancel</a>
+                                                        <div class="form-group">
+                                                            <label for="firstName" class="required">First Name</label>
 
-                                                                <button class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn float-end" type="submit">Save</button>
-                                                            </div>
+                                                            <input type="text" id="firstName" name="firstName"
+                                                                class="form-control mb-3 form-control-lg"
+                                                                placeholder="First Name" required autofocus />
                                                         </div>
-                                                    </form>
+                                                    </div>
+                                                    <div class="col-lg-6">
+                                                        <div class="form-group">
+                                                            <label for="lastName" class="required">Last Name</label>
+
+                                                            <input type="text" id="lastName" name="lastName"
+                                                                class="form-control mb-3 form-control-lg"
+                                                                placeholder="LastName" required autofocus />
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-6">
+                                                        <div class="form-group">
+                                                            <label for="phoneNumber" class="required">Phone
+                                                                Number</label>
+
+                                                            <input type="tel" id="phoneNumber" name="phoneNumber"
+                                                                class="form-control mb-3 form-control-lg"
+                                                                placeholder="XXX-XXX-XXXX" required autofocus />
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-6">
+                                                        <div class="form-group">
+                                                            <label for="dateOfBirth" class="required">Date Of
+                                                                Birth</label>
+                                                            <input type="text" id="dateOfBirth"
+                                                                onfocus="(this.type='date')" name="dateOfBirth"
+                                                                placeholder="mm/dd/yyyy"
+                                                                class="form-control mb-3 form-control-lg" required
+                                                                autofocus />
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-6">
+                                                        <div class="form-group">
+                                                            <label class="required" for="role">Role</label>
+                                                            <select name="role" id="role"
+                                                                class="form-control form-control-lg">
+                                                                <option value="">Select Role</option>
+                                                                <% for(const [key, value] of selectRoles) { %>
+                                                                <option value="<%= value %>"><%= key %></option>
+                                                                <% }%>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-6">
+                                                        <div class="form-group">
+                                                            <label for="city" class="required">City</label>
+
+                                                            <input type="text" id="city" name="city"
+                                                                class="form-control form-control-lg" placeholder="City"
+                                                                required autofocus />
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            </div>
+                                                <div class="row">
+                                                    <div class="mt-3">
+
+                                                        <a href="/account"
+                                                            class="btn btn-block btn-light btn-lg font-weight-medium auth-form-btn float-end">Cancel</a>
+
+                                                        <button
+                                                            class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn float-end"
+                                                            type="submit">Save</button>
+                                                    </div>
+                                                </div>
+                                            </form>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
             </div>
-            <!-- page-body-wrapper ends -->
+        </div>
+        <!-- page-body-wrapper ends -->
     </div>
     <!-- container-scroller -->
 
@@ -152,7 +174,8 @@
     <script src="../vendors/chart.js/Chart.min.js"></script>
     <script src="../vendors/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
     <script src="../vendors/progressbar.js/progressbar.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 
     <!-- End plugin js for this page -->
     <!-- inject:js -->
@@ -170,10 +193,14 @@
     <script src="../js/dashboard.js"></script>
     <script src="../js/Chart.roundedBarCharts.js"></script>
     <script src="../../js/register.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.10/jquery.mask.js"></script>
 
     <!-- End custom js for this page-->
 
     <%- include('../partials/alerts.ejs', {message, alertType}); %>
 </body>
+<script>
+    jQuery(document).ready(function () { jQuery("#phoneNumber").mask("999-999-9999"); });
+</script>
 
 </html>

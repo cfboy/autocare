@@ -8,19 +8,14 @@ const addUser = (User) => async ({
     password,
     role,
     billingID,
-    plan,
-    endDate,
     firstName,
     lastName,
     phoneNumber,
     dateOfBirth,
-    city,
-    brand,
-    model,
-    plate
+    city
 }) => {
-    if (!email || !password || !firstName || !lastName || !phoneNumber || !billingID || !plan) {
-        throw new Error(`USER: Missing Data. Please provide values for email=${email}, password=${password}, billingID=${billingID}, firstName=${firstName}, lastName=${lastName}, plan=${plan}, dateOfBirth=${dateOfBirth}`)
+    if (!email || !password || !firstName || !lastName || !phoneNumber || !billingID) {
+        throw new Error(`USER: Missing Data. Please provide values for email=${email}, password=${password}, billingID=${billingID}, firstName=${firstName}, lastName=${lastName}, dateOfBirth=${dateOfBirth}`)
     }
 
     console.log(`USER: addUser(${email})`)
@@ -30,18 +25,12 @@ const addUser = (User) => async ({
         password,
         billingID,
         role,
-        // membershipInfo: { plan, endDate },
         personalInfo: {
             firstName,
             lastName,
             phoneNumber,
             dateOfBirth,
             city
-        },
-        carInfo: {
-            brand,
-            model,
-            plate
         }
     })
 
@@ -68,6 +57,11 @@ const updateUser = (User) => async (id, updates) => {
     })
 }
 
+/**
+ * This function add a new location to user location.
+ * @param {id, location} User 
+ * @returns User
+ */
 const addUserLocation = (User) => async (id, location) => {
     console.log(`addUserLocation() ID: ${id}`)
     // findByIdAndUpdate returns the user
@@ -81,6 +75,11 @@ const addUserLocation = (User) => async (id, location) => {
     })
 }
 
+/**
+ * This function remove the location from user location.
+ * @param {id, location} User 
+ * @returns User
+ */
 const removeUserLocation = (User) => async (id, location) => {
     console.log(`removeUserLocation() ID: ${id}`)
     // findByIdAndUpdate returns the user
@@ -94,6 +93,39 @@ const removeUserLocation = (User) => async (id, location) => {
     })
 }
 
+/**
+ * This function add a new car to user cars.
+ * @param {id, car} User 
+ * @returns User
+ */
+const addUserCar = (User) => async (id, car) => {
+    console.log(`addUserCar() ID: ${id}`)
+    // findByIdAndUpdate returns the user
+    // updateOne is more quickly but not return the user.
+    return await User.findByIdAndUpdate({ _id: id }, { $addToSet: { cars: car } }, function (err, doc) {
+        if (err) {
+            console.error(err.message)
+        } else {
+            console.debug("Car Added to: ", doc.email);
+        }
+    }).populate('cars')
+}
+
+/**
+ * This function remove the car from user cars.
+ * @param {id, car} User 
+ * @returns User
+ */
+const removeUserCar = (User) => async (id, car) => {
+    console.log(`removeUserCar() ID: ${id}`)
+    return await User.findByIdAndUpdate({ _id: id }, { $pull: { cars: car } }, function (err, doc) {
+        if (err) {
+            console.error(err.message)
+        } else {
+            console.debug(`Car ${car.name} Removed of User: ${doc.email}`);
+        }
+    })
+}
 // TODO: maybe need delete customer on Stripe 
 /**
  * This function delete the user on DB.
@@ -117,11 +149,10 @@ const deleteUser = (User) => (id) => {
  * @param {*} User 
  * @returns 
  */
-const getUsers = (User) => (req) => {
-    return User.find({ _id: { $ne: req.user.id } }).populate('location')
+const getUsers = (User) => (userID) => {
+    return User.find({ _id: { $ne: userID } }).populate('location')
 }
 
-// Get All users from User Collection.
 /**
  * This function get users by roles.
  * @param {*} User 
@@ -200,19 +231,14 @@ const updateBillingID = (User) => async (id, billingID) => {
  * @param {*} User 
  * @returns user
  */
-const getUserByPlate = (User) => async (plate) => {
-    return User.findOne({ $and: [{ 'carInfo.plate': new RegExp(`^${plate}$`, 'i') }, { 'carInfo.plate': { $ne: '' } }] }, function (err, docs) {
+const getUserByCar = (User) => async (car) => {
+    return User.findOne({ cars: car }, function (err, docs) {
         if (err) {
             console.error(err)
         } else {
-            console.debug("USER-SERVICE: Found user: ", docs);
+            console.debug("USER-SERVICE: Found user: ", docs.email);
         }
     })
-}
-
-// TODO: TEST METHOD
-const updatePlan = (User) => (email, plan) => {
-    return User.findOneAndUpdate({ email, membershipInfo: { plan } })
 }
 
 /**
@@ -276,16 +302,17 @@ module.exports = (User) => {
         updateUser: updateUser(User),
         addUserLocation: addUserLocation(User),
         removeUserLocation: removeUserLocation(User),
+        addUserCar: addUserCar(User),
+        removeUserCar: removeUserCar(User),
         deleteUser: deleteUser(User),
         getUsers: getUsers(User),
         getUsersPerRole: getUsersPerRole(User),
         getUsersPerRoles: getUsersPerRoles(User),
         getUserById: getUserById(User),
         getUserByEmail: getUserByEmail(User),
-        updatePlan: updatePlan(User),
         getUserByBillingID: getUserByBillingID(User),
         updateBillingID: updateBillingID(User),
-        getUserByPlate: getUserByPlate(User),
+        getUserByCar: getUserByCar(User),
         getUsersByLocationID: getUsersByLocationID(User),
         getUsersByList: getUsersByList(User),
         addNewService: addNewService(User)

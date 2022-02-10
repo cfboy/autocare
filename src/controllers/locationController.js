@@ -267,7 +267,8 @@ exports.delete = async (req, res) => {
 
     try {
         LocationService.deleteLocation(id)
-
+        // TODO: remove location form user
+        
         // Set the message for alert. 
         req.session.message = `Location Deleted.`
         req.session.alertType = alertTypes.CompletedActionAlert

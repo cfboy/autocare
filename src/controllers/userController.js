@@ -36,7 +36,7 @@ exports.users = async (req, res) => {
                 users = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
             else
                 if (user.role == ROLES.ADMIN)
-                    users = await UserService.getUsers(req)
+                    users = await UserService.getUsers(user.id)
 
 
             res.render('user/index.ejs', { user, users, message, alertType })
@@ -112,12 +112,7 @@ exports.save = async (req, res) => {
                 lastName: fields.lastName,
                 phoneNumber: fields.phoneNumber,
                 dateOfBirth: fields.dateOfBirth,
-                city: fields.city,
-                brand: fields.brand,
-                model: fields.model,
-                plate: fields.plate,
-                plan: 'none',
-                endDate: null
+                city: fields.city
             })
 
             console.log(`A new user added to DB. The ID for ${user.email} is ${user.id}`)

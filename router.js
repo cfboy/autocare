@@ -2,24 +2,28 @@
 require('./src/connect/mongodb') //Connection to MongoDB
 
 // Controllers
-const stripeController = require('./src/controllers/stripeController')
-const authController = require('./src/controllers/authController')
-const userController = require('./src/controllers/userController')
-const locationController = require('./src/controllers/locationController')
-const dashboardsController = require('./src/controllers/dashboardsController')
-const historyController = require('./src/controllers/historyController')
+const stripeController = require('./src/controllers/stripeController'),
+    authController = require('./src/controllers/authController'),
+    userController = require('./src/controllers/userController'),
+    locationController = require('./src/controllers/locationController'),
+    dashboardsController = require('./src/controllers/dashboardsController'),
+    historyController = require('./src/controllers/historyController'),
+    carsController = require('./src/controllers/carsController')
 
 // Express
 const express = require('express');
 const router = express.Router();
 
-// Middleware helpers
-const checkAuthenticated = require('./src/middleware/checkAuthenticated')
-const checkNotAuthenticated = require('./src/middleware/checkNotAuthenticated')
-const hasPlan = require('./src/middleware/hasPlan')
-const authDeleteLocation = require('./src/middleware/authDeleteLocation')
-const authDeleteUser = require('./src/middleware/authDeleteUser')
-const authValidateMembership = require('./src/middleware/authValidateMembership')
+// Middleware helpers 
+const { checkAuthenticated,
+    checkNotAuthenticated,
+    authDeleteLocation,
+    authEditLocation,
+    authEditCar,
+    authDeleteUser,
+    authDeleteCar,
+    authValidateMembership } = require('./src/middleware/authFunctions'),
+    hasPlan = require('./src/middleware/hasPlan')
 
 // Main Route
 router.get('/', checkAuthenticated, (req, res) => {
@@ -72,16 +76,25 @@ router.post('/create-user', checkAuthenticated, userController.save)
 router.post('/edit-user', checkAuthenticated, userController.update)
 router.get('/delete-user/:id', checkAuthenticated, authDeleteUser, userController.delete)
 
+//------ Cars Routes ------
+router.get('/cars', checkAuthenticated, carsController.cars)
+router.get('/car/:id', checkAuthenticated, carsController.view)
+router.get('/create-car', checkAuthenticated, carsController.create)
+router.get('/edit-car/:id', checkAuthenticated, authEditCar, carsController.edit)
+
+router.post('/create-car', checkAuthenticated, carsController.save)
+router.post('/edit-car', checkAuthenticated, authEditCar, carsController.update)
+router.get('/delete-car/:id', checkAuthenticated, authDeleteCar, carsController.delete)
 
 //------ Location Routes ------
 router.get('/locations', checkAuthenticated, locationController.locations)
 router.get('/create-location', checkAuthenticated, locationController.createLocation)
 router.get('/view-location/:id', checkAuthenticated, locationController.viewLocation)
-router.get('/edit-location/:id', checkAuthenticated, locationController.editLocation)
+router.get('/edit-location/:id', checkAuthenticated, authEditLocation, locationController.editLocation)
 
 //------ Location CRUDS ------
 router.post('/create-location', checkAuthenticated, locationController.save)
-router.post('/edit-location', checkAuthenticated, locationController.update)
+router.post('/edit-location', checkAuthenticated, authEditLocation, locationController.update)
 router.get('/delete-location/:id', checkAuthenticated, authDeleteLocation, locationController.delete)
 
 //------ Dashboard Routes ------
@@ -102,7 +115,7 @@ router.post('/billing', checkAuthenticated, stripeController.billing)
 
 // ---------------------------------------
 
-router.get('/none', [checkAuthenticated, hasPlan('none')], async function(
+router.get('/none', [checkAuthenticated, hasPlan('none')], async function (
     req,
     res,
     next
@@ -110,7 +123,7 @@ router.get('/none', [checkAuthenticated, hasPlan('none')], async function(
     res.status(200).render('none.ejs')
 })
 
-router.get('/basic', [checkAuthenticated, hasPlan('basic')], async function(
+router.get('/basic', [checkAuthenticated, hasPlan('basic')], async function (
     req,
     res,
     next
@@ -118,7 +131,7 @@ router.get('/basic', [checkAuthenticated, hasPlan('basic')], async function(
     res.status(200).render('basic.ejs')
 })
 
-router.get('/pro', [checkAuthenticated, hasPlan('pro')], async function(
+router.get('/pro', [checkAuthenticated, hasPlan('pro')], async function (
     req,
     res,
     next

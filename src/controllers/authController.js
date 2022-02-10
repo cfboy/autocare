@@ -32,10 +32,7 @@ exports.register = async (req, res) => {
             lastName,
             phoneNumber,
             dateOfBirth,
-            city,
-            brand,
-            model,
-            plate
+            city
         } = req.body
 
         var { password } = req.body
@@ -66,13 +63,7 @@ exports.register = async (req, res) => {
                 firstName,
                 lastName,
                 phoneNumber,
-                dateOfBirth,
-                city,
-                brand,
-                model,
-                plate,
-                plan: 'none',
-                endDate: null
+                dateOfBirth
             })
 
             console.debug(

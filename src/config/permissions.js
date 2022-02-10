@@ -1,4 +1,4 @@
-const {ROLES} = require('../collections/user/user.model')
+const { ROLES } = require('../collections/user/user.model')
 
 function canDeleteLocation(user) {
     return (
@@ -6,9 +6,27 @@ function canDeleteLocation(user) {
     )
 }
 
+function canEditLocation(user) {
+    return (
+        [ROLES.ADMIN, ROLES.MANAGER].includes(user.role)
+    )
+}
+
 function canDeleteUser(user) {
     return (
         user.role === ROLES.ADMIN
+    )
+}
+
+function canDeleteCar(user, carID) {
+    return (
+        user.role === ROLES.ADMIN || user?.cars?.includes(carID)
+    )
+}
+
+function canEditCar(user, carID) {
+    return (
+        [ROLES.ADMIN, ROLES.MANAGER].includes(user.role) || user?.cars?.includes(carID)
     )
 }
 
@@ -19,7 +37,10 @@ function canValidateMemberships(user) {
 }
 
 module.exports = {
+    canDeleteCar,
+    canEditCar,
     canDeleteLocation,
+    canEditLocation,
     canDeleteUser,
     canValidateMemberships
 }

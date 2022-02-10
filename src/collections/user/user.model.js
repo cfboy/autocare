@@ -30,11 +30,7 @@ const userSchema = new Schema({
         location: { type: Schema.Types.ObjectId, ref: 'location', default: null },
         authorizedBy: { type: Schema.Types.ObjectId, ref: 'user', default: null },
     }],
-    carInfo: {
-        brand: String,
-        model: String,
-        plate: String
-    },
+    cars: [{ type: Schema.Types.ObjectId, ref: 'car', default: null }],
     membershipInfo: {
         plan: { type: String, enum: ['none', 'basic', 'pro'], default: 'none' },
         hasTrial: { type: Boolean, default: false },
