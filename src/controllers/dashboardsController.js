@@ -101,7 +101,11 @@ exports.validateMembership = async (req, res) => {
 exports.validate = async (req, res) => {
     try {
         let carPlate = req.body.tagNumber,
-            car = await CarService.getCarByPlate(carPlate),
+            car = await CarService.getCarByPlate(carPlate)
+
+        let customer
+
+        if (car)
             customer = await UserService.getUserByCar(car)
 
         if (customer) {

@@ -93,7 +93,10 @@ const getCarByPlate = (Car) => async (plate) => {
         if (err) {
             console.error(err)
         } else {
-            console.debug(`CAR-SERVICE: Found car: ${doc.name} - ${doc.model} - ${doc.plate}`);
+            if (doc)
+                console.debug(`CAR-SERVICE: Found car: ${doc?.name} - ${doc?.model} - ${doc?.plate}`);
+            else
+                console.debug(`CAR-SERVICE: Not Found car with plate: ${plate}`);
         }
     })
 }

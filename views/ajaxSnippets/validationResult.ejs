@@ -2,7 +2,7 @@
     <div class="col-lg-12 card">
         <div id="useServiceUpdate">
             <div class="row">
-                <% if(customer) { %>
+                <% if(customer && car) { %>
                 <div class="col-md-6 p-3">
                     <div class="d-sm-flex justify-content-between align-items-start">
                         <div>
@@ -126,15 +126,22 @@
                         </button>
                         <% } %>
                     </div>
-                    <% } else { %>
-                    <div class="col-md-12 text-center validation-msgs">
-                        <i class="fas fa-8x fa-exclamation-triangle warning"></i>
-                        <p>Customer not found.</p>
-
-                        <% } %>
-                    </div>
                 </div>
+                <% } else if(!customer){ %>
+                <div class="col-md-12 text-center validation-msgs">
+                    <i class="fas fa-8x fa-exclamation-triangle warning"></i>
+                    <p>Customer not found.</p>
+
+                </div>
+                <% } else if(!car) {%>
+                <div class="col-md-12 text-center validation-msgs">
+                    <i class="fas fa-8x fa-exclamation-triangle warning"></i>
+                    <p>Customer not found.</p>
+
+                </div>
+                <% } %>
             </div>
+
         </div>
     </div>
 </div>

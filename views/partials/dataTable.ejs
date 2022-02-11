@@ -1,25 +1,37 @@
+<!-- Datatables -->
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap5.min.js"></script>
 <script>
     $(document).ready(function () {
-        $('<%= tableID %>').DataTable({
-            "language": {
-                "emptyTable": "<%= lingua.emptyTable%>",
-                "info": "<%= lingua.infoNotEmpty%>",
-                "infoEmpty": "<%= lingua.infoEmpty%>",
-                "infoFiltered": "(filtered from _MAX_ total entries)",
-                "infoPostFix": "",
-                "thousands": ",",
-                "lengthMenu": "<%= lingua.lengthMenu%>",
-                "loadingRecords": "Loading...",
-                "processing": "Processing...",
-                "search": "<%= lingua.search%>:",
-                "zeroRecords": "No matching records found",
-                "paginate": {
-                    "first": "First",
-                    "last": "Last",
-                    "next": "<%= lingua.next%>",
-                    "previous": "<%= lingua.previous%>"
-                },
-            }
-        });
+        
+    let dateColumn = null;
+    <% if (typeof dateColumn == 'number') {%>
+        dateColumn = <%= dateColumn %>;
+    <% } %>
+    
+    $('<%= tableID %>').DataTable({
+        columnDefs: dateColumn ? [{ type: 'date', 'targets': [dateColumn] }] : '',
+        order: dateColumn ? [[dateColumn, 'desc']] : '',
+        "language": {
+            "emptyTable": "<%= lingua.emptyTable%>",
+            "info": "<%= lingua.infoNotEmpty%>",
+            "infoEmpty": "<%= lingua.infoEmpty%>",
+            "infoFiltered": "(filtered from _MAX_ total entries)",
+            "infoPostFix": "",
+            "thousands": ",",
+            "lengthMenu": "<%= lingua.lengthMenu%>",
+            "loadingRecords": "Loading...",
+            "processing": "Processing...",
+            "search": "<%= lingua.search%>:",
+            "zeroRecords": "No matching records found",
+            "paginate": {
+                "first": "First",
+                "last": "Last",
+                "next": "<%= lingua.next%>",
+                "previous": "<%= lingua.previous%>"
+            },
+        }
+    });
     });
 </script>
