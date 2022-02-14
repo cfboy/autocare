@@ -9,7 +9,7 @@ const bodyParser = require('body-parser'),
     lingua = require('lingua'),
     formats = require('./src/helpers/formats'),
     alertTypes = require('./src/helpers/alertTypes'),
-    {ROLES} = require('./src/collections/user/user.model'),
+    { ROLES } = require('./src/collections/user/user.model'),
     passport = require('passport'),
     { STATUS } = require('./src/connect/stripe');
 

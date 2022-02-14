@@ -177,7 +177,6 @@ exports.carCheck = async (req, res) => {
             let dataType = req.body.data_type,
                 bodyResult = req.body
             console.log(`REKOR-SCOUT: Data Type: ${dataType}`)
-
             switch (dataType) {
                 case 'alpr_results':
                     /**
