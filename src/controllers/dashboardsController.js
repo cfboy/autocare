@@ -6,6 +6,9 @@ const { historyTypes } = require('../collections/history/history.model')
 const Stripe = require('../connect/stripe')
 const alertTypes = require('../helpers/alertTypes')
 
+let readingObjs = {}
+let readingQueue = []
+
 /**
  * This function handle the dashboards of the different roles. 
  * @param {*} req 
@@ -87,7 +90,7 @@ exports.validateMembership = async (req, res) => {
     }
     let user = req.user
 
-    res.render('dashboards/validateMembership.ejs', { user, message, alertType })
+    res.render('dashboards/validateMembership.ejs', { user, message, alertType, readingQueue })
 
 }
 
@@ -162,5 +165,80 @@ exports.useService = async (req, res) => {
         req.session.message = `ERROR: ${error.message}`
         req.session.alertType = alertTypes.ErrorAlert
         res.redirect('/validateMembership')
+    }
+}
+
+exports.carCheck = async (req, res) => {
+    try {
+        if (req.body?.error) {
+            console.log(`REKOR-SCOUT: ERROR on JSON ${req.body.error}`)
+        }
+        else {
+            let dataType = req.body.data_type,
+                bodyResult = req.body
+            console.log(`REKOR-SCOUT: Data Type: ${dataType}`)
+
+            switch (dataType) {
+                case 'alpr_results':
+                    /**
+                     * Scout generates an alpr_results JSON value for every
+                     * frame of video in which a license plate is recognized. 
+                     * 
+                     * This is for single plate reads.
+                     * https://docs.rekor.ai/rekor-scout/application-integration/json-plate-results
+                     */
+
+                    console.log("Processing Time (MS): " + bodyResult.processing_time_ms)
+                    for (result of bodyResult.results) {
+                        console.log("IDENTFIED PLATE: " + result?.plate)
+                    }
+
+                    break;
+
+                case 'alpr_group':
+                    /**
+                     * Scout generates an alpr_group JSON value for a collection of similar license plates,
+                     * generally delegating a single plate group per vehicle. 
+                     * If more real-time results are needed, 
+                     * it is recommended that you ignore the plate_group value and use only the individual plate results.
+                     * 
+                     * https://docs.rekor.ai/rekor-scout/application-integration/json-group-results
+                     */
+                    readingObjs = {
+                        "plate": bodyResult.best_plate_number,
+                        "color": bodyResult.vehicle.color[0].name,
+                        "brand": bodyResult.vehicle.make[0].name,
+                        "model": bodyResult.vehicle.make_model[0].name,
+                        "year": bodyResult.vehicle.year[0].name
+                    }
+                    console.debug("CAR DETAILS: ")
+                    console.debug("-> PLATE: " + readingObjs.plate)
+                    console.debug("-> COLOR: " + readingObjs.color)
+                    console.debug("-> BRAND: " + readingObjs.brand)
+                    console.debug("-> MODEL: " + readingObjs.model)
+                    console.debug("-> YEAR : " + readingObjs.year)
+
+                    // Load info to a global queue list.
+                    if (!readingQueue.some(car => car.plate === readingObjs.plate))
+                        readingQueue.push(readingObjs)
+
+                    break;
+
+                case 'heartbeat':
+                    /**
+                     * Every minute, the Scout Agent adds one heartbeat message to the queue. 
+                     * The heartbeat provides general health and status information.
+                     */
+                    console.log('Video Streams: ' + bodyResult.video_streams.length)
+
+                    break;
+
+                default:
+                    console.log('REKOR-SCOUT: No dataType detected.');
+            }
+        }
+    } catch (error) {
+        console.error(error)
+        console.error('REKOR-SCOUT: ERROR --> ' + error.message)
     }
 }

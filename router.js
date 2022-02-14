@@ -104,6 +104,8 @@ router.get('/validateMembership', checkAuthenticated, authValidateMembership, da
 router.post('/validateMembership', checkAuthenticated, authValidateMembership, dashboardsController.validate)
 router.post('/useService', checkAuthenticated, authValidateMembership, dashboardsController.useService)
 
+router.post('/carcheck', dashboardsController.carCheck)
+
 // ---------------------------------------
 
 //------ Stripe and Payment Routes ------
