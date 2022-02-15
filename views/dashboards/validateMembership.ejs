@@ -57,7 +57,7 @@
                                                         <div id="resultOfCameraScan">
                                                             <% if(readingQueue?.length > 0) { %>
                                                             <% for(car of readingQueue) { %>
-                                                            <a class="btn btn-link" onclick="setPlateValue(car.plate">
+                                                            <a class="btn btn-link" onclick="setPlateValue(car.plate)">
                                                                 Car : <%= car.plate%>
                                                             </a>
                                                             <br>
@@ -146,7 +146,7 @@
     <%- include('../partials/alerts.ejs', {message, alertType}); %>
 
     <script>
-        const socket = io('http://64.225.27.26');
+        const socket = io('http://localhost');
 
         // Establish Route
         // socket.on('connection');
