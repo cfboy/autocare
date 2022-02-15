@@ -179,6 +179,10 @@ exports.carCheck = async (req, res) => {
             console.log(`REKOR-SCOUT: Data Type: ${dataType}`)
             switch (dataType) {
                 case 'alpr_results':
+                    req.io.emit('reading-plates');
+
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+
                     /**
                      * Scout generates an alpr_results JSON value for every
                      * frame of video in which a license plate is recognized. 
@@ -190,7 +194,21 @@ exports.carCheck = async (req, res) => {
                     console.log("Processing Time (MS): " + bodyResult.processing_time_ms)
                     for (result of bodyResult.results) {
                         console.log("IDENTFIED PLATE: " + result?.plate)
+                        readingObjs = {
+                            "plate": result.plate,
+                            "color": '',
+                            "brand": '',
+                            "model": '',
+                            "year": ''
+                        }
+                        console.debug("alpr_results - CAR DETAILS: ")
+                        console.debug("-> PLATE: " + readingObjs.plate)
+
+                        if (!readingQueue.some(car => car.plate === readingObjs.plate))
+                            readingQueue.push(readingObjs)
                     }
+
+                    req.io.emit('read-plates', readingQueue);
 
                     break;
 
@@ -210,7 +228,7 @@ exports.carCheck = async (req, res) => {
                         "model": bodyResult.vehicle.make_model[0].name,
                         "year": bodyResult.vehicle.year[0].name
                     }
-                    console.debug("CAR DETAILS: ")
+                    console.debug("alpr_group - CAR DETAILS: ")
                     console.debug("-> PLATE: " + readingObjs.plate)
                     console.debug("-> COLOR: " + readingObjs.color)
                     console.debug("-> BRAND: " + readingObjs.brand)
@@ -221,6 +239,9 @@ exports.carCheck = async (req, res) => {
                     if (!readingQueue.some(car => car.plate === readingObjs.plate))
                         readingQueue.push(readingObjs)
 
+
+                    req.io.emit('read-plates', readingQueue);
+
                     break;
 
                 case 'heartbeat':
@@ -228,14 +249,13 @@ exports.carCheck = async (req, res) => {
                      * Every minute, the Scout Agent adds one heartbeat message to the queue. 
                      * The heartbeat provides general health and status information.
                      */
-                    console.log('Video Streams: ' + bodyResult.video_streams.length)
+                    console.log('Video Streams: (' + bodyResult.video_streams.length + ')')
 
                     break;
 
                 default:
                     console.log('REKOR-SCOUT: No dataType detected.');
             }
-            req.io.emit('read-plates', readingQueue);
         }
     } catch (error) {
         console.error(error)

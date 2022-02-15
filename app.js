@@ -88,14 +88,11 @@ const port = process.env.PORT || 4242
 // app.listen(port, () => console.log(`Listening on port http://localhost:${port}/`))
 server.listen(port, () => {
     console.log(`Listening on port ${port}`)
-    console.log(`Server Running on http://localhost:${port}/`)
+    console.log(`http://localhost:${port}/`)
+    console.log(`Server Running...`)
 });
 
-// io.on('connection', (socket) => {
-//     console.log("Socket connected: " + socket.id)
-
-//     socket.on('message', (data) => {
-//         console.log(data)
-//         socket.emit('message', data);
-//     })
-// });
+io.on('connect', (socket) => {
+    console.log("Socket connected: " + socket.connected)
+    console.log("Socket ID: " + socket.id)
+});

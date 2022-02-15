@@ -155,25 +155,29 @@
         // const sendMessage = () => {
         //     socket.emit('message', 'Test Message');
         // }
+
+        socket.on('reading-plates', () => {
+
+            showResult('#resultOfCameraScan',
+                `<div class="spinner text-center">
+                                <div class="spinner-grow" style="width: 2rem; height: 2rem"></div>
+                            </div>`
+            );
+        })
+
         // Receive data
         socket.on('read-plates', (data) => {
-            document.querySelector('#resultOfCameraScanLoading').innerHTML = 'Reading...';
             console.log(JSON.stringify(data));
             document.querySelector('#resultOfCameraScan').innerHTML = '';
             for (car of data) {
                 document.querySelector('#resultOfCameraScan').innerHTML += (`
                 <a class="btn btn-link" onclick="setPlateValue('${car.plate}')"> Car: ${car.plate} </a>` + '<br>')
             }
-            // TODO: implement loading spinner.
-            // setTimeout('', 50000);
-            document.querySelector('#resultOfCameraScanLoading').innerHTML = '';
-
         })
 
         function setPlateValue(plate) {
             $("#tagNumber").val(plate);
             $("#validateMembershipBtn").click();
-            // sendMessage();
         }
 
         $("#validateMembershipBtn").on("click", function (event) {
