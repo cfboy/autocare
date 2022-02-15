@@ -1,6 +1,3 @@
-// Connections
-require('./src/connect/mongodb') //Connection to MongoDB
-
 // Controllers
 const stripeController = require('./src/controllers/stripeController'),
     authController = require('./src/controllers/authController'),

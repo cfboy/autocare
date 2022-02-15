@@ -17,6 +17,9 @@ var MemoryStore = require('memorystore')(session),
     router = require('./router'),
     moment = require('moment');
 
+// Connections
+require('./src/connect/mongodb') //Connection to MongoDB
+
 const app = express()
 
 const server = require('http').createServer(app)
