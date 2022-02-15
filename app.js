@@ -86,7 +86,7 @@ app.use(lingua(app, {
 
 app.use('/', router);
 
-const port = process.env.PORT || 4242
+const port = process.env.PORT || 3000
 
 // app.listen(port, () => console.log(`Listening on port http://localhost:${port}/`))
 server.listen(port, () => {
