@@ -19,6 +19,9 @@ var MemoryStore = require('memorystore')(session),
 
 const app = express()
 
+const server = require('http').createServer(app)
+const io = require('socket.io')(server, { cors: { origin: "*" } })
+
 app.use(session({
     saveUninitialized: false,
     cookie: { maxAge: 86400000 },
@@ -28,6 +31,13 @@ app.use(session({
     resave: false,
     secret: process.env.SESSION_SECRET
 }))
+
+// place this middleware before any other route definitions
+// makes io available as req.io in all request handlers
+app.use(function (req, res, next) {
+    req.io = io;
+    next();
+});
 
 // Flash is an extension of connect-flash with the ability to define a flash message and render it without redirecting the request.
 app.use(flash())
@@ -75,4 +85,17 @@ app.use('/', router);
 
 const port = process.env.PORT || 4242
 
-app.listen(port, () => console.log(`Listening on port http://localhost:${port}/`))
+// app.listen(port, () => console.log(`Listening on port http://localhost:${port}/`))
+server.listen(port, () => {
+    console.log(`Listening on port ${port}`)
+    console.log(`Server Running on http://localhost:${port}/`)
+});
+
+// io.on('connection', (socket) => {
+//     console.log("Socket connected: " + socket.id)
+
+//     socket.on('message', (data) => {
+//         console.log(data)
+//         socket.emit('message', data);
+//     })
+// });

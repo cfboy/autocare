@@ -235,6 +235,7 @@ exports.carCheck = async (req, res) => {
                 default:
                     console.log('REKOR-SCOUT: No dataType detected.');
             }
+            req.io.emit('read-plates', readingQueue);
         }
     } catch (error) {
         console.error(error)

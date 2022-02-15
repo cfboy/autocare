@@ -29,6 +29,7 @@
     <!-- endinject -->
     <link rel="shortcut icon" href="../images/favicon.png" />
 
+    <script src="https://cdn.socket.io/socket.io-3.0.1.min.js"></script>
 </head>
 
 <!-- <body class="sidebar-icon-only"> -->
@@ -50,40 +51,49 @@
                                                 <div class="col-lg-4 p-3">
                                                     <h4>Validate</h4>
                                                     <br>
-                                                    <ul>
-                                                        <% if(readingQueue?.length > 0) { %>
-                                                        <% for(queue of readingQueue) { %>
-                                                        <li>
-                                                            <a class="btn btn-link"
-                                                                onclick="setPlateValue('<%= queue.plate%>')">
-                                                                <%= queue.plate%>
+                                                    <div class="card p-3">
+                                                        <h5>Read By Camera: </h5>
+                                                        <div id="resultOfCameraScanLoading"></div>
+                                                        <div id="resultOfCameraScan">
+                                                            <% if(readingQueue?.length > 0) { %>
+                                                            <% for(car of readingQueue) { %>
+                                                            <a class="btn btn-link" onclick="setPlateValue(car.plate">
+                                                                Car : <%= car.plate%>
                                                             </a>
-                                                        </li>
-                                                        <% } %>
-                                                        <% } %>
-                                                    </ul>
-                                                    <form id="form-validate-membership" class="pt-3" method="post">
-                                                        <div class="row">
-                                                            <div class="col-lg-12">
-                                                                <div class="form-group">
-                                                                    <label class="required" for="name">Tag
-                                                                        Number</label>
-                                                                    <input autocomplete="off" type="text" id="tagNumber"
-                                                                        name="tagNumber"
-                                                                        class="form-control form-control-lg text-uppercase"
-                                                                        required />
+                                                            <br>
+                                                            <% } %>
+                                                            <% } else { %>
+                                                            N/A
+                                                            <% } %>
+                                                        </div>
+                                                    </div>
+                                                    <br>
+                                                    <div class="card p-3">
+                                                        <h5>Manual Input: </h5>
 
+                                                        <form id="form-validate-membership" class="pt-3" method="post">
+                                                            <div class="row">
+                                                                <div class="col-lg-12">
+                                                                    <div class="form-group">
+                                                                        <label class="required" for="name">Tag
+                                                                            Number</label>
+                                                                        <input autocomplete="off" type="text"
+                                                                            id="tagNumber" name="tagNumber"
+                                                                            class="form-control form-control-lg text-uppercase"
+                                                                            required />
+
+                                                                    </div>
+                                                                </div>
+                                                                <!-- </div>
+                                                                <div class="row"> -->
+                                                                <div class="mt-3 mb-3">
+                                                                    <button id="validateMembershipBtn"
+                                                                        class="btn btn-block btn-inverse-dark btn-lg font-weight-medium auth-form-btn float-end"
+                                                                        type="submit">Validate</button>
                                                                 </div>
                                                             </div>
-                                                            <!-- </div>
-                                                                <div class="row"> -->
-                                                            <div class="mt-3 mb-3">
-                                                                <button id="validateMembershipBtn"
-                                                                    class="btn btn-block btn-inverse-dark btn-lg font-weight-medium auth-form-btn float-end"
-                                                                    type="submit">Validate</button>
-                                                            </div>
-                                                        </div>
-                                                    </form>
+                                                        </form>
+                                                    </div>
                                                 </div>
                                                 <div class="col-lg-8">
                                                     <!-- Render results in membershipDetails div -->
@@ -136,10 +146,34 @@
     <%- include('../partials/alerts.ejs', {message, alertType}); %>
 
     <script>
+        const socket = io('http://localhost:4242');
+
+        // Establish Route
+        // socket.on('connection');
+
+        // Send data
+        // const sendMessage = () => {
+        //     socket.emit('message', 'Test Message');
+        // }
+        // Receive data
+        socket.on('read-plates', (data) => {
+            document.querySelector('#resultOfCameraScanLoading').innerHTML = 'Reading...';
+            console.log(JSON.stringify(data));
+            document.querySelector('#resultOfCameraScan').innerHTML = '';
+            for (car of data) {
+                document.querySelector('#resultOfCameraScan').innerHTML += (`
+                <a class="btn btn-link" onclick="setPlateValue('${car.plate}')"> Car: ${car.plate} </a>` + '<br>')
+            }
+            // TODO: implement loading spinner.
+            // setTimeout('', 50000);
+            document.querySelector('#resultOfCameraScanLoading').innerHTML = '';
+
+        })
 
         function setPlateValue(plate) {
             $("#tagNumber").val(plate);
             $("#validateMembershipBtn").click();
+            // sendMessage();
         }
 
         $("#validateMembershipBtn").on("click", function (event) {
