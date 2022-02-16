@@ -3,11 +3,6 @@ const Stripe = require('../connect/stripe')
 // const { ROLES } = require('../collections/user/user.model')
 const alertTypes = require('../helpers/alertTypes')
 
-const productToPriceMap = {
-    basic: process.env.PRODUCT_BASIC,
-    pro: process.env.PRODUCT_PRO
-}
-
 /**
  * This function handle all Stripe events.
  * @param {*} req 

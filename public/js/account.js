@@ -50,7 +50,7 @@ $(document).ready(function () {
     useServiceButton.click(function (event) {
         event.preventDefault();
         event.stopPropagation();
-        
+
         const userID = $(this).attr("user-id");
 
         $.ajax({
@@ -69,7 +69,7 @@ $(document).ready(function () {
 
             }
         }).done(function (result) {
-            showResult('#useServiceUpdate',result);
+            showResult('#useServiceUpdate', result);
             // cleanInput("tagNumber");
         }).fail(function (err) {
             console.log(err);

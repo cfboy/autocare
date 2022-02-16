@@ -89,8 +89,9 @@ exports.validateMembership = async (req, res) => {
         req.session.alertType = ''
     }
     let user = req.user
+    let domain = process.env.DOMAIN
 
-    res.render('dashboards/validateMembership.ejs', { user, message, alertType, readingQueue })
+    res.render('dashboards/validateMembership.ejs', { user, message, alertType, readingQueue, domain })
 
 }
 
