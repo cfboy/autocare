@@ -9,6 +9,11 @@ const alertTypes = require('../helpers/alertTypes')
 let readingObjs = {}
 let readingQueue = []
 
+exports.home = async (req, res) => {
+    let user = req.user, products = await Stripe.getAllProducts()
+
+    res.render('index.ejs', { products, user })
+}
 /**
  * This function handle the dashboards of the different roles. 
  * @param {*} req 

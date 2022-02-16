@@ -7,7 +7,7 @@ const stripeController = require('./src/controllers/stripeController'),
     historyController = require('./src/controllers/historyController'),
     carsController = require('./src/controllers/carsController')
 
-// Express
+    // Express
 const express = require('express');
 const router = express.Router();
 
@@ -23,6 +23,9 @@ const { checkAuthenticated,
     hasPlan = require('./src/middleware/hasPlan')
 
 // Main Route
+
+router.get('/home', dashboardsController.home)
+
 router.get('/', checkAuthenticated, (req, res) => {
     res.redirect('/account')
 })
