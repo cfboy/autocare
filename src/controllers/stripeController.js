@@ -145,6 +145,24 @@ exports.checkout = async (req, res) => {
     }
 }
 
+exports.stripeCheckout = async (req, res) => {
+    const { product, customerID } = req.query
+    const priceID = product
+
+    try {
+        const session = await Stripe.createCheckoutSession(customerID, priceID)
+        res.redirect(session.url)
+    } catch (e) {
+        console.log(e)
+        res.status(400)
+        return res.send({
+            error: {
+                message: e.message
+            }
+        })
+    }
+}
+
 /**
  * This function creates a billing session on stripe to manage payments/subscriptions.
  * @param {*} req 

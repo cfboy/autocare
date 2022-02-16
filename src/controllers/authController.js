@@ -53,11 +53,11 @@ exports.register = async (req, res) => {
                     city)
             }
 
-            password = await bcrypt.hash(password, 10)
+            hashPassword = await bcrypt.hash(password, 10)
 
             customer = await UserService.addUser({
                 email,
-                password,
+                password: hashPassword,
                 billingID: customerInfo.id,
                 role: ROLES.CUSTOMER,
                 firstName,
@@ -73,7 +73,21 @@ exports.register = async (req, res) => {
             req.session.message = `Account Created.`
             req.session.alertType = alertTypes.CompletedActionAlert
             req.flash('info', 'Account Created!');
-            res.redirect('/account')
+            if (req.session.selectedProduct) {
+                let product = encodeURIComponent(req.session.selectedProduct);
+                req.session.selectedProduct = '';
+                let billingID = encodeURIComponent(customer.billingID)
+                // passport.authenticate('local', req, res)
+                req.login(customer, function (err) {
+                    if (err) {
+                        console.log(err);
+                    }
+                })
+                // TODO: change route to call a method.
+                res.redirect(`/stripeCheckout?product=${product}&customerID=${billingID}`)
+            }
+            else
+                res.redirect('/account')
         } else {
             let message = `That email already exist, please login.`
             req.flash('info', message);

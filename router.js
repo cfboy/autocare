@@ -7,7 +7,7 @@ const stripeController = require('./src/controllers/stripeController'),
     historyController = require('./src/controllers/historyController'),
     carsController = require('./src/controllers/carsController')
 
-    // Express
+// Express
 const express = require('express');
 const router = express.Router();
 
@@ -48,6 +48,10 @@ router.get('/login', checkNotAuthenticated, (req, res) => {
 router.post('/login', checkNotAuthenticated, authController.login)
 
 router.get('/create-account', checkNotAuthenticated, (req, res) => {
+    let product = req.query.product
+
+    req.session.selectedProduct = product
+
     res.render('auth/register.ejs')
 })
 
@@ -114,7 +118,7 @@ router.get('/charges', checkAuthenticated, stripeController.charges)
 router.post('/webhook', stripeController.webhook)
 
 router.post('/checkout', checkAuthenticated, stripeController.checkout)
-
+router.get('/stripeCheckout', stripeController.stripeCheckout)
 router.post('/billing', checkAuthenticated, stripeController.billing)
 
 // ---------------------------------------
