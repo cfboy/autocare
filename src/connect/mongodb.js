@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 mongoose.Promise = global.Promise
 
-const db = process.env.NODE_ENV === "development" ? process.env.MONGODB : process.env.DATABASE_URL
+const db = process.env.NODE_ENV === "development" ? process.env.MONGODB : process.env.MONGODB
 
 mongoose.connect(db, {
     useUnifiedTopology: true,
