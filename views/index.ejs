@@ -75,8 +75,8 @@
             </div>
         </nav>
         <!-- partial -->
-        <div class="container-fluid">
-            <div class="container p-5">
+        <div class="container-fluid content-wrapper p-0">
+            <div class="container p-5 pt-0">
                 <div class="row">
                     <% if(products) { %>
                     <% for(product of products) { %>
@@ -118,7 +118,7 @@
                             </ul>
                             <div class="card-body text-center">
                                 <button class="btn btn-outline-primary btn-lg select-product-btn"
-                                    value="<%- price.id%>" style="border-radius:30px">Select</button>
+                                    value="<%- price.id%>">Select</button>
                             </div>
                         </div>
                     </div>
