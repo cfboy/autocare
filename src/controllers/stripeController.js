@@ -145,6 +145,13 @@ exports.checkout = async (req, res) => {
     }
 }
 
+/**
+ * This function creates a checkout session on stripe and redirect to this checkout.
+ * It's called from server side.
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 exports.stripeCheckout = async (req, res) => {
     const { product, customerID } = req.query
     const priceID = product

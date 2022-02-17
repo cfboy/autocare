@@ -57,7 +57,8 @@
                                                         <div id="resultOfCameraScan">
                                                             <% if(readingQueue?.length > 0) { %>
                                                             <% for(car of readingQueue) { %>
-                                                            <a class="btn btn-link" onclick="setPlateValue(car.plate)">
+                                                            <a id="plate-<%= car.plate%>" class="btn btn-link"
+                                                                onclick="setPlateValue(<%= car.plate%>)">
                                                                 Car : <%= car.plate%>
                                                             </a>
                                                             <br>
@@ -171,13 +172,14 @@
             document.querySelector('#resultOfCameraScan').innerHTML = '';
             for (car of data) {
                 document.querySelector('#resultOfCameraScan').innerHTML += (`
-                <a class="btn btn-link" onclick="setPlateValue('${car.plate}')"> Car: ${car.plate} </a>` + '<br>')
+                <a id="plate-${car.plate}" class="btn btn-link" onclick="setPlateValue('${car.plate}')"> Car: ${car.plate} </a>` + '<br>')
             }
         })
 
         function setPlateValue(plate) {
             $("#tagNumber").val(plate);
             $("#validateMembershipBtn").click();
+            $(`#plate-${plate}`).remove();
         }
 
         $("#validateMembershipBtn").on("click", function (event) {

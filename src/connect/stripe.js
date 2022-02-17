@@ -154,10 +154,11 @@ async function getAllProducts() {
         // Get price of all products.
         for (const product of products.data) {
             product.priceInfo = await getProductPrice(product.id)
+            product.perks = product?.metadata?.perks?.split(',')
         }
     }
 
-    return products.data
+    return products.data.sort(function(a, b){return a.metadata?.order - b.metadata?.order})
 }
 
 /**

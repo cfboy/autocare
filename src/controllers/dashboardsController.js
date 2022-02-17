@@ -124,6 +124,7 @@ exports.validate = async (req, res) => {
             HistoryService.addHistory(`Validate Membership: ${carPlate}`, historyTypes.USER_ACTION, req.user, req?.user?.locations[0])
         }
 
+        readingQueue = readingQueue.filter(item => carPlate !== item.plate)
 
         res.render('ajaxSnippets/validationResult.ejs', {
             customer,
@@ -154,10 +155,10 @@ exports.useService = async (req, res) => {
         if (userID) {
             // TODO: Change location
             let [customer, service] = await UserService.addNewService(userID, req.user, req?.user?.locations[0])
-            if (customer && service)
+            if (customer && service) 
                 //Log this action.
                 HistoryService.addHistory(`Use Service: ${service.id}`, historyTypes.SERVICE, customer, service.location)
-
+            
             res.render('ajaxSnippets/useServiceResult.ejs', { customer, service })
         } else {
             req.session.message = `USER ID UNDEFINED`
