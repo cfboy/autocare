@@ -36,11 +36,18 @@ function canValidateMemberships(user) {
     )
 }
 
+function canChangePassword(user, userID) {
+    return (
+        user.role === ROLES.ADMIN || user.id === userID
+    )
+}
+
 module.exports = {
     canDeleteCar,
     canEditCar,
     canDeleteLocation,
     canEditLocation,
     canDeleteUser,
-    canValidateMemberships
+    canValidateMemberships,
+    canChangePassword
 }

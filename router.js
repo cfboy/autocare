@@ -19,7 +19,8 @@ const { checkAuthenticated,
     authEditCar,
     authDeleteUser,
     authDeleteCar,
-    authValidateMembership } = require('./src/middleware/authFunctions'),
+    authValidateMembership,
+    authChangePassword } = require('./src/middleware/authFunctions'),
     hasPlan = require('./src/middleware/hasPlan')
 
 // Main Route
@@ -74,10 +75,12 @@ router.get('/users', checkAuthenticated, userController.users)
 router.get('/create-user', checkAuthenticated, userController.createUser)
 router.get('/view-user/:id', checkAuthenticated, userController.viewUser)
 router.get('/edit-user/:id', checkAuthenticated, userController.editUser)
+router.get('/changePassword/:id', checkAuthenticated, authChangePassword, userController.changePassword)
 
 //------ USER CRUDS ------
 router.post('/create-user', checkAuthenticated, userController.save)
 router.post('/edit-user', checkAuthenticated, userController.update)
+router.post('/changePassword', checkAuthenticated, authChangePassword, userController.updatePassword)
 router.get('/delete-user/:id', checkAuthenticated, authDeleteUser, userController.delete)
 
 //------ Cars Routes ------

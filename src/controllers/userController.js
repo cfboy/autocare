@@ -223,6 +223,31 @@ exports.editUser = async (req, res) => {
 }
 
 /**
+ * This function renders the change password form.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.changePassword = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const url = req.query.url ? req.query.url : '/account'
+        const customer = await UserService.getUserById(id)
+
+        if (customer) {
+            res.status(200).render('user/changePassword.ejs', { user: req.user, customer, url: (url == '/users' || url == '/account' || url == '/validateMembership') ? url : `${url}/${id}` })
+        } else {
+            console.log('User not found.')
+            res.redirect(`${url}`)
+        }
+    } catch (error) {
+        console.error(error.message)
+        req.session.message = "Error trying to render change password form."
+        req.session.alertType = alertTypes.ErrorAlert
+        res.redirect('/account')
+    }
+}
+
+/**
  * This function updates the user object with new properties.
  * @param {*} req 
  * @param {*} res 
@@ -260,6 +285,35 @@ exports.update = async (req, res) => {
         // res.status(400).send(error)
         res.redirect(`${url}`)
 
+    }
+}
+
+/**
+ * This function updates the user password.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.updatePassword = async (req, res) => {
+    const url = req.query.url
+    try {
+        req.body.password = await bcrypt.hash(req.body.password, 10)
+
+        const user = await UserService.updateUser(req.body.id, req.body)
+
+        if (!user) {
+            req.session.message = `Can't update User  ${req.body.email}`
+            req.session.alertType = alertTypes.WarningAlert
+        } else {
+            req.flash('info', 'Password Updated Completed.')
+            req.session.message = `Password updated ${user.email}`
+            req.session.alertType = alertTypes.CompletedActionAlert
+        }
+        res.redirect(`${url}`)
+
+    } catch (error) {
+        req.session.message = error.message
+        req.session.alertType = alertTypes.ErrorAlert
+        res.redirect(`${url}`)
     }
 }
 

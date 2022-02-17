@@ -3,7 +3,8 @@ const { canDeleteCar,
     canDeleteLocation,
     canEditLocation,
     canDeleteUser,
-    canValidateMemberships } = require('../config/permissions'),
+    canValidateMemberships,
+    canChangePassword } = require('../config/permissions'),
     alertTypes = require('../helpers/alertTypes')
 
 async function checkAuthenticated(req, res, next) {
@@ -80,6 +81,17 @@ async function authValidateMembership(req, res, next) {
     res.status(401).redirect('/account')
 }
 
+async function authChangePassword(req, res, next) {
+    let userID = req.body.id ? req.body.id : req.params.id ? req.params.id : ''
+
+    if (userID && canChangePassword(req.user, userID)) {
+        return next()
+    }
+    req.session.message = `Not allowed to change password.`
+    req.session.alertType = alertTypes.WarningAlert
+    res.status(401).redirect('/account')
+}
+
 module.exports = {
     checkAuthenticated,
     checkNotAuthenticated,
@@ -88,5 +100,6 @@ module.exports = {
     authDeleteLocation,
     authEditLocation,
     authDeleteUser,
-    authValidateMembership
+    authValidateMembership,
+    authChangePassword
 }
