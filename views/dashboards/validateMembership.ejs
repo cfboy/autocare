@@ -58,7 +58,7 @@
                                                             <% if(readingQueue?.length > 0) { %>
                                                             <% for(car of readingQueue) { %>
                                                             <a id="plate-<%= car.plate%>" class="btn btn-link"
-                                                                onclick="setPlateValue(<%= car.plate%>)">
+                                                                onclick="setPlateValue('<%= car.plate%>')">
                                                                 Car : <%= car.plate%>
                                                             </a>
                                                             <br>
