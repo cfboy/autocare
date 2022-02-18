@@ -17,6 +17,9 @@ var MemoryStore = require('memorystore')(session),
     router = require('./router'),
     moment = require('moment');
 
+const pjson = require('./package.json');
+
+
 // Connections
 require('./src/connect/mongodb') //Connection to MongoDB
 
@@ -69,6 +72,8 @@ app.locals.completeDateFormat = formats.completeDateFormat
 app.locals.alertTypes = alertTypes //To use this on the client side is necessary to use JSON.stringify
 app.locals.roles = ROLES
 app.locals.stripeStatus = STATUS
+
+app.locals.version = pjson.version
 
 // Lingua configuration
 app.use(lingua(app, {
