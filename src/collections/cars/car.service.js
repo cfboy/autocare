@@ -23,25 +23,24 @@ const getCarByID = (Car) => async (carID) => {
         if (err) {
             console.error(err)
         } else {
-            console.debug("CAR-SERVICE: Found car: ", docs.name);
+            console.debug("CAR-SERVICE: Found car: ", docs.brand);
         }
     })
 }
 
 /**
  * This function add new car to DB
- * @param {name, brand, model, plate} Car 
+ * @param {brand, model, plate} Car 
  * @returns car object
  */
-const addCar = (Car) => async (name, brand, model, plate) => {
-    if (!name) {
-        throw new Error(`Missing Data. Please provide the name of the car.`)
+const addCar = (Car) => async (brand, model, plate) => {
+    if (!brand || !model  || !plate) {
+        throw new Error(`Missing Data. Please provide all data for car.`)
     }
 
-    console.log(`CAR-SERVICE: addCar(${name})`)
+    console.log(`CAR-SERVICE: addCar(${brand})`)
 
     const car = new Car({
-        name,
         brand,
         model,
         plate
@@ -61,7 +60,7 @@ const updateCar = (Car) => async (id, updates) => {
         if (err) {
             console.error(err.message)
         } else {
-            console.debug("Updated : ", doc.name);
+            console.debug("Updated : ", doc.brand);
         }
     })
 }
@@ -94,7 +93,7 @@ const getCarByPlate = (Car) => async (plate) => {
             console.error(err)
         } else {
             if (doc)
-                console.debug(`CAR-SERVICE: Found car: ${doc?.name} - ${doc?.model} - ${doc?.plate}`);
+                console.debug(`CAR-SERVICE: Found car: ${doc?.brand} - ${doc?.model} - ${doc?.plate}`);
             else
                 console.debug(`CAR-SERVICE: Not Found car with plate: ${plate}`);
         }

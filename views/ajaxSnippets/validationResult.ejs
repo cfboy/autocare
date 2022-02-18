@@ -24,20 +24,6 @@
                         </b>
                         <%- customer?.personalInfo.firstName + ' ' + customer?.personalInfo.lastName %>
                     </p>
-
-                    <p>
-                        <b>
-                            Email:
-                        </b>
-                        <%- customer?.email%>
-                    </p>
-                    <p>
-                        <b>
-                            Car Name:
-                        </b>
-                        <%- car?.name%>
-
-                    </p>
                     <p>
                         <b>
                             Car Brand:
@@ -57,18 +43,9 @@
                         </b>
                         <%- car?.plate%>
                     </p>
-
-                    <p>
-                        <b>
-                            Membership:
-                        </b>
-                        <span style="text-transform: uppercase;">
-                            <%- membershipStatus%>
-                        </span>
-                    </p>
                     <p>
                         <b>Product:</b>
-                        <%- stripeSubscription.product.name%>
+                        <%- stripeSubscription?.product?.name%>
                     </p>
                     <p>
                         <b>
@@ -133,7 +110,7 @@
                     <p>Customer not found.</p>
 
                 </div>
-                <% } else if(!car) {%>
+                <% } else if(!car) { %>
                 <div class="col-md-12 text-center validation-msgs">
                     <i class="fas fa-8x fa-exclamation-triangle warning"></i>
                     <p>Customer not found.</p>

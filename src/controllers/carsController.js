@@ -125,14 +125,14 @@ exports.save = async (req, res) => {
     try {
         console.log('Creating New Car: ', fields.brand)
 
-        let car = await CarService.addCar(fields.name ? fields.name : 'My Car', fields.brand, fields.model, fields.plate)
+        let car = await CarService.addCar(fields.brand, fields.model, fields.plate)
 
         console.debug(`A new car added to DB. ID: ${car.id}.`)
 
         // Add car to user
         let user = await UserService.addUserCar(req.user.id, car)
 
-        req.session.message = `New Car: ${car.name}.`
+        req.session.message = `New Car: ${car.model} - ${car.brand} - ${car.plate}.`
         req.session.alertType = alertTypes.CompletedActionAlert
         req.flash('info', 'Car created.')
         res.redirect('/cars')
@@ -168,7 +168,7 @@ exports.update = async (req, res) => {
 
         } else {
             req.flash('info', 'Car Updated.')
-            req.session.message = `Car updated ${car.name}`
+            req.session.message = `Car updated ${car.brand}`
             req.session.alertType = alertTypes.CompletedActionAlert
         }
         res.redirect(`${url}`)

@@ -142,6 +142,7 @@ exports.save = async (req, res) => {
 
 /**
  * This function renders the user information.
+ * Find by billingID when the call comes from validate membership.
  * @param {*} req 
  * @param {*} res 
  */

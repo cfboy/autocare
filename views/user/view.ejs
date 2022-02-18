@@ -127,6 +127,59 @@
                                     </div>
                                 </div>
                                 <% } %>
+                                <% if(!isMyProfile && customer?.cars?.length > 0) { %>
+                                <div class="col-6 grid-margin stretch-card">
+                                    <div class="card card-rounded">
+                                        <div class="card-body">
+                                            <div class="table-responsive  mt-1">
+                                                <% let enableActions = (user.role === roles.ADMIN || customer.services.length < 1) %>
+                                                <table id="users" class="table table-hover stripe">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Brand</th>
+                                                            <th>Model</th>
+                                                            <th>Plate</th>
+                                                            <% if(enableActions) { %>
+                                                            <th>Action</th>
+                                                            <% } %>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <% if(customer.cars) { %>
+                                                        <% for(car of customer.cars) { %>
+                                                        <tr>
+                                                            <td>
+                                                                <a class="btn-link"
+                                                                    href="/car/<%- car.id%>"><%- car.brand%></a>
+                                                            </td>
+
+                                                            <td><%- car.model%></td>
+                                                            <td><%- car.plate%></td>
+
+                                                            <td>
+                                                                <% if(enableActions) { %>
+                                                                <a href="/edit-car/<%- car.id%>?url=/cars" type="button"
+                                                                    class="btn btn-icon btn-icon-no-border no-margin">
+                                                                    <i class="far fa-edit icon-sm"></i>
+                                                                </a>
+
+                                                                <a id="deleteBtn"
+                                                                    onclick="return confirmDelete('/delete-car', '<%- car.id%>')"
+                                                                    class="btn btn-icon btn-icon-no-border no-margin">
+                                                                    <i class="fas fa-trash-alt icon-sm text-danger"></i>
+                                                                </a>
+                                                                <% } %>
+                                                            </td>
+                                                        </tr>
+                                                        <% } %>
+                                                        <% } %>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <% } %>
                             </div>
                         </div>
                     </div>

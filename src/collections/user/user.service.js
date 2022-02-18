@@ -122,7 +122,7 @@ const removeUserCar = (User) => async (id, car) => {
         if (err) {
             console.error(err.message)
         } else {
-            console.debug(`Car ${car.name} Removed of User: ${doc.email}`);
+            console.debug(`Car ${car.model} Removed of User: ${doc.email}`);
         }
     })
 }
@@ -185,7 +185,7 @@ const getUserById = (User) => (id) => {
         } else {
             console.debug("USER-SERVICE: Found user to edit: ", docs);
         }
-    }).populate('location')
+    }).populate('location').populate('cars')
 }
 
 /**
