@@ -4,7 +4,8 @@ const { ROLES } = require('../collections/user/user.model')
 const HistoryService = require('../collections/history')
 const { historyTypes } = require('../collections/history/history.model')
 const Stripe = require('../connect/stripe')
-const alertTypes = require('../helpers/alertTypes')
+const alertTypes = require('../helpers/alertTypes'),
+    { STATUS } = require('../connect/stripe');
 
 let readingObjs = {}
 let readingQueue = []
@@ -44,34 +45,43 @@ exports.account = async (req, res) => {
             stripeSubscription: user?.stripe?.subscription,
             membershipStatus: user?.stripe?.subscription ? user?.stripe?.subscription?.status : Stripe.STATUS.NONE
         }
-        switch (role) {
-            case ROLES.ADMIN:
-                // Get Customers
-                customers = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
-                params = { ...params, customers }
-                res.render('dashboards/mainDashboard.ejs', params)
-                break;
-            case ROLES.CUSTOMER:
-                res.render('dashboards/customer.ejs', params)
-                break;
-            case ROLES.MANAGER:
-                // Get Customers
-                customers = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
-                params = { ...params, customers }
 
-                res.render('dashboards/mainDashboard.ejs', params)
-                break;
+        if (params.membershipStatus === STATUS.ACTIVE && user.cars.length == 0) {
+            req.session.message = `Need to add a car to continue whit the process.`
+            req.session.alertType = alertTypes.WarningAlert
+            req.flash('warning', 'Need to add a car to continue whit the process.')
+            res.redirect('/create-car')
+        } else {
 
-            case ROLES.CASHIER:
-                // Get Customers
-                customers = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
-                params = { ...params, customers }
-                res.render('dashboards/mainDashboard.ejs', params)
-                break;
-            default:
-                console.log('No ROLE detected.');
-                res.redirect('/logout')
+            switch (role) {
+                case ROLES.ADMIN:
+                    // Get Customers
+                    customers = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
+                    params = { ...params, customers }
+                    res.render('dashboards/mainDashboard.ejs', params)
+                    break;
+                case ROLES.CUSTOMER:
+                    res.render('dashboards/customer.ejs', params)
+                    break;
+                case ROLES.MANAGER:
+                    // Get Customers
+                    customers = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
+                    params = { ...params, customers }
 
+                    res.render('dashboards/mainDashboard.ejs', params)
+                    break;
+
+                case ROLES.CASHIER:
+                    // Get Customers
+                    customers = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
+                    params = { ...params, customers }
+                    res.render('dashboards/mainDashboard.ejs', params)
+                    break;
+                default:
+                    console.log('No ROLE detected.');
+                    res.redirect('/logout')
+
+            }
         }
     } catch (error) {
         console.error("ERROR: dashboardController -> Tyring to find stripeInfo.")
@@ -155,10 +165,10 @@ exports.useService = async (req, res) => {
         if (userID) {
             // TODO: Change location
             let [customer, service] = await UserService.addNewService(userID, req.user, req?.user?.locations[0])
-            if (customer && service) 
+            if (customer && service)
                 //Log this action.
                 HistoryService.addHistory(`Use Service: ${service.id}`, historyTypes.SERVICE, customer, service.location)
-            
+
             res.render('ajaxSnippets/useServiceResult.ejs', { customer, service })
         } else {
             req.session.message = `USER ID UNDEFINED`

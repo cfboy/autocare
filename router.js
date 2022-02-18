@@ -33,6 +33,9 @@ router.get('/', checkAuthenticated, (req, res) => {
     res.redirect('/account')
 })
 
+//------ Dashboard Routes ------
+router.get('/account', checkAuthenticated, dashboardsController.account)
+
 //------ Auth Routes ------
 
 router.get('/login', checkNotAuthenticated, (req, res) => {
@@ -54,7 +57,7 @@ router.get('/create-account', checkNotAuthenticated, (req, res) => {
     let product = req.query.product
 
     req.session.selectedProduct = product
-    res.render('auth/register.ejs', {municipalities})
+    res.render('auth/register.ejs', { municipalities })
 })
 
 router.post('/register', checkNotAuthenticated, authController.register)
@@ -104,9 +107,6 @@ router.get('/edit-location/:id', checkAuthenticated, authEditLocation, locationC
 router.post('/create-location', checkAuthenticated, locationController.save)
 router.post('/edit-location', checkAuthenticated, authEditLocation, locationController.update)
 router.get('/delete-location/:id', checkAuthenticated, authDeleteLocation, locationController.delete)
-
-//------ Dashboard Routes ------
-router.get('/account', checkAuthenticated, dashboardsController.account)
 
 router.get('/validateMembership', checkAuthenticated, authValidateMembership, dashboardsController.validateMembership)
 router.post('/validateMembership', checkAuthenticated, authValidateMembership, dashboardsController.validate)
