@@ -9,6 +9,10 @@ const { canDeleteCar,
     canAddCar
 } = require('../config/permissions')
 
+const fetch = require('node-fetch'); 
+//Use node-fetch to call externals API. 
+//Use v2.0 to use the module in code (for versions prior to version):
+
 /**
  * This function render all cars of current user.
  *
@@ -102,7 +106,21 @@ exports.create = async (req, res) => {
     req.session.message = ''
     req.session.alertType = ''
 
-    res.render('cars/create.ejs', { user: req.user, message, alertType })
+    try {
+        const apiRoute = 'GetAllMakes?format=json'
+        const apiResponse = await fetch(
+            'https://vpic.nhtsa.dot.gov/api/vehicles/' + apiRoute
+        )
+        const apiResponseJSON = await apiResponse.json()
+        // await db.collection('collection').insertOne(apiResponseJson)
+        console.log(apiResponseJSON)
+        // res.send('Done – check console log')
+        res.render('cars/create.ejs', { user: req.user, allMakes: apiResponseJSON.Results, allModels: [], message, alertType })
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).send('Something went worng')
+    }
 }
 
 /**
@@ -116,8 +134,15 @@ exports.edit = async (req, res) => {
             url = req.query.url ? req.query.url : '/account',
             car = await CarService.getCarByID(carID)
 
-        if (car)
-            res.status(200).render('cars/edit.ejs', { user: req.user, car, url: (url == '/cars' || url == '/account') ? url : `${url}/${carID}` })
+        if (car) {
+            const apiRoute = 'GetAllMakes?format=json'
+            const apiResponse = await fetch(
+                'https://vpic.nhtsa.dot.gov/api/vehicles/' + apiRoute
+            )
+            const apiResponseJSON = await apiResponse.json()
+            // console.log(apiResponseJSON)
+            res.status(200).render('cars/edit.ejs', { user: req.user, car, allMakes: apiResponseJSON.Results, url: (url == '/cars' || url == '/account') ? url : `${url}/${carID}` })
+        }
 
     } catch (error) {
         console.error(error.message)
@@ -175,12 +200,12 @@ exports.update = async (req, res) => {
         let car = await CarService.updateCar(req.body.id, req.body)
 
         if (!car) {
-            req.session.message = `Can't update car  ${req.body.name}`
+            req.session.message = `Can't update car  ${req.body.brand}`
             req.session.alertType = alertTypes.WarningAlert
 
         } else {
             req.flash('info', 'Car Updated.')
-            req.session.message = `Car updated ${car.brand}`
+            req.session.message = `Car updated: ${car.model} - ${car.brand} - ${car.plate}.`
             req.session.alertType = alertTypes.CompletedActionAlert
         }
         res.redirect(`${url}`)
