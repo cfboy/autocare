@@ -22,6 +22,7 @@ const { checkAuthenticated,
     authDeleteCar,
     authValidateMembership,
     authChangePassword } = require('./src/middleware/authFunctions'),
+    { municipalities } = require('./src/helpers/municipalities'),
     hasPlan = require('./src/middleware/hasPlan')
 
 // Main Route
@@ -53,8 +54,7 @@ router.get('/create-account', checkNotAuthenticated, (req, res) => {
     let product = req.query.product
 
     req.session.selectedProduct = product
-
-    res.render('auth/register.ejs')
+    res.render('auth/register.ejs', {municipalities})
 })
 
 router.post('/register', checkNotAuthenticated, authController.register)

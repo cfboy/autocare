@@ -5,6 +5,7 @@ const { historyTypes } = require('../collections/history/history.model')
 const Stripe = require('../connect/stripe')
 const alertTypes = require('../helpers/alertTypes')
 const bcrypt = require('bcrypt');
+const { municipalities } = require('../helpers/municipalities')
 
 
 // ------------------------------- Create -------------------------------
@@ -74,7 +75,7 @@ exports.createUser = async (req, res) => {
             selectRoles = Object.entries(subset)
         }
 
-        res.render('user/create.ejs', { user: req.user, message, alertType, selectRoles })
+        res.render('user/create.ejs', { user: req.user, municipalities, message, alertType, selectRoles })
     }
 }
 
@@ -209,7 +210,7 @@ exports.editUser = async (req, res) => {
             if (ROLES)
                 selectRoles = Object.entries(ROLES)
 
-            res.status(200).render('user/edit.ejs', { user: req.user, customer, selectRoles, url: (url == '/users' || url == '/account' || url == '/validateMembership') ? url : `${url}/${id}` })
+            res.status(200).render('user/edit.ejs', { user: req.user, customer, municipalities, selectRoles, url: (url == '/users' || url == '/account' || url == '/validateMembership') ? url : `${url}/${id}` })
         } else {
             console.log('User not found.')
             res.redirect(`${url}`)
