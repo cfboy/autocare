@@ -1,6 +1,7 @@
 const { canDeleteCar,
     canEditCar,
     canDeleteLocation,
+    canAddCar,
     canEditLocation,
     canDeleteUser,
     canValidateMemberships,
@@ -32,6 +33,15 @@ async function authDeleteCar(req, res, next) {
     req.session.message = `Not allowed to delete this car.`
     req.session.alertType = alertTypes.WarningAlert
     res.status(401).redirect('/cars')
+}
+
+async function authAddCar(req, res, next) {
+    if (canAddCar(req.user)) {
+        return next()
+    }
+    req.session.message = `Not allowed to add a car.`
+    req.session.alertType = alertTypes.WarningAlert
+    res.status(401).redirect('/account')
 }
 
 async function authEditCar(req, res, next) {
@@ -95,6 +105,7 @@ async function authChangePassword(req, res, next) {
 module.exports = {
     checkAuthenticated,
     checkNotAuthenticated,
+    authAddCar,
     authDeleteCar,
     authEditCar,
     authDeleteLocation,

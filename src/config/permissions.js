@@ -24,9 +24,21 @@ function canDeleteCar(user, carID) {
     )
 }
 
+function canAddCar(user) {
+    return (
+        [ROLES.ADMIN].includes(user.role) || user?.cars?.length < 1
+    )
+}
+
 function canEditCar(user, carID) {
     return (
         [ROLES.ADMIN, ROLES.MANAGER].includes(user.role) || user?.cars?.includes(carID)
+    )
+}
+
+function canManageCars(user) {
+    return (
+        [ROLES.ADMIN].includes(user.role) || user?.services.length < 1
     )
 }
 
@@ -43,6 +55,8 @@ function canChangePassword(user, userID) {
 }
 
 module.exports = {
+    canManageCars,
+    canAddCar,
     canDeleteCar,
     canEditCar,
     canDeleteLocation,

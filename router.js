@@ -16,6 +16,7 @@ const { checkAuthenticated,
     checkNotAuthenticated,
     authDeleteLocation,
     authEditLocation,
+    authAddCar,
     authEditCar,
     authDeleteUser,
     authDeleteCar,
@@ -86,10 +87,10 @@ router.get('/delete-user/:id', checkAuthenticated, authDeleteUser, userControlle
 //------ Cars Routes ------
 router.get('/cars', checkAuthenticated, carsController.cars)
 router.get('/car/:id', checkAuthenticated, carsController.view)
-router.get('/create-car', checkAuthenticated, carsController.create)
+router.get('/create-car', checkAuthenticated, authAddCar, carsController.create)
 router.get('/edit-car/:id', checkAuthenticated, authEditCar, carsController.edit)
 
-router.post('/create-car', checkAuthenticated, carsController.save)
+router.post('/create-car', checkAuthenticated, authAddCar, carsController.save)
 router.post('/edit-car', checkAuthenticated, authEditCar, carsController.update)
 router.get('/delete-car/:id', checkAuthenticated, authDeleteCar, carsController.delete)
 

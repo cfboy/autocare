@@ -3,10 +3,15 @@ const CarService = require('../collections/cars')
 const HistoryService = require('../collections/history')
 const { historyTypes } = require('../collections/history/history.model')
 const alertTypes = require('../helpers/alertTypes')
+const { canDeleteCar,
+    canManageCars,
+    canEditCar,
+    canAddCar
+} = require('../config/permissions')
 
 /**
  * This function render all cars of current user.
- * If the current user is ROLE.MANAGER then find only CUSTOMERS users.
+ *
  * @param {*} req 
  * @param {*} res 
  */
@@ -29,7 +34,11 @@ exports.cars = async (req, res) => {
         } else {
             cars = await CarService.getCars(user.cars)
 
-            res.render('cars/index.ejs', { user, cars, message, alertType })
+            res.render('cars/index.ejs', {
+                user, cars, message, alertType,
+                canAddCar: canAddCar(user),
+                canManageCars: canManageCars(user)
+            })
 
         }
     } catch (error) {
@@ -48,7 +57,8 @@ exports.cars = async (req, res) => {
  */
 exports.view = async (req, res) => {
     try {
-        let { message, alertType } = req.session
+        let { message, alertType } = req.session,
+            user = req.user;
 
         if (message) {
             req.session.message = ''
@@ -59,10 +69,12 @@ exports.view = async (req, res) => {
 
         if (car) {
             res.status(200).render('cars/view.ejs', {
-                user: req.user,
+                user,
                 car,
                 message,
-                alertType
+                alertType,
+                canEditCar: canEditCar(user, car.id),
+                canManageCars: canManageCars(user)
             })
         } else {
             message = 'Car not found.'
@@ -105,7 +117,7 @@ exports.edit = async (req, res) => {
             car = await CarService.getCarByID(carID)
 
         if (car)
-            res.status(200).render('cars/edit.ejs', { user: req.user, car, url: (url == '/cars' || url == '/account' || url == '/validateMembership') ? url : `${url}/${id}` })
+            res.status(200).render('cars/edit.ejs', { user: req.user, car, url: (url == '/cars' || url == '/account') ? url : `${url}/${carID}` })
 
     } catch (error) {
         console.error(error.message)

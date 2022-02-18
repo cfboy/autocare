@@ -51,7 +51,7 @@
                                                 <div>
                                                     <h4 class="card-title card-title-dash">My Cars</h4>
                                                 </div>
-                                                <% if(user.cars.length < 1) { %>
+                                                <% if(canAddCar) { %>
                                                 <div>
                                                     <a href="/create-car" class="btn btn-primary btn-icon-text"
                                                         type="button">
@@ -61,14 +61,13 @@
                                             </div>
                                             <br>
                                             <div class="table-responsive  mt-1">
-                                                <% let enableActions = (user.role === roles.ADMIN || user.services.length < 1) %>
                                                 <table id="users" class="table table-hover stripe">
                                                     <thead>
                                                         <tr>
                                                             <th>Brand</th>
                                                             <th>Model</th>
                                                             <th>Plate</th>
-                                                            <% if(enableActions) { %>
+                                                            <% if(canManageCars) { %>
                                                             <th>Action</th>
                                                             <% } %>
                                                         </tr>
@@ -86,7 +85,7 @@
                                                             <td><%- car.plate%></td>
 
                                                             <td>
-                                                                <% if(enableActions) { %>
+                                                                <% if(canManageCars) { %>
                                                                 <a href="/edit-car/<%- car.id%>?url=/cars" type="button"
                                                                     class="btn btn-icon btn-icon-no-border no-margin">
                                                                     <i class="far fa-edit icon-sm"></i>
