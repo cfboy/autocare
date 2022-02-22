@@ -15,6 +15,7 @@ const userSchema = new Schema({
     role: { type: String, enum: Object.values(ROLES), default: ROLES.CUSTOMER },
     locations: [{ type: Schema.Types.ObjectId, ref: 'location', default: null }],
     hasAllInformation: { type: Boolean, default: false },
+    created_date: { type: Date, default: Date.now },
 
     personalInfo: {
         firstName: String,
@@ -30,17 +31,7 @@ const userSchema = new Schema({
         location: { type: Schema.Types.ObjectId, ref: 'location', default: null },
         authorizedBy: { type: Schema.Types.ObjectId, ref: 'user', default: null },
     }],
-    cars: [{ type: Schema.Types.ObjectId, ref: 'car', default: null }],
-    membershipInfo: {
-        plan: { type: String, enum: ['none', 'basic', 'pro'], default: 'none' },
-        hasTrial: { type: Boolean, default: false },
-        endDate: { type: Date, default: null }
-    },
-    tagInfo: {
-        isttached: { type: Boolean, default: false },
-        attachDate: { type: Date, default: null },
-        tagID: String
-    }
+    cars: [{ type: Schema.Types.ObjectId, ref: 'car', default: null }]
 })
 
 const User = mongoose.model('user', userSchema, 'user')

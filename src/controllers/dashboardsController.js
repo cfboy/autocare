@@ -1,5 +1,6 @@
 const UserService = require('../collections/user')
 const CarService = require('../collections/cars')
+const AnalyticsService = require('../collections/analytics/service')
 const { ROLES } = require('../collections/user/user.model')
 const HistoryService = require('../collections/history')
 const { historyTypes } = require('../collections/history/history.model')
@@ -55,9 +56,10 @@ exports.account = async (req, res) => {
 
             switch (role) {
                 case ROLES.ADMIN:
+                    let analytics = await AnalyticsService.getAnalytics()
                     // Get Customers
                     customers = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
-                    params = { ...params, customers }
+                    params = { ...params, customers, analytics }
                     res.render('dashboards/mainDashboard.ejs', params)
                     break;
                 case ROLES.CUSTOMER:

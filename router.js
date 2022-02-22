@@ -127,29 +127,29 @@ router.post('/billing', checkAuthenticated, stripeController.billing)
 
 // ---------------------------------------
 
-router.get('/none', [checkAuthenticated, hasPlan('none')], async function (
-    req,
-    res,
-    next
-) {
-    res.status(200).render('none.ejs')
-})
+// router.get('/none', [checkAuthenticated, hasPlan('none')], async function (
+//     req,
+//     res,
+//     next
+// ) {
+//     res.status(200).render('none.ejs')
+// })
 
-router.get('/basic', [checkAuthenticated, hasPlan('basic')], async function (
-    req,
-    res,
-    next
-) {
-    res.status(200).render('basic.ejs')
-})
+// router.get('/basic', [checkAuthenticated, hasPlan('basic')], async function (
+//     req,
+//     res,
+//     next
+// ) {
+//     res.status(200).render('basic.ejs')
+// })
 
-router.get('/pro', [checkAuthenticated, hasPlan('pro')], async function (
-    req,
-    res,
-    next
-) {
-    res.status(200).render('pro.ejs')
-})
+// router.get('/pro', [checkAuthenticated, hasPlan('pro')], async function (
+//     req,
+//     res,
+//     next
+// ) {
+//     res.status(200).render('pro.ejs')
+// })
 
 // if (process.env.NODE_ENV !== 'production') {
 // The last route for not found pages.

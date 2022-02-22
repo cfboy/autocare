@@ -158,7 +158,7 @@ async function getAllProducts() {
         }
     }
 
-    return products.data.sort(function(a, b){return a.metadata?.order - b.metadata?.order})
+    return products.data.sort(function (a, b) { return a.metadata?.order - b.metadata?.order })
 }
 
 /**
@@ -323,6 +323,17 @@ const setStripeInfoToUser = async (customerObj, products) => {
     }
 }
 
+/**
+ * This function get all subsctiptions.
+ * @returns subscriptions list
+ */
+async function getAllSubscriptions() {
+    const subscriptions = await Stripe.subscriptions.list({
+    })
+
+    return subscriptions.data
+}
+
 module.exports = {
     STATUS,
     getCustomerByID,
@@ -338,5 +349,6 @@ module.exports = {
     getCustomerSubscription,
     getCustomerEvents,
     getCustomerCharges,
-    setStripeInfoToUser
+    setStripeInfoToUser,
+    getAllSubscriptions
 }
