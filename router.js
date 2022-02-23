@@ -7,6 +7,9 @@ const stripeController = require('./src/controllers/stripeController'),
     historyController = require('./src/controllers/historyController'),
     carsController = require('./src/controllers/carsController')
 
+const Stripe = require('./src/connect/stripe')
+const fetch = require('node-fetch');
+
 // Express
 const express = require('express');
 const router = express.Router();
@@ -22,8 +25,7 @@ const { checkAuthenticated,
     authDeleteCar,
     authValidateMembership,
     authChangePassword } = require('./src/middleware/authFunctions'),
-    { municipalities } = require('./src/helpers/municipalities'),
-    hasPlan = require('./src/middleware/hasPlan')
+    { municipalities } = require('./src/helpers/municipalities')
 
 // Main Route
 
@@ -58,6 +60,20 @@ router.get('/create-account', checkNotAuthenticated, (req, res) => {
 
     req.session.selectedProduct = product
     res.render('auth/register.ejs', { municipalities })
+})
+
+router.get('/create-subscriptions', checkAuthenticated, async (req, res) => {
+    let user = req.user
+    const apiRoute = 'GetAllMakes?format=json'
+    const apiResponse = await fetch(
+        'https://vpic.nhtsa.dot.gov/api/vehicles/' + apiRoute
+    )
+    const apiResponseJSON = await apiResponse.json()
+
+    const prices = await Stripe.getAllPrices()
+
+
+    res.render('auth/createSubs.ejs', { user, allMakes: apiResponseJSON.Results, allModels: [], prices })
 })
 
 router.post('/register', checkNotAuthenticated, authController.register)

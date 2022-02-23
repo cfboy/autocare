@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>
+        <%= lingua.membership.createSusbscriptions%>
+    </title>
+    <!-- plugins:css -->
+    <link rel="stylesheet" href="../../vendors/feather/feather.css">
+    <link rel="stylesheet" href="../../vendors/mdi/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="../../vendors/ti-icons/css/themify-icons.css">
+    <link rel="stylesheet" href="../../vendors/typicons/typicons.css">
+    <link rel="stylesheet" href="../../vendors/simple-line-icons/css/simple-line-icons.css">
+    <link rel="stylesheet" href="../../vendors/css/vendor.bundle.base.css">
+    <link rel="stylesheet" href="../../css/register.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+        integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="../../vendors/select2/select2.min.css">
+    <link rel="stylesheet" href="../../vendors/select2-bootstrap-theme/select2-bootstrap.min.css">
+    <!-- endinject -->
+    <!-- Plugin css for this page -->
+    <!-- Plugin css for this page -->
+    <link rel="stylesheet" href="../../js/select.dataTables.min.css">
+    <!-- End plugin css for this page -->
+    <!-- inject:css -->
+    <link rel="stylesheet" href="../../css/vertical-layout-light/style.css">
+    <!-- endinject -->
+    <link rel="shortcut icon" href="../../images/favicon.png" />
+</head>
+
+<body>
+    <div class="container-scroller">
+        <div class="container-fluid page-body-wrapper full-page-wrapper">
+            <div class="content-wrapper d-flex align-items-center auth px-0">
+                <div class="row w-100 mx-0">
+                    <div class="col-lg-8 mx-auto">
+                        <div class="auth-form-light text-left py-5 px-4 px-sm-5">
+
+                            <!-- <a class="float-start btn-link" id="close-registration" href="/home">
+                                <i class="fa-solid fa-angle-left"></i>
+                                Back to Pricing
+                            </a> -->
+                            <a class="float-end btn-link" id="close-registration" href="/account">
+                                Home <i class="fa-solid fa-home"></i>
+                            </a>
+                            <div class="brand-logo text-center">
+                                <img src="/images/mrquicks-logo.png" alt="logo">
+                            </div>
+
+                            <h4>
+                                <%= lingua.membership.createSubscriptions%>
+                            </h4>
+                            <!-- <h6 class="fw-light">Sign in to continue.</h6> -->
+                            <form id="form-subscriptions" class="pt-3" method="post">
+                                <div class="row">
+                                    <input id="userID" name="userID" value="<%= user.id%>" hidden />
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label for="carBrand" class="required">Car
+                                                Brand</label>
+
+                                            <select id="brand" name="brand" required autofocus
+                                                onchange="this.value ? findModel(this.value) : ''"
+                                                class="form-control mb-3 form-control-lg js-example-basic-single w-100">
+                                                <option value="">Select One</option>
+                                                <% for(const make of allMakes) { %>
+                                                <option value="<%= make.Make_Name%>">
+                                                    <%= make.Make_Name%>
+                                                </option>
+                                                <% } %>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+
+                                        <div class="form-group">
+                                            <label for="carModel" class="required">Car
+                                                Model</label>
+
+                                            <select id="model" name="model" required
+                                                class="form-control mb-3 form-control-lg js-example-basic-single w-100">
+                                                <option value="">Select One</option>
+
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+
+                                        <div class="form-group">
+                                            <label for="carPlate" class="required">Car
+                                                Plate</label>
+
+                                            <input type="text" id="carPlate" name="plate"
+                                                class="form-control mb-3 form-control-lg text-uppercase"
+                                                placeholder="Car Plate" autofocus required />
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label for="carBrand" class="required">Product</label>
+
+                                            <select id="product" name="product" required autofocus
+                                                class="form-control mb-3 form-control-lg js-example-basic-single w-100">
+                                                <option value="">Select One</option>
+                                                <% for(const price of prices) { %>
+                                                <option value="<%= price.id%>" name="<%= price.product.name%>"
+                                                    price="<%= price.unit_amount%>">
+                                                    (<%= price.unit_amount%>) <%= price.product.name%>
+                                                </option>
+                                                <% } %>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="mt-3">
+                                        <button id="addSub" type="submit"
+                                            class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn float-end"><%= lingua.add%></button>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <table id="subs-to-create-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Number</th>
+                                                <th>Brand</th>
+                                                <th>Model</th>
+                                                <th>Plate</th>
+                                                <th>Product</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                    <div class="mt-3">
+                                        <button
+                                            class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn float-end"
+                                            type="submit"><%= lingua.create%></button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- content-wrapper ends -->
+        </div>
+        <!-- page-body-wrapper ends -->
+    </div>
+    <!-- container-scroller -->
+    <!-- plugins:js -->
+    <script src="../../vendors/js/vendor.bundle.base.js"></script>
+    <!-- endinject -->
+    <!-- Plugin js for this page -->
+    <script src="../../vendors/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
+    <!-- End plugin js for this page -->
+    <!-- inject:js -->
+    <script src="../../js/off-canvas.js"></script>
+    <script src="../../js/hoverable-collapse.js"></script>
+    <script src="../../js/template.js"></script>
+    <script src="../js/cars.js"></script>
+    <script src="../js/helper-functions.js"></script>
+
+    <!-- endinject -->
+    <!-- Custom js for this page-->
+    <script src="./js/jquery.cookie.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.10/jquery.mask.js"></script>
+    <script src="../../vendors/select2/select2.min.js"></script>
+    <script src="../../js/select2.js"></script>
+
+    <!-- End custom js for this page-->
+
+    <script>
+        let subscriptionList = [];
+        $("#addSub").on("click", function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            var form = $("#form-subscriptions");
+            var rowIdx = 0;
+
+            // reportValidity and checkValidity validate inputs on form.
+            form[0].reportValidity();
+            if (form[0].checkValidity()) {
+                console.log("checkvalidity is ok");
+                var brand = $("#brand").val(),
+                    model = $("#model").val(),
+                    plate = $("#carPlate").val(),
+                    priceID = $("#product").val(),
+                    product = $("#product").find('option:selected').attr("name"),
+                    price = $("#product").find('option:selected').attr("price"),
+                    newItem = {
+                        brand: brand, model: model, plate: plate,
+                        product: product, price: price, priceID: priceID
+                    };
+                console.log(newItem)
+
+                $('#subs-to-create-table tbody').append(
+                    `<tr id="R${++rowIdx}">
+                        <td class="row-index text-center">
+                            <p>Row ${rowIdx}</p></td>
+                        <td class="text-center">
+                            <p>${newItem.brand}</p>
+                        </td>
+                        <td class="text-center">
+                            <p>${newItem.model}</p>
+                        </td>
+                        <td class="text-center">
+                            <p>${newItem.plate}</p>
+                        </td>
+                        <td class="text-center">
+                            <p>(${newItem.price}) ${newItem.product}</p>
+                        </td>
+                        <td class="text-center">
+                            <button class="btn btn-danger remove"
+                                type="button">Remove</button>
+                        </td>
+                    </tr>`
+                )
+                subscriptionList.push(newItem);
+                console.log("List: " + JSON.stringify(subscriptionList));
+                clearForm(form);
+            }
+        });
+    </script>
+</body>
+
+
+</html>

@@ -16,7 +16,10 @@ const userSchema = new Schema({
     locations: [{ type: Schema.Types.ObjectId, ref: 'location', default: null }],
     hasAllInformation: { type: Boolean, default: false },
     created_date: { type: Date, default: Date.now },
-
+    subscriptions: [{
+        id: String,
+        car: { type: Schema.Types.ObjectId, ref: 'car', default: null }
+    }],
     personalInfo: {
         firstName: String,
         middleName: String,

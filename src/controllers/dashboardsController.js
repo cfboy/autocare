@@ -12,9 +12,16 @@ let readingObjs = {}
 let readingQueue = []
 
 exports.home = async (req, res) => {
-    let user = req.user, products = await Stripe.getAllProducts()
+    let user = req.user,
+        // products = await Stripe.getAllProducts(),
+        prices = await Stripe.getAllPrices()
 
-    res.render('index.ejs', { products, user })
+
+    res.render('index.ejs', {
+        prices,
+        //  products,
+        user
+    })
 }
 /**
  * This function handle the dashboards of the different roles. 
@@ -33,25 +40,22 @@ exports.account = async (req, res) => {
         // Passport store the user in req.user
         let user = req.user,
             role = user.role,
-            products = await Stripe.getAllProducts(),
+            prices = await Stripe.getAllPrices(),
             params
 
-        params = { user, products, message, alertType }
+        params = { user, prices, message, alertType }
 
         if (user.billingID) {
-            user = await Stripe.setStripeInfoToUser(user, products)
+            user = await Stripe.setStripeInfoToUser(user, prices)
         }
         params = {
             ...params,
-            stripeSubscription: user?.stripe?.subscription,
-            membershipStatus: user?.stripe?.subscription ? user?.stripe?.subscription?.status : Stripe.STATUS.NONE
+            subscriptions: user?.subscriptions
         }
 
-        if (params.membershipStatus === STATUS.ACTIVE && user.cars.length == 0) {
-            req.session.message = `Need to add a car to continue whit the process.`
-            req.session.alertType = alertTypes.WarningAlert
+        if (user.subscriptions.length < 1) {
             req.flash('warning', 'Need to add a car to continue whit the process.')
-            res.redirect('/create-car')
+            res.redirect('/create-subscriptions')
         } else {
 
             switch (role) {
@@ -82,7 +86,6 @@ exports.account = async (req, res) => {
                 default:
                     console.log('No ROLE detected.');
                     res.redirect('/logout')
-
             }
         }
     } catch (error) {

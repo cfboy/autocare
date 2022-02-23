@@ -78,14 +78,14 @@
         <div class="container-fluid content-wrapper p-0">
             <div class="container p-5 pt-0">
                 <div class="row">
-                    <% if(products) { %>
-                    <% for(product of products) { %>
-                    <% for(price of product.priceInfo) { %>
+                    <% if(prices) { %>
+                    <% for(price of prices) { %>
+                    <%# for(price of product.priceInfo) { %>
                     <div class="col-lg-6 col-md-6 mb-4">
                         <div class="card h-100 shadow-lg">
                             <div class="card-body">
                                 <div class="text-center p-3">
-                                    <h5 class="card-title"><%= product.name %></h5>
+                                    <h5 class="card-title"><%= price.product.name %></h5>
                                     <!-- <small>Individual</small> -->
                                     <br><br>
                                     <span class="h2"><%= price.unit_amount%></span>
@@ -97,12 +97,12 @@
                                     <% } %>
                                     <br><br>
                                 </div>
-                                <p class="card-text"><%= product.description%></p>
+                                <p class="card-text"><%= price.product.description%></p>
                                 <div>
                                     <ul class="list-group list-group-flush">
-                                        <% if(product?.perks) { %>
+                                        <% if(price.product?.perks) { %>
 
-                                        <% for(perk of product?.perks) { %>
+                                        <% for(perk of price.product?.perks) { %>
                                         <li class="list-group-item"><svg xmlns="http://www.w3.org/2000/svg" width="16"
                                                 height="16" fill="currentColor" class="bi bi-check" viewBox="0 0 16 16">
                                                 <path
@@ -121,7 +121,7 @@
                             </div>
                         </div>
                     </div>
-                    <% } %>
+                    <%# } %>
                     <% } %>
                     <% } %>
                 </div>

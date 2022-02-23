@@ -9,13 +9,12 @@
                             <%= lingua.membership.notPlan%>
                         </p>
                         <br>
-                        <% for(const product of products) { %>
-                        <% for(const price of product.priceInfo) { %>
+                        <% for(const price of prices) { %>
 
                         <input type="radio" id="<%= price?.id%>" name="product" value="<%= price?.id%>" />
 
                         <label for="<%= price?.id%>">
-                            <%= product.name %>
+                            <%= price.product.name %>
                             for
                             <%= price.unit_amount%>
                             <% if(price?.transform_quantity){ %>
@@ -25,25 +24,28 @@
                         </label><br><br>
                         <% }; %>
 
-                        <% }; %>
-
                         <button class="btn btn-primary upgrade-btn" id="checkout-button" type="submit"
                             value="<%- user.billingID%>" email="<%- user.email%>">Buy
                             now</button>
 
                         <% } else { %>
+                        <!-- Loop of subscriptions -->
+                        <% for(stripeSubscription of subscriptions) { %>
+
                         <p class="lead">
-                            You are currently on the <b><%- stripeSubscription?.product.name %></b> plan.
+                            You are currently on the <b><%- stripeSubscription?.data?.product.name %></b> plan.
                         </p>
                         <br>
                         <p class="lead">Plan will end on
-                            <%= moment(stripeSubscription?.current_period_end * 1000).isValid() ? moment(stripeSubscription?.current_period_end * 1000).format(completeDateFormat) : 'N/A' %>
+                            <%= moment(stripeSubscription?.data?.current_period_end * 1000).isValid() ? moment(stripeSubscription?.data?.current_period_end * 1000).format(completeDateFormat) : 'N/A' %>
                         </p>
                         <hr />
 
-                        <%- include('./information.ejs' , {showManageBtn : false, customer : user, stripeSubscription, membershipStatus}); %>
+                        <%- include('./information.ejs' , {showManageBtn : false, customer : user, stripeSubscription: stripeSubscription.data, membershipStatus : stripeSubscription?.data?.status}); %>
 
                         <hr />
+
+                        <% } %>
                         <p class="mt-4 text-muted">
                             Not happy with your current plan? Cancel or Upgrade by clicking the
                             button below.

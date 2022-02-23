@@ -26,6 +26,7 @@
     "plan": "Plan",
     "action": "Acción",
     "membership": {
+        "createSubscriptions" : "Crear Subscripciones",
         "notPlan": "Actualmente no estás en ningún plan. Compre una suscripción a continuación.",
         "notHappy": "¿No estás satisfecho con tu plan actual? Cancele o actualice haciendo clic en el botón a continuación."
     },
