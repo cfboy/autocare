@@ -6,10 +6,7 @@ const stripeController = require('./src/controllers/stripeController'),
     dashboardsController = require('./src/controllers/dashboardsController'),
     historyController = require('./src/controllers/historyController'),
     carsController = require('./src/controllers/carsController')
-
-const Stripe = require('./src/connect/stripe')
-const fetch = require('node-fetch');
-
+    
 // Express
 const express = require('express');
 const router = express.Router();
@@ -24,8 +21,7 @@ const { checkAuthenticated,
     authDeleteUser,
     authDeleteCar,
     authValidateMembership,
-    authChangePassword } = require('./src/middleware/authFunctions'),
-    { municipalities } = require('./src/helpers/municipalities')
+    authChangePassword } = require('./src/middleware/authFunctions')
 
 // Main Route
 
@@ -55,26 +51,9 @@ router.get('/login', checkNotAuthenticated, (req, res) => {
 
 router.post('/login', checkNotAuthenticated, authController.login)
 
-router.get('/create-account', checkNotAuthenticated, (req, res) => {
-    let product = req.query.product
+router.get('/create-account', checkNotAuthenticated, authController.createAccount)
 
-    req.session.selectedProduct = product
-    res.render('auth/register.ejs', { municipalities })
-})
-
-router.get('/create-subscriptions', checkAuthenticated, async (req, res) => {
-    let user = req.user
-    const apiRoute = 'GetAllMakes?format=json'
-    const apiResponse = await fetch(
-        'https://vpic.nhtsa.dot.gov/api/vehicles/' + apiRoute
-    )
-    const apiResponseJSON = await apiResponse.json()
-
-    const prices = await Stripe.getAllPrices()
-
-
-    res.render('auth/createSubs.ejs', { user, allMakes: apiResponseJSON.Results, allModels: [], prices })
-})
+router.get('/create-subscriptions', checkAuthenticated, authController.createSubscriptions)
 
 router.post('/register', checkNotAuthenticated, authController.register)
 router.delete('/logout', checkAuthenticated, authController.logout)

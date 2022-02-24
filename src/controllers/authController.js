@@ -3,7 +3,10 @@ const { ROLES } = require('../collections/user/user.model')
 const Stripe = require('../connect/stripe')
 const alertTypes = require('../helpers/alertTypes')
 const bcrypt = require('bcrypt');
-const passport = require('passport');
+const passport = require('passport')
+const { municipalities } = require('../helpers/municipalities');
+const fetch = require('node-fetch');
+
 require("../config/passport");
 require("../config/local");
 
@@ -17,6 +20,41 @@ exports.login =
         failureRedirect: '/login',
         failureFlash: true
     })
+
+/**
+ * This function render the create account form.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.createAccount = async (req, res) => {
+    let product = req.query.product
+
+    req.session.selectedProduct = product
+    res.render('auth/register.ejs', { municipalities })
+}
+
+/**
+ * This function render the create subscriptions form.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.createSubscriptions = async (req, res) => {
+    let { message, alertType } = req.session
+    // clear message y alertType
+    req.session.message = ''
+    req.session.alertType = ''
+
+    let user = req.user
+    const apiRoute = 'GetAllMakes?format=json'
+    const apiResponse = await fetch(
+        'https://vpic.nhtsa.dot.gov/api/vehicles/' + apiRoute
+    )
+    const apiResponseJSON = await apiResponse.json()
+
+    const prices = await Stripe.getAllPrices()
+
+    res.render('auth/createSubs.ejs', { message, alertType, user, allMakes: apiResponseJSON.Results, allModels: [], prices })
+}
 
 /**
  * This function verify if the user exist on the DB, if not then create new user. 
@@ -73,21 +111,23 @@ exports.register = async (req, res) => {
             req.session.message = `Account Created.`
             req.session.alertType = alertTypes.CompletedActionAlert
             req.flash('info', 'Account Created!');
-            if (req.session.selectedProduct) {
-                let product = encodeURIComponent(req.session.selectedProduct);
-                req.session.selectedProduct = '';
-                let billingID = encodeURIComponent(customer.billingID)
-                // passport.authenticate('local', req, res)
-                req.login(customer, function (err) {
-                    if (err) {
-                        console.log(err);
-                    }
-                })
-                // TODO: change route to call a method.
-                res.redirect(`/stripeCheckout?product=${product}&customerID=${billingID}`)
-            }
-            else
-                res.redirect('/account')
+
+            // Login the user
+            req.login(customer, function (err) {
+                if (err) {
+                    console.log(err);
+                }
+            })
+            // if (req.session.selectedProduct) {
+            // let product = encodeURIComponent(req.session.selectedProduct);
+            // req.session.selectedProduct = '';
+            // let billingID = encodeURIComponent(customer.billingID)
+            // res.redirect(`/stripeCheckout?product=${product}&customerID=${billingID}`)
+            res.redirect('create-subscriptions')
+            // }
+            // else
+            // res.redirect('/account')
+
         } else {
             let message = `That email already exist, please login.`
             req.flash('info', message);

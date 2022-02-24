@@ -45,7 +45,24 @@
                             <div class="brand-logo text-center">
                                 <img src="/images/mrquicks-logo.png" alt="logo">
                             </div>
+                            <div id="messages">
+                                <% if (messages.error) { %>
+                                <p class="error">
+                                    <%= messages.error %>
+                                </p>
+                                <% } %>
 
+                                <% if (messages.info) { %>
+                                <p class="info">
+                                    <%= messages.info %>
+                                </p>
+                                <% } %>
+                                <% if (messages.warning) { %>
+                                <p class="warning">
+                                    <%= messages.warning %>
+                                </p>
+                                <% } %>
+                            </div>
                             <div class="row">
                                 <div class="col-lg-6">
                                     <div class="card">
@@ -251,6 +268,7 @@
     </script>
 
     <%- include('../partials/dataTable.ejs', {tableID : '#cart-table', ordering: false, searching: false , info: false, paging: false, footerCheckout: true}); %>
+    <%- include('../partials/alerts.ejs', {message, alertType}); %>
 
 </body>
 
