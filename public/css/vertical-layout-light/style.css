@@ -12111,7 +12111,7 @@ textarea.is-invalid.tt-hint {
     user-select: none;
     background-color: transparent;
     border: 1px solid transparent;
-    padding: 0.875rem 1.5rem;
+    padding: 0.875rem 1.5rem !important;
     font-size: 0.875rem;
     border-radius: 0.1875rem;
     transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
@@ -12336,6 +12336,12 @@ fieldset:disabled .swal2-modal .swal2-buttonswrapper .swal2-styled,
     color: #000;
     background-color: #52CDFF;
     border-color: #52CDFF;
+}
+
+.btn-checkout {
+    background-color: #ffd814;
+    color: black;
+    border-color: #ffd814;
 }
 
 .btn-warning {
@@ -21795,7 +21801,7 @@ code {
 .home-tab .statistics-details .statistics-title {
     font-style: normal;
     font-weight: 500;
-    /* font-size: 13px; */
+    font-size: 13px;
     line-height: 18px;
     color: #8D8D8D;
     margin-bottom: 4px;
@@ -28858,7 +28864,7 @@ body.avgrund-active {
 }
 
 .dataTables_wrapper .dataTable thead th {
-    border-bottom-width: 0;
+    border-bottom-width: 1px;
 }
 
 .dataTables_wrapper .dataTable thead .sorting:before,

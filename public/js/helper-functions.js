@@ -60,6 +60,5 @@ function manageLangDropdown() {
 
 function clearForm(form) {
     form.find('input').val('');
-    form.find('select').val(null).trigger('change');
-
+    form.find('select').val("").trigger("change");
 }

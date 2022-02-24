@@ -23,8 +23,8 @@
     <link rel="stylesheet" href="../../vendors/select2-bootstrap-theme/select2-bootstrap.min.css">
     <!-- endinject -->
     <!-- Plugin css for this page -->
-    <!-- Plugin css for this page -->
     <link rel="stylesheet" href="../../js/select.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.4/css/dataTables.bootstrap5.min.css">
     <!-- End plugin css for this page -->
     <!-- inject:css -->
     <link rel="stylesheet" href="../../css/vertical-layout-light/style.css">
@@ -37,13 +37,8 @@
         <div class="container-fluid page-body-wrapper full-page-wrapper">
             <div class="content-wrapper d-flex align-items-center auth px-0">
                 <div class="row w-100 mx-0">
-                    <div class="col-lg-8 mx-auto">
+                    <div class="col-lg-12 mx-auto">
                         <div class="auth-form-light text-left py-5 px-4 px-sm-5">
-
-                            <!-- <a class="float-start btn-link" id="close-registration" href="/home">
-                                <i class="fa-solid fa-angle-left"></i>
-                                Back to Pricing
-                            </a> -->
                             <a class="float-end btn-link" id="close-registration" href="/account">
                                 Home <i class="fa-solid fa-home"></i>
                             </a>
@@ -51,100 +46,123 @@
                                 <img src="/images/mrquicks-logo.png" alt="logo">
                             </div>
 
-                            <h4>
-                                <%= lingua.membership.createSubscriptions%>
-                            </h4>
-                            <!-- <h6 class="fw-light">Sign in to continue.</h6> -->
-                            <form id="form-subscriptions" class="pt-3" method="post">
-                                <div class="row">
-                                    <input id="userID" name="userID" value="<%= user.id%>" hidden />
-                                    <div class="col-lg-4">
-                                        <div class="form-group">
-                                            <label for="carBrand" class="required">Car
-                                                Brand</label>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="card-title">
+                                                <%= lingua.membership.createSubscriptions%>
+                                            </div>
+                                            <form id="form-subscriptions" class="pt-3" method="post">
+                                                <div class="row">
+                                                    <input id="userID" name="userID" value="<%= user.id%>" hidden />
+                                                    <div class="col-lg-12">
+                                                        <div class="form-group">
+                                                            <label for="carBrand" class="required">Car
+                                                                Brand</label>
 
-                                            <select id="brand" name="brand" required autofocus
-                                                onchange="this.value ? findModel(this.value) : ''"
-                                                class="form-control mb-3 form-control-lg js-example-basic-single w-100">
-                                                <option value="">Select One</option>
-                                                <% for(const make of allMakes) { %>
-                                                <option value="<%= make.Make_Name%>">
-                                                    <%= make.Make_Name%>
-                                                </option>
-                                                <% } %>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-4">
+                                                            <select id="brand" name="brand" required autofocus
+                                                                onchange="findModel(this.value)"
+                                                                class="form-control mb-3 form-control-lg js-example-basic-single w-100">
+                                                                <option value="">Select One</option>
+                                                                <% for(const make of allMakes) { %>
+                                                                <option value="<%= make.Make_Name%>">
+                                                                    <%= make.Make_Name%>
+                                                                </option>
+                                                                <% } %>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-12">
+                                                        <div class="form-group">
+                                                            <label for="carModel" class="required">Car Model</label>
+                                                            <select id="carModel" name="model" required autofocus
+                                                                class="form-control mb-3 form-control-lg js-example-basic-single w-100">
+                                                                <option value="">Select One</option>
 
-                                        <div class="form-group">
-                                            <label for="carModel" class="required">Car
-                                                Model</label>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-12">
+                                                        <div class="form-group">
+                                                            <label for="carPlate" class="required">Car
+                                                                Plate</label>
 
-                                            <select id="model" name="model" required
-                                                class="form-control mb-3 form-control-lg js-example-basic-single w-100">
-                                                <option value="">Select One</option>
+                                                            <input type="text" id="carPlate" name="plate"
+                                                                class="form-control mb-3 form-control-lg text-uppercase"
+                                                                placeholder="Car Plate" autofocus required />
+                                                        </div>
+                                                    </div>
 
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-4">
+                                                    <div class="col-lg-12">
+                                                        <div class="form-group">
+                                                            <label for="product" class="required">Product</label>
 
-                                        <div class="form-group">
-                                            <label for="carPlate" class="required">Car
-                                                Plate</label>
-
-                                            <input type="text" id="carPlate" name="plate"
-                                                class="form-control mb-3 form-control-lg text-uppercase"
-                                                placeholder="Car Plate" autofocus required />
-                                        </div>
-                                    </div>
-
-                                    <div class="col-lg-4">
-                                        <div class="form-group">
-                                            <label for="carBrand" class="required">Product</label>
-
-                                            <select id="product" name="product" required autofocus
-                                                class="form-control mb-3 form-control-lg js-example-basic-single w-100">
-                                                <option value="">Select One</option>
-                                                <% for(const price of prices) { %>
-                                                <option value="<%= price.id%>" name="<%= price.product.name%>"
-                                                    price="<%= price.unit_amount%>">
-                                                    (<%= price.unit_amount%>) <%= price.product.name%>
-                                                </option>
-                                                <% } %>
-                                            </select>
+                                                            <select id="product" name="product" required autofocus
+                                                                class="form-control mb-3 form-control-lg js-example-basic-single w-100">
+                                                                <option value="">Select One</option>
+                                                                <% for(const price of prices) { %>
+                                                                <option value="<%= price.id%>"
+                                                                    name="<%= price.product.name%>"
+                                                                    price="<%= price.unit_amount%>">
+                                                                    (<%= price.unit_amount%>) <%= price.product.name%>
+                                                                </option>
+                                                                <% } %>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="mt-3">
+                                                        <button id="addSub" type="submit"
+                                                            class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn float-end"><%= lingua.add%>
+                                                            Car</button>
+                                                    </div>
+                                                </div>
+                                            </form>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="mt-3">
-                                        <button id="addSub" type="submit"
-                                            class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn float-end"><%= lingua.add%></button>
+                                <div class="col-lg-6">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h4 class="card-title"> My Cart</h4>
+                                            <div class="table-responsive">
+                                                <table id="cart-table" class="table table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Car</th>
+                                                            <th>Product</th>
+                                                            <th>Price</th>
+                                                            <th>Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="tbody"></tbody>
+                                                    <tfoot>
+                                                        <tr>
+                                                            <th></th>
+                                                            <th colspan="1" style="text-align:right">Total:</th>
+                                                            <th></th>
+                                                            <th></th>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
+
+                                        </div>
+                                        <br>
+                                        <div class="m-3">
+                                            <button
+                                                class="btn btn-block btn-checkout btn-lg font-weight-medium auth-form-btn float-end"
+                                                type="submit">
+                                                <%# lingua.create%>
+                                                Proceed to Checkout
+                                            </button>
+                                        </div>
                                     </div>
+
                                 </div>
-                                <br>
-                                <div class="row">
-                                    <table id="subs-to-create-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Number</th>
-                                                <th>Brand</th>
-                                                <th>Model</th>
-                                                <th>Plate</th>
-                                                <th>Product</th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody></tbody>
-                                    </table>
-                                    <div class="mt-3">
-                                        <button
-                                            class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn float-end"
-                                            type="submit"><%= lingua.create%></button>
-                                    </div>
-                                </div>
-                            </form>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -171,6 +189,7 @@
     <!-- Custom js for this page-->
     <script src="./js/jquery.cookie.js" type="text/javascript"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.10/jquery.mask.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.8/js/select2.min.js" defer></script>
     <script src="../../vendors/select2/select2.min.js"></script>
     <script src="../../js/select2.js"></script>
 
@@ -178,56 +197,61 @@
 
     <script>
         let subscriptionList = [];
-        $("#addSub").on("click", function (event) {
+        var rowIdx = 0;
+        var form = $("#form-subscriptions");
+
+        $('#addSub').on('click', function (event) {
             event.preventDefault();
             event.stopPropagation();
-            var form = $("#form-subscriptions");
-            var rowIdx = 0;
-
-            // reportValidity and checkValidity validate inputs on form.
             form[0].reportValidity();
             if (form[0].checkValidity()) {
-                console.log("checkvalidity is ok");
+                // Get all values
                 var brand = $("#brand").val(),
-                    model = $("#model").val(),
+                    model = $("#carModel").val(),
                     plate = $("#carPlate").val(),
                     priceID = $("#product").val(),
                     product = $("#product").find('option:selected').attr("name"),
                     price = $("#product").find('option:selected').attr("price"),
+                    // Prepare newItem Obj.
                     newItem = {
                         brand: brand, model: model, plate: plate,
                         product: product, price: price, priceID: priceID
                     };
-                console.log(newItem)
-
-                $('#subs-to-create-table tbody').append(
-                    `<tr id="R${++rowIdx}">
-                        <td class="row-index text-center">
-                            <p>Row ${rowIdx}</p></td>
-                        <td class="text-center">
-                            <p>${newItem.brand}</p>
-                        </td>
-                        <td class="text-center">
-                            <p>${newItem.model}</p>
-                        </td>
-                        <td class="text-center">
-                            <p>${newItem.plate}</p>
-                        </td>
-                        <td class="text-center">
-                            <p>(${newItem.price}) ${newItem.product}</p>
-                        </td>
-                        <td class="text-center">
-                            <button class="btn btn-danger remove"
-                                type="button">Remove</button>
-                        </td>
-                    </tr>`
-                )
+                console.log("newItem: " + newItem);
+                // Initialize DataTable
+                var t = $('#cart-table').DataTable();
+                ++rowIdx;
+                // Add row to table.
+                t.row.add([
+                    `<p> Brand: ${brand} </p> <br> 
+                         <p> Model: ${model} </p> <br>
+                         <p> Plate: ${plate} </p>`,
+                    product,
+                    price,
+                    `<td class="text-center">
+                        <button  class="btn btn-icon btn-icon-no-border no-margin remove">
+                            <i class="fas fa-trash-alt icon-sm text-danger"></i>
+                        </button>
+                    </td>`
+                ]).draw(false);
+                // Add newItem to subscriptionList
                 subscriptionList.push(newItem);
                 console.log("List: " + JSON.stringify(subscriptionList));
+                // Clear all elements on form for next submit.
                 clearForm(form);
             }
         });
+
+        $('#cart-table tbody').on('click', '.remove', function () {
+            var t = $('#cart-table').DataTable();
+
+            t.row($(this).parents('tr')).remove().draw();
+            rowIdx--;
+        });
     </script>
+
+    <%- include('../partials/dataTable.ejs', {tableID : '#cart-table', ordering: false, searching: false , info: false, paging: false, footerCheckout: true}); %>
+
 </body>
 
 

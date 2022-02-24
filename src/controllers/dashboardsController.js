@@ -53,7 +53,7 @@ exports.account = async (req, res) => {
             subscriptions: user?.subscriptions
         }
 
-        if (user.subscriptions.length < 1) {
+        if (user.subscriptions.length < 1 && user.role ==! ROLES.ADMIN) {
             req.flash('warning', 'Need to add a car to continue whit the process.')
             res.redirect('/create-subscriptions')
         } else {
