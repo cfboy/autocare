@@ -4,6 +4,19 @@ const Stripe = require('../connect/stripe')
 const alertTypes = require('../helpers/alertTypes')
 
 /**
+ * This function is a helper for agroup a list per key.
+ * @param {*} list 
+ * @param {*} key 
+ * @param {*} {omitKey} 
+ * @returns list //use Object.values/keys/entries to manage their content.
+ */
+const groupByKey = (list, key, { omitKey = false }) =>
+    list.reduce((hash, { [key]: value, ...rest }) => (
+        { ...hash, [value]: (hash[value] || []).concat(omitKey ? { ...rest } : { [key]: value, ...rest }) }), {}
+    )
+
+
+/**
  * This function handle all Stripe events.
  * @param {*} req 
  * @param {*} res 
@@ -125,12 +138,13 @@ exports.webhook = async (req, res) => {
  * @returns 
  */
 exports.checkout = async (req, res) => {
-    const { product, customerID } = req.body
-    const priceID = product
+    const { subscriptions, customerID } = req.body
 
     try {
-        const session = await Stripe.createCheckoutSession(customerID, priceID)
-
+        // Group by priceID
+        const subscriptionsGroup = groupByKey(subscriptions, 'priceID', { omitKey: false })
+        const session = await Stripe.createCheckoutSession(customerID, Object.entries(subscriptionsGroup))
+        // res.redirect(session.url)
         res.send({
             sessionId: session.id
         })

@@ -169,7 +169,9 @@
                                         </div>
                                         <br>
                                         <div class="m-3">
-                                            <button
+                                            <input id="subscription-list" type="text" hidden value="">
+                                            <button id="checkout-btn" hidden value="<%- user.billingID%>"
+                                                email="<%- user.email%>"
                                                 class="btn btn-block btn-checkout btn-lg font-weight-medium auth-form-btn float-end"
                                                 type="submit">
                                                 <%# lingua.create%>
@@ -209,15 +211,20 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.8/js/select2.min.js" defer></script>
     <script src="../../vendors/select2/select2.min.js"></script>
     <script src="../../js/select2.js"></script>
+    <script type="text/javascript" src="https://js.stripe.com/v3/"></script>
+    <script type="text/javascript" src="../js/account.js"></script>
 
     <!-- End custom js for this page-->
 
     <script>
         let subscriptionList = [];
-        var rowIdx = 0;
+        var rowIdx = 0; //This field is used to filter the list when remove any from de list.
         var form = $("#form-subscriptions");
+        var checkoutBtn = $('#checkout-btn'); //This btn is hidden for default
 
+        // Add subscription
         $('#addSub').on('click', function (event) {
+            // Validate form before submit.
             event.preventDefault();
             event.stopPropagation();
             form[0].reportValidity();
@@ -231,14 +238,15 @@
                     price = $("#product").find('option:selected').attr("price"),
                     // Prepare newItem Obj.
                     newItem = {
+                        id: ++rowIdx,
                         brand: brand, model: model, plate: plate,
                         product: product, price: price, priceID: priceID
                     };
                 console.log("newItem: " + newItem);
                 // Initialize DataTable
                 var t = $('#cart-table').DataTable();
-                ++rowIdx;
                 // Add row to table.
+                // Set the rowIdx to btn id to get the id of deleted element.
                 t.row.add([
                     `<p> Brand: ${brand} </p> <br> 
                          <p> Model: ${model} </p> <br>
@@ -246,25 +254,43 @@
                     product,
                     price,
                     `<td class="text-center">
-                        <button  class="btn btn-icon btn-icon-no-border no-margin remove">
+                        <button  id="${rowIdx}" class="btn btn-icon btn-icon-no-border no-margin remove">
                             <i class="fas fa-trash-alt icon-sm text-danger"></i>
                         </button>
                     </td>`
                 ]).draw(false);
                 // Add newItem to subscriptionList
                 subscriptionList.push(newItem);
-                console.log("List: " + JSON.stringify(subscriptionList));
+                // Stringify the value to store on input element for checkout.
+                var stringSubscriptionList = JSON.stringify(subscriptionList)
+                $('#subscription-list').val(stringSubscriptionList);
+                console.log("List: " + stringSubscriptionList);
                 // Clear all elements on form for next submit.
                 clearForm(form);
+                // If the susbcription has at least one item, then show ckeckout btn.
+                if (subscriptionList.length > 0)
+                    checkoutBtn.removeAttr('hidden');
             }
         });
-
+        // Remove subscription
         $('#cart-table tbody').on('click', '.remove', function () {
             var t = $('#cart-table').DataTable();
+            var id = $(this).attr('id');
 
+            // Remove from the table.
             t.row($(this).parents('tr')).remove().draw();
+            // Decrease the row index.
             rowIdx--;
+            // Remove the deleted item from de subscriptionList.
+            subscriptionList = subscriptionList.filter(item => item.id != id);
+
+            $('#subscription-list').val(JSON.stringify(subscriptionList));
+
+            // If the susbcription list is empty, then hide ckeckout btn.
+            if (subscriptionList.length < 1)
+                checkoutBtn.attr("hidden", true);
         });
+
     </script>
 
     <%- include('../partials/dataTable.ejs', {tableID : '#cart-table', ordering: false, searching: false , info: false, paging: false, footerCheckout: true}); %>

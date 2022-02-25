@@ -6,7 +6,7 @@ const stripeController = require('./src/controllers/stripeController'),
     dashboardsController = require('./src/controllers/dashboardsController'),
     historyController = require('./src/controllers/historyController'),
     carsController = require('./src/controllers/carsController')
-    
+
 // Express
 const express = require('express');
 const router = express.Router();
@@ -121,31 +121,6 @@ router.get('/stripeCheckout', stripeController.stripeCheckout)
 router.post('/billing', checkAuthenticated, stripeController.billing)
 
 // ---------------------------------------
-
-// router.get('/none', [checkAuthenticated, hasPlan('none')], async function (
-//     req,
-//     res,
-//     next
-// ) {
-//     res.status(200).render('none.ejs')
-// })
-
-// router.get('/basic', [checkAuthenticated, hasPlan('basic')], async function (
-//     req,
-//     res,
-//     next
-// ) {
-//     res.status(200).render('basic.ejs')
-// })
-
-// router.get('/pro', [checkAuthenticated, hasPlan('pro')], async function (
-//     req,
-//     res,
-//     next
-// ) {
-//     res.status(200).render('pro.ejs')
-// })
-
 // if (process.env.NODE_ENV !== 'production') {
 // The last route for not found pages.
 // router.get('*', (req, res) =>

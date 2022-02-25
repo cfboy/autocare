@@ -1,31 +1,31 @@
 $(document).ready(function () {
     const publishableKey = 'pk_test_51JbqswL5YqSpFl3KswbblP5qXQFWDBV6sNxKnsqfP1Sckl8KaXzpKfAL6aErdRj7M2kp6E3igZVFjrY79ywN9ewT00Rcp2wiCp'
-
-    const stripe = Stripe(
-        publishableKey)
-    const checkoutButton = $('#checkout-button')
+    const stripe = Stripe(publishableKey)
+    // const checkoutButton = $('#checkout-button') //Old checkout btn TODO: delete
     const manageBillingButton = $('.manage-billing-button')
     const useServiceButton = $('#use-service-button')
+    const checkoutBtn = $('#checkout-btn'); //New checkout btn
 
-    checkoutButton.click(function () {
-        const product = $("input[name='product']:checked").val()
-        const billingID = $(this).attr("value");
-        const email = $(this).attr("email");
+    // TODO: delete this.
+    // checkoutButton.click(function () {
+    //     const product = $("input[name='product']:checked").val()
+    //     const billingID = $(this).attr("value");
+    //     const email = $(this).attr("email");
 
-        fetch('/checkout', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'email': email
-            },
-            body: JSON.stringify({
-                product,
-                customerID: billingID
-            })
-        })
-            .then((result) => result.json())
-            .then(({ sessionId }) => stripe.redirectToCheckout({ sessionId }))
-    })
+    //     fetch('/checkout', {
+    //         method: 'POST',
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //             'email': email
+    //         },
+    //         body: JSON.stringify({
+    //             product,
+    //             customerID: billingID
+    //         })
+    //     })
+    //         .then((result) => result.json())
+    //         .then(({ sessionId }) => stripe.redirectToCheckout({ sessionId }))
+    // })
 
     manageBillingButton.click(function () {
         const billingID = $(this).attr("value");
@@ -75,5 +75,26 @@ $(document).ready(function () {
             console.log(err);
         })
 
+    })
+
+    // Checkout
+    checkoutBtn.click(function () {
+        const subscriptions = JSON.parse($('#subscription-list').val());
+        const billingID = $(this).attr("value");
+        const email = $(this).attr("email");
+
+        fetch('/checkout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'email': email
+            },
+            body: JSON.stringify({
+                subscriptions,
+                customerID: billingID
+            })
+        })
+            .then((result) => result.json())
+            .then(({ sessionId }) => stripe.redirectToCheckout({ sessionId }))
     })
 })

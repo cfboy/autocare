@@ -17,15 +17,23 @@ const Stripe = stripe(process.env.STRIPE_SECRET_KEY, {
     apiVersion: '2020-08-27'
 })
 
-const createCheckoutSession = async (customerID, price) => {
+const createCheckoutSession = async (customerID, subscriptions) => {
+    let items = [];
+    if (subscriptions) {
+        // Prepare items to create a session.
+        // The first position [0] has the priceID (divided by groups)
+        // The second position [1] has the list of cars per priceID.
+        for (sub of subscriptions) {
+            items.push({ price: sub[0], quantity: sub[1].length })
+        }
+    }
+
     const session = await Stripe.checkout.sessions.create({
         mode: 'subscription',
         payment_method_types: ['card'],
         customer: customerID,
-        line_items: [{
-            price,
-            quantity: 1 //TODO: implement option for select qty.
-        }],
+        line_items: items,
+        // TODO: Add car on metadata
         // subscription_data: {
         //     trial_period_days: process.env.TRIAL_DAYS
         // },
@@ -145,7 +153,6 @@ const createWebhook = (rawBody, sig) => {
  * @returns product list
  */
 async function getAllProducts() {
-    // On Stripe All products need a productKey Metadata field.
     const products = await Stripe.products.list({
         active: true
     })
@@ -167,10 +174,21 @@ async function getAllProducts() {
  */
 async function getAllPrices() {
     const prices = await Stripe.prices.list({
-        active: true
+        active: true,
+        expand: ['data.product']
     })
 
-    return prices.data
+    // format currency
+    for (const price of prices.data) {
+        price.unit_amount = Dinero({ amount: price.unit_amount }).toFormat('$0,0.00')
+
+        if (price?.product) {
+            // Get price of all products.
+            price.product.perks = price?.product?.metadata?.perks?.split(',')
+        }
+
+    }
+    return prices.data.sort(function (a, b) { return a.product.metadata?.order - b.product.metadata?.order })
 }
 
 /**
@@ -236,7 +254,7 @@ const getCustomerSubscription = async (customerID) => {
     }
 }
 /**
- * This function que the customer subscriptions.
+ * This function get the customer events on stripe.
  * @param {*} customerID 
  * @returns subscription list
  */
@@ -258,6 +276,11 @@ const getCustomerEvents = async (customerID) => {
     }
 }
 
+/**
+ * This function get the customer charges on stripe.
+ * @param {*} user 
+ * @returns 
+ */
 const getCustomerCharges = async (user) => {
     try {
         let customerID = user.billingID,
@@ -291,24 +314,29 @@ const getCustomerCharges = async (user) => {
 /**
  * This function set the stripe information temporary on .stripe property in the user object.
  * @param {*} customerObj 
- * @param {*} products 
+ * @param {*} prices 
  * @returns customer object
  */
-const setStripeInfoToUser = async (customerObj, products) => {
+
+const setStripeInfoToUser = async (customerObj, prices) => {
     try {
         let customer = customerObj
-
         customer.hasSubscription = false
+        customer.subscriptions = [{ id: 'sub_1KONCJL5YqSpFl3KeyUCy7GN', car: '62047cbf4bb764559852af53' },
+        { id: 'sub_1KW9tZL5YqSpFl3KE5fOJOgh', car: '62047cbf4bb764559852af53' }]
+        if (customer.subscriptions.length > 0) {
+            customer.hasSubscription = true
 
-        customer.stripe = await getCustomerByID(customer.billingID)
-        if (customer.stripe) {
-            customer.stripe.subscription = customer.stripe?.subscriptions?.data[0]
-            if (customer.stripe.subscription) {
-                customer.hasSubscription = true
-                if (!products)
-                    products = await getAllProducts()
-                // find Product on this sub.
-                customer.stripe.subscription.product = products.find(({ id }) => id === customer.stripe.subscription.plan.product)
+            for (subscription of customer.subscriptions) {
+                subscription.data = await getSubscriptionById(subscription.id)
+
+                if (subscription.data) {
+                    if (!prices)
+                        prices = await getAllPrices()
+                    // find Product on this sub.
+                    // Set the product variables on data to easy access.
+                    subscription.data.product = prices.find(({ product }) => product.id === subscription.data.plan.product).product
+                }
             }
         }
 
@@ -334,6 +362,16 @@ async function getAllSubscriptions() {
     return subscriptions.data
 }
 
+/**
+ * This function get a subsctiption by id.
+ * @returns subscriptions list
+ */
+async function getSubscriptionById(id) {
+    const subscription = await Stripe.subscriptions.retrieve(id)
+
+    return subscription
+}
+
 module.exports = {
     STATUS,
     getCustomerByID,
@@ -350,5 +388,6 @@ module.exports = {
     getCustomerEvents,
     getCustomerCharges,
     setStripeInfoToUser,
-    getAllSubscriptions
+    getAllSubscriptions,
+    getSubscriptionById
 }
