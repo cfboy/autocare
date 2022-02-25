@@ -32,161 +32,139 @@
     <link rel="shortcut icon" href="../../images/favicon.png" />
 </head>
 
-<body>
+<body class="sidebar-icon-only">
     <div class="container-scroller">
-        <div class="container-fluid page-body-wrapper full-page-wrapper">
-            <div class="content-wrapper d-flex align-items-center auth px-0">
-                <div class="row w-100 mx-0">
-                    <div class="col-lg-12 mx-auto">
-                        <div class="auth-form-light text-left py-5 px-4 px-sm-5">
-                            <a class="float-end btn-link" id="close-registration" href="/account">
-                                Home <i class="fa-solid fa-home"></i>
-                            </a>
-                            <div class="brand-logo text-center">
-                                <img src="/images/mrquicks-logo.png" alt="logo">
-                            </div>
-                            <div id="messages">
-                                <% if (messages.error) { %>
-                                <p class="error">
-                                    <%= messages.error %>
-                                </p>
-                                <% } %>
-
-                                <% if (messages.info) { %>
-                                <p class="info">
-                                    <%= messages.info %>
-                                </p>
-                                <% } %>
-                                <% if (messages.warning) { %>
-                                <p class="warning">
-                                    <%= messages.warning %>
-                                </p>
-                                <% } %>
-                            </div>
-                            <div class="row">
-                                <div class="col-lg-6">
-                                    <div class="card">
-                                        <div class="card-body">
-                                            <div class="card-title">
-                                                <%= lingua.membership.createSubscriptions%>
-                                            </div>
-                                            <form id="form-subscriptions" class="pt-3" method="post">
-                                                <div class="row">
-                                                    <input id="userID" name="userID" value="<%= user.id%>" hidden />
-                                                    <div class="col-lg-12">
-                                                        <div class="form-group">
-                                                            <label for="carBrand" class="required">Car
-                                                                Brand</label>
-
-                                                            <select id="brand" name="brand" required autofocus
-                                                                onchange="findModel(this.value)"
-                                                                class="form-control mb-3 form-control-lg js-example-basic-single w-100">
-                                                                <option value="">Select One</option>
-                                                                <% for(const make of allMakes) { %>
-                                                                <option value="<%= make.Make_Name%>">
-                                                                    <%= make.Make_Name%>
-                                                                </option>
-                                                                <% } %>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-12">
-                                                        <div class="form-group">
-                                                            <label for="carModel" class="required">Car Model</label>
-                                                            <select id="carModel" name="model" required autofocus
-                                                                class="form-control mb-3 form-control-lg js-example-basic-single w-100">
-                                                                <option value="">Select One</option>
-
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-12">
-                                                        <div class="form-group">
-                                                            <label for="carPlate" class="required">Car
-                                                                Plate</label>
-
-                                                            <input type="text" id="carPlate" name="plate"
-                                                                class="form-control mb-3 form-control-lg text-uppercase"
-                                                                placeholder="Car Plate" autofocus required />
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="col-lg-12">
-                                                        <div class="form-group">
-                                                            <label for="product" class="required">Product</label>
-
-                                                            <select id="product" name="product" required autofocus
-                                                                class="form-control mb-3 form-control-lg js-example-basic-single w-100">
-                                                                <option value="">Select One</option>
-                                                                <% for(const price of prices) { %>
-                                                                <option value="<%= price.id%>"
-                                                                    name="<%= price.product.name%>"
-                                                                    price="<%= price.unit_amount%>">
-                                                                    (<%= price.unit_amount%>) <%= price.product.name%>
-                                                                </option>
-                                                                <% } %>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="mt-3">
-                                                        <button id="addSub" type="submit"
-                                                            class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn float-end"><%= lingua.add%>
-                                                            Car</button>
-                                                    </div>
-                                                </div>
-                                            </form>
-                                        </div>
+        <%- include('../partials/navbar.ejs' , {user}); %>
+        <!-- partial -->
+        <div class="container-fluid page-body-wrapper">
+            <%#- include('../partials/settings-panel.ejs', {user}); %>
+            <!-- partial -->
+            <%- include('../partials/sidebar.ejs', {user}); %>
+            <!-- partial -->
+            <div class="main-panel">
+                <div class="content-wrapper">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-12 col-lg-6 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="card-title">
+                                        <%= lingua.membership.createSubscriptions%>
                                     </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <div class="card">
-                                        <div class="card-body">
-                                            <h4 class="card-title"> My Cart</h4>
-                                            <div class="table-responsive">
-                                                <table id="cart-table" class="table table-hover">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Car</th>
-                                                            <th>Product</th>
-                                                            <th>Price</th>
-                                                            <th>Action</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody id="tbody"></tbody>
-                                                    <tfoot>
-                                                        <tr>
-                                                            <th></th>
-                                                            <th colspan="1" style="text-align:right">Total:</th>
-                                                            <th></th>
-                                                            <th></th>
-                                                        </tr>
-                                                    </tfoot>
-                                                </table>
+                                    <form id="form-subscriptions" class="pt-3" method="post">
+                                        <div class="row">
+                                            <input id="userID" name="userID" value="<%= user.id%>" hidden />
+                                            <div class="col-lg-12">
+                                                <div class="form-group">
+                                                    <label for="carBrand" class="required">Car
+                                                        Brand</label>
+
+                                                    <select id="brand" name="brand" required autofocus
+                                                        onchange="findModel(this.value)"
+                                                        class="form-control mb-3 form-control-lg js-example-basic-single w-100">
+                                                        <option value="">Select One</option>
+                                                        <% for(const make of allMakes) { %>
+                                                        <option value="<%= make.Make_Name%>">
+                                                            <%= make.Make_Name%>
+                                                        </option>
+                                                        <% } %>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-12">
+                                                <div class="form-group">
+                                                    <label for="carModel" class="required">Car Model</label>
+                                                    <select id="carModel" name="model" required autofocus
+                                                        class="form-control mb-3 form-control-lg js-example-basic-single w-100">
+                                                        <option value="">Select One</option>
+
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-12">
+                                                <div class="form-group">
+                                                    <label for="carPlate" class="required">Car
+                                                        Plate</label>
+
+                                                    <input type="text" id="carPlate" name="plate"
+                                                        class="form-control mb-3 form-control-lg text-uppercase"
+                                                        placeholder="Car Plate" autofocus required />
+                                                </div>
                                             </div>
 
-                                        </div>
-                                        <br>
-                                        <div class="m-3">
-                                            <input id="subscription-list" type="text" hidden value="">
-                                            <button id="checkout-btn" hidden value="<%- user.billingID%>"
-                                                email="<%- user.email%>"
-                                                class="btn btn-block btn-checkout btn-lg font-weight-medium auth-form-btn float-end"
-                                                type="submit">
-                                                <%# lingua.create%>
-                                                Proceed to Checkout
-                                            </button>
-                                        </div>
-                                    </div>
+                                            <div class="col-lg-12">
+                                                <div class="form-group">
+                                                    <label for="product" class="required">Product</label>
 
+                                                    <select id="product" name="product" required autofocus
+                                                        class="form-control mb-3 form-control-lg js-example-basic-single w-100">
+                                                        <option value="">Select One</option>
+                                                        <% for(const price of prices) { %>
+                                                        <option value="<%= price.id%>" name="<%= price.product.name%>"
+                                                            price="<%= price.unit_amount%>">
+                                                            (<%= price.unit_amount%>) <%= price.product.name%>
+                                                        </option>
+                                                        <% } %>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="mt-3">
+                                                <button id="addSub" type="submit"
+                                                    class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn float-end"><%= lingua.add%>
+                                                    Car</button>
+                                            </div>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
                         </div>
+                        <div class="col-sm-12 col-md-12 col-lg-6 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title"> My Cart</h4>
+                                    <div class="table-responsive">
+                                        <table id="cart-table" class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Car</th>
+                                                    <th>Product</th>
+                                                    <th>Price</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tbody"></tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <th></th>
+                                                    <th colspan="1" style="text-align:right">Total:</th>
+                                                    <th></th>
+                                                    <th></th>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+
+                                </div>
+                                <br>
+                                <div class="m-3">
+                                    <input id="subscription-list" type="text" hidden value="">
+                                    <button id="checkout-btn" hidden value="<%- user.billingID%>"
+                                        email="<%- user.email%>"
+                                        class="btn btn-block btn-checkout btn-lg font-weight-medium auth-form-btn float-end"
+                                        type="submit">
+                                        <%# lingua.create%>
+                                        Proceed to Checkout
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
+
+                <%- include('../partials/footer.ejs'); %>
             </div>
-            <!-- content-wrapper ends -->
         </div>
         <!-- page-body-wrapper ends -->
     </div>

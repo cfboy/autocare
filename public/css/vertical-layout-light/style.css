@@ -10729,6 +10729,11 @@ progress {
     color: #6c757d;
 }
 
+.select2-container {
+    display: block !important;
+    width: 100% !important;
+}
+
 .form-control,
 .asColorPicker-input,
 .dataTables_wrapper select,
@@ -10737,7 +10742,7 @@ progress {
 .typeahead,
 .tt-query,
 .tt-hint {
-    display: block;
+    display: block!important;
     width: 100%;
     /* padding: 0.875rem 1.375rem; */
     padding: .4375rem 0;

@@ -15,6 +15,9 @@ function findModel(makeName, carModel = null) {
             type: "GET",
             data: { format: "json", data: "3GNDA13D76S000000;5XYKT3A12CG000000;" },
             dataType: "json",
+            beforeSend:  function(){
+                modelSelect.attr('disabled', true)
+            },
             success: function (result) {
                 // console.log(result);
                 // Append the models to select element.
@@ -27,6 +30,7 @@ function findModel(makeName, carModel = null) {
                 })
 
                 modelSelect.trigger("change");
+                modelSelect.attr('disabled', false)
 
                 // modelSelect.empty().append(function () {
                 //     var output = '<option value="">Select One</option>';
