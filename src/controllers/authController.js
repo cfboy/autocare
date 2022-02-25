@@ -39,21 +39,35 @@ exports.createAccount = async (req, res) => {
  * @param {*} res 
  */
 exports.createSubscriptions = async (req, res) => {
-    let { message, alertType } = req.session
-    // clear message y alertType
-    req.session.message = ''
-    req.session.alertType = ''
+    try {
+        let { message, alertType } = req.session
+        // clear message y alertType
+        req.session.message = ''
+        req.session.alertType = ''
 
-    let user = req.user
-    const apiRoute = 'GetAllMakes?format=json'
-    const apiResponse = await fetch(
-        'https://vpic.nhtsa.dot.gov/api/vehicles/' + apiRoute
-    )
-    const apiResponseJSON = await apiResponse.json()
+        let user = req.user
+        const apiRoute = 'GetAllMakes?format=json'
+        const apiResponse = await fetch(
+            'https://vpic.nhtsa.dot.gov/api/vehicles/' + apiRoute
+        )
+        let apiResponseJSON
+        let allMakes = []
 
-    const prices = await Stripe.getAllPrices()
+        if (apiResponse.ok) {
+            apiResponseJSON = await apiResponse.json()
+            allMakes = apiResponseJSON?.Results
+        }
 
-    res.render('auth/createSubs.ejs', { message, alertType, user, allMakes: apiResponseJSON.Results, allModels: [], prices })
+        const prices = await Stripe.getAllPrices()
+
+        res.render('auth/createSubs.ejs', { message, alertType, user, allMakes: allMakes, allModels: [], prices })
+    }
+    catch (error) {
+        console.error(error)
+        req.session.message = error.message
+        req.session.alertType = alertTypes.ErrorAlert
+        res.redirect('/account')
+    }
 }
 
 /**
