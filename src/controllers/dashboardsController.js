@@ -46,14 +46,14 @@ exports.account = async (req, res) => {
         params = { user, prices, message, alertType }
 
         if (user.billingID) {
-            user = await Stripe.setStripeInfoToUser(user, prices)
+            user = await Stripe.setStripeInfoToUser(user)
         }
         params = {
             ...params,
             subscriptions: user?.subscriptions
         }
 
-        if (user.subscriptions.length < 1 && user.role ==! ROLES.ADMIN) {
+        if (user.subscriptions.length < 1 && user.role !== ROLES.ADMIN) {
             req.flash('warning', 'Need to add a car to continue whit the process.')
             res.redirect('/create-subscriptions')
         } else {
