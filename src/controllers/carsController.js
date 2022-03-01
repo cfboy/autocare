@@ -3,6 +3,7 @@ const CarService = require('../collections/cars')
 const HistoryService = require('../collections/history')
 const { historyTypes } = require('../collections/history/history.model')
 const alertTypes = require('../helpers/alertTypes')
+const Stripe = require('../connect/stripe')
 const { canDeleteCar,
     canManageCars,
     canEditCar,
@@ -109,6 +110,7 @@ exports.view = async (req, res) => {
 // TODO: change this method to new logic.
 exports.create = async (req, res) => {
     let { message, alertType } = req.session
+    let user = req.user
     // clear message y alertType
     req.session.message = ''
     req.session.alertType = ''
@@ -116,7 +118,18 @@ exports.create = async (req, res) => {
     try {
         let { allMakes, allModels } = await CarService.getAllMakes()
 
-        res.render('cars/create.ejs', { user: req.user, allMakes, allModels, message, alertType })
+        let siToAddCar = []
+
+        for (subscriptions of user.subscriptions) {
+            for (item of subscriptions.items) {
+                if (item.cars.length === 0) {
+                    let stripeItem = await Stripe.getSubscriptionItemById(item.id)
+                    siToAddCar.push(stripeItem)
+                }
+            }
+        }
+
+        res.render('cars/create.ejs', { user, allMakes, allModels, siToAddCar, message, alertType })
 
     } catch (error) {
         console.log(error)
@@ -163,7 +176,7 @@ exports.save = async (req, res) => {
         console.debug(`A new car added to DB. ID: ${car.id}.`)
 
         // Add car to user
-        let user = await UserService.addUserCar(req.user.id, car)
+        let user = await UserService.addUserCar(req.user.id, car, fields.subItem.split('/')[0], fields.subItem.split('/')[1])
 
         req.session.message = `New Car:  ${car.brand} - ${car.model} - ${car.plate}.`
         req.session.alertType = alertTypes.CompletedActionAlert

@@ -24,7 +24,7 @@ const groupByKey = (list, key, { omitKey = false }) =>
  * @returns 
  */
 exports.webhook = async (req, res) => {
-    //    TODO: implement all necessary webhooks
+    // TODO: implement all necessary webhooks
     let event
 
     try {

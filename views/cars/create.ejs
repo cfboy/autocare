@@ -49,6 +49,24 @@
                                             <form id="form-create-car" class="pt-3" action="/create-car" method="post">
                                                 <input id="userID" name="userID" value="<%= user.id%>" hidden />
                                                 <div class="row">
+                                                    <% if(siToAddCar.length > 0) { %>
+                                                    <div class="col-lg-12">
+                                                        <div class="form-group">
+                                                            <label for="subItem" class="required">Membership to add a
+                                                                Car</label>
+
+                                                            <select id="subItem" name="subItem" required autofocus
+                                                                class="form-control mb-3 form-control-lg js-example-basic-single w-100">
+                                                                <option value="">Select One</option>
+                                                                <% for(item of siToAddCar) { %>
+                                                                <option value="<%= item.subscription%>/<%= item.id%>">
+                                                                    <%= item.price.product.name%></option>
+                                                                <% } %>
+
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <% } %>
                                                     <%- include('./formFields.ejs', {allMakes, car: null}); %>
                                                 </div>
                                                 <div class="row">

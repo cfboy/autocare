@@ -54,6 +54,11 @@ const createBillingSession = async (customer) => {
     return session
 }
 
+/**
+ * This function get the session by id.
+ * @param {*} sessionID 
+ * @returns 
+ */
 const getSessionByID = async (sessionID) => {
 
     const session = await Stripe.checkout.sessions.retrieve(sessionID);
@@ -394,6 +399,19 @@ async function getSubscriptionById(id) {
     return subscription
 }
 
+/**
+ * This function get a subsctiption item by id.
+ * @returns subscription item
+ */
+async function getSubscriptionItemById(id) {
+    const subscriptionItem = await Stripe.subscriptionItems.retrieve(id,
+        {
+            expand: ['price.product']
+        })
+
+    return subscriptionItem
+}
+
 module.exports = {
     STATUS,
     getCustomerByID,
@@ -412,5 +430,6 @@ module.exports = {
     getCustomerCharges,
     setStripeInfoToUser,
     getAllSubscriptions,
-    getSubscriptionById
+    getSubscriptionById,
+    getSubscriptionItemById
 }

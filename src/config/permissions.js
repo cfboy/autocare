@@ -21,20 +21,24 @@ function canDeleteUser(user) {
 function canDeleteCar(user, carID) {
     return (
         user.role === ROLES.ADMIN ||
-        user.subscriptions.find(subs => subs.items.find(item => item.cars.some(car => car == carID)))
+        (user.subscriptions.find(subs => subs.items.find(item => item.cars.some(car => car.id == carID)))
+            && user.services.length == 0)
     )
 }
 
 function canAddCar(user) {
     return (
-        [ROLES.ADMIN].includes(user.role) || user?.cars?.length < 1
-    )
+        [ROLES.ADMIN].includes(user.role) ||
+        user.subscriptions.some(subs => subs.items.some(item => item.cars.length === 0))
+            //  user?.cars?.length < 1
+        )
 }
 
 function canEditCar(user, carID) {
     return (
         [ROLES.ADMIN, ROLES.MANAGER].includes(user.role) ||
-        user.subscriptions.find(subs => subs.items.find(item => item.cars.some(car => car.id == carID)))
+        (user.subscriptions.find(subs => subs.items.find(item => item.cars.some(car => car.id == carID)))
+            && user.services.length == 0)
     )
 }
 

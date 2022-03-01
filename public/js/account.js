@@ -6,27 +6,6 @@ $(document).ready(function () {
     const useServiceButton = $('#use-service-button')
     const checkoutBtn = $('#checkout-btn'); //New checkout btn
 
-    // TODO: delete this.
-    // checkoutButton.click(function () {
-    //     const product = $("input[name='product']:checked").val()
-    //     const billingID = $(this).attr("value");
-    //     const email = $(this).attr("email");
-
-    //     fetch('/checkout', {
-    //         method: 'POST',
-    //         headers: {
-    //             'Content-Type': 'application/json',
-    //             'email': email
-    //         },
-    //         body: JSON.stringify({
-    //             product,
-    //             customerID: billingID
-    //         })
-    //     })
-    //         .then((result) => result.json())
-    //         .then(({ sessionId }) => stripe.redirectToCheckout({ sessionId }))
-    // })
-
     manageBillingButton.click(function () {
         const billingID = $(this).attr("value");
         const email = $(this).attr("email");

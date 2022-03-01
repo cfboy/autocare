@@ -98,17 +98,20 @@ const removeUserLocation = (User) => async (id, location) => {
  * @returns User
  */
 // TODO: change this method
-const addUserCar = (User) => async (id, car) => {
+const addUserCar = (User) => async (id, car, sub, subItemID) => {
     console.log(`addUserCar() ID: ${id}`)
     // findByIdAndUpdate returns the user
     // updateOne is more quickly but not return the user.
-    return await User.findByIdAndUpdate({ _id: id }, { $addToSet: { cars: car } }, function (err, doc) {
-        if (err) {
-            console.error(err.message)
-        } else {
-            console.debug("Car Added to: ", doc.email);
-        }
-    }).populate({ path: 'subscriptions.items.cars', model: 'car' })
+    return await User.findByIdAndUpdate({ _id: id },
+        { $addToSet: { "subscriptions.$[sub].items.$[item].cars": car } },
+        { "arrayFilters": [{ "sub.id": sub }, { "item.id": subItemID }] },
+        function (err, doc) {
+            if (err) {
+                console.error(err.message)
+            } else {
+                console.debug("Car Added to: ", doc.email);
+            }
+        }).populate({ path: 'subscriptions.items.cars', model: 'car' })
 }
 
 /**
