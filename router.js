@@ -117,6 +117,8 @@ router.get('/charges', checkAuthenticated, stripeController.charges)
 router.post('/webhook', stripeController.webhook)
 
 router.post('/checkout', checkAuthenticated, stripeController.checkout)
+router.get('/completeCheckoutSuccess', checkAuthenticated, stripeController.completeCheckoutSuccess)
+
 router.get('/stripeCheckout', stripeController.stripeCheckout)
 router.post('/billing', checkAuthenticated, stripeController.billing)
 

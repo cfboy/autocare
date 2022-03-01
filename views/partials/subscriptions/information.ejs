@@ -16,10 +16,20 @@
         </thead>
         <tbody>
             <tr>
-                <td>Plan</td>
+                <td>Products/Cars</td>
                 <td>
-                    <%- stripeSubscription?.product?.name%>
-
+                    <% for(item of stripeSubscription.items.data) { %>
+                    <p>
+                        <b><%- item.price.product.name %></b>
+                    </p>
+                    <ul class="mb-0">
+                        <% for(car of item.cars) { %>
+                        <li style="margin-left: 10px">
+                            <%- car.brand %> - <%- car.model %> - <%- car.plate %>
+                        </li>
+                        <% } %>
+                    </ul>
+                    <% } %>
                 </td>
             </tr>
             <tr>

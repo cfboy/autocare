@@ -9,7 +9,7 @@ const { canDeleteCar,
     canAddCar
 } = require('../config/permissions')
 
-const fetch = require('node-fetch'); 
+const fetch = require('node-fetch');
 //Use node-fetch to call externals API. 
 //Use v2.0 to use the module in code (for versions prior to version):
 
@@ -36,7 +36,17 @@ exports.cars = async (req, res) => {
         if (!user) {
             res.redirect('/')
         } else {
-            cars = await CarService.getCars(user.cars)
+            let userCars = []
+            for (customerSub of user.subscriptions) {
+                // Iterates the items on DB subscription.
+                for (customerItem of customerSub.items) {
+                    // then iterates cars in DB item.
+                    for (car of customerItem.cars) {
+                        userCars.push(car)
+                    }
+                }
+            }
+            cars = await CarService.getCars(userCars)
 
             res.render('cars/index.ejs', {
                 user, cars, message, alertType,

@@ -17,13 +17,14 @@ const Stripe = stripe(process.env.STRIPE_SECRET_KEY, {
     apiVersion: '2020-08-27'
 })
 
-const createCheckoutSession = async (customerID, subscriptions) => {
+const createCheckoutSession = async (customerID, subscriptions, subscriptionsEntries) => {
     let items = [];
-    if (subscriptions) {
+    let cars_price = subscriptions;
+    if (subscriptionsEntries) {
         // Prepare items to create a session.
         // The first position [0] has the priceID (divided by groups)
         // The second position [1] has the list of cars per priceID.
-        for (sub of subscriptions) {
+        for (sub of subscriptionsEntries) {
             items.push({ price: sub[0], quantity: sub[1].length })
         }
     }
@@ -33,12 +34,12 @@ const createCheckoutSession = async (customerID, subscriptions) => {
         payment_method_types: ['card'],
         customer: customerID,
         line_items: items,
-        // TODO: Add car on metadata
-        // subscription_data: {
-        //     trial_period_days: process.env.TRIAL_DAYS
-        // },
-
-        success_url: `${process.env.DOMAIN}?session_id={CHECKOUT_SESSION_ID}`,
+        subscription_data: {
+            metadata: {
+                cars: JSON.stringify(cars_price)
+            }
+        },
+        success_url: `${process.env.DOMAIN}/completeCheckoutSuccess?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${process.env.DOMAIN}`
     })
 
@@ -50,6 +51,13 @@ const createBillingSession = async (customer) => {
         customer,
         return_url: `${process.env.DOMAIN}`
     })
+    return session
+}
+
+const getSessionByID = async (sessionID) => {
+
+    const session = await Stripe.checkout.sessions.retrieve(sessionID);
+
     return session
 }
 
@@ -231,28 +239,28 @@ const getProductInfoById = async (id) => {
 }
 
 
-/**
- * This function que the customer subscriptions.
- * @param {*} customerID 
- * @returns subscription list
- */
-const getCustomerSubscription = async (customerID) => {
-    try {
-        console.debug(`STRIPE: getCustomerSubscription(${customerID})`);
-        const subscription = await Stripe.subscriptions.list({
-            customer: customerID,
-            limit: 3
-        });
-        console.debug(`STRIPE: Subscription Found`);
+// /**
+//  * This function que the customer subscriptions.
+//  * @param {*} customerID 
+//  * @returns subscription list
+//  */
+// const getCustomerSubscription = async (customerID) => {
+//     try {
+//         console.debug(`STRIPE: getCustomerSubscription(${customerID})`);
+//         const subscription = await Stripe.subscriptions.list({
+//             customer: customerID,
+//             limit: 3
+//         });
+//         console.debug(`STRIPE: Subscription Found`);
 
-        return subscription
-    } catch (error) {
-        console.debug(`ERROR-STRIPE: Stripe Subscription Not Found`);
-        console.debug(`ERROR-STRIPE: ${error.message}`);
+//         return subscription
+//     } catch (error) {
+//         console.debug(`ERROR-STRIPE: Stripe Subscription Not Found`);
+//         console.debug(`ERROR-STRIPE: ${error.message}`);
 
-        return null
-    }
-}
+//         return null
+//     }
+// }
 /**
  * This function get the customer events on stripe.
  * @param {*} customerID 
@@ -318,12 +326,10 @@ const getCustomerCharges = async (user) => {
  * @returns customer object
  */
 
-const setStripeInfoToUser = async (customerObj, prices) => {
+const setStripeInfoToUser = async (customerObj) => {
     try {
         let customer = customerObj
         customer.hasSubscription = false
-        customer.subscriptions = [{ id: 'sub_1KONCJL5YqSpFl3KeyUCy7GN', car: '62047cbf4bb764559852af53' },
-        { id: 'sub_1KW9tZL5YqSpFl3KE5fOJOgh', car: '62047cbf4bb764559852af53' }]
         if (customer.subscriptions.length > 0) {
             customer.hasSubscription = true
 
@@ -331,11 +337,24 @@ const setStripeInfoToUser = async (customerObj, prices) => {
                 subscription.data = await getSubscriptionById(subscription.id)
 
                 if (subscription.data) {
-                    if (!prices)
-                        prices = await getAllPrices()
-                    // find Product on this sub.
-                    // Set the product variables on data to easy access.
-                    subscription.data.product = prices.find(({ product }) => product.id === subscription.data.plan.product).product
+                    // TODO: Optimize this logic.
+                    // this for loop iterates: Stripe info.
+                    for (item of subscription.data.items.data) {
+                        let itemCars = []
+                        // Iterates the DB customer.subscriptions.
+                        for (customerSub of customer.subscriptions) {
+                            // Iterates the items on DB subscription.
+                            for (customerItem of customerSub.items) {
+                                // If the item match with stripe subs item, then iterates cars in DB item.
+                                if (customerItem.id === item.id) {
+                                    for (car of customerItem.cars) {
+                                        itemCars.push(car)
+                                    }
+                                }
+                            }
+                        }
+                        item.cars = itemCars
+                    }
                 }
             }
         }
@@ -367,7 +386,10 @@ async function getAllSubscriptions() {
  * @returns subscriptions list
  */
 async function getSubscriptionById(id) {
-    const subscription = await Stripe.subscriptions.retrieve(id)
+    const subscription = await Stripe.subscriptions.retrieve(id,
+        {
+            expand: ['items.data.price.product']
+        })
 
     return subscription
 }
@@ -377,6 +399,7 @@ module.exports = {
     getCustomerByID,
     getCustomerByEmail,
     addNewCustomer,
+    getSessionByID,
     createCheckoutSession,
     createBillingSession,
     createWebhook,
@@ -384,7 +407,7 @@ module.exports = {
     getAllPrices,
     getProductPrice,
     getProductInfoById,
-    getCustomerSubscription,
+    // getCustomerSubscription,
     getCustomerEvents,
     getCustomerCharges,
     setStripeInfoToUser,

@@ -32,19 +32,10 @@
                         <!-- Loop of subscriptions -->
                         <% for(stripeSubscription of subscriptions) { %>
 
-                        <p class="lead">
-                            You are currently on the <b><%- stripeSubscription?.data?.product.name %></b> plan.
-                        </p>
-                        <br>
-                        <p class="lead">Plan will end on
-                            <%= moment(stripeSubscription?.data?.current_period_end * 1000).isValid() ? moment(stripeSubscription?.data?.current_period_end * 1000).format(completeDateFormat) : 'N/A' %>
-                        </p>
-                        <hr />
-
                         <%- include('./information.ejs' , {showManageBtn : false, customer : user, stripeSubscription: stripeSubscription.data, membershipStatus : stripeSubscription?.data?.status}); %>
 
                         <hr />
-
+                        <br>
                         <% } %>
                         <p class="mt-4 text-muted">
                             Not happy with your current plan? Cancel or Upgrade by clicking the

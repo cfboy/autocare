@@ -1,5 +1,6 @@
 const Stripe = require('../connect/stripe')
-// const UserService = require('../collections/user')
+const CarService = require('../collections/cars')
+const UserService = require('../collections/user')
 // const { ROLES } = require('../collections/user/user.model')
 const alertTypes = require('../helpers/alertTypes')
 
@@ -143,7 +144,7 @@ exports.checkout = async (req, res) => {
     try {
         // Group by priceID
         const subscriptionsGroup = groupByKey(subscriptions, 'priceID', { omitKey: false })
-        const session = await Stripe.createCheckoutSession(customerID, Object.entries(subscriptionsGroup))
+        const session = await Stripe.createCheckoutSession(customerID, subscriptions, Object.entries(subscriptionsGroup))
         // res.redirect(session.url)
         res.send({
             sessionId: session.id
@@ -156,6 +157,52 @@ exports.checkout = async (req, res) => {
                 message: e.message
             }
         })
+    }
+}
+
+exports.completeCheckoutSuccess = async (req, res) => {
+    try {
+        let { session_id, subscription_id } = req.query,
+            session, subscriptionID
+
+        if (session_id) {
+            console.debug("sessionID: " + session_id)
+            session = await Stripe.getSessionByID(session_id)
+            console.log(session)
+            subscriptionID = session.subscription
+        }
+        if (subscription_id) {
+            subscriptionID = subscription_id
+        }
+
+        const subscription = await Stripe.getSubscriptionById(subscriptionID)
+        const cars = JSON.parse(subscription.metadata.cars)
+
+        let subscriptionItems = subscription.items.data
+        let items = []
+        for (subItem of subscriptionItems) {
+            let newItem = { id: subItem.id, cars: [] }
+            for (carObj of cars) {
+                if (subItem.price.id === carObj.priceID) {
+                    let newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate)
+                    newItem.cars.push(newCar)
+                }
+
+            }
+            items.push(newItem)
+        }
+
+        // let customer = await UserService.getUserByBillingID(subscription.customer)
+        let customer = await UserService.addSubscriptionToUser(subscription.customer, { id: subscription.id, items: items })
+
+        res.redirect('/account')
+
+    }
+    catch (error) {
+        console.log(error.message)
+        req.session.message = error.message
+        req.session.alertType = alertTypes.ErrorAlert
+        res.status(400).redirect('/account')
     }
 }
 

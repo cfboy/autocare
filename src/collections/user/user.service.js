@@ -108,7 +108,7 @@ const addUserCar = (User) => async (id, car) => {
         } else {
             console.debug("Car Added to: ", doc.email);
         }
-    }).populate('cars')
+    }).populate({ path: 'subscriptions.items.cars', model: 'car' })
 }
 
 /**
@@ -126,6 +126,25 @@ const removeUserCar = (User) => async (id, car) => {
         }
     })
 }
+
+/**
+ * This function add a new subs to user.
+ * @param {id, location} User 
+ * @returns User
+ */
+const addSubscriptionToUser = (User) => async (billingID, subscription) => {
+    console.log(`addSubscriptionToUser() billingID: ${billingID}`)
+    // Set new: true to return the updated document.
+    return await User.findOneAndUpdate({ billingID: billingID }, { $addToSet: { subscriptions: subscription } },
+        { new: true }, function (err, doc) {
+            if (err) {
+                console.error(err.message)
+            } else {
+                console.debug("Subscription Added : ", doc.email);
+            }
+        }).populate({ path: 'subscriptions.items.cars', model: 'car' })
+}
+
 // TODO: maybe need delete customer on Stripe 
 /**
  * This function delete the user on DB.
@@ -150,7 +169,7 @@ const deleteUser = (User) => (id) => {
  * @returns 
  */
 const getUsers = (User) => (userID) => {
-    return User.find({ _id: { $ne: userID } }).populate('location')
+    return User.find({ _id: { $ne: userID } }).populate('locations')
 }
 
 /**
@@ -159,7 +178,7 @@ const getUsers = (User) => (userID) => {
  * @returns user
  */
 const getUsersPerRole = (User) => (req, role) => {
-    return User.find({ role: role }).populate('location')
+    return User.find({ role: role }).populate('locations')
 }
 
 /**
@@ -168,7 +187,7 @@ const getUsersPerRole = (User) => (req, role) => {
  * @returns user
  */
 const getUsersPerRoles = (User) => (roles) => {
-    return User.find({ role: { $in: roles } }).populate('location')
+    return User.find({ role: { $in: roles } }).populate('locations')
 }
 
 /**
@@ -185,7 +204,7 @@ const getUserById = (User) => (id) => {
         } else {
             console.debug("USER-SERVICE: Found user to edit: ", docs);
         }
-    }).populate('location').populate('cars')
+    }).populate('locations').populate({ path: 'subscriptions.items.cars', model: 'car' })
 }
 
 /**
@@ -196,7 +215,7 @@ const getUserById = (User) => (id) => {
 const getUserByEmail = (User) => async (email) => {
     console.log(`getUserByEmail(): ${email}`)
 
-    return await User.findOne({ email })
+    return await User.findOne({ email }).populate({ path: 'subscriptions.items.cars', model: 'car' })
 }
 
 /**
@@ -304,6 +323,7 @@ module.exports = (User) => {
         removeUserLocation: removeUserLocation(User),
         addUserCar: addUserCar(User),
         removeUserCar: removeUserCar(User),
+        addSubscriptionToUser: addSubscriptionToUser(User),
         deleteUser: deleteUser(User),
         getUsers: getUsers(User),
         getUsersPerRole: getUsersPerRole(User),

@@ -20,7 +20,8 @@ function canDeleteUser(user) {
 
 function canDeleteCar(user, carID) {
     return (
-        user.role === ROLES.ADMIN || user?.cars?.includes(carID)
+        user.role === ROLES.ADMIN ||
+        user.subscriptions.find(subs => subs.items.find(item => item.cars.some(car => car == carID)))
     )
 }
 
@@ -32,7 +33,8 @@ function canAddCar(user) {
 
 function canEditCar(user, carID) {
     return (
-        [ROLES.ADMIN, ROLES.MANAGER].includes(user.role) || user?.cars?.includes(carID)
+        [ROLES.ADMIN, ROLES.MANAGER].includes(user.role) ||
+        user.subscriptions.find(subs => subs.items.find(item => item.cars.some(car => car.id == carID)))
     )
 }
 

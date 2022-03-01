@@ -17,8 +17,12 @@ const userSchema = new Schema({
     hasAllInformation: { type: Boolean, default: false },
     created_date: { type: Date, default: Date.now },
     subscriptions: [{
-        id: String,
-        car: { type: Schema.Types.ObjectId, ref: 'car', default: null }
+        id: String, //Subscription ID
+        items: [{
+            id: String, //Subscription Item ID
+            // priceID: String,
+            cars: [{ type: Schema.Types.ObjectId, ref: 'car', default: null }]
+        }]
     }],
     personalInfo: {
         firstName: String,
@@ -34,7 +38,6 @@ const userSchema = new Schema({
         location: { type: Schema.Types.ObjectId, ref: 'location', default: null },
         authorizedBy: { type: Schema.Types.ObjectId, ref: 'user', default: null },
     }],
-    cars: [{ type: Schema.Types.ObjectId, ref: 'car', default: null }]
 })
 
 const User = mongoose.model('user', userSchema, 'user')

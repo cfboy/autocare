@@ -34,19 +34,24 @@ const getCarByID = (Car) => async (carID) => {
  * @returns car object
  */
 const addCar = (Car) => async (brand, model, plate) => {
-    if (!brand || !model  || !plate) {
-        throw new Error(`Missing Data. Please provide all data for car.`)
+    try {
+        if (!brand || !model || !plate) {
+            throw new Error(`Missing Data. Please provide all data for car.`)
+        }
+
+        console.log(`CAR-SERVICE: addCar(${brand})`)
+
+        const car = new Car({
+            brand,
+            model,
+            plate
+        })
+
+        return await car.save()
+    } catch (error) {
+        console.log(`ERROR: CAR-SERVICE: addCar()`)
+        return null
     }
-
-    console.log(`CAR-SERVICE: addCar(${brand})`)
-
-    const car = new Car({
-        brand,
-        model,
-        plate
-    })
-
-    return await car.save()
 }
 
 /**
