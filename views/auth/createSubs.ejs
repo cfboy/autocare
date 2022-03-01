@@ -53,54 +53,7 @@
                                     <form id="form-subscriptions" class="pt-3" method="post">
                                         <div class="row">
                                             <input id="userID" name="userID" value="<%= user.id%>" hidden />
-                                            <div class="col-lg-12">
-                                                <div class="form-group">
-                                                    <label for="carBrand" class="required">Car
-                                                        Brand</label>
-                                                    <% if(allMakes.length == 0) { %>
-                                                    <input type="text" id="brand" name="brand"
-                                                        class="form-control mb-3 form-control-lg text-uppercase"
-                                                        placeholder="Brand" autofocus required />
-                                                    <% } else { %>
-                                                    <select id="brand" name="brand" required autofocus
-                                                        onchange="findModel(this.value)"
-                                                        class="form-control mb-3 form-control-lg js-example-basic-single w-100">
-                                                        <option value="">Select One</option>
-                                                        <% for(const make of allMakes) { %>
-                                                        <option value="<%= make.Make_Name%>">
-                                                            <%= make.Make_Name%>
-                                                        </option>
-                                                        <% } %>
-                                                    </select>
-                                                    <% } %>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-12">
-                                                <div class="form-group">
-                                                    <label for="carModel" class="required">Car Model</label>
-                                                    <% if(allMakes.length == 0) { %>
-                                                    <input type="text" id="carModel" name="model"
-                                                        class="form-control mb-3 form-control-lg text-uppercase"
-                                                        placeholder="Model" autofocus required />
-                                                    <% } else { %>
-                                                    <select id="carModel" name="model" required autofocus
-                                                        class="form-control mb-3 form-control-lg js-example-basic-single w-100">
-                                                        <option value="">Select One</option>
-
-                                                    </select>
-                                                    <% } %>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-12">
-                                                <div class="form-group">
-                                                    <label for="carPlate" class="required">Car
-                                                        Plate</label>
-
-                                                    <input type="text" id="carPlate" name="plate"
-                                                        class="form-control mb-3 form-control-lg text-uppercase"
-                                                        placeholder="Car Plate" autofocus required />
-                                                </div>
-                                            </div>
+                                            <%- include('../cars/formFields.ejs', {allMakes, car: null}); %>
 
                                             <div class="col-lg-12">
                                                 <div class="form-group">
@@ -190,8 +143,6 @@
     <script src="../../js/off-canvas.js"></script>
     <script src="../../js/hoverable-collapse.js"></script>
     <script src="../../js/template.js"></script>
-    <script src="../js/cars.js"></script>
-    <script src="../js/helper-functions.js"></script>
 
     <!-- endinject -->
     <!-- Custom js for this page-->
@@ -202,7 +153,8 @@
     <script src="../../js/select2.js"></script>
     <script type="text/javascript" src="https://js.stripe.com/v3/"></script>
     <script type="text/javascript" src="../js/account.js"></script>
-
+    <script src="../js/helper-functions.js"></script>
+    
     <!-- End custom js for this page-->
 
     <script>

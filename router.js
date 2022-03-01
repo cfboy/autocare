@@ -24,15 +24,17 @@ const { checkAuthenticated,
     authChangePassword } = require('./src/middleware/authFunctions')
 
 // Main Route
-
-router.get('/home', dashboardsController.home)
-
 router.get('/', checkAuthenticated, (req, res) => {
     res.redirect('/account')
 })
 
 //------ Dashboard Routes ------
+
+router.get('/home', dashboardsController.home)
+
 router.get('/account', checkAuthenticated, dashboardsController.account)
+
+router.get('/create-subscriptions', checkAuthenticated, dashboardsController.createSubscriptions)
 
 //------ Auth Routes ------
 
@@ -53,9 +55,8 @@ router.post('/login', checkNotAuthenticated, authController.login)
 
 router.get('/create-account', checkNotAuthenticated, authController.createAccount)
 
-router.get('/create-subscriptions', checkAuthenticated, authController.createSubscriptions)
-
 router.post('/register', checkNotAuthenticated, authController.register)
+
 router.delete('/logout', checkAuthenticated, authController.logout)
 
 //------ History Routes ------
@@ -117,9 +118,11 @@ router.get('/charges', checkAuthenticated, stripeController.charges)
 router.post('/webhook', stripeController.webhook)
 
 router.post('/checkout', checkAuthenticated, stripeController.checkout)
+
 router.get('/completeCheckoutSuccess', checkAuthenticated, stripeController.completeCheckoutSuccess)
 
 router.get('/stripeCheckout', stripeController.stripeCheckout)
+
 router.post('/billing', checkAuthenticated, stripeController.billing)
 
 // ---------------------------------------

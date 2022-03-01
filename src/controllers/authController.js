@@ -5,7 +5,6 @@ const alertTypes = require('../helpers/alertTypes')
 const bcrypt = require('bcrypt');
 const passport = require('passport')
 const { municipalities } = require('../helpers/municipalities');
-const fetch = require('node-fetch');
 
 require("../config/passport");
 require("../config/local");
@@ -34,49 +33,11 @@ exports.createAccount = async (req, res) => {
 }
 
 /**
- * This function render the create subscriptions form.
- * @param {*} req 
- * @param {*} res 
- */
-exports.createSubscriptions = async (req, res) => {
-    try {
-        let { message, alertType } = req.session
-        // clear message y alertType
-        req.session.message = ''
-        req.session.alertType = ''
-
-        let user = req.user
-        const apiRoute = 'GetAllMakes?format=json'
-        const apiResponse = await fetch(
-            'https://vpic.nhtsa.dot.gov/api/vehicles/' + apiRoute
-        )
-        let apiResponseJSON
-        let allMakes = []
-
-        if (apiResponse.ok) {
-            apiResponseJSON = await apiResponse.json()
-            allMakes = apiResponseJSON?.Results
-        }
-
-        const prices = await Stripe.getAllPrices()
-
-        res.render('auth/createSubs.ejs', { message, alertType, user, allMakes: allMakes, allModels: [], prices })
-    }
-    catch (error) {
-        console.error(error)
-        req.session.message = error.message
-        req.session.alertType = alertTypes.ErrorAlert
-        res.redirect('/account')
-    }
-}
-
-/**
  * This function verify if the user exist on the DB, if not then create new user. 
  * @param {*} req 
  * @param {*} res 
  */
 exports.register = async (req, res) => {
-    // TODO: Optimize this method.
     try {
         const {
             email,

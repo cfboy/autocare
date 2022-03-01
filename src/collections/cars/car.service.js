@@ -1,3 +1,7 @@
+//Use node-fetch to call externals API. 
+//Use v2.0 to use the module in code (for versions prior to version):
+const fetch = require('node-fetch');
+
 /**
  * This function get all cars on db.
  * @param {} Car 
@@ -104,6 +108,25 @@ const getCarByPlate = (Car) => async (plate) => {
         }
     })
 }
+/**
+ * This function get all makes from external API.
+ * @returns 
+ */
+async function getAllMakes() {
+    const apiRoute = 'GetAllMakes?format=json'
+    const apiResponse = await fetch(
+        'https://vpic.nhtsa.dot.gov/api/vehicles/' + apiRoute
+    )
+    let apiResponseJSON
+    let allMakes = [], allModels = []
+
+    if (apiResponse.ok) {
+        apiResponseJSON = await apiResponse.json()
+        allMakes = apiResponseJSON?.Results
+    }
+
+    return { allMakes, allModels }
+}
 
 module.exports = (Car) => {
     return {
@@ -112,6 +135,7 @@ module.exports = (Car) => {
         addCar: addCar(Car),
         updateCar: updateCar(Car),
         deleteCar: deleteCar(Car),
-        getCarByPlate: getCarByPlate(Car)
+        getCarByPlate: getCarByPlate(Car),
+        getAllMakes: getAllMakes
     }
 }

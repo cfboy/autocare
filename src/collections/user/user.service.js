@@ -38,7 +38,6 @@ const addUser = (User) => async ({
     return await user.save()
 }
 
-// TODO: Finish this
 /**
  * This function updates the user properties.
  * @param {*} User 
@@ -98,6 +97,7 @@ const removeUserLocation = (User) => async (id, location) => {
  * @param {id, car} User 
  * @returns User
  */
+// TODO: change this method
 const addUserCar = (User) => async (id, car) => {
     console.log(`addUserCar() ID: ${id}`)
     // findByIdAndUpdate returns the user

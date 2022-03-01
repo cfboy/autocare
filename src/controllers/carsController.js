@@ -9,10 +9,6 @@ const { canDeleteCar,
     canAddCar
 } = require('../config/permissions')
 
-const fetch = require('node-fetch');
-//Use node-fetch to call externals API. 
-//Use v2.0 to use the module in code (for versions prior to version):
-
 /**
  * This function render all cars of current user.
  *
@@ -110,6 +106,7 @@ exports.view = async (req, res) => {
  * @param {*} req 
  * @param {*} res 
  */
+// TODO: change this method to new logic.
 exports.create = async (req, res) => {
     let { message, alertType } = req.session
     // clear message y alertType
@@ -117,15 +114,9 @@ exports.create = async (req, res) => {
     req.session.alertType = ''
 
     try {
-        const apiRoute = 'GetAllMakes?format=json'
-        const apiResponse = await fetch(
-            'https://vpic.nhtsa.dot.gov/api/vehicles/' + apiRoute
-        )
-        const apiResponseJSON = await apiResponse.json()
-        // await db.collection('collection').insertOne(apiResponseJson)
-        console.log(apiResponseJSON)
-        // res.send('Done – check console log')
-        res.render('cars/create.ejs', { user: req.user, allMakes: apiResponseJSON.Results, allModels: [], message, alertType })
+        let { allMakes, allModels } = await CarService.getAllMakes()
+
+        res.render('cars/create.ejs', { user: req.user, allMakes, allModels, message, alertType })
 
     } catch (error) {
         console.log(error)
@@ -145,13 +136,8 @@ exports.edit = async (req, res) => {
             car = await CarService.getCarByID(carID)
 
         if (car) {
-            const apiRoute = 'GetAllMakes?format=json'
-            const apiResponse = await fetch(
-                'https://vpic.nhtsa.dot.gov/api/vehicles/' + apiRoute
-            )
-            const apiResponseJSON = await apiResponse.json()
-            // console.log(apiResponseJSON)
-            res.status(200).render('cars/edit.ejs', { user: req.user, car, allMakes: apiResponseJSON.Results, url: (url == '/cars' || url == '/account') ? url : `${url}/${carID}` })
+            let { allMakes, allModels } = await CarService.getAllMakes()
+            res.status(200).render('cars/edit.ejs', { user: req.user, car, allMakes, allModels, url: (url == '/cars' || url == '/account') ? url : `${url}/${carID}` })
         }
 
     } catch (error) {
@@ -179,7 +165,7 @@ exports.save = async (req, res) => {
         // Add car to user
         let user = await UserService.addUserCar(req.user.id, car)
 
-        req.session.message = `New Car: ${car.model} - ${car.brand} - ${car.plate}.`
+        req.session.message = `New Car:  ${car.brand} - ${car.model} - ${car.plate}.`
         req.session.alertType = alertTypes.CompletedActionAlert
         req.flash('info', 'Car created.')
         res.redirect('/cars')

@@ -95,6 +95,33 @@ exports.account = async (req, res) => {
 }
 
 /**
+ * This function render the create subscriptions form.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.createSubscriptions = async (req, res) => {
+    try {
+        let { message, alertType } = req.session
+        // clear message y alertType
+        req.session.message = ''
+        req.session.alertType = ''
+
+        let user = req.user
+        let {allMakes, allModels} = await CarService.getAllMakes()
+
+        const prices = await Stripe.getAllPrices()
+
+        res.render('auth/createSubs.ejs', { message, alertType, user, allMakes, allModels, prices })
+    }
+    catch (error) {
+        console.error(error)
+        req.session.message = error.message
+        req.session.alertType = alertTypes.ErrorAlert
+        res.redirect('/account')
+    }
+}
+
+/**
  * This function render the validateMembership template. 
  * @param {*} req 
  * @param {*} res 

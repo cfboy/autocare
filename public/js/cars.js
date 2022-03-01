@@ -4,19 +4,20 @@ function findModel(makeName, carModel = null) {
     let modelSelect = $('#carModel'); //Get the Select element of the Car Model.
 
     if (makeName === '') {
-        $.ajax({
-            success: function () {
-                modelSelect.empty().append(new Option("Select One", "", false, false)).trigger("change");
-            }
-        });
+        // Removed ajax call to avoid go to server and back.
+        // $.ajax({
+        // success: function () {
+        modelSelect.empty().append(new Option("Select One", "", false, false)).trigger("change");
+        // }
+        // });
     } else {
         $.ajax({
             url: "https://vpic.nhtsa.dot.gov/api/vehicles/GetModelsForMake/" + makeName,
             type: "GET",
             data: { format: "json", data: "3GNDA13D76S000000;5XYKT3A12CG000000;" },
             dataType: "json",
-            beforeSend:  function(){
-                modelSelect.attr('disabled', true)
+            beforeSend: function () {
+                modelSelect.attr('disabled', true);
             },
             success: function (result) {
                 // console.log(result);
@@ -24,22 +25,14 @@ function findModel(makeName, carModel = null) {
                 modelSelect.empty().append(new Option("Select One", "", false, false));
 
                 $.each(result.Results, function () {
+                    let selected = (carModel && carModel == this.Model_Name)
                     // This works with select2 library.
-                    var newOption = new Option(this.Model_Name, this.Model_Name, false, false);
-                    modelSelect.append(newOption)
+                    var newOption = new Option(this.Model_Name, this.Model_Name, selected, selected);
+                    modelSelect.append(newOption);
                 })
 
                 modelSelect.trigger("change");
-                modelSelect.attr('disabled', false)
-
-                // modelSelect.empty().append(function () {
-                //     var output = '<option value="">Select One</option>';
-                //     $.each(result.Results, function () {
-                //         var selected = (this.Model_Name === carModel ? "selected" : "");
-                //         output += '<option id="' + this.Model_Name + '" ' + selected + '>' + this.Model_Name + '</option>';
-                //     });
-                //     return output;
-                // }).trigger("change");
+                modelSelect.attr('disabled', false);
             },
             error: function (xhr, ajaxOptions, thrownError) {
                 console.log(xhr.status);
