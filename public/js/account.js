@@ -31,13 +31,15 @@ $(document).ready(function () {
         event.stopPropagation();
 
         const userID = $(this).attr("user-id");
+        const carID = $(this).attr("car-id");
 
         $.ajax({
             url: "/useService",
             type: "POST",
             contentType: "application/json",
             data: JSON.stringify({
-                userID: userID
+                userID: userID,
+                carID: carID
             }),
             beforeSend: function () {
                 showResult('#useServiceUpdate',

@@ -193,11 +193,15 @@ exports.validate = async (req, res) => {
  */
 exports.useService = async (req, res) => {
     try {
-        let userID = req.body.userID
+        let { userID, carID } = req.body
 
         if (userID) {
-            // TODO: Change location
-            let [customer, service] = await UserService.addNewService(userID, req.user, req?.user?.locations[0])
+            let car = await CarService.getCarByID(carID)
+            let authorizedBy = req.user
+            let locationOfService = req?.user?.locations[0] // TODO: Change location
+
+            let [customer, service] = await UserService.addNewService(userID, authorizedBy, locationOfService, car)
+
             if (customer && service)
                 //Log this action.
                 HistoryService.addHistory(`Use Service: ${service.id}`, historyTypes.SERVICE, customer, service.location)

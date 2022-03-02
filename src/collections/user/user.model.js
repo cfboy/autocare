@@ -37,6 +37,8 @@ const userSchema = new Schema({
         date: { type: Date, default: Date.now },
         location: { type: Schema.Types.ObjectId, ref: 'location', default: null },
         authorizedBy: { type: Schema.Types.ObjectId, ref: 'user', default: null },
+        // TODO: verify if define a car with objecId is the best option or plain info.
+        car: { type: Schema.Types.ObjectId, ref: 'car', default: null }
     }],
 })
 

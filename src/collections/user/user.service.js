@@ -119,15 +119,18 @@ const addUserCar = (User) => async (id, car, sub, subItemID) => {
  * @param {id, car} User 
  * @returns User
  */
-const removeUserCar = (User) => async (id, car) => {
+const removeUserCar = (User) => async (id, sub, item, car) => {
     console.log(`removeUserCar() ID: ${id}`)
-    return await User.findByIdAndUpdate({ _id: id }, { $pull: { "subscriptions.items.cars": car } }, function (err, doc) {
-        if (err) {
-            console.error(err.message)
-        } else {
-            console.debug(`Car ${car.model} Removed of User: ${doc.email}`);
-        }
-    })
+    return await User.findByIdAndUpdate({ _id: id },
+        { $pull: { "subscriptions.$[sub].items.$[item].cars": car.id } },
+        { "arrayFilters": [{ "sub.id": sub }, { "item.id": item }], new: true },
+        function (err, doc) {
+            if (err) {
+                console.error(err.message)
+            } else {
+                console.debug(`Car ${car.model} Removed of User: ${doc.email}`);
+            }
+        })
 }
 
 /**
@@ -295,7 +298,7 @@ const getUsersByList = (User) => async (users) => {
  * @param {userID, authorizedBy, location} User 
  * @returns user object, service object
  */
-const addNewService = (User) => async (userID, authorizedBy, location) => {
+const addNewService = (User) => async (userID, authorizedBy, location, car) => {
     console.log(`addNewService() ID: ${userID}`)
 
     let service = {
@@ -303,7 +306,8 @@ const addNewService = (User) => async (userID, authorizedBy, location) => {
         id: 'AC-' + Math.random().toString(36).toUpperCase().substring(2, 6),
         date: Date.now(),
         location: location,
-        authorizedBy: authorizedBy?._id
+        authorizedBy: authorizedBy?._id,
+        car: car
 
     }, customer = await User.findByIdAndUpdate({ _id: userID }, { $addToSet: { services: service } },
         { new: true }, function (err, doc) {
@@ -313,7 +317,7 @@ const addNewService = (User) => async (userID, authorizedBy, location) => {
             } else {
                 console.debug("Service Added : ", service?.id);
             }
-        }).populate({ path: 'services.location', model: 'location' }).populate({ path: 'services.authorizedBy', model: 'user' })
+        }).populate({ path: 'services.location', model: 'location' }).populate({ path: 'services.authorizedBy', model: 'user' }).populate({ path: 'services.car', model: 'car' })
 
     service = (customer.services.find(({ id }) => id === service.id))
 

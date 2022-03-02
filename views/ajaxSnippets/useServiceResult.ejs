@@ -16,8 +16,11 @@
                 </p>
             </li>
             <li>
+                <p>Car: <%= service?.car?.brand%>, <%= service?.car?.model%> (<%= service?.car?.plate%>)</p>
+            </li>
+            <li>
                 <p>
-                    Location : <%= service.location.name%>
+                    Location : <%= service?.location?.name%>
                 </p>
             </li>
         </ul>

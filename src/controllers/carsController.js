@@ -184,6 +184,7 @@ exports.save = async (req, res) => {
         res.redirect('/cars')
 
     } catch (error) {
+        console.error(error)
         console.error(error.message)
 
         if (error.code === 11000)
@@ -235,15 +236,30 @@ exports.update = async (req, res) => {
  */
 exports.delete = async (req, res) => {
     console.log('Deleting Car...')
-    const id = req.params.id
+    const carID = req.params.id
 
     try {
-        let user = UserService.removeUserCar(req.user.id, id)
-        if (!user) {
+        let car = await CarService.getCarByID(carID),
+            userCar = await UserService.getUserByCar(car)
+
+        let subscription = userCar.subscriptions.find(subscription =>
+            subscription.items.filter(item =>
+                item.cars.filter(itemCar =>
+                    itemCar.id = car.id)))
+
+        let user = await UserService.removeUserCar(userCar.id, subscription.id, subscription.items[0].id, car)
+
+        // Validate if the car is removed from user.
+        let notDeletedCar = user?.subscriptions?.some(subscription =>
+            subscription.items.some(item =>
+                item.cars.some(itemCar =>
+                    itemCar.id = car.id)))
+
+        if (!user || notDeletedCar) {
             req.session.message = `Can't delete the car from user.`
-            req.session.alertType = alertTypes.CompletedActionAlert
+            req.session.alertType = alertTypes.WarningAlert
         } else {
-            CarService.deleteCar(id)
+            CarService.deleteCar(carID)
             // Set the message for alert. 
             req.session.message = `Car Deleted.`
             req.session.alertType = alertTypes.CompletedActionAlert
