@@ -174,8 +174,7 @@ exports.viewUser = async (req, res) => {
                 user: req.user,
                 isMyProfile,
                 customer,
-                stripeSubscription: customer?.stripe?.subscription,
-                membershipStatus: customer?.stripe?.subscription ? customer?.stripe?.subscription?.status : Stripe.STATUS.NONE,
+                subscriptions: customer?.subscriptions,
                 message,
                 alertType
             })

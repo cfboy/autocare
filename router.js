@@ -93,6 +93,7 @@ router.post('/create-car', checkAuthenticated, authAddCar, carsController.save)
 router.post('/edit-car', checkAuthenticated, authEditCar, carsController.update)
 router.get('/delete-car/:id', checkAuthenticated, authDeleteCar, carsController.delete)
 
+router.post('/validatePlate', checkAuthenticated, carsController.validatePlate)
 //------ Location Routes ------
 router.get('/locations', checkAuthenticated, locationController.locations)
 router.get('/create-location', checkAuthenticated, locationController.createLocation)

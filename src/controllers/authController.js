@@ -76,7 +76,8 @@ exports.register = async (req, res) => {
                 firstName,
                 lastName,
                 phoneNumber,
-                dateOfBirth
+                dateOfBirth,
+                city
             })
 
             console.debug(

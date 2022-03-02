@@ -283,3 +283,25 @@ exports.delete = async (req, res) => {
     res.redirect('/cars')
 
 }
+
+exports.validatePlate = async (req, res) => {
+    try {
+        let carPlate = req.body.plateNumber,
+            car = await CarService.getCarByPlate(carPlate),
+            subscriptionList = req.body.subscriptionList,
+            existingCar = false
+
+
+        if (car || subscriptionList.some(car => car.plate === carPlate)) {
+            existingCar = true
+        }
+
+        res.send({ existingCar: existingCar })
+
+    } catch (error) {
+        console.error("ERROR: carController -> Tyring to validate car plate.")
+        console.error(error.message)
+        res.render('Error validating car plate.')
+    }
+
+}

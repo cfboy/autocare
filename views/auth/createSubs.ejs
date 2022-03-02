@@ -54,7 +54,6 @@
                                         <div class="row">
                                             <input id="userID" name="userID" value="<%= user.id%>" hidden />
                                             <%- include('../cars/formFields.ejs', {allMakes, car: null}); %>
-
                                             <div class="col-lg-12">
                                                 <div class="form-group">
                                                     <label for="product" class="required">Product</label>
@@ -154,7 +153,7 @@
     <script type="text/javascript" src="https://js.stripe.com/v3/"></script>
     <script type="text/javascript" src="../js/account.js"></script>
     <script src="../js/helper-functions.js"></script>
-    
+
     <!-- End custom js for this page-->
 
     <script>
@@ -183,34 +182,60 @@
                         brand: brand, model: model, plate: plate,
                         product: product, price: price, priceID: priceID
                     };
-                console.log("newItem: " + newItem);
-                // Initialize DataTable
-                var t = $('#cart-table').DataTable();
-                // Add row to table.
-                // Set the rowIdx to btn id to get the id of deleted element.
-                t.row.add([
-                    `<p> Brand: ${brand} </p> <br> 
-                         <p> Model: ${model} </p> <br>
-                         <p> Plate: ${plate} </p>`,
-                    product,
-                    price,
-                    `<td class="text-center">
-                        <button  id="${rowIdx}" class="btn btn-icon btn-icon-no-border no-margin remove">
-                            <i class="fas fa-trash-alt icon-sm text-danger"></i>
-                        </button>
-                    </td>`
-                ]).draw(false);
-                // Add newItem to subscriptionList
-                subscriptionList.push(newItem);
-                // Stringify the value to store on input element for checkout.
-                var stringSubscriptionList = JSON.stringify(subscriptionList)
-                $('#subscription-list').val(stringSubscriptionList);
-                console.log("List: " + stringSubscriptionList);
-                // Clear all elements on form for next submit.
-                clearForm(form);
-                // If the susbcription has at least one item, then show ckeckout btn.
-                if (subscriptionList.length > 0)
-                    checkoutBtn.removeAttr('hidden');
+
+                $.ajax({
+                    url: "/validatePlate",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        plateNumber: plate,
+                        subscriptionList: subscriptionList ? subscriptionList : []
+                    }),
+                }).done(function (result) {
+                    if (result.existingCar) {
+                        document.getElementById("carPlate").setCustomValidity("Existing Car Plate");
+                        document.getElementById("carPlate").reportValidity();
+                        let reportMessage = `<p class="error"> Existing Car Plate in the system. Please provide another plate.</p>`
+                        showResult('#plateValidationResult', reportMessage);
+
+                    } else {
+                        console.log("newItem: " + newItem);
+                        showResult('#plateValidationResult',
+                            `<p class="success"> Valid Car Plate</p>`);
+
+                        // Initialize DataTable
+                        var t = $('#cart-table').DataTable();
+                        // Add row to table.
+                        // Set the rowIdx to btn id to get the id of deleted element.
+                        t.row.add([
+                            `<p> Brand: ${brand} </p> <br> 
+                            <p> Model: ${model} </p> <br>
+                            <p> Plate: ${plate} </p>`,
+                            product,
+                            price,
+                            `<td class="text-center">
+                                <button  id="${rowIdx}" class="btn btn-icon btn-icon-no-border no-margin remove">
+                                    <i class="fas fa-trash-alt icon-sm text-danger"></i>
+                                </button>
+                            </td>`
+                        ]).draw(false);
+                        // Add newItem to subscriptionList
+                        subscriptionList.push(newItem);
+                        // Stringify the value to store on input element for checkout.
+                        var stringSubscriptionList = JSON.stringify(subscriptionList)
+                        $('#subscription-list').val(stringSubscriptionList);
+                        console.log("List: " + stringSubscriptionList);
+                        // Clear all elements on form for next submit.
+                        clearForm(form);
+                        showResult('#plateValidationResult', ``);
+                        // If the susbcription has at least one item, then show ckeckout btn.
+                        if (subscriptionList.length > 0)
+                            checkoutBtn.removeAttr('hidden');
+                    }
+
+                }).fail(function (err) {
+                    console.log(err);
+                })
             }
         });
         // Remove subscription
@@ -232,6 +257,9 @@
                 checkoutBtn.attr("hidden", true);
         });
 
+        var showResult = function (updateDiv, result) {
+            $(updateDiv).html(result);
+        }
     </script>
 
     <%- include('../partials/dataTable.ejs', {tableID : '#cart-table', ordering: false, searching: false , info: false, paging: false, footerCheckout: true}); %>
