@@ -164,6 +164,9 @@
 
         // Add subscription
         $('#addSub').on('click', function (event) {
+            // Clean plate input validator.
+            document.getElementById("carPlate").setCustomValidity("");
+            showResult('#plateValidationResult', ``);
             // Validate form before submit.
             event.preventDefault();
             event.stopPropagation();
@@ -260,6 +263,12 @@
         var showResult = function (updateDiv, result) {
             $(updateDiv).html(result);
         }
+
+        // function clearValidity() {
+        //     // Clean plate input validator.
+        //     document.getElementById("carPlate").setCustomValidity("");
+        //     showResult('#plateValidationResult', ``);
+        // }
     </script>
 
     <%- include('../partials/dataTable.ejs', {tableID : '#cart-table', ordering: false, searching: false , info: false, paging: false, footerCheckout: true}); %>
