@@ -6,6 +6,7 @@ const Stripe = require('../connect/stripe')
 const alertTypes = require('../helpers/alertTypes')
 const bcrypt = require('bcrypt');
 const { municipalities } = require('../helpers/municipalities')
+const CarService = require('../collections/cars')
 
 
 // ------------------------------- Create -------------------------------
@@ -170,11 +171,24 @@ exports.viewUser = async (req, res) => {
                 customer = await Stripe.setStripeInfoToUser(customer)
             }
 
+            let customerCars = []
+            for (customerSub of customer.subscriptions) {
+                // Iterates the items on DB subscription.
+                for (customerItem of customerSub.items) {
+                    // then iterates cars in DB item.
+                    for (car of customerItem.cars) {
+                        customerCars.push(car)
+                    }
+                }
+            }
+            cars = await CarService.getCars(customerCars)
+
             res.status(200).render('user/view.ejs', {
                 user: req.user,
                 isMyProfile,
                 customer,
                 subscriptions: customer?.subscriptions,
+                cars,
                 message,
                 alertType
             })
@@ -346,4 +360,37 @@ exports.delete = async (req, res) => {
         req.session.alertType = alertTypes.ErrorAlert
     }
     res.redirect('/users')
+}
+
+exports.services = async (req, res) => {
+    try {
+        let user = await UserService.getUserById(req.user.id)
+        let { message, alertType } = req.session
+
+        if (message) {
+            req.session.message = ''
+            req.session.alertType = ''
+        }
+
+        if (user) {
+            let services = user.services
+            res.status(200).render('user/services.ejs', {
+                user: req.user,
+                services,
+                message,
+                alertType
+            })
+        } else {
+            message = 'Customer not found.'
+            alertType = alertTypes.ErrorAlert
+            console.log('Customer not found.')
+            res.redirect('/account', { message, alertType })
+        }
+    } catch (error) {
+        console.error(error.message)
+        req.session.message = "Error trying to render the user services."
+        req.session.alertType = alertTypes.ErrorAlert
+        res.redirect('/account')
+
+    }
 }

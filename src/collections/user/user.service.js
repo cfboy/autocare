@@ -211,6 +211,10 @@ const getUserById = (User) => (id) => {
             console.debug("USER-SERVICE: Found user to edit: ", docs);
         }
     }).populate('locations').populate({ path: 'subscriptions.items.cars', model: 'car' })
+        .populate({ path: 'services.location', model: 'location' })
+        .populate({ path: 'services.authorizedBy', model: 'user' })
+        .populate({ path: 'services.car', model: 'car' })
+
 }
 
 /**
@@ -317,7 +321,9 @@ const addNewService = (User) => async (userID, authorizedBy, location, car) => {
             } else {
                 console.debug("Service Added : ", service?.id);
             }
-        }).populate({ path: 'services.location', model: 'location' }).populate({ path: 'services.authorizedBy', model: 'user' }).populate({ path: 'services.car', model: 'car' })
+        }).populate({ path: 'services.location', model: 'location' })
+        .populate({ path: 'services.authorizedBy', model: 'user' })
+        .populate({ path: 'services.car', model: 'car' })
 
     service = (customer.services.find(({ id }) => id === service.id))
 
