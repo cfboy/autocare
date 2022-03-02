@@ -165,7 +165,7 @@ exports.validate = async (req, res) => {
             subscription = customer.subscriptions.find(subscription => subscription.items.filter(item => item.cars.filter(itemCar => itemCar.id = car.id)))
             // TODO: use selected location 
             //Log this action.
-            // HistoryService.addHistory(`Validate Membership: ${carPlate}`, historyTypes.USER_ACTION, req.user, req?.user?.locations[0])
+            HistoryService.addHistory(`Validate Membership: ${carPlate}`, historyTypes.USER_ACTION, req.user, req?.user?.locations[0])
         }
 
         readingQueue = readingQueue.filter(item => carPlate !== item.plate)
