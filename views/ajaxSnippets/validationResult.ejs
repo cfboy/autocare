@@ -45,29 +45,29 @@
                     </p>
                     <p>
                         <b>Product:</b>
-                        <%- stripeSubscription?.product?.name%>
+                        <%- subscription?.data?.items.data[0].price?.product?.name%>
                     </p>
                     <p>
                         <b>
                             Current Period Start:
                         </b>
-                        <%= moment(stripeSubscription?.current_period_start * 1000).isValid() ? moment(stripeSubscription?.current_period_start * 1000).format(completeDateFormat) : 'N/A' %>
+                        <%= moment(subscription?.data?.current_period_start * 1000).isValid() ? moment(subscription?.data?.current_period_start * 1000).format(completeDateFormat) : 'N/A' %>
 
                     </p>
                     <p>
                         <b>
                             Current Period End Date:
                         </b>
-                        <%= moment(stripeSubscription?.current_period_end * 1000).isValid() ? moment(stripeSubscription?.current_period_end * 1000).format(completeDateFormat) : 'N/A' %>
+                        <%= moment(subscription?.data?.current_period_end * 1000).isValid() ? moment(subscription?.data?.current_period_end * 1000).format(completeDateFormat) : 'N/A' %>
 
                     </p>
 
-                    <% if(stripeSubscription?.trial_end) { %>
+                    <% if(subscription?.data?.trial_end) { %>
                     <p>
                         <b>
                             Trial Expiration Date:
                         </b>
-                        <%= moment(stripeSubscription?.trial_end * 1000).isValid() ? moment(stripeSubscription?.trial_end * 1000).format(completeDateFormat) : 'N/A' %>
+                        <%= moment(subscription?.data?.trial_end * 1000).isValid() ? moment(subscription?.data?.trial_end * 1000).format(completeDateFormat) : 'N/A' %>
 
                     </p>
                     <% } %>
@@ -77,10 +77,10 @@
                     <h4 class="text-center">Membership Status</h4>
                     <br>
                     <div class="col-md-12 text-center validation-msgs">
-                        <% if([stripeStatus.ACTIVE, stripeStatus.TRIALING].includes(membershipStatus)) { %>
+                        <% if([stripeStatus.ACTIVE, stripeStatus.TRIALING].includes(subscription?.data?.status)) { %>
                         <i class="fas fa-8x fa-check-circle valid"></i>
                         <p style="text-transform: uppercase">
-                            <%= membershipStatus %>
+                            <%= subscription?.data?.status %>
                         </p>
                         <br>
                         <div class="mt-3 mb-3">
@@ -91,10 +91,10 @@
                             </button>
                         </div>
 
-                        <% } else if([stripeStatus.CANCELED, stripeStatus.UNPAID, stripeStatus.NONE].includes(membershipStatus)) { %>
+                        <% } else if([stripeStatus.CANCELED, stripeStatus.UNPAID, stripeStatus.NONE].includes(subscription?.data?.status)) { %>
                         <i class="far fa-8x fa-times-circle invalid"></i>
                         <p style="text-transform: uppercase">
-                            <%= membershipStatus %>
+                            <%= subscription?.data?.status %>
                         </p>
                         <br>
                         <button class="btn btn-primary btn-lg text-white mb-0 me-0 manage-billing-button" type="submit"

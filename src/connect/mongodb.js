@@ -6,7 +6,8 @@ const db = process.env.NODE_ENV === "development" ? process.env.MONGODB : proces
 mongoose.connect(db, {
     useUnifiedTopology: true,
     useNewUrlParser: true,
-    useFindAndModify: false
+    useFindAndModify: false,
+    useCreateIndex: true
 })
 
 mongoose.connection.on('connected', function () {

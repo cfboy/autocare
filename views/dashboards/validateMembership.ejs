@@ -76,10 +76,10 @@
                                                             <div class="row">
                                                                 <div class="col-lg-12">
                                                                     <div class="form-group">
-                                                                        <label class="required" for="name">Tag
+                                                                        <label class="required" for="name">Plate
                                                                             Number</label>
                                                                         <input autocomplete="off" type="text"
-                                                                            id="tagNumber" name="tagNumber"
+                                                                            id="plateNumber" name="plateNumber"
                                                                             class="form-control form-control-lg text-uppercase"
                                                                             required />
 
@@ -177,7 +177,7 @@
         })
 
         function setPlateValue(plate) {
-            $("#tagNumber").val(plate);
+            $("#plateNumber").val(plate);
             $("#validateMembershipBtn").click();
             $(`#plate-${plate}`).remove();
         }
@@ -185,7 +185,7 @@
         $("#validateMembershipBtn").on("click", function (event) {
             event.preventDefault();
             event.stopPropagation();
-            var valueToValidate = $("#tagNumber");
+            var valueToValidate = $("#plateNumber");
             // reportValidity and checkValidity validate inputs on form.
             valueToValidate[0].reportValidity();
             if (valueToValidate[0].checkValidity()) {
@@ -194,7 +194,7 @@
                     type: "POST",
                     contentType: "application/json",
                     data: JSON.stringify({
-                        tagNumber: valueToValidate.val()
+                        plateNumber: valueToValidate.val()
                     }),
                     beforeSend: function () {
                         showResult('#membershipDetails',
@@ -206,7 +206,7 @@
                     }
                 }).done(function (result) {
                     showResult('#membershipDetails', result);
-                    // cleanInput("tagNumber");
+                    // cleanInput("plateNumber");
                 }).fail(function (err) {
                     console.log(err);
                 })

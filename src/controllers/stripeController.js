@@ -139,6 +139,7 @@ exports.webhook = async (req, res) => {
  * @returns 
  */
 exports.checkout = async (req, res) => {
+    // TODO validate if the car is valid.
     const { subscriptions, customerID } = req.body
 
     try {

@@ -4,7 +4,7 @@ const Schema = mongoose.Schema
 const carSchema = new Schema({
     brand: String,
     model: String,
-    plate: String,
+    plate: {type: String, unique: true},
     created_date: { type: Date, default: Date.now },
 })
 

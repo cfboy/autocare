@@ -121,7 +121,7 @@ const addUserCar = (User) => async (id, car, sub, subItemID) => {
  */
 const removeUserCar = (User) => async (id, car) => {
     console.log(`removeUserCar() ID: ${id}`)
-    return await User.findByIdAndUpdate({ _id: id }, { $pull: { cars: car } }, function (err, doc) {
+    return await User.findByIdAndUpdate({ _id: id }, { $pull: { "subscriptions.items.cars": car } }, function (err, doc) {
         if (err) {
             console.error(err.message)
         } else {
@@ -247,20 +247,22 @@ const updateBillingID = (User) => async (id, billingID) => {
     })
 }
 
-// Get User By Car Plate
 /**
  * This function get user by plate number.
  * @param {*} User 
  * @returns user
  */
 const getUserByCar = (User) => async (car) => {
-    return User.findOne({ cars: car }, function (err, docs) {
-        if (err) {
-            console.error(err)
-        } else {
-            console.debug("USER-SERVICE: Found user: ", docs.email);
-        }
-    })
+    return User.findOne({
+        "subscriptions.items.cars": { _id: car.id }
+    },
+        function (err, docs) {
+            if (err) {
+                console.error(err)
+            } else {
+                console.debug("USER-SERVICE: Found user: ", docs?.email);
+            }
+        })
 }
 
 /**
@@ -269,7 +271,7 @@ const getUserByCar = (User) => async (car) => {
  * @returns user list
  */
 const getUsersByLocationID = (User) => async (location) => {
-    return await User.find({ location })
+    return await User.find({ "locations": { _id: location.id } })
 }
 
 /**

@@ -107,7 +107,7 @@ exports.createSubscriptions = async (req, res) => {
         req.session.alertType = ''
 
         let user = req.user
-        let {allMakes, allModels} = await CarService.getAllMakes()
+        let { allMakes, allModels } = await CarService.getAllMakes()
 
         const prices = await Stripe.getAllPrices()
 
@@ -151,19 +151,21 @@ exports.validateMembership = async (req, res) => {
  */
 exports.validate = async (req, res) => {
     try {
-        let carPlate = req.body.tagNumber,
+        // TODO: handle multiple cars with the same plate
+        let carPlate = req.body.plateNumber,
             car = await CarService.getCarByPlate(carPlate)
 
-        let customer
+        let customer, subscription
 
         if (car)
             customer = await UserService.getUserByCar(car)
 
         if (customer) {
             customer = await Stripe.setStripeInfoToUser(customer)
+            subscription = customer.subscriptions.find(subscription => subscription.items.filter(item => item.cars.filter(itemCar => itemCar.id = car.id)))
             // TODO: use selected location 
             //Log this action.
-            HistoryService.addHistory(`Validate Membership: ${carPlate}`, historyTypes.USER_ACTION, req.user, req?.user?.locations[0])
+            // HistoryService.addHistory(`Validate Membership: ${carPlate}`, historyTypes.USER_ACTION, req.user, req?.user?.locations[0])
         }
 
         readingQueue = readingQueue.filter(item => carPlate !== item.plate)
@@ -171,8 +173,7 @@ exports.validate = async (req, res) => {
         res.render('ajaxSnippets/validationResult.ejs', {
             customer,
             car,
-            stripeSubscription: customer?.stripe?.subscription,
-            membershipStatus: customer?.stripe?.subscription ? customer?.stripe?.subscription?.status : Stripe.STATUS.NONE
+            subscription
         })
     } catch (error) {
         console.error("ERROR: dashboardController -> Tyring to validate membership.")
