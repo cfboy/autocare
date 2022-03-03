@@ -96,45 +96,7 @@
                     <input type="search" class="form-control" placeholder="Search Here" title="Search here">
                 </form>
             </li>
-            <li class="nav-item dropdown">
-                <a class="nav-link count-indicator" id="notificationDropdown" href="#" data-bs-toggle="dropdown">
-                    <i class="icon-mail icon-lg"></i>
-                </a>
-                <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list pb-0"
-                    aria-labelledby="notificationDropdown">
-                    <a class="dropdown-item py-3 border-bottom">
-                        <p class="mb-0 font-weight-medium float-left">You have 4 new notifications </p>
-                        <span class="badge badge-pill badge-primary float-right">View all</span>
-                    </a>
-                    <a class="dropdown-item preview-item py-3">
-                        <div class="preview-thumbnail">
-                            <i class="mdi mdi-alert m-auto text-primary"></i>
-                        </div>
-                        <div class="preview-item-content">
-                            <h6 class="preview-subject fw-normal text-dark mb-1">Application Error</h6>
-                            <p class="fw-light small-text mb-0"> Just now </p>
-                        </div>
-                    </a>
-                    <a class="dropdown-item preview-item py-3">
-                        <div class="preview-thumbnail">
-                            <i class="mdi mdi-settings m-auto text-primary"></i>
-                        </div>
-                        <div class="preview-item-content">
-                            <h6 class="preview-subject fw-normal text-dark mb-1">Settings</h6>
-                            <p class="fw-light small-text mb-0"> Private message </p>
-                        </div>
-                    </a>
-                    <a class="dropdown-item preview-item py-3">
-                        <div class="preview-thumbnail">
-                            <i class="mdi mdi-airballoon m-auto text-primary"></i>
-                        </div>
-                        <div class="preview-item-content">
-                            <h6 class="preview-subject fw-normal text-dark mb-1">New user registration</h6>
-                            <p class="fw-light small-text mb-0"> 2 days ago </p>
-                        </div>
-                    </a>
-                </div>
-            </li>
+            
             <li class="nav-item dropdown">
                 <a class="nav-link count-indicator" id="countDropdown" href="#" data-bs-toggle="dropdown"
                     aria-expanded="false">
@@ -208,6 +170,44 @@
                     <i class="fa-solid fa-list"></i>
                 </a>
             </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link count-indicator" id="notificationDropdownBtn" href="#" data-bs-toggle="dropdown">
+                    <i <% var hasNotifi = (user?.notifications?.filter(notification => notification.isRead == false).length > 0) ? "text-primary" : "" %>
+                        class="fa-solid fa-bell <%=  hasNotifi%>"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list pb-0 notifications-dropdown"
+                    aria-labelledby="notificationDropdown" onclick="">
+                    <a class="dropdown-item py-3 border-bottom">
+                        <p class="mb-0 font-weight-medium float-left">You have
+                            <%= user?.notifications?.filter(notification => notification.isRead == false).length %> new
+                            notifications </p>
+                        <span class="badge badge-pill badge-primary float-right">View all</span>
+                    </a>
+                    <% if(user?.notifications) { %>
+                    <div id="notifications">
+                    </div>
+
+                    <% for(notification of user.notifications) { %>
+                    <a class="dropdown-item preview-item py-3">
+                        <div class="preview-thumbnail">
+                            <% var textPrimary = notification.isRead ? "" : "text-primary"%>
+
+                            <i id="<%= notification.id%>" class="fa-solid fa-eye <%=  textPrimary%> "
+                                onclick="changeNotificationState('<%= user.id%>','<%= notification.id%>','<%= !notification.isRead%>')"></i>
+                            <!-- <i class="mdi mdi-alert m-auto text-primary"></i> -->
+                        </div>
+                        <div class="preview-item-content">
+                            <h6 class="preview-subject fw-normal text-dark mb-1"><%= notification?.message%></h6>
+                            <p class="fw-light small-text mb-0"> <%# moment(notification?.created_date).%>
+
+                                <%= moment(notification?.created_date).isValid() ? moment(notification?.created_date).format(completeDateFormat) : 'N/A' %>
+                            </p>
+                        </div>
+                    </a>
+                    <% } %>
+                    <% } %>
+                </div>
+            </li>
             <li class="nav-item dropdown d-none d-lg-block user-dropdown">
                 <a class="nav-link" id="UserDropdown" href="#" data-bs-toggle="dropdown" aria-expanded="false">
                     <img class="img-xs rounded-circle" src="../../images/faces/profile/user.png" alt="Profile image">
@@ -256,11 +256,52 @@
         </button>
     </div>
 </nav>
+
 <script src="../js/helper-functions.js"></script>
+<script src="https://cdn.socket.io/socket.io-3.0.1.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
 <script>
     window.onload = function () {
         //YOUR JQUERY CODE
         manageLangDropdown();
     };
+
+    const socket = io('<%= domain%>');
+
+    // Receive data
+    socket.on('notifications', (data) => {
+        console.log(JSON.stringify(data));
+
+        $('#notifications').prepend(`
+        <div class="preview-item-content">
+            <h6 class="preview-subject fw-normal text-dark mb-1">${data?.message}</h6>
+                <p class="fw-light small-text mb-0"> ${data?.created_date} </p>
+        </div>`);
+    })
+
+    function changeNotificationState(userId, notificationId, newStatus) {
+        $.ajax({
+            url: "/changeNotificationState",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({
+                userId,
+                notificationId,
+                newStatus
+            })
+        }).done(function (result) {
+            if (newStatus == "true")
+                $(`#${notificationId}`).removeClass('text-primary');
+            else
+                $(`#${notificationId}`).addClass('text-primary');
+
+        }).fail(function (err) {
+            console.log(err);
+        })
+    }
+
+    $('.notifications-dropdown').on('click', function (e) {
+        e.stopPropagation();
+    });
 </script>

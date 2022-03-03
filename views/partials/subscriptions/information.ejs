@@ -26,7 +26,7 @@
                 <td>
                     <% for(item of stripeSubscription.items.data) { %>
                     <p>
-                        <b><%- item.price.product.name %></b>
+                        <b><%- item.price.product.name %></b> (<%= item.cars.length %>/<%= item.quantity%>)
                     </p>
                     <ul class="mb-0">
                         <% if(item.cars.length > 0) { %>

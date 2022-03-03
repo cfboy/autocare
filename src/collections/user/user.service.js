@@ -302,6 +302,7 @@ const getUsersByList = (User) => async (users) => {
  * @param {userID, authorizedBy, location} User 
  * @returns user object, service object
  */
+// TODO: move to cars service.
 const addNewService = (User) => async (userID, authorizedBy, location, car) => {
     console.log(`addNewService() ID: ${userID}`)
 
@@ -330,6 +331,69 @@ const addNewService = (User) => async (userID, authorizedBy, location, car) => {
     return [customer, service]
 }
 
+
+/**
+ * This function add new notification to user.
+ * @param {userID, authorizedBy, location} User 
+ * @returns user object, service object
+ */
+const addNotification = (User) => async (userID, message) => {
+    console.log(`addNotification() ID: ${userID}`)
+    let date = Date.now();
+    let notification = {
+        isRead: false,
+        message: message,
+        created_date: date
+    }, customer = await User.findByIdAndUpdate(userID, {
+        $addToSet: { notifications: notification }
+    }, { new: true }, function (err, doc) {
+        if (err) {
+            console.error(err)
+            console.error(err.message)
+        } else {
+            console.debug("Notification Added to: ", doc?.id);
+        }
+    })
+
+    notification = (customer.notifications.find(({ created_date }) => created_date.getTime() === new Date(notification.created_date).getTime()))
+
+    return [customer, notification]
+}
+
+/**
+ * This function add new notification to user.
+ * @param {userID, authorizedBy, location} User 
+ * @returns user object, service object
+ */
+const changeNotificationState = (User) => async (userID, notificationID, value) => {
+    console.log(`readNotification() ID: ${userID}`)
+    let customer = await User.findByIdAndUpdate(
+        {
+            "_id": userID,
+            "notifications": {
+                "_id": notificationID
+            }
+        },
+        {
+            $set: { 'notifications.$[outer].isRead': JSON.parse(value) }
+        },
+        {
+            "arrayFilters": [{ "outer._id": notificationID }]
+        }, function (err, doc) {
+            if (err) {
+                console.error(err)
+                console.error(err.message)
+            } else {
+                console.debug("Notification Changed.");
+            }
+        })
+
+    let notification = (customer.notifications.find(({ id }) => id === notificationID))
+
+    return [customer, notification]
+}
+
+
 module.exports = (User) => {
     return {
         addUser: addUser(User),
@@ -350,6 +414,8 @@ module.exports = (User) => {
         getUserByCar: getUserByCar(User),
         getUsersByLocationID: getUsersByLocationID(User),
         getUsersByList: getUsersByList(User),
-        addNewService: addNewService(User)
+        addNewService: addNewService(User),
+        addNotification: addNotification(User),
+        changeNotificationState: changeNotificationState(User)
     }
 }

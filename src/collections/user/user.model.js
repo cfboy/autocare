@@ -13,6 +13,14 @@ const userSchema = new Schema({
     password: String,
     billingID: String, //Stripe ID
     role: { type: String, enum: Object.values(ROLES), default: ROLES.CUSTOMER },
+    personalInfo: {
+        firstName: String,
+        middleName: String,
+        lastName: String,
+        phoneNumber: String,
+        dateOfBirth: { type: Date, default: null },
+        city: String
+    },
     locations: [{ type: Schema.Types.ObjectId, ref: 'location', default: null }],
     hasAllInformation: { type: Boolean, default: false },
     created_date: { type: Date, default: Date.now },
@@ -24,22 +32,11 @@ const userSchema = new Schema({
             cars: [{ type: Schema.Types.ObjectId, ref: 'car', default: null }]
         }]
     }],
-    personalInfo: {
-        firstName: String,
-        middleName: String,
-        lastName: String,
-        phoneNumber: String,
-        dateOfBirth: { type: Date, default: null },
-        city: String
-    },
-    services: [{
-        id: String,
-        date: { type: Date, default: Date.now },
-        location: { type: Schema.Types.ObjectId, ref: 'location', default: null },
-        authorizedBy: { type: Schema.Types.ObjectId, ref: 'user', default: null },
-        // TODO: verify if define a car with objecId is the best option or plain info.
-        car: { type: Schema.Types.ObjectId, ref: 'car', default: null }
-    }],
+    notifications: [{
+        isRead: { type: Boolean, default: false },
+        message: String,
+        created_date: { type: Date, default: Date.now },
+    }]
 })
 
 const User = mongoose.model('user', userSchema, 'user')

@@ -77,11 +77,14 @@ router.get('/view-user/:id', checkAuthenticated, userController.viewUser)
 router.get('/edit-user/:id', checkAuthenticated, userController.editUser)
 router.get('/changePassword/:id', checkAuthenticated, authChangePassword, userController.changePassword)
 router.get('/services', checkAuthenticated, userController.services)
+
 //------ USER CRUDS ------
 router.post('/create-user', checkAuthenticated, userController.save)
 router.post('/edit-user', checkAuthenticated, userController.update)
 router.post('/changePassword', checkAuthenticated, authChangePassword, userController.updatePassword)
 router.get('/delete-user/:id', checkAuthenticated, authDeleteUser, userController.delete)
+
+router.post('/changeNotificationState', checkAuthenticated, userController.changeNotificationState)
 
 //------ Cars Routes ------
 router.get('/cars', checkAuthenticated, carsController.cars)

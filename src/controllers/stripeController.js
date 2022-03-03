@@ -3,6 +3,8 @@ const CarService = require('../collections/cars')
 const UserService = require('../collections/user')
 // const { ROLES } = require('../collections/user/user.model')
 const alertTypes = require('../helpers/alertTypes')
+const moment = require('moment');
+const { completeDateFormat } = require('../helpers/formats')
 
 /**
  * This function is a helper for agroup a list per key.
@@ -35,7 +37,7 @@ exports.webhook = async (req, res) => {
     }
 
     const data = event.data.object
-
+    let customer, notification
     console.log(event.type, data)
     switch (event.type) {
         case 'customer.created':
@@ -61,6 +63,7 @@ exports.webhook = async (req, res) => {
         case 'invoice.paid':
             break
         case 'customer.subscription.created':
+            // TODO: handle errors
             console.debug(`WEBHOOK: customer.subscription.created: ${data.id}`)
 
             let subscription = data
@@ -72,49 +75,31 @@ exports.webhook = async (req, res) => {
             }
             console.debug(`WEBHOOK: Items to add ${items}`)
 
-            let customer = await UserService.addSubscriptionToUser(subscription.customer, { id: subscription.id, items: items })
+            customer = await UserService.addSubscriptionToUser(subscription.customer, { id: subscription.id, items: items })
             console.debug(`WEBHOOK: Customer Updated ${customer.email}`)
 
             break
 
         case 'customer.subscription.updated':
-            {
-                // started trial
-                // const user = await UserService.getUserByBillingID(data.customer)
+            // started trial
+            customer = await UserService.getUserByBillingID(data.customer)
+            let alertInfo = { message: "Subscription Updated", alertType: alertTypes.BasicAlert }
 
-                // if (data.plan.id == process.env.PRODUCT_BASIC) {
-                //     console.log('You are talking about basic product')
-                //     user.membershipInfo.plan = 'basic'
-                // }
-
-                // if (data.plan.id === process.env.PRODUCT_PRO) {
-                //     console.log('You are talking about pro product')
-                //     user.membershipInfo.plan = 'pro'
-                // }
-
-                // const isOnTrial = data.status === 'trialing'
-
-                // if (isOnTrial) {
-                //     user.membershipInfo.hasTrial = true
-                //     user.membershipInfo.endDate = new Date(data.current_period_end * 1000)
-                // } else if (data.status === 'active') {
-                //     user.membershipInfo.hasTrial = false
-                //     user.membershipInfo.endDate = new Date(data.current_period_end * 1000)
-                // }
-
-                // if (data.canceled_at) {
-                //     // cancelled
-                //     console.log('You just canceled the subscription' + data.canceled_at)
-                //     user.membershipInfo.plan = 'none'
-                //     user.membershipInfo.hasTrial = false
-                //     user.membershipInfo.endDate = null
-                // }
-                // console.debug(`Actual: hasTrial: ${user.membershipInfo.hasTrial}, current_period_end ${data.current_period_end}, User Plan: ${user.membershipInfo.plan}`)
-
-                // await user.save()
-                // console.log('Customer Changed', JSON.stringify(data))
-                break
+            if (data.canceled_at) {
+                // cancelled
+                console.log(`You just canceled the subscription: ${data.id} at ${moment(data?.canceled_at * 1000).isValid() ? moment(data?.canceled_at * 1000).format(completeDateFormat) : 'N/A'}`)
+                alertInfo = { message: "Subscription Cancelled", alertType: alertTypes.BasicAlert }
             }
+
+            // Add notification to user.
+            [customer, notification] = await UserService.addNotification(customer.id, alertInfo.message)
+
+            req.io.emit('notification', notification);
+            // console.debug(`Actual: hasTrial: ${user.membershipInfo.hasTrial}, current_period_end ${data.current_period_end}, User Plan: ${user.membershipInfo.plan}`)
+
+            // await user.save()
+            // console.log('Customer Changed', JSON.stringify(data))
+            break
         case 'customer.subscription.deleted':
             break;
         default:
@@ -131,7 +116,7 @@ exports.webhook = async (req, res) => {
  * @returns 
  */
 exports.checkout = async (req, res) => {
-    // TODO validate if the car is valid.
+    // The validation if the car is valid are handled on the client side..
     const { subscriptions, customerID } = req.body
 
     try {
@@ -153,6 +138,15 @@ exports.checkout = async (req, res) => {
     }
 }
 
+/**
+ * This function complete the checkout process after sucess.
+ * Receive a sessionID, then find the session object.
+ * Create cars on DB
+ * Finally create a subscription object with items and cars and attach to user object.
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ */
 exports.completeCheckoutSuccess = async (req, res) => {
     try {
         let { session_id, subscription_id } = req.query,
@@ -187,6 +181,8 @@ exports.completeCheckoutSuccess = async (req, res) => {
 
         // let customer = await UserService.getUserByBillingID(subscription.customer)
         let customer = await UserService.addSubscriptionToUser(subscription.customer, { id: subscription.id, items: items })
+
+        // TODO: completed message, add history
 
         res.redirect('/account')
 

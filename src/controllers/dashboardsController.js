@@ -54,7 +54,7 @@ exports.account = async (req, res) => {
         }
 
         if (user.subscriptions.length < 1 && user.role !== ROLES.ADMIN) {
-            req.flash('warning', 'Need to add a car to continue whit the process.')
+            req.flash('warning', 'Create a subscription to continue.')
             res.redirect('/create-subscriptions')
         } else {
 
@@ -234,7 +234,8 @@ exports.carCheck = async (req, res) => {
             switch (dataType) {
                 case 'alpr_results':
                     req.io.emit('reading-plates');
-
+                    
+                    // Timer to delay
                     await new Promise(resolve => setTimeout(resolve, 2000));
 
                     /**

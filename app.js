@@ -74,6 +74,7 @@ app.locals.roles = ROLES
 app.locals.stripeStatus = STATUS
 
 app.locals.version = pjson.version
+app.locals.domain = process.env.DOMAIN
 
 // Lingua configuration
 app.use(lingua(app, {

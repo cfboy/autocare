@@ -394,3 +394,22 @@ exports.services = async (req, res) => {
 
     }
 }
+
+exports.changeNotificationState = async (req, res) => {
+    let changed = false
+    try {
+        let { userId, notificationId, newStatus } = req.body,
+
+            customer = await UserService.changeNotificationState(userId, notificationId, newStatus)
+
+        if (customer)
+            changed = true
+
+        res.send({ changed })
+    } catch (error) {
+        console.error("ERROR: userController -> Tyring to change notification state.")
+        console.error(error.message)
+        res.send({ changed })
+
+    }
+}
