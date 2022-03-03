@@ -40,24 +40,19 @@ exports.webhook = async (req, res) => {
     switch (event.type) {
         case 'customer.created':
             console.log(JSON.stringify(data))
-            // if (data) {
-            //     let user = await UserService.addUser({
-            //         email: data.email,
-            //         password: 'Test1234', //TODO: optimize
-            //         billingID: data.id,
-            //         role: Roles.CUSTOMER,
-            //         firstName: data.name.split(' ')[0],
-            //         lastName: data.name.split(' ')[1],
-            //         phoneNumber: data.phone,
-            //         dateOfBirth: null,
-            //         city: data.address ? data.address.city : null,
-            //         brand: null,
-            //         model: null,
-            //         plate: null,
-            //         plan: 'none',
-            //         endDate: null
-            //     })
-            // }
+            if (data) {
+                let user = await UserService.addUser({
+                    email: data.email,
+                    password: 'Test1234', //TODO: optimize
+                    billingID: data.id,
+                    role: Roles.CUSTOMER,
+                    firstName: data.name.split(' ')[0],
+                    lastName: data.name.split(' ')[1],
+                    phoneNumber: data.phone,
+                    dateOfBirth: null,
+                    city: data.address ? data.address.city : null
+                })
+            }
             break
         case 'customer.deleted':
             break
@@ -66,27 +61,22 @@ exports.webhook = async (req, res) => {
         case 'invoice.paid':
             break
         case 'customer.subscription.created':
-            {
-                // TODO: move all logic to user.service
-                // const user = await UserService.getUserByBillingID(data.customer)
+            console.debug(`WEBHOOK: customer.subscription.created: ${data.id}`)
 
-                // if (data.plan.id === process.env.PRODUCT_BASIC) {
-                //     console.log('You are talking about basic product')
-                //     user.membershipInfo.plan = 'basic'
-                // }
-
-                // if (data.plan.id === process.env.PRODUCT_PRO) {
-                //     console.log('You are talking about pro product')
-                //     user.membershipInfo.plan = 'pro'
-                // }
-
-                // user.membershipInfo.hasTrial = true
-                // user.membershipInfo.endDate = new Date(data.current_period_end * 1000)
-
-                // await user.save()
-
-                break
+            let subscription = data
+            let subscriptionItems = subscription.items.data
+            let items = []
+            for (subItem of subscriptionItems) {
+                let newItem = { id: subItem.id, cars: [] }
+                items.push(newItem)
             }
+            console.debug(`WEBHOOK: Items to add ${items}`)
+
+            let customer = await UserService.addSubscriptionToUser(subscription.customer, { id: subscription.id, items: items })
+            console.debug(`WEBHOOK: Customer Updated ${customer.email}`)
+
+            break
+
         case 'customer.subscription.updated':
             {
                 // started trial
@@ -128,6 +118,8 @@ exports.webhook = async (req, res) => {
         case 'customer.subscription.deleted':
             break;
         default:
+            console.log(`Unhandled event type ${event.type}`);
+
     }
     res.sendStatus(200)
 }
@@ -270,43 +262,6 @@ exports.charges = async (req, res) => {
             message = 'User ID not found.'
             alertType = alertTypes.ErrorAlert
             console.log('User ID not found.')
-            res.redirect('/account')
-        }
-
-    } catch (error) {
-        console.error(error.message)
-        req.session.message = "Error trying to render the user events."
-        req.session.alertType = alertTypes.ErrorAlert
-        res.redirect('/account')
-
-    }
-
-}
-
-
-exports.events = async (req, res) => {
-    try {
-        let user = req.user,
-            { message, alertType } = req.session
-
-        if (message) {
-            req.session.message = ''
-            req.session.alertType = ''
-        }
-
-        if (user?.billingID) {
-            // const events = await Stripe.getCustomerEvents(user?.billingID)
-            const charges = await Stripe.getCustomerCharges(user?.billingID)
-
-
-            res.status(200).render('events/index.ejs', {
-                user,
-                charges, message, alertType
-            })
-        } else {
-            message = 'Billing ID not found.'
-            alertType = alertTypes.ErrorAlert
-            console.log('Billing ID not found.')
             res.redirect('/account')
         }
 

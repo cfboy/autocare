@@ -60,7 +60,7 @@ Download Stripe CLI.
 
 <!-- Go first to the path where stripe is installed. -->
 ```bash
-stripe listen --forward-to localhost:4242/webhook
+stripe listen --forward-to localhost:3000/webhook
 ```
 
 Copy the webhook secret and assign it to STRIPE_WEBHOOK_SECRET in .env file.

@@ -29,10 +29,16 @@
                         <b><%- item.price.product.name %></b>
                     </p>
                     <ul class="mb-0">
+                        <% if(item.cars.length > 0) { %>
                         <% for(car of item.cars) { %>
                         <li style="margin-left: 10px">
                             <%- car.brand %> - <%- car.model %> - <%- car.plate %>
                         </li>
+                        <% } %>
+                        <% } else { %>
+                        <a href="/create-car?subID=<%- stripeSubscription.id%>&itemID=<%- item.id%>" id="add-car-button"
+                            class="btn btn-primary text-white" style="margin: 0;" type="submit">
+                            Add Car</a>
                         <% } %>
                     </ul>
                     <% } %>

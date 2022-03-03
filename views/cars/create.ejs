@@ -59,8 +59,14 @@
                                                                 class="form-control mb-3 form-control-lg js-example-basic-single w-100">
                                                                 <option value="">Select One</option>
                                                                 <% for(item of siToAddCar) { %>
-                                                                <option value="<%= item.subscription%>/<%= item.id%>">
-                                                                    <%= item.price.product.name%></option>
+
+                                                                <% var selected = (item.id === itemID) ? "selected" : ""; %>
+
+                                                                <option value="<%= item.subscription%>/<%= item.id%>"
+                                                                    <%= selected%>>
+                                                                    <%= item.price.product.name%>
+                                                                    (<%= moment(item.created).isValid() ? moment(item.created * 1000).format(completeDateFormat) : 'N/A' %>)
+                                                                </option>
                                                                 <% } %>
 
                                                             </select>

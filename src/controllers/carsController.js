@@ -107,9 +107,11 @@ exports.view = async (req, res) => {
  * @param {*} req 
  * @param {*} res 
  */
-// TODO: change this method to new logic.
+
 exports.create = async (req, res) => {
     let { message, alertType } = req.session
+    // This values are filled if click Add Car Btn in a subscription item.
+    let { subID, itemID } = req.query
     let user = req.user
     // clear message y alertType
     req.session.message = ''
@@ -129,7 +131,7 @@ exports.create = async (req, res) => {
             }
         }
 
-        res.render('cars/create.ejs', { user, allMakes, allModels, siToAddCar, message, alertType })
+        res.render('cars/create.ejs', { user, allMakes, allModels, siToAddCar, subID, itemID, message, alertType })
 
     } catch (error) {
         console.log(error)
@@ -243,8 +245,8 @@ exports.delete = async (req, res) => {
             userCar = await UserService.getUserByCar(car)
 
         let subscription = userCar.subscriptions.find(subscription =>
-            subscription.items.filter(item =>
-                item.cars.filter(itemCar =>
+            subscription.items.find(item =>
+                item.cars.find(itemCar =>
                     itemCar.id = car.id)))
 
         let user = await UserService.removeUserCar(userCar.id, subscription.id, subscription.items[0].id, car)
