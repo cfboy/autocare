@@ -113,16 +113,24 @@ const getCarByPlate = (Car) => async (plate) => {
  * @returns 
  */
 async function getAllMakes() {
-    const apiRoute = 'GetAllMakes?format=json'
-    const apiResponse = await fetch(
-        'https://vpic.nhtsa.dot.gov/api/vehicles/' + apiRoute
-    )
-    let apiResponseJSON
+
     let allMakes = [], allModels = []
 
-    if (apiResponse.ok) {
-        apiResponseJSON = await apiResponse.json()
-        allMakes = apiResponseJSON?.Results
+    if (JSON.parse(process.env.USE_CAR_API)) {
+        console.debug("getAllMakes from API")
+        const apiRoute = 'GetAllMakes?format=json'
+        const apiResponse = await fetch(
+            'https://vpic.nhtsa.dot.gov/api/vehicles/' + apiRoute
+        )
+        let apiResponseJSON
+
+        if (apiResponse.ok) {
+            apiResponseJSON = await apiResponse.json()
+            allMakes = apiResponseJSON?.Results
+        }
+    } else {
+        console.debug("getAllMakes from local list")
+        allMakes = require('../../helpers/carMakes').carMakes
     }
 
     return { allMakes, allModels }
