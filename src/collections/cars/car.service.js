@@ -133,6 +133,8 @@ async function getAllMakes() {
         allMakes = require('../../helpers/carMakes').carMakes
     }
 
+    allMakes = allMakes.sort((a, b) => a.Make_Name.localeCompare(b.Make_Name))
+
     return { allMakes, allModels }
 }
 

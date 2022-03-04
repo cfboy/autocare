@@ -20,11 +20,15 @@ function findModel(makeName, carModel = null) {
                 modelSelect.attr('disabled', true);
             },
             success: function (result) {
+                let models = result.Results
+
+                models = models.sort((a, b) => a.Model_Name.localeCompare(b.Model_Name))
+
                 // console.log(result);
                 // Append the models to select element.
                 modelSelect.empty().append(new Option("Select One", "", false, false));
 
-                $.each(result.Results, function () {
+                $.each(models, function () {
                     let selected = (carModel && carModel == this.Model_Name)
                     // This works with select2 library.
                     var newOption = new Option(this.Model_Name, this.Model_Name, selected, selected);
