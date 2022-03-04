@@ -170,10 +170,15 @@
                     <i class="fa-solid fa-list"></i>
                 </a>
             </li>
-            <li class="nav-item dropdown">
+            <% var hasNotifi = (user?.notifications?.filter(notification => notification.isRead == false).length > 0) ? true : false %>
+
+            <li class="nav-item dropdown" onclick="<%= hasNotifi ? `changeNotificationState('', true, true)` : '' %>">
                 <a class="nav-link count-indicator" id="notificationDropdownBtn" href="#" data-bs-toggle="dropdown">
-                    <i <% var hasNotifi = (user?.notifications?.filter(notification => notification.isRead == false).length > 0) ? "text-primary" : "" %>
-                        class="fa-solid fa-bell <%=  hasNotifi%>"></i>
+                    <i class="fa-solid fa-bell text-primary"></i>
+                    <% if(hasNotifi) { %>
+                    <span class="count"></span>
+                    <% } %>
+
                 </a>
                 <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list pb-0 notifications-dropdown"
                     aria-labelledby="notificationDropdown" onclick="">
@@ -181,21 +186,23 @@
                         <p class="mb-0 font-weight-medium float-left">You have
                             <%= user?.notifications?.filter(notification => notification.isRead == false).length %> new
                             notifications </p>
-                        <span class="badge badge-pill badge-primary float-right">View all</span>
+                        <span onclick="window.location.href='/notifications';"
+                            class="badge badge-pill badge-primary float-right">
+                            View all</span>
                     </a>
                     <% if(user?.notifications) { %>
                     <div id="notifications">
                     </div>
 
-                    <% for(notification of user.notifications) { %>
-                    <a class="dropdown-item preview-item py-3">
-                        <div class="preview-thumbnail">
-                            <% var textPrimary = notification.isRead ? "" : "text-primary"%>
+                    <% for(notification of user.notifications.filter(notification => notification.isRead == false)) { %>
+                    <a id="a-<%= notification.id%>" class="dropdown-item preview-item py-3">
+                        <!-- <div class="preview-thumbnail">
+                            <%# var textPrimary = notification.isRead ? "" : "text-primary"%>
 
-                            <i id="<%= notification.id%>" class="fa-solid fa-eye <%=  textPrimary%> "
-                                onclick="changeNotificationState('<%= user.id%>','<%= notification.id%>','<%= !notification.isRead%>')"></i>
-                            <!-- <i class="mdi mdi-alert m-auto text-primary"></i> -->
-                        </div>
+                            <i id="<%# notification.id%>" class="fa-solid fa-eye <%#  textPrimary%> "
+                                onclick="changeNotificationState('<%# user.id%>','<%# notification.id%>','<%# !notification.isRead%>')"></i>
+                            <i class="mdi mdi-alert m-auto text-primary"></i>
+                        </div> -->
                         <div class="preview-item-content">
                             <h6 class="preview-subject fw-normal text-dark mb-1"><%= notification?.message%></h6>
                             <p class="fw-light small-text mb-0"> <%# moment(notification?.created_date).%>
@@ -280,25 +287,30 @@
         </div>`);
     })
 
-    function changeNotificationState(userId, notificationId, newStatus) {
-        $.ajax({
-            url: "/changeNotificationState",
-            type: "POST",
-            contentType: "application/json",
-            data: JSON.stringify({
-                userId,
-                notificationId,
-                newStatus
-            })
-        }).done(function (result) {
-            if (newStatus == "true")
-                $(`#${notificationId}`).removeClass('text-primary');
-            else
-                $(`#${notificationId}`).addClass('text-primary');
+    function changeNotificationState(notificationId, newStatus, allNotifications) {
+        var userId = '<%- user.id%>';
 
-        }).fail(function (err) {
-            console.log(err);
-        })
+        if (userId && newStatus && allNotifications) {
+            $.ajax({
+                url: "/changeNotificationState",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    userId,
+                    notificationId,
+                    newStatus,
+                    allNotifications
+                })
+            }).done(function (result) {
+                // if (newStatus == "true")
+                // $(`#a-${notificationId}`).remove();
+                // else
+                // $(`#${notificationId}`).addClass('text-primary');
+
+            }).fail(function (err) {
+                console.log(err);
+            })
+        }
     }
 
     $('.notifications-dropdown').on('click', function (e) {

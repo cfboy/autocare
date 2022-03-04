@@ -362,6 +362,7 @@ exports.delete = async (req, res) => {
     res.redirect('/users')
 }
 
+// TODO: change services because the services now are on cars.
 exports.services = async (req, res) => {
     try {
         let user = await UserService.getUserById(req.user.id)
@@ -395,12 +396,50 @@ exports.services = async (req, res) => {
     }
 }
 
+exports.notifications = async (req, res) => {
+    try {
+        let user = await UserService.getUserById(req.user.id)
+        let { message, alertType } = req.session
+
+        if (message) {
+            req.session.message = ''
+            req.session.alertType = ''
+        }
+
+        if (user) {
+            let notifications = user.notifications
+            res.status(200).render('user/notifications.ejs', {
+                user: req.user,
+                notifications,
+                message,
+                alertType
+            })
+        } else {
+            message = 'Customer not found.'
+            alertType = alertTypes.ErrorAlert
+            console.log('Customer not found.')
+            res.redirect('/account', { message, alertType })
+        }
+    } catch (error) {
+        console.error(error.message)
+        req.session.message = "Error trying to render the user notifications."
+        req.session.alertType = alertTypes.ErrorAlert
+        res.redirect('/account')
+
+    }
+}
+
 exports.changeNotificationState = async (req, res) => {
     let changed = false
     try {
-        let { userId, notificationId, newStatus } = req.body,
-
+        let { userId, notificationId, newStatus, allNotifications } = req.body
+        let customer
+        if (notificationId) {
             customer = await UserService.changeNotificationState(userId, notificationId, newStatus)
+        } else if (allNotifications) {
+            console.debug("readAllNotifications")
+            customer = await UserService.readAllNotifications(userId)
+        }
 
         if (customer)
             changed = true

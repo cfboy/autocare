@@ -84,6 +84,7 @@ router.post('/edit-user', checkAuthenticated, userController.update)
 router.post('/changePassword', checkAuthenticated, authChangePassword, userController.updatePassword)
 router.get('/delete-user/:id', checkAuthenticated, authDeleteUser, userController.delete)
 
+router.get('/notifications', checkAuthenticated, userController.notifications)
 router.post('/changeNotificationState', checkAuthenticated, userController.changeNotificationState)
 
 //------ Cars Routes ------

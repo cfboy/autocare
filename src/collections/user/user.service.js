@@ -394,6 +394,34 @@ const changeNotificationState = (User) => async (userID, notificationID, value) 
 }
 
 
+/**
+ * This function marks as read all unread notifications.
+ * @param {userID, authorizedBy, location} User 
+ * @returns user object, service object
+ */
+const readAllNotifications = (User) => async (userID) => {
+    console.log(`readAllNotifications() ID: ${userID}`)
+    let customer = await User.findByIdAndUpdate(
+        {
+            "_id": userID
+        },
+        {
+            $set: { 'notifications.$[outer].isRead': true }
+        },
+        {
+            "arrayFilters": [{ "outer.isRead": false }]
+        }, function (err, doc) {
+            if (err) {
+                console.error(err)
+                console.error(err.message)
+            } else {
+                console.debug("Notification Changed.");
+            }
+        })
+
+    return customer
+}
+
 module.exports = (User) => {
     return {
         addUser: addUser(User),
@@ -416,6 +444,7 @@ module.exports = (User) => {
         getUsersByList: getUsersByList(User),
         addNewService: addNewService(User),
         addNotification: addNotification(User),
-        changeNotificationState: changeNotificationState(User)
+        changeNotificationState: changeNotificationState(User),
+        readAllNotifications: readAllNotifications(User)
     }
 }
