@@ -1,3 +1,8 @@
+/**
+ * This function is called from AJAX function to fing the mondel of selected brand/make.
+ * @param {*} makeName 
+ * @param {*} carModel 
+ */
 function findModel(makeName, carModel = null) {
     console.log("Make Name: " + makeName);
     // Call to Cars API to get the Model of selected Make.

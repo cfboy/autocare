@@ -76,7 +76,6 @@ router.get('/create-user', checkAuthenticated, userController.createUser)
 router.get('/view-user/:id', checkAuthenticated, userController.viewUser)
 router.get('/edit-user/:id', checkAuthenticated, userController.editUser)
 router.get('/changePassword/:id', checkAuthenticated, authChangePassword, userController.changePassword)
-router.get('/services', checkAuthenticated, userController.services)
 
 //------ USER CRUDS ------
 router.post('/create-user', checkAuthenticated, userController.save)
@@ -92,6 +91,7 @@ router.get('/cars', checkAuthenticated, carsController.cars)
 router.get('/car/:id', checkAuthenticated, carsController.view)
 router.get('/create-car', checkAuthenticated, authAddCar, carsController.create)
 router.get('/edit-car/:id', checkAuthenticated, authEditCar, carsController.edit)
+router.get('/services', checkAuthenticated, carsController.services)
 
 router.post('/create-car', checkAuthenticated, authAddCar, carsController.save)
 router.post('/edit-car', checkAuthenticated, authEditCar, carsController.update)

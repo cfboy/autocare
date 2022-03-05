@@ -14,7 +14,8 @@ const getCars = (Car) => (cars) => {
         } else {
             console.debug("CAR-SERVICE: Found Cars: ", docs.length);
         }
-    })
+    }).populate({ path: 'services.location', model: 'location' })
+        .populate({ path: 'services.authorizedBy', model: 'user' })
 }
 
 /**
@@ -29,7 +30,8 @@ const getCarByID = (Car) => async (carID) => {
         } else {
             console.debug("CAR-SERVICE: Found car: ", docs.brand);
         }
-    })
+    }).populate({ path: 'services.location', model: 'location' })
+        .populate({ path: 'services.authorizedBy', model: 'user' })
 }
 
 /**
@@ -38,6 +40,7 @@ const getCarByID = (Car) => async (carID) => {
  * @returns car object
  */
 const addCar = (Car) => async (brand, model, plate) => {
+    // TODO: change this to find first then create new car.
     try {
         if (!brand || !model || !plate) {
             throw new Error(`Missing Data. Please provide all data for car.`)
@@ -80,6 +83,8 @@ const updateCar = (Car) => async (id, updates) => {
  * @returns promise
  */
 const deleteCar = (Car) => async (id) => {
+    // TODO: implement not forever delete.
+
     console.log(`deleteCar() by ID: ${id}`)
 
     return Car.deleteOne({ _id: id }, function (err, docs) {
@@ -106,8 +111,43 @@ const getCarByPlate = (Car) => async (plate) => {
             else
                 console.debug(`CAR-SERVICE: Not Found car with plate: ${plate}`);
         }
-    })
+    }).populate({ path: 'services.location', model: 'location' })
+        .populate({ path: 'services.authorizedBy', model: 'user' })
 }
+
+/**
+ * This function add new service to a Car.
+ * Find the Car and add new service.
+ * @param {carID, authorizedBy, location} 
+ * @returns car object, service object
+ */
+const addService = (Car) => async (carID, authorizedBy, location) => {
+    console.log(`addService() ID: ${userID}`)
+
+    let service = {
+        // id is a random ID genetated with letters and numbers. 
+        // TODO: change the id.
+        id: 'AC-' + Math.random().toString(36).toUpperCase().substring(2, 6),
+        date: Date.now(),
+        location: location,
+        authorizedBy: authorizedBy?._id
+
+    }, car = await Car.findByIdAndUpdate({ _id: carID }, { $addToSet: { services: service } },
+        { new: true }, function (err, doc) {
+            if (err) {
+                console.error(err)
+                console.error(err.message)
+            } else {
+                console.debug(`Service Added (${service?.id}) to a car ${doc.id}`);
+            }
+        }).populate({ path: 'services.location', model: 'location' })
+        .populate({ path: 'services.authorizedBy', model: 'user' })
+
+    service = (car.services.find(({ id }) => id === service.id))
+
+    return [car, service]
+}
+
 /**
  * This function get all makes from external API.
  * @returns 
@@ -146,6 +186,7 @@ module.exports = (Car) => {
         updateCar: updateCar(Car),
         deleteCar: deleteCar(Car),
         getCarByPlate: getCarByPlate(Car),
+        addService: addService(Car),
         getAllMakes: getAllMakes
     }
 }

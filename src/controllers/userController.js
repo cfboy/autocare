@@ -362,40 +362,6 @@ exports.delete = async (req, res) => {
     res.redirect('/users')
 }
 
-// TODO: change services because the services now are on cars.
-exports.services = async (req, res) => {
-    try {
-        let user = await UserService.getUserById(req.user.id)
-        let { message, alertType } = req.session
-
-        if (message) {
-            req.session.message = ''
-            req.session.alertType = ''
-        }
-
-        if (user) {
-            let services = user.services
-            res.status(200).render('user/services.ejs', {
-                user: req.user,
-                services,
-                message,
-                alertType
-            })
-        } else {
-            message = 'Customer not found.'
-            alertType = alertTypes.ErrorAlert
-            console.log('Customer not found.')
-            res.redirect('/account', { message, alertType })
-        }
-    } catch (error) {
-        console.error(error.message)
-        req.session.message = "Error trying to render the user services."
-        req.session.alertType = alertTypes.ErrorAlert
-        res.redirect('/account')
-
-    }
-}
-
 exports.notifications = async (req, res) => {
     try {
         let user = await UserService.getUserById(req.user.id)
@@ -452,3 +418,6 @@ exports.changeNotificationState = async (req, res) => {
 
     }
 }
+
+
+// TODO: Remove car from subscriptions

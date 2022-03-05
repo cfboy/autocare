@@ -211,10 +211,6 @@ const getUserById = (User) => (id) => {
             console.debug("USER-SERVICE: Found user to edit: ", docs);
         }
     }).populate('locations').populate({ path: 'subscriptions.items.cars', model: 'car' })
-        .populate({ path: 'services.location', model: 'location' })
-        .populate({ path: 'services.authorizedBy', model: 'user' })
-        .populate({ path: 'services.car', model: 'car' })
-
 }
 
 /**
@@ -297,45 +293,9 @@ const getUsersByList = (User) => async (users) => {
 }
 
 /**
- * This function add new service to user.
- * Find the user and add new service.
- * @param {userID, authorizedBy, location} User 
- * @returns user object, service object
- */
-// TODO: move to cars service.
-const addNewService = (User) => async (userID, authorizedBy, location, car) => {
-    console.log(`addNewService() ID: ${userID}`)
-
-    let service = {
-        // id is a random ID genetated with letters and numbers. 
-        id: 'AC-' + Math.random().toString(36).toUpperCase().substring(2, 6),
-        date: Date.now(),
-        location: location,
-        authorizedBy: authorizedBy?._id,
-        car: car
-
-    }, customer = await User.findByIdAndUpdate({ _id: userID }, { $addToSet: { services: service } },
-        { new: true }, function (err, doc) {
-            if (err) {
-                console.error(err)
-                console.error(err.message)
-            } else {
-                console.debug("Service Added : ", service?.id);
-            }
-        }).populate({ path: 'services.location', model: 'location' })
-        .populate({ path: 'services.authorizedBy', model: 'user' })
-        .populate({ path: 'services.car', model: 'car' })
-
-    service = (customer.services.find(({ id }) => id === service.id))
-
-    return [customer, service]
-}
-
-
-/**
  * This function add new notification to user.
  * @param {userID, authorizedBy, location} User 
- * @returns user object, service object
+ * @returns user object
  */
 const addNotification = (User) => async (userID, message) => {
     console.log(`addNotification() ID: ${userID}`)
@@ -363,7 +323,7 @@ const addNotification = (User) => async (userID, message) => {
 /**
  * This function add new notification to user.
  * @param {userID, authorizedBy, location} User 
- * @returns user object, service object
+ * @returns user object
  */
 const changeNotificationState = (User) => async (userID, notificationID, value) => {
     console.log(`readNotification() ID: ${userID}`)
@@ -397,7 +357,7 @@ const changeNotificationState = (User) => async (userID, notificationID, value) 
 /**
  * This function marks as read all unread notifications.
  * @param {userID, authorizedBy, location} User 
- * @returns user object, service object
+ * @returns user object
  */
 const readAllNotifications = (User) => async (userID) => {
     console.log(`readAllNotifications() ID: ${userID}`)
@@ -442,7 +402,6 @@ module.exports = (User) => {
         getUserByCar: getUserByCar(User),
         getUsersByLocationID: getUsersByLocationID(User),
         getUsersByList: getUsersByList(User),
-        addNewService: addNewService(User),
         addNotification: addNotification(User),
         changeNotificationState: changeNotificationState(User),
         readAllNotifications: readAllNotifications(User)

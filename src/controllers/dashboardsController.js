@@ -11,6 +11,11 @@ const alertTypes = require('../helpers/alertTypes'),
 let readingObjs = {}
 let readingQueue = []
 
+/**
+ * This function renders the home page / pricing page.
+ * @param {*} req 
+ * @param {*} res 
+ */
 exports.home = async (req, res) => {
     let user = req.user,
         // products = await Stripe.getAllProducts(),
@@ -23,6 +28,7 @@ exports.home = async (req, res) => {
         user
     })
 }
+
 /**
  * This function handle the dashboards of the different roles. 
  * @param {*} req 
@@ -196,13 +202,15 @@ exports.useService = async (req, res) => {
         let { userID, carID } = req.body
 
         if (userID) {
+            let customer = await UserService.getUserByCar(userID)
             let car = await CarService.getCarByID(carID)
-            let authorizedBy = req.user
-            let locationOfService = req?.user?.locations[0] // TODO: Change location
+            let authorizedBy = req.user,
+                service
+            let locationOfService = authorizedBy.locations[0] // TODO: Change location
 
-            let [customer, service] = await UserService.addNewService(userID, authorizedBy, locationOfService, car)
+            [car, service] = await CarService.addService(car.id, authorizedBy, locationOfService)
 
-            if (customer && service)
+            if (car && service)
                 //Log this action.
                 HistoryService.addHistory(`Use Service: ${service.id}`, historyTypes.SERVICE, customer, service.location)
 
@@ -222,6 +230,12 @@ exports.useService = async (req, res) => {
     }
 }
 
+/**
+ * This function is called from the REKOR software.
+ * On req receive the results of reading. 
+ * @param {*} req 
+ * @param {*} res 
+ */
 exports.carCheck = async (req, res) => {
     try {
         if (req.body?.error) {
@@ -234,7 +248,7 @@ exports.carCheck = async (req, res) => {
             switch (dataType) {
                 case 'alpr_results':
                     req.io.emit('reading-plates');
-                    
+
                     // Timer to delay
                     await new Promise(resolve => setTimeout(resolve, 2000));
 

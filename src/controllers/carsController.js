@@ -34,6 +34,7 @@ exports.cars = async (req, res) => {
             res.redirect('/')
         } else {
             let userCars = []
+            // TODO: move this to service.
             for (customerSub of user.subscriptions) {
                 // Iterates the items on DB subscription.
                 for (customerItem of customerSub.items) {
@@ -286,6 +287,12 @@ exports.delete = async (req, res) => {
 
 }
 
+/**
+ * This function is called on AJAX function to validate if the carPlate is valid or not.
+ * The validation is make looking into the recently added car to cart before checkout or in the Car tables on DB.
+ * @param {*} req 
+ * @param {*} res 
+ */
 exports.validatePlate = async (req, res) => {
     try {
         let carPlate = req.body.plateNumber,
@@ -306,4 +313,61 @@ exports.validatePlate = async (req, res) => {
         res.render('Error validating car plate.')
     }
 
+}
+// TODO: change services because the services now are on cars.
+exports.services = async (req, res) => {
+    try {
+
+        // Message for alerts
+        let { message, alertType } = req.session,
+            cars,
+            // Passport store the user in req.user
+            // TODO: implement for othe user.
+            user = req.user
+
+        // clear message y alertType
+        if (message) {
+            req.session.message = ''
+            req.session.alertType = ''
+        }
+
+        if (!user) {
+            res.redirect('/')
+        } else {
+            let userCars = []
+            // TODO: move this to service.
+            for (customerSub of user.subscriptions) {
+                // Iterates the items on DB subscription.
+                for (customerItem of customerSub.items) {
+                    // then iterates cars in DB item.
+                    for (car of customerItem.cars) {
+                        userCars.push(car)
+                    }
+                }
+            }
+            cars = await CarService.getCars(userCars)
+
+            let userServices = [] //On this array store all the services.
+            for (car of cars) {
+                for (service of car.services) {
+                    userServices.push(service)
+                }
+            }
+
+            // Manage services by car on client side.
+            res.render('cars/index.ejs', {
+                user, cars, message, alertType,
+                userServices,
+                canAddCar: canAddCar(user),
+                canManageCars: canManageCars(user)
+            })
+
+        }
+    } catch (error) {
+        console.error(error.message)
+        req.session.message = "Error trying to render the user services."
+        req.session.alertType = alertTypes.ErrorAlert
+        res.redirect('/account')
+
+    }
 }
