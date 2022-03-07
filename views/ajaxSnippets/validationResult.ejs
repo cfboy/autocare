@@ -9,8 +9,6 @@
                             <h4>Customer Information </h4>
                         </div>
                         <div>
-                            <!-- <a href="/create-user" class="btn btn-primary btn-icon-text" type="button"><i class="mdi mdi-map-marker-plus btn-icon-prepend"></i>Add
-                            User</a> -->
                             <a href="/edit-user/<%- customer?.id%>?url=/validateMembership" type="button"
                                 data-toggle="tooltip" title="Edit user"
                                 class="btn btn-icon btn-icon-no-border no-margin">
@@ -71,37 +69,43 @@
 
                     </p>
                     <% } %>
-
                 </div>
                 <div class="col-md-6 p-3">
                     <h4 class="text-center">Membership Status</h4>
-                    <br>
                     <div class="col-md-12 text-center validation-msgs">
                         <% if([stripeStatus.ACTIVE, stripeStatus.TRIALING].includes(subscription?.data?.status)) { %>
                         <i class="fas fa-8x fa-check-circle valid"></i>
                         <p style="text-transform: uppercase">
                             <%= subscription?.data?.status %>
                         </p>
-                        <br>
-                        <div class="mt-3 mb-3">
-                            <button id="use-service-button" user-id="<%= customer?.id%>" car-id="<%= car?.id%>"
-                                class="btn btn-block btn-primary btn-lg font-weight-medium btn-icon-text" type="submit">
-                                USE SERVICE
-                                <i class="menu-icon mdi mdi-car-wash btn-icon-apepend"></i>
-                            </button>
-                        </div>
 
                         <% } else if([stripeStatus.CANCELED, stripeStatus.UNPAID, stripeStatus.NONE].includes(subscription?.data?.status)) { %>
                         <i class="far fa-8x fa-times-circle invalid"></i>
                         <p style="text-transform: uppercase">
                             <%= subscription?.data?.status %>
                         </p>
-                        <br>
-                        <button class="btn btn-primary btn-lg text-white mb-0 me-0 manage-billing-button" type="submit"
-                            value="<%- customer.billingID%>" email="<%- customer.email%>">
-                            Manage Billing
-                        </button>
                         <% } %>
+                        <br>
+                        <div class="mt-3 mb-3">
+                            <% var subscriptionOnValidPeriod = moment(new Date()).isBefore(subscription?.data?.current_period_end * 1000)%>
+                            <% if(subscriptionOnValidPeriod) { %>
+                            <button
+                                class="btn btn-block btn-primary btn-lg font-weight-medium btn-icon-text manage-billing-button"
+                                type="submit" value="<%- customer.billingID%>" email="<%- customer.email%>">
+                                Manage Billing
+                                <i class="fab fa-stripe-s btn-icon-apepend"></i>
+                                <!-- <i class="menu-icon mdi mdi-car-wash "></i> -->
+
+                            </button>
+
+                            <button id="use-service-button" user-id="<%= customer?.id%>" car-id="<%= car?.id%>"
+                                class="btn btn-block btn-success btn-lg font-weight-medium btn-icon-text" type="submit">
+                                USE SERVICE
+                                <i class="menu-icon mdi mdi-car-wash btn-icon-apepend"></i>
+                            </button>
+                            <% } %>
+                        </div>
+
                     </div>
                 </div>
                 <% } else if(!customer){ %>
@@ -118,7 +122,6 @@
                 </div>
                 <% } %>
             </div>
-
         </div>
     </div>
 </div>

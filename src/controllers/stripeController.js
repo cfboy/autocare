@@ -236,6 +236,11 @@ exports.billing = async (req, res) => {
     res.json({ url: session.url })
 }
 
+/**
+ * This function render the stripe charges of user.
+ * @param {*} req 
+ * @param {*} res 
+ */
 exports.charges = async (req, res) => {
     try {
         let user = req.user,

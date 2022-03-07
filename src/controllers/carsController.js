@@ -112,7 +112,7 @@ exports.view = async (req, res) => {
 exports.create = async (req, res) => {
     let { message, alertType } = req.session
     // This values are filled if click Add Car Btn in a subscription item.
-    let { subID, itemID } = req.query
+    let { itemID } = req.query
     let user = req.user
     // clear message y alertType
     req.session.message = ''
@@ -122,17 +122,17 @@ exports.create = async (req, res) => {
         let { allMakes, allModels } = await CarService.getAllMakes()
 
         let siToAddCar = []
-
-        for (subscriptions of user.subscriptions) {
-            for (item of subscriptions.items) {
-                if (item.cars.length === 0) {
-                    let stripeItem = await Stripe.getSubscriptionItemById(item.id)
+        let stripeItem
+        for (subscription of user.subscriptions) {
+            for (item of subscription.items) {
+                stripeItem = await Stripe.getSubscriptionItemById(item.id)
+                if (item.cars.length < stripeItem.quantity) {
                     siToAddCar.push(stripeItem)
                 }
             }
         }
 
-        res.render('cars/create.ejs', { user, allMakes, allModels, siToAddCar, subID, itemID, message, alertType })
+        res.render('cars/create.ejs', { user, allMakes, allModels, siToAddCar, itemID, message, alertType })
 
     } catch (error) {
         console.log(error)
@@ -314,7 +314,7 @@ exports.validatePlate = async (req, res) => {
     }
 
 }
-// TODO: change services because the services now are on cars.
+
 exports.services = async (req, res) => {
     try {
 
@@ -334,38 +334,60 @@ exports.services = async (req, res) => {
         if (!user) {
             res.redirect('/')
         } else {
-            let userCars = []
-            // TODO: move this to service.
-            for (customerSub of user.subscriptions) {
-                // Iterates the items on DB subscription.
-                for (customerItem of customerSub.items) {
-                    // then iterates cars in DB item.
-                    for (car of customerItem.cars) {
-                        userCars.push(car)
-                    }
-                }
-            }
-            cars = await CarService.getCars(userCars)
 
-            let userServices = [] //On this array store all the services.
-            for (car of cars) {
-                for (service of car.services) {
-                    userServices.push(service)
-                }
-            }
+            let userCars = await CarService.getAllCarsByUser(user)
+
+            let services = await CarService.getAllServicesByCarList(userCars)
 
             // Manage services by car on client side.
-            res.render('cars/index.ejs', {
+            res.render('services/index.ejs', {
                 user, cars, message, alertType,
-                userServices,
-                canAddCar: canAddCar(user),
-                canManageCars: canManageCars(user)
+                services
             })
 
         }
     } catch (error) {
         console.error(error.message)
         req.session.message = "Error trying to render the user services."
+        req.session.alertType = alertTypes.ErrorAlert
+        res.redirect('/account')
+
+    }
+}
+
+// TODO: change services because the services now are on cars.
+exports.viewService = async (req, res) => {
+    try {
+
+        // Message for alerts
+        let { message, alertType } = req.session,
+            cars,
+            // Passport store the user in req.user
+            user = req.user
+
+        // clear message y alertType
+        if (message) {
+            req.session.message = ''
+            req.session.alertType = ''
+        }
+
+        if (!user) {
+            res.redirect('/')
+        } else {
+            let id = req.params.id,
+                carID = req.query.carID
+
+            let service = await CarService.getServicesByIdAndCarId(id, carID)
+
+            res.render('services/view.ejs', {
+                user, message, alertType,
+                service
+            })
+
+        }
+    } catch (error) {
+        console.error(error.message)
+        req.session.message = "Error trying to render the service."
         req.session.alertType = alertTypes.ErrorAlert
         res.redirect('/account')
 

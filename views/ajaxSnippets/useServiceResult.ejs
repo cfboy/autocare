@@ -2,36 +2,46 @@
     <h4 class="text-center">Service Recipe</h4>
     <br>
     <% if(service) { %>
-    <div class="col-md-12">
+    <div class="col-md-12 doc-credits">
         <ul>
             <li>
-                <p>Service ID : <%= service.id%></p>
+                <h4>Service ID : <b><%= service.id%></b></h4>
             </li>
             <li>
-                <p>Approved By: <%= service?.authorizedBy?.email%></p>
+                <h4>Approved By: <%= service?.authorizedBy?.email%></h4>
             </li>
             <li>
-                <p>Date :
+                <h4>Date :
                     <%= moment(service.date).isValid() ? moment(service.date).format(completeDateFormat) : 'N/A' %>
-                </p>
+                </h4>
             </li>
             <li>
-                <p>Car: <%= service?.car?.brand%>, <%= service?.car?.model%> (<%= service?.car?.plate%>)</p>
+                <h4>Car: <%= car?.brand%>, <%= car?.model%> (<%= car?.plate%>)</h4>
             </li>
             <li>
-                <p>
+                <h4>
                     Location : <%= service?.location?.name%>
-                </p>
+                </h4>
             </li>
         </ul>
-
-
     </div>
     <% } else { %>
     <div class="col-md-12 text-center validation-msgs">
         <i class="fas fa-8x fa-exclamation-triangle warning"></i>
         <p>Service not found.</p>
 
-        <% } %>
+    </div>
+    <% } %>
+    <div class="col-md-12 text-center">
+        <button id="doneServiceBtn" class="btn btn-block btn-inverse-dark btn-lg font-weight-medium auth-form-btn"
+            type="submit">Done</button>
     </div>
 </div>
+
+
+<script>
+    $("#doneServiceBtn").on("click", function (event) {
+        $('#membershipDetails').empty();
+        cleanInput("plateNumber");
+    })
+</script>

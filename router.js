@@ -92,6 +92,7 @@ router.get('/car/:id', checkAuthenticated, carsController.view)
 router.get('/create-car', checkAuthenticated, authAddCar, carsController.create)
 router.get('/edit-car/:id', checkAuthenticated, authEditCar, carsController.edit)
 router.get('/services', checkAuthenticated, carsController.services)
+router.get('/service/:id', checkAuthenticated, carsController.viewService)
 
 router.post('/create-car', checkAuthenticated, authAddCar, carsController.save)
 router.post('/edit-car', checkAuthenticated, authEditCar, carsController.update)

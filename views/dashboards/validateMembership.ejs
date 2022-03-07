@@ -96,7 +96,7 @@
                                                         </form>
                                                     </div>
                                                 </div>
-                                                <div class="col-lg-8">
+                                                <div class="col-lg-8 p-3">
                                                     <!-- Render results in membershipDetails div -->
                                                     <div class="membershipDetails" id="membershipDetails"></div>
                                                 </div>
@@ -130,8 +130,6 @@
     <script src="../js/off-canvas.js"></script>
     <script src="../js/hoverable-collapse.js"></script>
     <script src="../js/template.js"></script>
-    <script src="../js/settings.js"></script>
-    <script src="../js/todolist.js"></script>
     <!-- endinject -->
     <!-- Custom js for this page-->
 
@@ -147,7 +145,8 @@
     <%- include('../partials/alerts.ejs', {message, alertType}); %>
 
     <script>
-        const socket = io('<%= domain%>');
+        // The socket is already define on navbar.
+        // const socket = io('<%# domain%>');
 
         // Establish Route
         // socket.on('connection');
@@ -212,7 +211,6 @@
                 })
             }
         });
-
 
         var showResult = function (updateDiv, result) {
             $(updateDiv).html(result);

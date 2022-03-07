@@ -396,6 +396,8 @@ async function getSubscriptionById(id) {
             expand: ['items.data.price.product']
         })
 
+    console.debug("Subscription: " + subscription.id)
+
     return subscription
 }
 

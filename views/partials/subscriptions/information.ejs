@@ -29,16 +29,20 @@
                         <b><%- item.price.product.name %></b> (<%= item.cars.length %>/<%= item.quantity%>)
                     </p>
                     <ul class="mb-0">
+                        <!-- Show all item cars -->
                         <% if(item.cars.length > 0) { %>
                         <% for(car of item.cars) { %>
                         <li style="margin-left: 10px">
                             <%- car.brand %> - <%- car.model %> - <%- car.plate %>
                         </li>
                         <% } %>
-                        <% } else { %>
-                        <a href="/create-car?subID=<%- stripeSubscription.id%>&itemID=<%- item.id%>" id="add-car-button"
+                        <% } %>
+
+                        <!-- If the length of cars is less than item quantity, then show add car btn. -->
+                        <% if(item.cars.length < item.quantity) { %>
+                        <a href="/create-car?itemID=<%- item.id%>" id="add-car-button"
                             class="btn btn-primary text-white" style="margin: 0;" type="submit">
-                            Add Car</a>
+                            Add Missing Car</a>
                         <% } %>
                     </ul>
                     <% } %>

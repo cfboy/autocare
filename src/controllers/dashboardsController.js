@@ -174,6 +174,7 @@ exports.validate = async (req, res) => {
             HistoryService.addHistory(`Validate Membership: ${carPlate}`, historyTypes.USER_ACTION, req.user, req?.user?.locations[0])
         }
 
+        // Remove readed plate to readingQueue list.
         readingQueue = readingQueue.filter(item => carPlate !== item.plate)
 
         res.render('ajaxSnippets/validationResult.ejs', {
@@ -202,31 +203,31 @@ exports.useService = async (req, res) => {
         let { userID, carID } = req.body
 
         if (userID) {
-            let customer = await UserService.getUserByCar(userID)
             let car = await CarService.getCarByID(carID)
+            let customer = await UserService.getUserByCar(car)
             let authorizedBy = req.user,
                 service
-            let locationOfService = authorizedBy.locations[0] // TODO: Change location
 
-            [car, service] = await CarService.addService(car.id, authorizedBy, locationOfService)
+            // TODO: Change location 
+            [car, service] = await CarService.addService(car.id, authorizedBy, authorizedBy.locations[0])
 
             if (car && service)
                 //Log this action.
                 HistoryService.addHistory(`Use Service: ${service.id}`, historyTypes.SERVICE, customer, service.location)
 
-            res.render('ajaxSnippets/useServiceResult.ejs', { customer, service })
+            res.render('ajaxSnippets/useServiceResult.ejs', { customer, service, car })
         } else {
             req.session.message = `USER ID UNDEFINED`
             req.session.alertType = alertTypes.ErrorAlert
             console.debug(`userID is undefined.`)
-            res.redirect('/validateMembership')
+            res.render(`Error trying to log service.`)
         }
     } catch (error) {
         console.debug("ERROR: dashboardController -> Tyring to log use service.")
-        console.debug(error.message)
+        console.debug(error)
         req.session.message = `ERROR: ${error.message}`
         req.session.alertType = alertTypes.ErrorAlert
-        res.redirect('/validateMembership')
+        res.render(`Error trying to log service.`)
     }
 }
 

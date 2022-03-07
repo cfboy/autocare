@@ -131,7 +131,7 @@
                                     <div class="card card-rounded">
                                         <div class="card-body">
                                             <% for(stripeSubscription of subscriptions) { %>
-                                            <%- include('../partials/subscriptions/information.ejs' , {showManageBtn : true, customer : user, stripeSubscription : stripeSubscription.data, membershipStatus : stripeSubscription?.data?.status}); %>
+                                            <%- include('../partials/subscriptions/information.ejs' , {showManageBtn : true, customer : customer, stripeSubscription : stripeSubscription.data, membershipStatus : stripeSubscription?.data?.status}); %>
                                             <% }  %>
                                         </div>
                                     </div>
@@ -226,6 +226,7 @@
     <script type="text/javascript" src="https://js.stripe.com/v3/"></script>
     <script src="../js/jquery.cookie.js" type="text/javascript"></script>
     <!-- End custom js for this page-->
+    <script type="text/javascript" src="../js/account.js"></script>
 
     <!-- Alerts Code -->
     <%- include('../partials/alerts.ejs', {message, alertType}); %>

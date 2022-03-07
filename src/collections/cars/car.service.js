@@ -122,7 +122,7 @@ const getCarByPlate = (Car) => async (plate) => {
  * @returns car object, service object
  */
 const addService = (Car) => async (carID, authorizedBy, location) => {
-    console.log(`addService() ID: ${userID}`)
+    console.log(`addService() ID: ${carID}`)
 
     let service = {
         // id is a random ID genetated with letters and numbers. 
@@ -130,7 +130,7 @@ const addService = (Car) => async (carID, authorizedBy, location) => {
         id: 'AC-' + Math.random().toString(36).toUpperCase().substring(2, 6),
         date: Date.now(),
         location: location,
-        authorizedBy: authorizedBy?._id
+        authorizedBy: authorizedBy
 
     }, car = await Car.findByIdAndUpdate({ _id: carID }, { $addToSet: { services: service } },
         { new: true }, function (err, doc) {
@@ -146,6 +146,100 @@ const addService = (Car) => async (carID, authorizedBy, location) => {
     service = (car.services.find(({ id }) => id === service.id))
 
     return [car, service]
+}
+
+/**
+ * This function get service by id.
+ * @param {*} Car 
+ * @returns service
+ */
+const getServiceById = (Car) => async (serviceID) => {
+    return Car.findOne({ 'services.id': serviceID })
+        .populate({ path: 'services.location', model: 'location' })
+        .populate({ path: 'services.authorizedBy', model: 'user' })
+        .then(result => {
+            if (result) {
+                console.debug(`Successfully found document: ${result.id}.`);
+            } else {
+                console.debug("No document matches the provided query.");
+            }
+            let service = result?.services?.find(service => service.id == serviceID)
+            service.car = result
+            return service;
+        })
+        .catch(err => console.error(`Failed to find document: ${err}`));
+}
+
+/**
+ * This function return all cars by user object.
+ * @param {*} user 
+ * @returns car list
+ */
+async function getAllCarsByUser(user) {
+    console.debug("getAllCarsByUser()...")
+
+    let userCars = []
+    // TODO: move this to service.
+    for (customerSub of user?.subscriptions) {
+        // Iterates the items on DB subscription.
+        for (customerItem of customerSub?.items) {
+            // then iterates cars in DB item.
+            for (car of customerItem?.cars) {
+                userCars.push(car)
+            }
+        }
+    }
+
+    return userCars
+}
+
+/**
+ * This funtion returns all services by servideID and carID, if not have carID the call another function.
+ * @param {*} serviceID 
+ * @param {*} carID 
+ * @returns service
+ */
+async function getServicesByIdAndCarId(serviceID, carID) {
+    console.debug("getServicesByIdAndCarId()...")
+    let service
+
+    if (carID) {
+        let car = await this.getCarByID(carID)
+
+        for (carService of car.services) {
+            if (carService.id == serviceID) {
+                service = carService
+                service.car = car
+            }
+        }
+    } else {
+        service = await this.getServiceById(serviceID)
+    }
+
+    return service
+}
+
+/**
+ * This function returns all services by car list.
+ * @param {*} userCars 
+ * @returns service list
+ */
+async function getAllServicesByCarList(userCars) {
+    console.debug("getAllServicesByCarList()...")
+
+    let allServices = [] //On this array store all the services.
+
+    if (userCars) {
+        allServices = [] //On this array store all the services.
+        for (car of userCars) {
+            for (service of car.services) {
+                service.car = car
+                allServices.push(service)
+            }
+        }
+
+        return allServices
+    }
 }
 
 /**
@@ -187,6 +281,10 @@ module.exports = (Car) => {
         deleteCar: deleteCar(Car),
         getCarByPlate: getCarByPlate(Car),
         addService: addService(Car),
-        getAllMakes: getAllMakes
+        getServiceById: getServiceById(Car),
+        getServicesByIdAndCarId: getServicesByIdAndCarId,
+        getAllMakes: getAllMakes,
+        getAllCarsByUser: getAllCarsByUser,
+        getAllServicesByCarList: getAllServicesByCarList
     }
 }

@@ -418,6 +418,3 @@ exports.changeNotificationState = async (req, res) => {
 
     }
 }
-
-
-// TODO: Remove car from subscriptions
