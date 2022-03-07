@@ -29,22 +29,22 @@ function canDeleteCar(user, carID) {
 function canAddCar(user) {
     return (
         [ROLES.ADMIN].includes(user.role) ||
-        user.subscriptions.some(subs => subs.items.some(item => item.cars.length === 0))
-            //  user?.cars?.length < 1
-        )
+        user.subscriptions.some(sub => sub.data.items.data.some(item => item.cars.length < item.quantity))
+    )
 }
 
 function canEditCar(user, carID) {
+    let subscription = user.subscriptions.find(subs => subs.items.find(item => item.cars.find(car => car.id == carID)))
+    let car = subscription.items[0].cars[0]
     return (
-        [ROLES.ADMIN, ROLES.MANAGER].includes(user.role) ||
-        (user.subscriptions.find(subs => subs.items.find(item => item.cars.some(car => car.id == carID)))
-            && user.services.length == 0)
+        [ROLES.ADMIN, ROLES.MANAGER].includes(user.role) || (car && car.services.length == 0)
     )
 }
 
 function canManageCars(user) {
     return (
-        [ROLES.ADMIN].includes(user.role) || user?.services.length < 1
+        [ROLES.ADMIN].includes(user.role)
+        // || user?.services.length < 1
     )
 }
 

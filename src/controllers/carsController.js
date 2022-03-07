@@ -22,7 +22,7 @@ exports.cars = async (req, res) => {
         let { message, alertType } = req.session,
             cars,
             // Passport store the user in req.user
-            user = req.user
+        user = await Stripe.setStripeInfoToUser(req.user)
 
         // clear message y alertType
         if (message) {
@@ -39,8 +39,8 @@ exports.cars = async (req, res) => {
                 // Iterates the items on DB subscription.
                 for (customerItem of customerSub.items) {
                     // then iterates cars in DB item.
-                    for (car of customerItem.cars) {
-                        userCars.push(car)
+                    for (customerCar of customerItem.cars) {
+                        userCars.push(customerCar)
                     }
                 }
             }
@@ -54,7 +54,7 @@ exports.cars = async (req, res) => {
 
         }
     } catch (error) {
-        console.error("ERROR: userController -> Tyring to find user cars.")
+        console.error("ERROR: carsController -> Tyring to find user cars.")
         console.error(error.message)
         req.session.message = 'Error tyring to find user cars.'
         req.session.alertType = alertTypes.ErrorAlert

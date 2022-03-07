@@ -190,6 +190,9 @@ async function getAllCarsByUser(user) {
         }
     }
 
+    // Get cars to populate all infromation.
+    userCars = await this.getCars(userCars)
+
     return userCars
 }
 
