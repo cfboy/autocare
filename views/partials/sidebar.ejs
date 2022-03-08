@@ -32,12 +32,6 @@
             </a>
         </li>
         <% } %>
-        <!-- <li class="nav-item">
-            <a class="nav-link" href="/activity">
-                <i class="fas fa-book menu-icon"></i>
-                <span class="menu-title">My Activity</span>
-            </a>
-        </li> -->
         <% if([roles.ADMIN, roles.MANAGER].includes(user.role)) { %>
         <li class="nav-item">
             <a class="nav-link" href="/users">

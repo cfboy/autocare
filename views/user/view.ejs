@@ -130,9 +130,7 @@
                                 <div class="col-6 grid-margin stretch-card">
                                     <div class="card card-rounded">
                                         <div class="card-body">
-                                            <% for(stripeSubscription of subscriptions) { %>
-                                            <%- include('../partials/subscriptions/information.ejs' , {showManageBtn : true, customer : customer, stripeSubscription : stripeSubscription.data, membershipStatus : stripeSubscription?.data?.status}); %>
-                                            <% }  %>
+                                            <%- include('../partials/subscriptions/information.ejs' , {subscriptions, showManageBtn : true, customer : customer}); %>
                                         </div>
                                     </div>
                                 </div>

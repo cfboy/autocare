@@ -30,13 +30,15 @@
 
                         <% } else { %>
                         <!-- Loop of subscriptions -->
-                        <% for(stripeSubscription of subscriptions) { %>
-
-                        <%- include('./information.ejs' , {showManageBtn : false, customer : user, stripeSubscription: stripeSubscription.data, membershipStatus : stripeSubscription?.data?.status}); %>
-
-                        <hr />
+                        <div class="d-sm-flex justify-content-between align-items-start">
+                            <div>
+                                <h4 class="card-title card-title-dash">Subscriptions</h4>
+                            </div>
+                            <a href="/create-sub" class="btn btn-primary btn-icon-text text-white" type="button">
+                                <i class="fas fa-plus btn-icon-prepend"></i>Create Memberships</a>
+                        </div>
                         <br>
-                        <% } %>
+                        <%- include('./information.ejs' , {subscriptions, showManageBtn : false, customer : user}); %>
                         <p class="mt-4 text-muted">
                             Not happy with your current plan? Cancel or Upgrade by clicking the
                             button below.

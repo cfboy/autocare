@@ -1,9 +1,3 @@
-<div class="d-sm-flex justify-content-between align-items-start">
-    <div>
-        <h4 class="card-title card-title-dash">Subscriptions</h4>
-    </div>
-</div>
-<br>
 <div class="table-responsive  mt-1">
     <% if(showManageBtn) { %>
     <div class="d-sm-flex justify-content-between align-items-start float-end">
@@ -15,16 +9,25 @@
     <table class="table table-hover">
         <thead>
             <tr>
-                <th>Membership Information</th>
                 <th>
+                    Membership Information
+                </th>
+                <th>
+                    Period
+                    <br>
+                    <small>(start date) / (end date)</small>
+
+                </th>
+                <th class="text-center">
+                    Status
                 </th>
             </tr>
         </thead>
         <tbody>
+            <% for(stripeSubscription of subscriptions) { %>
             <tr>
-                <td>Products/Cars</td>
                 <td>
-                    <% for(item of stripeSubscription.items.data) { %>
+                    <% for(item of stripeSubscription.data.items.data) { %>
                     <p>
                         <b><%- item.price.product.name %></b> (<%= item.cars.length %>/<%= item.quantity%>)
                     </p>
@@ -32,44 +35,36 @@
                         <!-- Show all item cars -->
                         <% if(item.cars.length > 0) { %>
                         <% for(car of item.cars) { %>
-                        <li style="margin-left: 10px">
+                        <li class="mt-0 mb-0 m-3">
                             <%- car.brand %> - <%- car.model %> - <%- car.plate %>
                         </li>
                         <% } %>
                         <% } %>
-
                         <!-- If the length of cars is less than item quantity, then show add car btn. -->
                         <% if(item.cars.length < item.quantity) { %>
-                        <a href="/create-car?itemID=<%- item.id%>" id="add-car-button"
-                            class="btn btn-primary text-white" style="margin: 0;" type="submit">
-                            Add Missing Car</a>
-                        <% } %>
+                        <li class="mt-0 mb-0 m-3">
+                            <a href="/create-car?itemID=<%- item.id%>" id="add-car-button" class="btn btn-link p-0"
+                                style="margin: 0;" type="submit">
+                                Add Missing Car</a>
+                            <% } %>
+                        </li>
                     </ul>
+                    <br>
                     <% } %>
                 </td>
-            </tr>
-            <tr>
-                <td>Status</td>
-                <td> <span style="text-transform: uppercase;">
-                        <%- membershipStatus%>
-                    </span></td>
-            </tr>
-            <tr>
                 <td>
-                    Current Period Start
+                    (<%= moment(stripeSubscription?.data?.current_period_start * 1000).isValid() ? moment(stripeSubscription?.data?.current_period_start * 1000).format(shortDateFormat) : 'N/A' %>)
+                    /
+                    (<%= moment(stripeSubscription?.data?.current_period_start * 1000).isValid() ? moment(stripeSubscription?.data?.current_period_start * 1000).format(shortDateFormat) : 'N/A' %>)
+
                 </td>
-                <td>
-                    <%= moment(stripeSubscription?.current_period_start * 1000).isValid() ? moment(stripeSubscription?.current_period_start * 1000).format(completeDateFormat) : 'N/A' %>
+                <td class="text-center">
+                    <span style="text-transform: uppercase;">
+                        <%- stripeSubscription?.data.status%>
+                    </span>
                 </td>
             </tr>
-            <tr>
-                <td>
-                    Current Period End
-                </td>
-                <td>
-                    <%= moment(stripeSubscription?.current_period_end * 1000).isValid() ? moment(stripeSubscription?.current_period_end * 1000).format(completeDateFormat) : 'N/A' %>
-                </td>
-            </tr>
+            <% } %>
         </tbody>
     </table>
 </div>
