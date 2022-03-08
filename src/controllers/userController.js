@@ -33,13 +33,10 @@ exports.users = async (req, res) => {
         if (!user) {
             res.redirect('/')
         } else {
-            let users
-            if (user.role == ROLES.MANAGER)
-                users = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
-            else
-                if (user.role == ROLES.ADMIN)
-                    users = await UserService.getUsers(user.id)
+            let users = []
 
+            if ([ROLES.ADMIN, ROLES.MANAGER].includes(user.role))
+                users = await UserService.getUsers(user.id)
 
             res.render('user/index.ejs', { user, users, message, alertType })
 
@@ -48,6 +45,42 @@ exports.users = async (req, res) => {
         console.error("ERROR: userController -> Tyring to find users.")
         console.error(error.message)
         req.session.message = 'Error tyring to find users.'
+        req.session.alertType = alertTypes.ErrorAlert
+        res.redirect('/account')
+    }
+}
+
+/**
+ * This function render all users except the current user.
+ * If the current user is ROLE.MANAGER then find only CUSTOMERS users.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.customers = async (req, res) => {
+    try {
+        // Message for alerts
+        let { message, alertType } = req.session
+
+        // clear message y alertType
+        if (message) {
+            req.session.message = ''
+            req.session.alertType = ''
+        }
+        // Passport store the user in req.user
+        let user = req.user
+
+        if (!user) {
+            res.redirect('/')
+        } else {
+            let users = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
+
+            res.render('user/index.ejs', { user, users, message, alertType })
+
+        }
+    } catch (error) {
+        console.error("ERROR: userController -> Tyring to find customers.")
+        console.error(error.message)
+        req.session.message = 'Error tyring to find customers.'
         req.session.alertType = alertTypes.ErrorAlert
         res.redirect('/account')
     }

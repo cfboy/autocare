@@ -30,15 +30,14 @@
 
                         <% } else { %>
                         <!-- Loop of subscriptions -->
-                        <div class="d-sm-flex justify-content-between align-items-start">
-                            <div>
+                        <!-- <div class="d-sm-flex justify-content-between align-items-start"> -->
+                            <!-- <div>
                                 <h4 class="card-title card-title-dash">Subscriptions</h4>
-                            </div>
-                            <a href="/create-sub" class="btn btn-primary btn-icon-text text-white" type="button">
-                                <i class="fas fa-plus btn-icon-prepend"></i>Create Memberships</a>
-                        </div>
-                        <br>
-                        <%- include('./information.ejs' , {subscriptions, showManageBtn : false, customer : user}); %>
+                            </div> -->
+
+                        <!-- </div> -->
+                        <!-- <br> -->
+                        <%- include('./information.ejs' , {subscriptions, showManageBtn : false, customer : user, showCreateBtn: true}); %>
                         <p class="mt-4 text-muted">
                             Not happy with your current plan? Cancel or Upgrade by clicking the
                             button below.

@@ -72,6 +72,7 @@ router.get('/delete-history/:id', checkAuthenticated, authDeleteUser, historyCon
 
 //------ User Routes ------
 router.get('/users', checkAuthenticated, userController.users)
+router.get('/customers', checkAuthenticated, userController.customers)
 router.get('/create-user', checkAuthenticated, userController.createUser)
 router.get('/view-user/:id', checkAuthenticated, userController.viewUser)
 router.get('/edit-user/:id', checkAuthenticated, userController.editUser)

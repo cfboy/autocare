@@ -59,7 +59,7 @@ exports.account = async (req, res) => {
             subscriptions: user?.subscriptions
         }
 
-        if (user.subscriptions.length < 1 && user.role !== ROLES.ADMIN) {
+        if (user.subscriptions.length < 1 && [ROLES.CUSTOMER].includes(user.role)) {
             req.flash('warning', 'Create a subscription to continue.')
             res.redirect('/create-subscriptions')
         } else {
@@ -84,10 +84,12 @@ exports.account = async (req, res) => {
                     break;
 
                 case ROLES.CASHIER:
-                    // Get Customers
-                    customers = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
-                    params = { ...params, customers }
-                    res.render('dashboards/mainDashboard.ejs', params)
+                    if (message) {
+                        req.session.message = message
+                        req.session.alertType = alertType
+                    }
+                    
+                    res.redirect('/validateMembership')
                     break;
                 default:
                     console.log('No ROLE detected.');
