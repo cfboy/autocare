@@ -10742,7 +10742,7 @@ progress {
 .typeahead,
 .tt-query,
 .tt-hint {
-    display: block!important;
+    display: block;
     width: 100%;
     /* padding: 0.875rem 1.375rem; */
     padding: .4375rem 0;
@@ -10756,6 +10756,10 @@ progress {
     appearance: none;
     border-radius: 2px;
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control {
+    display: block!important;
 }
 
 @media (prefers-reduced-motion: reduce) {
