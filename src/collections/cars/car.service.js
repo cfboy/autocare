@@ -68,7 +68,7 @@ const addCar = (Car) => async (brand, model, plate) => {
  */
 const updateCar = (Car) => async (id, updates) => {
     console.log(`updateCar() ID: ${id}`)
-    return await Car.findByIdAndUpdate({ _id: id }, updates, function (err, doc) {
+    return await Car.findByIdAndUpdate({ _id: id }, updates, { new: true }, function (err, doc) {
         if (err) {
             console.error(err.message)
         } else {
