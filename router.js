@@ -74,7 +74,7 @@ router.get('/delete-history/:id', checkAuthenticated, authDeleteUser, historyCon
 router.get('/users', checkAuthenticated, userController.users)
 router.get('/customers', checkAuthenticated, userController.customers)
 router.get('/create-user', checkAuthenticated, userController.createUser)
-router.get('/view-user/:id', checkAuthenticated, userController.viewUser)
+router.get('/customers/:id', checkAuthenticated, userController.viewUser)
 router.get('/edit-user/:id', checkAuthenticated, userController.editUser)
 router.get('/changePassword/:id', checkAuthenticated, authChangePassword, userController.changePassword)
 
@@ -90,12 +90,12 @@ router.post('/changeNotificationState', checkAuthenticated, userController.chang
 //------ Cars Routes ------
 router.get('/cars', checkAuthenticated, carsController.cars)
 router.get('/car/:id', checkAuthenticated, carsController.view)
-router.get('/create-car', checkAuthenticated, authAddCar, carsController.create)
+router.get('/cars/create', checkAuthenticated, authAddCar, carsController.create)
 router.get('/edit-car/:id', checkAuthenticated, authEditCar, carsController.edit)
 router.get('/services', checkAuthenticated, carsController.services)
 router.get('/service/:id', checkAuthenticated, carsController.viewService)
 
-router.post('/create-car', checkAuthenticated, authAddCar, carsController.save)
+router.post('/cars/create', checkAuthenticated, authAddCar, carsController.save)
 router.post('/edit-car', checkAuthenticated, authEditCar, carsController.update)
 router.get('/delete-car/:id', checkAuthenticated, authDeleteCar, carsController.delete)
 

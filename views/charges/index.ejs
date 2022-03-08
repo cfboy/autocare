@@ -81,7 +81,7 @@
                                                             <td>
                                                                 <% if(charge.billing_details.email) { %>
                                                                 <a
-                                                                    href="/view-user/<%= charge.customer%>?billingID=true">
+                                                                    href="/customers/<%= charge.customer%>?billingID=true">
                                                                     <%= charge.billing_details.email %>
                                                                 </a>
                                                                 <% } else { %>

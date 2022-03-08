@@ -73,7 +73,7 @@
                                                         <% for(const user of users) { %>
                                                         <tr>
                                                             <td>
-                                                                <a class="btn-link" href="/view-user/<%- user.id%>">
+                                                                <a class="btn-link" href="/customers/<%- user.id%>">
                                                                     <%- user.personalInfo.firstName + ' ' + user.personalInfo.lastName %>
                                                                     <% if(!user.hasAllInformation) {%>
                                                                     <i class="mdi mdi-alert text-warning"

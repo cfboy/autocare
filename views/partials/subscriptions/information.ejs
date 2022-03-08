@@ -55,7 +55,7 @@
                         <!-- If the length of cars is less than item quantity, then show add car btn. -->
                         <% if(item.cars.length < item.quantity) { %>
                         <li class="mt-0 mb-0 m-3">
-                            <a href="/create-car?itemID=<%- item.id%>" id="add-car-button" class="btn btn-link p-0"
+                            <a href="/cars/create?itemID=<%- item.id%>" id="add-car-button" class="btn btn-link p-0"
                                 style="margin: 0;" type="submit">
                                 Add Missing Car</a>
                             <% } %>
