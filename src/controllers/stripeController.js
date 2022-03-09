@@ -1,6 +1,7 @@
 const Stripe = require('../connect/stripe')
 const CarService = require('../collections/cars')
 const UserService = require('../collections/user')
+const SubscriptionService = require('../collections/subscription')
 // const { ROLES } = require('../collections/user/user.model')
 const alertTypes = require('../helpers/alertTypes')
 const moment = require('moment');
@@ -37,7 +38,7 @@ exports.webhook = async (req, res) => {
     }
 
     const data = event.data.object
-    let customer, notification
+    let customer, notification, subscription, items, subscriptionItems
     console.log(event.type, data)
     switch (event.type) {
         case 'customer.created':
@@ -66,28 +67,47 @@ exports.webhook = async (req, res) => {
             // TODO: handle errors
             console.debug(`WEBHOOK: customer.subscription.created: ${data.id}`)
 
-            let subscription = data
-            let subscriptionItems = subscription.items.data
-            let items = []
+            subscription = data
+            subscriptionItems = subscription.items.data
+            items = []
             for (subItem of subscriptionItems) {
-                let newItem = { id: subItem.id, cars: [] }
+                let newItem = { id: subItem.id, cars: [], data: subItem }
                 items.push(newItem)
             }
             console.debug(`WEBHOOK: Items to add ${items}`)
-
-            customer = await UserService.addSubscriptionToUser(subscription.customer, { id: subscription.id, items: items })
-            console.debug(`WEBHOOK: Customer Updated ${customer.email}`)
+            customer = await UserService.getUserByBillingID(subscription.customer)
+            subscription = await SubscriptionService.addSubscription({ id: subscription.id, items: items, data: subscription, user: customer })
+            console.debug(`WEBHOOK: Add new subscription ${subscription.id} to customer ${subscription.user.email}`)
 
             break
 
         case 'customer.subscription.updated':
             // started trial
-            customer = await UserService.getUserByBillingID(data.customer)
+            subscription = data
+            customer = await UserService.getUserByBillingID(subscription.customer)
             let alertInfo = { message: "Subscription Updated", alertType: alertTypes.BasicAlert }
 
-            if (data.canceled_at) {
+            subscriptionItems = subscription.items.data
+            let mySubscription = await SubscriptionService.getSubscriptionById(subscription.id)
+
+            items = []
+            for (subItem of subscriptionItems) {
+                let itemToUpdate = mySubscription.items.find(item => item.id == subItem.id)
+                let newItem = { id: itemToUpdate.id, cars: itemToUpdate.cars, data: subItem }
+                items.push(newItem)
+            }
+
+            updates = {
+                data: subscription,
+                items: items
+            }
+
+
+            subscription = await SubscriptionService.updateSubscription(subscription.id, updates)
+
+            if (subscription.canceled_at) {
                 // cancelled
-                console.log(`You just canceled the subscription: ${data.id} at ${moment(data?.canceled_at * 1000).isValid() ? moment(data?.canceled_at * 1000).format(completeDateFormat) : 'N/A'}`)
+                console.log(`You just canceled the subscription: ${subscription.id} at ${moment(subscription?.canceled_at * 1000).isValid() ? moment(subscription?.canceled_at * 1000).format(completeDateFormat) : 'N/A'}`)
                 alertInfo = { message: "Subscription Cancelled", alertType: alertTypes.BasicAlert }
             }
 
@@ -168,7 +188,7 @@ exports.completeCheckoutSuccess = async (req, res) => {
         let subscriptionItems = subscription.items.data
         let items = []
         for (subItem of subscriptionItems) {
-            let newItem = { id: subItem.id, cars: [] }
+            let newItem = { id: subItem.id, cars: [], data: subItem }
             for (carObj of cars) {
                 if (subItem.price.id === carObj.priceID) {
                     let newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate)
@@ -179,10 +199,18 @@ exports.completeCheckoutSuccess = async (req, res) => {
             items.push(newItem)
         }
 
-        // let customer = await UserService.getUserByBillingID(subscription.customer)
-        let customer = await UserService.addSubscriptionToUser(subscription.customer, { id: subscription.id, items: items })
+        let customer = await UserService.getUserByBillingID(subscription.customer)
+
+        let newSubscription = await SubscriptionService.addSubscription({ id: subscription.id, data: subscription, items: items, user: customer })
 
         // TODO: completed message, add history
+        if (newSubscription) {
+            req.session.message = `Subcription Created to customer ${newSubscription.user.email}`
+            req.session.alertType = alertTypes.CompletedActionAlert
+        } else {
+            req.session.message = `Failed to add a Subscription.`
+            req.session.alertType = alertTypes.ErrorAlert
+        }
 
         res.redirect('/account')
 

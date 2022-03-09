@@ -24,14 +24,6 @@ const userSchema = new Schema({
     locations: [{ type: Schema.Types.ObjectId, ref: 'location', default: null }],
     hasAllInformation: { type: Boolean, default: false },
     created_date: { type: Date, default: Date.now },
-    subscriptions: [{
-        id: String, //Subscription ID
-        items: [{
-            id: String, //Subscription Item ID
-            // priceID: String,
-            cars: [{ type: Schema.Types.ObjectId, ref: 'car', default: null }]
-        }]
-    }],
     notifications: [{
         isRead: { type: Boolean, default: false },
         message: String,

@@ -92,65 +92,6 @@ const removeUserLocation = (User) => async (id, location) => {
     })
 }
 
-/**
- * This function add a new car to user cars.
- * @param {id, car} User 
- * @returns User
- */
-// TODO: change this method
-const addUserCar = (User) => async (id, car, sub, subItemID) => {
-    console.log(`addUserCar() ID: ${id}`)
-    // findByIdAndUpdate returns the user
-    // updateOne is more quickly but not return the user.
-    return await User.findByIdAndUpdate({ _id: id },
-        { $addToSet: { "subscriptions.$[sub].items.$[item].cars": car } },
-        { "arrayFilters": [{ "sub.id": sub }, { "item.id": subItemID }] },
-        function (err, doc) {
-            if (err) {
-                console.error(err.message)
-            } else {
-                console.debug("Car Added to: ", doc.email);
-            }
-        }).populate({ path: 'subscriptions.items.cars', model: 'car' })
-}
-
-/**
- * This function remove the car from user cars.
- * @param {id, car} User 
- * @returns User
- */
-const removeUserCar = (User) => async (id, sub, item, car) => {
-    console.log(`removeUserCar() ID: ${id}`)
-    return await User.findByIdAndUpdate({ _id: id },
-        { $pull: { "subscriptions.$[sub].items.$[item].cars": car.id } },
-        { "arrayFilters": [{ "sub.id": sub }, { "item.id": item }], new: true },
-        function (err, doc) {
-            if (err) {
-                console.error(err.message)
-            } else {
-                console.debug(`Car ${car.model} Removed of User: ${doc.email}`);
-            }
-        })
-}
-
-/**
- * This function add a new subs to user.
- * @param {id, location} User 
- * @returns User
- */
-const addSubscriptionToUser = (User) => async (billingID, subscription) => {
-    console.log(`addSubscriptionToUser() billingID: ${billingID}`)
-    // Set new: true to return the updated document.
-    return await User.findOneAndUpdate({ billingID: billingID }, { $addToSet: { subscriptions: subscription } },
-        { new: true }, function (err, doc) {
-            if (err) {
-                console.error(err.message)
-            } else {
-                console.debug("Subscription Added : ", doc.email);
-            }
-        }).populate({ path: 'subscriptions.items.cars', model: 'car' })
-}
-
 // TODO: maybe need delete customer on Stripe 
 /**
  * This function delete the user on DB.
@@ -388,9 +329,6 @@ module.exports = (User) => {
         updateUser: updateUser(User),
         addUserLocation: addUserLocation(User),
         removeUserLocation: removeUserLocation(User),
-        addUserCar: addUserCar(User),
-        removeUserCar: removeUserCar(User),
-        addSubscriptionToUser: addSubscriptionToUser(User),
         deleteUser: deleteUser(User),
         getUsers: getUsers(User),
         getUsersPerRole: getUsersPerRole(User),

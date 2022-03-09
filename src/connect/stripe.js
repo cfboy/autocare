@@ -1,6 +1,7 @@
 const stripe = require('stripe')
 const Dinero = require('dinero.js')
 const { ROLES } = require('../collections/user/user.model')
+const SubscriptionService = require('../collections/subscription')
 
 const STATUS = {
     NONE: "none",
@@ -334,7 +335,10 @@ const getCustomerCharges = async (user) => {
 const setStripeInfoToUser = async (customerObj) => {
     try {
         let customer = customerObj
+
+        customer.subscriptions = await SubscriptionService.getSubscriptionsByUser(customer)
         customer.hasSubscription = false
+
         if (customer.subscriptions.length > 0) {
             customer.hasSubscription = true
 
@@ -427,7 +431,6 @@ module.exports = {
     getAllPrices,
     getProductPrice,
     getProductInfoById,
-    // getCustomerSubscription,
     getCustomerEvents,
     getCustomerCharges,
     setStripeInfoToUser,

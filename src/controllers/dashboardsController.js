@@ -1,4 +1,5 @@
 const UserService = require('../collections/user')
+const SubscriptionService = require('../collections/subscription')
 const CarService = require('../collections/cars')
 const AnalyticsService = require('../collections/analytics/service')
 const { ROLES } = require('../collections/user/user.model')
@@ -88,7 +89,7 @@ exports.account = async (req, res) => {
                         req.session.message = message
                         req.session.alertType = alertType
                     }
-                    
+
                     res.redirect('/validateMembership')
                     break;
                 default:
@@ -165,8 +166,10 @@ exports.validate = async (req, res) => {
 
         let customer, subscription
 
-        if (car)
-            customer = await UserService.getUserByCar(car)
+        if (car) {
+            subscription = await SubscriptionService.getSubscriptionByCar(car)
+            customer = subscription?.user
+        }
 
         if (customer) {
             customer = await Stripe.setStripeInfoToUser(customer)
@@ -206,7 +209,8 @@ exports.useService = async (req, res) => {
 
         if (userID) {
             let car = await CarService.getCarByID(carID)
-            let customer = await UserService.getUserByCar(car)
+            let customer = await SubscriptionService.getUserByCar(car)
+            // let customer = car.user
             let authorizedBy = req.user,
                 service
 

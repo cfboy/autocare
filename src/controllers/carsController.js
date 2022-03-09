@@ -1,4 +1,4 @@
-const UserService = require('../collections/user')
+const SubscriptionService = require('../collections/subscription')
 const CarService = require('../collections/cars')
 const HistoryService = require('../collections/history')
 const { historyTypes } = require('../collections/history/history.model')
@@ -22,7 +22,7 @@ exports.cars = async (req, res) => {
         let { message, alertType } = req.session,
             cars,
             // Passport store the user in req.user
-        user = await Stripe.setStripeInfoToUser(req.user)
+            user = await Stripe.setStripeInfoToUser(req.user)
 
         // clear message y alertType
         if (message) {
@@ -178,8 +178,17 @@ exports.save = async (req, res) => {
 
         console.debug(`A new car added to DB. ID: ${car.id}.`)
 
-        // Add car to user
-        let user = await UserService.addUserCar(req.user.id, car, fields.subItem.split('/')[0], fields.subItem.split('/')[1])
+        // Add car to subscription
+        // fields.subItem.split('/')[0] has the subscription ID
+        // fields.subItem.split('/')[1] has the subItem ID 
+        let subscription = await SubscriptionService.addSubscriptionCar(fields.subItem.split('/')[0], car, fields.subItem.split('/')[1])
+
+        if (subscription) {
+            req.session.message = `
+            Added Car to subscription: ${subscription.id}
+
+            New Car:  ${car.brand} - ${car.model} - ${car.plate}`
+        }
 
         req.session.message = `New Car:  ${car.brand} - ${car.model} - ${car.plate}.`
         req.session.alertType = alertTypes.CompletedActionAlert
@@ -193,7 +202,7 @@ exports.save = async (req, res) => {
         if (error.code === 11000)
             req.session.message = "This car is already registered in the system."
         else
-            req.session.message = "Error trying to add car to the current user."
+            req.session.message = "Error trying to add car to subscription."
 
         req.session.alertType = alertTypes.ErrorAlert
         res.redirect('/account')
@@ -243,33 +252,32 @@ exports.delete = async (req, res) => {
 
     try {
         let car = await CarService.getCarByID(carID),
-            userCar = await UserService.getUserByCar(car)
+            subscription = await SubscriptionService.getSubscriptionByCar(car)
 
-        let subscription = userCar.subscriptions.find(subscription =>
-            subscription.items.find(item =>
-                item.cars.find(itemCar =>
-                    itemCar.id = car.id)))
+        subscription = subscription.items.find(item =>
+            item.cars.find(itemCar =>
+                itemCar.id = car.id))
 
-        let user = await UserService.removeUserCar(userCar.id, subscription.id, subscription.items[0].id, car)
+        let updatedSubscription = await SubscriptionService.removeSubscriptionCar(subscription.id, subscription.items[0].id, car)
+
 
         // Validate if the car is removed from user.
-        let notDeletedCar = user?.subscriptions?.some(subscription =>
-            subscription.items.some(item =>
-                item.cars.some(itemCar =>
-                    itemCar.id = car.id)))
+        let notDeletedCar = updatedSubscription.items.some(item =>
+            item.cars.some(itemCar =>
+                itemCar.id = car.id))
 
-        if (!user || notDeletedCar) {
-            req.session.message = `Can't delete the car from user.`
+        if (!updatedSubscription || notDeletedCar) {
+            req.session.message = `Can't delete the car from subscription.`
             req.session.alertType = alertTypes.WarningAlert
         } else {
-            CarService.deleteCar(carID)
+            CarService.deleteCar(carID) //TODO: verify if is need to delete the car forever.
             // Set the message for alert. 
             req.session.message = `Car Deleted.`
             req.session.alertType = alertTypes.CompletedActionAlert
         }
 
     } catch (error) {
-        console.log(`ERROR-USER-CONTROLLER : ${error.message}`)
+        console.log(`ERROR-CAR-CONTROLLER : ${error.message}`)
         req.session.message = "Can't delete car."
         req.session.alertType = alertTypes.ErrorAlert
     }
@@ -335,7 +343,8 @@ exports.services = async (req, res) => {
             res.redirect('/')
         } else {
 
-            let userCars = await CarService.getAllCarsByUser(user)
+            // let userCars = await CarService.getAllCarsByUser(user)
+            let userCars = await SubscriptionService.getAllCarsByUser(user)
 
             let services = await CarService.getAllServicesByCarList(userCars)
 

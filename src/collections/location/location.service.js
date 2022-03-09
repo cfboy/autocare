@@ -26,7 +26,7 @@ const addLocation = (Location) => async ({ name, services, users }) => {
  */
 const updateLocation = (Location) => async (id, updates) => {
     console.log(`updateLocation() ID: ${id}`)
-    return await Location.findByIdAndUpdate({ _id: id }, updates, function (err, doc) {
+    return await Location.findByIdAndUpdate({ _id: id }, updates, { new: true }, function (err, doc) {
         if (err) {
             console.error(err.message)
         } else {
