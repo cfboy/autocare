@@ -12,7 +12,7 @@
             </li>
             <li>
                 <h4>Date :
-                    <%= moment(service.date).isValid() ? moment(service.date).format(completeDateFormat) : 'N/A' %>
+                    <%= moment(service?.created_date).isValid() ? moment(service?.created_date).format(completeDateFormat) : 'N/A' %>
                 </h4>
             </li>
             <li>

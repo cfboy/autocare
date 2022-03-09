@@ -8,7 +8,7 @@ const carSchema = new Schema({
     created_date: { type: Date, default: Date.now },
     services: [{
         id: String,
-        date: { type: Date, default: Date.now },
+        created_date: { type: Date, default: Date.now },
         location: { type: Schema.Types.ObjectId, ref: 'location', default: null },
         authorizedBy: { type: Schema.Types.ObjectId, ref: 'user', default: null },
     }]

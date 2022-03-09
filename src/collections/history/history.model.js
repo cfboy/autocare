@@ -7,7 +7,7 @@ const historySchema = new Schema({
     type: { type: String, enum: Object.values(historyTypes), default: null },
     user: { type: Schema.Types.ObjectId, ref: 'user' },
     location: { type: Schema.Types.ObjectId, ref: 'location', default: null },
-    date: { type: Date, default: Date.now },
+    created_date: { type: Date, default: Date.now },
 })
 
 const History = mongoose.model('history', historySchema, 'history')
