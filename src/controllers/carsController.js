@@ -332,7 +332,7 @@ exports.services = async (req, res) => {
             cars,
             // Passport store the user in req.user
             // TODO: implement for othe user.
-            user = req.user
+            user = await Stripe.setStripeInfoToUser(req.user)
 
         // clear message y alertType
         if (message) {
@@ -347,7 +347,7 @@ exports.services = async (req, res) => {
             // let userCars = await CarService.getAllCarsByUser(user)
             let userCars = await SubscriptionService.getAllCarsByUser(user)
 
-            let services = await CarService.getAllServicesByCarList(userCars)
+            let services = await CarService.getAllServicesByCars(userCars)
 
             // Manage services by car on client side.
             res.render('services/index.ejs', {
@@ -387,11 +387,11 @@ exports.viewService = async (req, res) => {
             let id = req.params.id,
                 carID = req.query.carID
 
-            let service = await CarService.getServicesByIdAndCarId(id, carID)
+            let [service, car] = await CarService.getServicesByIdAndCarId(id, carID)
 
             res.render('services/view.ejs', {
                 user, message, alertType,
-                service
+                service, car
             })
 
         }

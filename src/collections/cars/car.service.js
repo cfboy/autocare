@@ -7,7 +7,7 @@ const fetch = require('node-fetch');
  * @param {} Car 
  * @returns Car list
  */
-const getCars = (Car) => (cars) => {
+const getCars = (Car) => async (cars) => {
     return Car.find({ _id: { $in: cars } }, function (err, docs) {
         if (err) {
             console.error(err)
@@ -164,8 +164,8 @@ const getServiceById = (Car) => async (serviceID) => {
                 console.debug("No document matches the provided query.");
             }
             let service = result?.services?.find(service => service.id == serviceID)
-            service.car = result
-            return service;
+            //Return the service and the car.
+            return [service, result];
         })
         .catch(err => console.error(`Failed to find document: ${err}`));
 }
@@ -175,6 +175,7 @@ const getServiceById = (Car) => async (serviceID) => {
  * @param {*} user 
  * @returns car list
  */
+// TODO: to optimize this method need to add a userID on car schema.
 async function getAllCarsByUser(user) {
     console.debug("getAllCarsByUser()...")
 
@@ -197,52 +198,53 @@ async function getAllCarsByUser(user) {
 }
 
 /**
- * This funtion returns all services by servideID and carID, if not have carID the call another function.
+ * This funtion returns a service by serviceID and carID,
+ * if not have carID the call another function.
  * @param {*} serviceID 
  * @param {*} carID 
  * @returns service
  */
 async function getServicesByIdAndCarId(serviceID, carID) {
-    console.debug("getServicesByIdAndCarId()...")
+    console.debug("getServicesByIdAndCarId()")
     let service
-
+    let car
     if (carID) {
-        let car = await this.getCarByID(carID)
+        car = await this.getCarByID(carID)
+        service = car.services.find(service => service.id == serviceID)
 
-        for (carService of car.services) {
-            if (carService.id == serviceID) {
-                service = carService
-                service.car = car
-            }
-        }
     } else {
-        service = await this.getServiceById(serviceID)
+        [service, car] = await this.getServiceById(serviceID)
     }
 
-    return service
+    return [service, car]
 }
 
 /**
- * This function returns all services by car list.
- * @param {*} userCars 
+ * This function returns all services by cars.
+ * @param {*} cars 
  * @returns service list
  */
-async function getAllServicesByCarList(userCars) {
-    console.debug("getAllServicesByCarList()...")
-
-    let allServices = [] //On this array store all the services.
-
-    if (userCars) {
-        allServices = [] //On this array store all the services.
-        for (car of userCars) {
-            for (service of car.services) {
-                service.car = car
-                allServices.push(service)
+const getAllServicesByCars = (Car) => async (cars) => {
+    return Car.find({ _id: { $in: cars } })
+        .populate({ path: 'services.location', model: 'location' })
+        .populate({ path: 'services.authorizedBy', model: 'user' })
+        .then(result => {
+            if (result) {
+                console.debug(`getAllServicesByCars(): Successfully found ${result.length} documents.`);
+            } else {
+                console.debug("getAllServicesByCars(): No document matches the provided query.");
             }
-        }
+            let services = []
 
-        return allServices
-    }
+            for (resultCar of result) {
+                for (service of resultCar.services) {
+                    service.car = resultCar
+                    services.push(service)
+                }
+            }
+            return services;
+        })
+        .catch(err => console.error(`Failed to find document: ${err}`));
 }
 
 /**
@@ -288,6 +290,6 @@ module.exports = (Car) => {
         getServicesByIdAndCarId: getServicesByIdAndCarId,
         getAllMakes: getAllMakes,
         getAllCarsByUser: getAllCarsByUser,
-        getAllServicesByCarList: getAllServicesByCarList
+        getAllServicesByCars: getAllServicesByCars(Car)
     }
 }
