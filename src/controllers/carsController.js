@@ -70,7 +70,7 @@ exports.cars = async (req, res) => {
 exports.view = async (req, res) => {
     try {
         let { message, alertType } = req.session,
-            user = req.user;
+            user = await Stripe.setStripeInfoToUser(req.user);
 
         if (message) {
             req.session.message = ''
