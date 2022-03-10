@@ -15,7 +15,7 @@
                 <img src="../../images/mrquicks/mrQuicksLogo.png" alt="logo" style="height: auto!important;" />
             </a>
             <a class="navbar-brand brand-logo-mini" href="/account">
-                <img src="../../images/mrquicks/mrQuicksLogo2.png" alt="logo" />
+                <img src="../../images/favicon.png" alt="logo" />
             </a>
         </div>
     </div>
@@ -166,8 +166,9 @@
                 </div>
             </li>
             <li class="nav-item d-none d-lg-block">
-                <a class="nav-link" href="/home" aria-expanded="false">
-                    <i class="fa-solid fa-list"></i>
+                <a class="nav-link" href="/home" aria-expanded="false" title="Add Membership">
+                    <i class="fa-solid fa-cart-plus text-primary"></i>
+                    <!-- <i class="fa-solid fa-list"></i> -->
                 </a>
             </li>
             <% var hasNotifi = (user?.notifications?.filter(notification => notification.isRead == false).length > 0) ? true : false %>
@@ -243,10 +244,10 @@
                         <!-- <i class="dropdown-item-icon mdi mdi-calendar-check-outline text-primary me-2"></i> -->
                         <i class="dropdown-item-icon far fa-calendar-check text-primary me-2"></i> Activity
                     </a>
-                    <a class="dropdown-item">
-                        <!-- <i class="dropdown-item-icon mdi mdi-help-circle-outline text-primary me-2"></i> -->
+                    <!-- <a class="dropdown-item">
+                        <i class="dropdown-item-icon mdi mdi-help-circle-outline text-primary me-2"></i>
                         <i class="dropdown-item-icon far fa-question-circle text-primary me-2"></i> FAQ
-                    </a>
+                    </a> -->
                     <form action="/logout?_method=DELETE" method="POST">
                         <button type="submit" class="dropdown-item">
                             <!-- <i class="dropdown-item-icon mdi mdi-power text-primary me-2"></i> -->
