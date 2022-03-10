@@ -8,6 +8,8 @@ const { canDeleteCar,
     canChangePassword } = require('../config/permissions'),
     alertTypes = require('../helpers/alertTypes')
 
+const Stripe = require('../connect/stripe')
+
 async function checkAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
         return next()
@@ -26,8 +28,9 @@ async function checkNotAuthenticated(req, res, next) {
 
 async function authDeleteCar(req, res, next) {
     let carID = req.params.id
+    let user = await Stripe.setStripeInfoToUser(req.user)
 
-    if (carID && canDeleteCar(req.user, carID)) {
+    if (carID && canDeleteCar(user, carID)) {
         return next()
     }
     req.session.message = `Not allowed to delete this car.`
@@ -36,7 +39,10 @@ async function authDeleteCar(req, res, next) {
 }
 
 async function authAddCar(req, res, next) {
-    if (canAddCar(req.user)) {
+    
+    let user = await Stripe.setStripeInfoToUser(req.user)
+
+    if (canAddCar(user)) {
         return next()
     }
     req.session.message = `Not allowed to add a car.`
@@ -46,8 +52,9 @@ async function authAddCar(req, res, next) {
 
 async function authEditCar(req, res, next) {
     let carID = req.body.id ? req.body.id : req.params.id ? req.params.id : ''
+    let user = await Stripe.setStripeInfoToUser(req.user)
 
-    if (carID && canEditCar(req.user, carID)) {
+    if (carID && canEditCar(user, carID)) {
         return next()
     }
     req.session.message = `Not allowed to edit this car.`

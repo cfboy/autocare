@@ -123,6 +123,7 @@ exports.create = async (req, res) => {
 
         let siToAddCar = []
         let stripeItem
+        user = await Stripe.setStripeInfoToUser(user)
         for (subscription of user.subscriptions) {
             for (item of subscription.items) {
                 stripeItem = await Stripe.getSubscriptionItemById(item.id)

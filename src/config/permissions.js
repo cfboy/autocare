@@ -19,10 +19,10 @@ function canDeleteUser(user) {
 }
 
 function canDeleteCar(user, carID) {
+    let subscription = user.subscriptions.find(subs => subs.items.find(item => item.cars.find(car => car.id == carID)))
+    let car = subscription.items[0].cars[0]
     return (
-        user.role === ROLES.ADMIN ||
-        (user.subscriptions.find(subs => subs.items.find(item => item.cars.some(car => car.id == carID)))
-            && user.services.length == 0)
+        user.role === ROLES.ADMIN || (car && car.services.length == 0)
     )
 }
 
