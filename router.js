@@ -5,7 +5,8 @@ const stripeController = require('./src/controllers/stripeController'),
     locationController = require('./src/controllers/locationController'),
     dashboardsController = require('./src/controllers/dashboardsController'),
     historyController = require('./src/controllers/historyController'),
-    carsController = require('./src/controllers/carsController')
+    carsController = require('./src/controllers/carsController'),
+    servicesController = require('./src/controllers/servicesController')
 
 // Express
 const express = require('express');
@@ -92,14 +93,17 @@ router.get('/cars', checkAuthenticated, carsController.cars)
 router.get('/car/:id', checkAuthenticated, carsController.view)
 router.get('/cars/create', checkAuthenticated, authAddCar, carsController.create)
 router.get('/edit-car/:id', checkAuthenticated, authEditCar, carsController.edit)
-router.get('/services', checkAuthenticated, carsController.services)
-router.get('/service/:id', checkAuthenticated, carsController.viewService)
 
 router.post('/cars/create', checkAuthenticated, authAddCar, carsController.save)
 router.post('/edit-car', checkAuthenticated, authEditCar, carsController.update)
 router.get('/delete-car/:id', checkAuthenticated, authDeleteCar, carsController.delete)
 
 router.post('/validatePlate', checkAuthenticated, carsController.validatePlate)
+
+//------ Services Routes ------
+router.get('/services', checkAuthenticated, servicesController.services)
+router.get('/service/:id', checkAuthenticated, servicesController.view)
+
 //------ Location Routes ------
 router.get('/locations', checkAuthenticated, locationController.locations)
 router.get('/create-location', checkAuthenticated, locationController.createLocation)

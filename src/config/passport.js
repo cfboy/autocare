@@ -8,5 +8,5 @@ passport.serializeUser((user, done) => {
 passport.deserializeUser(async (id, done) => {
     User.findById(id, function (err, user) {
         done(err, user);
-    }).populate({ path: 'subscriptions.items.cars', model: 'car' });
+    }).populate({ path: 'locations', model: 'location' });
 });

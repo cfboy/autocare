@@ -84,10 +84,10 @@
 
                                                             <td><%- car.model%></td>
                                                             <td><%- car.plate%></td>
-                                                            <td><%- car.services?.length%></td>
+                                                            <td><%- car?.services?.length%></td>
 
                                                             <td>
-                                                                <% let hasServices = car.services.length > 0 %>
+                                                                <% let hasServices = car?.services?.length > 0 %>
 
                                                                 <a <%- !hasServices ? `href="/edit-car/${car.id}?url=/cars"` : ''%>
                                                                     type="button"

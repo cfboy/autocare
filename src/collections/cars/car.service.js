@@ -4,6 +4,7 @@ const fetch = require('node-fetch');
 
 /**
  * This function get all cars on db.
+ * This function receive a list off cars (user cars) because the car schema don't have user reference.
  * @param {} Car 
  * @returns Car list
  */
@@ -14,8 +15,7 @@ const getCars = (Car) => async (cars) => {
         } else {
             console.debug("CAR-SERVICE: Found Cars: ", docs.length);
         }
-    }).populate({ path: 'services.location', model: 'location' })
-        .populate({ path: 'services.authorizedBy', model: 'user' })
+    })
 }
 
 /**
@@ -30,8 +30,7 @@ const getCarByID = (Car) => async (carID) => {
         } else {
             console.debug("CAR-SERVICE: Found car: ", docs.brand);
         }
-    }).populate({ path: 'services.location', model: 'location' })
-        .populate({ path: 'services.authorizedBy', model: 'user' })
+    })
 }
 
 /**
@@ -111,63 +110,7 @@ const getCarByPlate = (Car) => async (plate) => {
             else
                 console.debug(`CAR-SERVICE: Not Found car with plate: ${plate}`);
         }
-    }).populate({ path: 'services.location', model: 'location' })
-        .populate({ path: 'services.authorizedBy', model: 'user' })
-}
-
-/**
- * This function add new service to a Car.
- * Find the Car and add new service.
- * @param {carID, authorizedBy, location} 
- * @returns car object, service object
- */
-const addService = (Car) => async (carID, authorizedBy, location) => {
-    console.log(`addService() ID: ${carID}`)
-
-    let service = {
-        // id is a random ID genetated with letters and numbers. 
-        // TODO: change the id.
-        id: 'AC-' + Math.random().toString(36).toUpperCase().substring(2, 6),
-        date: Date.now(),
-        location: location,
-        authorizedBy: authorizedBy
-
-    }, car = await Car.findByIdAndUpdate({ _id: carID }, { $addToSet: { services: service } },
-        { new: true }, function (err, doc) {
-            if (err) {
-                console.error(err)
-                console.error(err.message)
-            } else {
-                console.debug(`Service Added (${service?.id}) to a car ${doc.id}`);
-            }
-        }).populate({ path: 'services.location', model: 'location' })
-        .populate({ path: 'services.authorizedBy', model: 'user' })
-
-    service = (car.services.find(({ id }) => id === service.id))
-
-    return [car, service]
-}
-
-/**
- * This function get service by id.
- * @param {*} Car 
- * @returns service
- */
-const getServiceById = (Car) => async (serviceID) => {
-    return Car.findOne({ 'services.id': serviceID })
-        .populate({ path: 'services.location', model: 'location' })
-        .populate({ path: 'services.authorizedBy', model: 'user' })
-        .then(result => {
-            if (result) {
-                console.debug(`Successfully found document: ${result.id}.`);
-            } else {
-                console.debug("No document matches the provided query.");
-            }
-            let service = result?.services?.find(service => service.id == serviceID)
-            //Return the service and the car.
-            return [service, result];
-        })
-        .catch(err => console.error(`Failed to find document: ${err}`));
+    })
 }
 
 /**
@@ -197,55 +140,6 @@ async function getAllCarsByUser(user) {
     return userCars
 }
 
-/**
- * This funtion returns a service by serviceID and carID,
- * if not have carID the call another function.
- * @param {*} serviceID 
- * @param {*} carID 
- * @returns service
- */
-async function getServicesByIdAndCarId(serviceID, carID) {
-    console.debug("getServicesByIdAndCarId()")
-    let service
-    let car
-    if (carID) {
-        car = await this.getCarByID(carID)
-        service = car.services.find(service => service.id == serviceID)
-
-    } else {
-        [service, car] = await this.getServiceById(serviceID)
-    }
-
-    return [service, car]
-}
-
-/**
- * This function returns all services by cars.
- * @param {*} cars 
- * @returns service list
- */
-const getAllServicesByCars = (Car) => async (cars) => {
-    return Car.find({ _id: { $in: cars } })
-        .populate({ path: 'services.location', model: 'location' })
-        .populate({ path: 'services.authorizedBy', model: 'user' })
-        .then(result => {
-            if (result) {
-                console.debug(`getAllServicesByCars(): Successfully found ${result.length} documents.`);
-            } else {
-                console.debug("getAllServicesByCars(): No document matches the provided query.");
-            }
-            let services = []
-
-            for (resultCar of result) {
-                for (service of resultCar.services) {
-                    service.car = resultCar
-                    services.push(service)
-                }
-            }
-            return services;
-        })
-        .catch(err => console.error(`Failed to find document: ${err}`));
-}
 
 /**
  * This function get all makes from external API.
@@ -285,11 +179,7 @@ module.exports = (Car) => {
         updateCar: updateCar(Car),
         deleteCar: deleteCar(Car),
         getCarByPlate: getCarByPlate(Car),
-        addService: addService(Car),
-        getServiceById: getServiceById(Car),
-        getServicesByIdAndCarId: getServicesByIdAndCarId,
         getAllMakes: getAllMakes,
         getAllCarsByUser: getAllCarsByUser,
-        getAllServicesByCars: getAllServicesByCars(Car)
     }
 }

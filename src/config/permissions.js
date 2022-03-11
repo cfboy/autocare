@@ -18,11 +18,9 @@ function canDeleteUser(user) {
     )
 }
 
-function canDeleteCar(user, carID) {
-    let subscription = user.subscriptions.find(subs => subs.items.find(item => item.cars.find(car => car.id == carID)))
-    let car = subscription.items[0].cars[0]
+function canDeleteCar(user, carID, services) {
     return (
-        user.role === ROLES.ADMIN || (car && car.services.length == 0)
+        user.role === ROLES.ADMIN || (carID && services.length == 0)
     )
 }
 
@@ -33,11 +31,10 @@ function canAddCar(user) {
     )
 }
 
-function canEditCar(user, carID) {
-    let subscription = user.subscriptions.find(subs => subs.items.find(item => item.cars.find(car => car.id == carID)))
-    let car = subscription.items[0].cars[0]
+function canEditCar(user, carID, services) {
+
     return (
-        [ROLES.ADMIN, ROLES.MANAGER].includes(user.role) || (car && car.services.length == 0)
+        [ROLES.ADMIN, ROLES.MANAGER].includes(user.role) || (carID && services.length == 0)
     )
 }
 

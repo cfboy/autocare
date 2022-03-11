@@ -1,4 +1,5 @@
 const SubscriptionService = require('../collections/subscription')
+const ServiceService = require('../collections/services')
 const CarService = require('../collections/cars')
 const HistoryService = require('../collections/history')
 const { historyTypes } = require('../collections/history/history.model')
@@ -46,6 +47,8 @@ exports.cars = async (req, res) => {
             }
             cars = await CarService.getCars(userCars)
 
+            cars = await ServiceService.setServicesToCars(cars)
+
             res.render('cars/index.ejs', {
                 user, cars, message, alertType,
                 canAddCar: canAddCar(user),
@@ -79,13 +82,15 @@ exports.view = async (req, res) => {
         let id = req.params.id,
             car = await CarService.getCarByID(id)
 
+        car.services = await ServiceService.getServicesByCar(car)
+
         if (car) {
             res.status(200).render('cars/view.ejs', {
                 user,
                 car,
                 message,
                 alertType,
-                canEditCar: canEditCar(user, car.id),
+                canEditCar: canEditCar(user, car.id, car.services),
                 canManageCars: canManageCars(user)
             })
         } else {
@@ -322,84 +327,4 @@ exports.validatePlate = async (req, res) => {
         res.render('Error validating car plate.')
     }
 
-}
-
-exports.services = async (req, res) => {
-    try {
-
-        // Message for alerts
-        let { message, alertType } = req.session,
-            cars,
-            // Passport store the user in req.user
-            // TODO: implement for othe user.
-            user = await Stripe.setStripeInfoToUser(req.user)
-
-        // clear message y alertType
-        if (message) {
-            req.session.message = ''
-            req.session.alertType = ''
-        }
-
-        if (!user) {
-            res.redirect('/')
-        } else {
-
-            // let userCars = await CarService.getAllCarsByUser(user)
-            let userCars = await SubscriptionService.getAllCarsByUser(user)
-
-            let services = await CarService.getAllServicesByCars(userCars)
-
-            // Manage services by car on client side.
-            res.render('services/index.ejs', {
-                user, cars, message, alertType,
-                services
-            })
-
-        }
-    } catch (error) {
-        console.error(error.message)
-        req.session.message = "Error trying to render the user services."
-        req.session.alertType = alertTypes.ErrorAlert
-        res.redirect('/account')
-
-    }
-}
-
-// TODO: change services because the services now are on cars.
-exports.viewService = async (req, res) => {
-    try {
-
-        // Message for alerts
-        let { message, alertType } = req.session,
-            cars,
-            // Passport store the user in req.user
-            user = req.user
-
-        // clear message y alertType
-        if (message) {
-            req.session.message = ''
-            req.session.alertType = ''
-        }
-
-        if (!user) {
-            res.redirect('/')
-        } else {
-            let id = req.params.id,
-                carID = req.query.carID
-
-            let [service, car] = await CarService.getServicesByIdAndCarId(id, carID)
-
-            res.render('services/view.ejs', {
-                user, message, alertType,
-                service, car
-            })
-
-        }
-    } catch (error) {
-        console.error(error.message)
-        req.session.message = "Error trying to render the service."
-        req.session.alertType = alertTypes.ErrorAlert
-        res.redirect('/account')
-
-    }
 }

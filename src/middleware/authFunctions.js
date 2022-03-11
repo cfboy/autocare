@@ -1,3 +1,4 @@
+const ServiceService = require('../collections/services')
 const { canDeleteCar,
     canEditCar,
     canDeleteLocation,
@@ -29,8 +30,9 @@ async function checkNotAuthenticated(req, res, next) {
 async function authDeleteCar(req, res, next) {
     let carID = req.params.id
     let user = await Stripe.setStripeInfoToUser(req.user)
+    let services = await ServiceService.getServicesByCar(carID)
 
-    if (carID && canDeleteCar(user, carID)) {
+    if (carID && canDeleteCar(user, carID, services)) {
         return next()
     }
     req.session.message = `Not allowed to delete this car.`
@@ -39,7 +41,7 @@ async function authDeleteCar(req, res, next) {
 }
 
 async function authAddCar(req, res, next) {
-    
+
     let user = await Stripe.setStripeInfoToUser(req.user)
 
     if (canAddCar(user)) {
@@ -53,8 +55,9 @@ async function authAddCar(req, res, next) {
 async function authEditCar(req, res, next) {
     let carID = req.body.id ? req.body.id : req.params.id ? req.params.id : ''
     let user = await Stripe.setStripeInfoToUser(req.user)
+    let services = await ServiceService.getServicesByCar(carID)
 
-    if (carID && canEditCar(user, carID)) {
+    if (carID && canEditCar(user, carID, services)) {
         return next()
     }
     req.session.message = `Not allowed to edit this car.`

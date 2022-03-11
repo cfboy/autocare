@@ -1,6 +1,7 @@
 const UserService = require('../collections/user')
 const SubscriptionService = require('../collections/subscription')
 const CarService = require('../collections/cars')
+const ServiceService = require('../collections/services')
 const AnalyticsService = require('../collections/analytics/service')
 const { ROLES } = require('../collections/user/user.model')
 const HistoryService = require('../collections/history')
@@ -208,14 +209,11 @@ exports.useService = async (req, res) => {
         let { userID, carID } = req.body
 
         if (userID) {
+            let authorizedBy = req.user
             let car = await CarService.getCarByID(carID)
             let customer = await SubscriptionService.getUserByCar(car)
-            // let customer = car.user
-            let authorizedBy = req.user,
-                service
-
             // TODO: Change location 
-            [car, service] = await CarService.addService(car.id, authorizedBy, authorizedBy.locations[0])
+            let service = await ServiceService.addService(car, authorizedBy, authorizedBy.locations[0], customer)
 
             if (car && service)
                 //Log this action.

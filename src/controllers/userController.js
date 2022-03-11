@@ -7,6 +7,8 @@ const alertTypes = require('../helpers/alertTypes')
 const bcrypt = require('bcrypt');
 const { municipalities } = require('../helpers/municipalities')
 const CarService = require('../collections/cars')
+const ServiceService = require('../collections/services')
+const cars = require('../collections/cars')
 
 
 // ------------------------------- Create -------------------------------
@@ -214,7 +216,8 @@ exports.viewUser = async (req, res) => {
                     }
                 }
             }
-            cars = await CarService.getCars(customerCars)
+
+            let cars = await ServiceService.setServicesToCars(customerCars)
 
             res.status(200).render('user/view.ejs', {
                 user: req.user,
