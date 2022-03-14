@@ -149,7 +149,7 @@
                                                     <tbody>
                                                         <% if(cars) { %>
                                                         <% for(car of cars) { %>
-                                                        <% let enableActions = (user.role === roles.ADMIN || car.services.length < 1) %>
+                                                        <% let enableActions = (user.role === roles.ADMIN || car?.services?.length < 1) %>
 
                                                         <tr>
                                                             <td>
