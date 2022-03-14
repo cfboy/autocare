@@ -21696,7 +21696,7 @@ code {
     border-radius: 100%;
 }
 
-/* .home-tab .btn, */
+.home-tab .btn,
 .home-tab .ajax-upload-dragdrop .ajax-file-upload,
 .ajax-upload-dragdrop .home-tab .ajax-file-upload,
 .home-tab .swal2-modal .swal2-buttonswrapper .swal2-styled,
