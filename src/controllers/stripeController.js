@@ -118,7 +118,7 @@ exports.webhook = async (req, res) => {
             // Add notification to user.
             [customer, notification] = await UserService.addNotification(customer.id, alertInfo.message)
 
-            req.io.emit('notification', notification);
+            req.io.emit('notifications', notification);
             // console.debug(`Actual: hasTrial: ${user.membershipInfo.hasTrial}, current_period_end ${data.current_period_end}, User Plan: ${user.membershipInfo.plan}`)
 
             // await user.save()

@@ -243,8 +243,8 @@ const addNotification = (User) => async (userID, message) => {
     // let date = Date.now();
     let notification = {
         isRead: false,
-        message: message
-        // created_date: date
+        message: message,
+        created_date: new Date()
     }, customer = await User.findByIdAndUpdate(userID, {
         $addToSet: { notifications: notification }
     }, { new: true }, function (err, doc) {

@@ -141,8 +141,7 @@
             </li> -->
             <%# } %>
             <li class="nav-item dropdown">
-                <a class="nav-link count-indicator" id="languageDropdown" href="#" data-bs-toggle="dropdown"
-                    aria-expanded="false">
+                <a class="nav-link" id="languageDropdown" href="#" data-bs-toggle="dropdown" aria-expanded="false">
                     <!-- <i class="icon-globe"></i> -->
                     <!-- <i class="fas fa-globe-americas"></i> -->
                     <div id="showLang" style="display: contents;">
@@ -197,13 +196,6 @@
 
                     <% for(notification of user.notifications.filter(notification => notification.isRead == false)) { %>
                     <a id="a-<%= notification.id%>" class="dropdown-item preview-item py-3">
-                        <!-- <div class="preview-thumbnail">
-                            <%# var textPrimary = notification.isRead ? "" : "text-primary"%>
-
-                            <i id="<%# notification.id%>" class="fa-solid fa-eye <%#  textPrimary%> "
-                                onclick="changeNotificationState('<%# user.id%>','<%# notification.id%>','<%# !notification.isRead%>')"></i>
-                            <i class="mdi mdi-alert m-auto text-primary"></i>
-                        </div> -->
                         <div class="preview-item-content">
                             <h6 class="preview-subject fw-normal text-dark mb-1"><%= notification?.message%></h6>
                             <p class="fw-light small-text mb-0"> <%# moment(notification?.created_date).%>
@@ -275,6 +267,8 @@
         manageLangDropdown();
     };
 
+    var readFlag = false;
+
     const socket = io('<%= domain%>');
 
     // Receive data
@@ -282,16 +276,24 @@
         console.log(JSON.stringify(data));
 
         $('#notifications').prepend(`
-        <div class="preview-item-content">
-            <h6 class="preview-subject fw-normal text-dark mb-1">${data?.message}</h6>
-                <p class="fw-light small-text mb-0"> ${data?.created_date} </p>
-        </div>`);
+        <a id="a-${data.id}" class="dropdown-item preview-item py-3">
+                        <div class="preview-item-content">
+                            <h6 class="preview-subject fw-normal text-dark mb-1">${data?.message}</h6>
+                            <p class="fw-light small-text mb-0">
+                                Now
+                            </p>
+                        </div>
+                    </a>`);
+
+        $('#notificationDropdownBtn').append(`
+        <span class="count"></span>`)
+
     })
 
     function changeNotificationState(notificationId, newStatus, allNotifications) {
         var userId = '<%- user.id%>';
 
-        if (userId && newStatus && allNotifications) {
+        if (!readFlag && userId && newStatus && allNotifications) {
             $.ajax({
                 url: "/changeNotificationState",
                 type: "POST",
@@ -303,6 +305,7 @@
                     allNotifications
                 })
             }).done(function (result) {
+                readFlag = true;
                 // if (newStatus == "true")
                 // $(`#a-${notificationId}`).remove();
                 // else
