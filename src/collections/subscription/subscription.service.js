@@ -1,4 +1,11 @@
 /**
+ * IMPORTANT: All the subscription obj has the ID of Stripe Subscription Obj on id property.
+ * So when need to find a subscription by id should use findOne instead findByID.
+ * This is because the findById methods assumes that the parameter is an ObjectID. 
+ * 
+ *  */
+
+/**
  * This function add new Subscription to DB.
  * @param {*} Subscription 
  * @returns Subscription
