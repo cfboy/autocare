@@ -53,7 +53,7 @@ exports.account = async (req, res) => {
 
         params = { user, prices, message, alertType }
 
-        if (user.billingID) {
+        if (user?.billingID) {
             user = await Stripe.setStripeInfoToUser(user)
         }
         params = {
@@ -61,17 +61,18 @@ exports.account = async (req, res) => {
             subscriptions: user?.subscriptions
         }
 
-        if (user.subscriptions.length < 1 && [ROLES.CUSTOMER].includes(user.role)) {
+        if (user?.subscriptions?.length < 1 && [ROLES.CUSTOMER].includes(user.role)) {
             req.flash('warning', 'Create a subscription to continue.')
             res.redirect('/create-subscriptions')
         } else {
 
+            // let analytics = await AnalyticsService.getAnalytics()
+
             switch (role) {
                 case ROLES.ADMIN:
-                    let analytics = await AnalyticsService.getAnalytics()
                     // Get Customers
                     customers = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
-                    params = { ...params, customers, analytics }
+                    params = { ...params, customers }
                     res.render('dashboards/mainDashboard.ejs', params)
                     break;
                 case ROLES.CUSTOMER:

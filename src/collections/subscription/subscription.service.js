@@ -30,7 +30,7 @@ const addSubscription = (Subscription) => async ({
 const updateSubscription = (Subscription) => async (id, updates) => {
     console.log(`updateSubscription() ID: ${id}`)
 
-    return await Subscription.findByIdAndUpdate({ _id: id }, updates, function (err, doc) {
+    return await Subscription.findOneAndUpdate({ id: id }, updates, function (err, doc) {
         if (err) {
             console.error(err.message)
         } else {
@@ -46,7 +46,7 @@ const updateSubscription = (Subscription) => async (id, updates) => {
  */
 const addSubscriptionCar = (Subscription) => async (id, car, subItemID) => {
     console.log(`addSubscriptionCar() ID: ${id}`)
-    return await Subscription.findByIdAndUpdate({ _id: id },
+    return await Subscription.findOneAndUpdate({ id: id },
         { $addToSet: { "items.$[item].cars": car } },
         { "arrayFilters": [{ "item.id": subItemID }] },
         function (err, doc) {
@@ -65,7 +65,7 @@ const addSubscriptionCar = (Subscription) => async (id, car, subItemID) => {
  */
 const removeSubscriptionCar = (Subscription) => async (id, item, car) => {
     console.log(`removeSubscriptionCar() ID: ${id}`)
-    return await Subscription.findByIdAndUpdate({ _id: id },
+    return await Subscription.findOneAndUpdate({ id: id },
         { $pull: { "items.$[item].cars": car.id } },
         { "arrayFilters": [{ "item.id": item }], new: true },
         function (err, doc) {
@@ -85,7 +85,7 @@ const removeSubscriptionCar = (Subscription) => async (id, item, car) => {
 const deleteSubscription = (Subscription) => (id) => {
     console.log(`deleteSubscription() by ID: ${id}`)
 
-    return Subscription.deleteOne({ _id: id }, function (err, docs) {
+    return Subscription.deleteOne({ id: id }, function (err, docs) {
         if (err) {
             console.error(err)
         } else {
@@ -122,7 +122,7 @@ const getSubscriptionsByUser = (Subscription) => (user) => {
 const getSubscriptionById = (Subscription) => (id) => {
     console.log(`getSubscriptionById() by ID: ${id}`)
 
-    return Subscription.findOne({ _id: id }, function (err, docs) {
+    return Subscription.findOne({ id: id }, function (err, docs) {
         if (err) {
             console.error(err)
         } else {

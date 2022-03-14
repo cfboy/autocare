@@ -204,8 +204,10 @@ const setServicesToCars = (Service) => async (cars) => {
 
     for (carObj of cars) {
         carObj.services = []
-        let carServices = services.find(service => service.car.id == carObj.id)
-        carObj.services = carServices
+        if (services) {
+            let carServices = services.find(service => service.car.id == carObj.id)
+            carObj.services = carServices
+        }
     }
     return cars
 }

@@ -79,6 +79,10 @@ exports.webhook = async (req, res) => {
             subscription = await SubscriptionService.addSubscription({ id: subscription.id, items: items, data: subscription, user: customer })
             console.debug(`WEBHOOK: Add new subscription ${subscription.id} to customer ${subscription.user.email}`)
 
+            [customer, notification] = await UserService.addNotification(customer.id, "Subscription Updated")
+
+            req.io.emit('notification', notification);
+
             break
 
         case 'customer.subscription.updated':
