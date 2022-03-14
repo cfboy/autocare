@@ -240,11 +240,11 @@ const getUsersByList = (User) => async (users) => {
  */
 const addNotification = (User) => async (userID, message) => {
     console.log(`addNotification() ID: ${userID}`)
-    let date = Date.now();
+    // let date = Date.now();
     let notification = {
         isRead: false,
-        message: message,
-        created_date: date
+        message: message
+        // created_date: date
     }, customer = await User.findByIdAndUpdate(userID, {
         $addToSet: { notifications: notification }
     }, { new: true }, function (err, doc) {
