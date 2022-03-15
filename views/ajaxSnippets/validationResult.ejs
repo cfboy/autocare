@@ -90,7 +90,7 @@
                             <% var subscriptionOnValidPeriod = moment(new Date()).isBefore(subscription?.data?.current_period_end * 1000)%>
                             <% if(subscriptionOnValidPeriod) { %>
                             <button
-                                class="btn btn-block btn-primary btn-lg font-weight-medium btn-icon-text manage-billing-button"
+                                class="btn btn-block btn-primary btn-lg font-weight-medium btn-icon-text manage-billing-button m-1"
                                 type="submit" value="<%- customer.billingID%>" email="<%- customer.email%>">
                                 Manage Billing
                                 <i class="fab fa-stripe-s btn-icon-apepend"></i>
@@ -99,7 +99,7 @@
                             </button>
 
                             <button id="use-service-button" user-id="<%= customer?.id%>" car-id="<%= car?.id%>"
-                                class="btn btn-block btn-success btn-lg font-weight-medium btn-icon-text" type="submit">
+                                class="btn btn-block btn-success btn-lg font-weight-medium btn-icon-text m-1" type="submit">
                                 USE SERVICE
                                 <i class="menu-icon mdi mdi-car-wash btn-icon-apepend"></i>
                             </button>

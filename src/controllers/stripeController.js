@@ -71,14 +71,26 @@ exports.webhook = async (req, res) => {
 
                 customer = await UserService.getUserByBillingID(subscription.customer)
                 if (customer) {
-                    items = []
+                    const cars = JSON.parse(subscription?.metadata?.cars)
+                    let items = []
                     for (subItem of subscriptionItems) {
                         let newItem = { id: subItem.id, cars: [], data: subItem }
+                        if (cars.length > 0) {
+                            for (carObj of cars) {
+                                if (subItem.price.id === carObj.priceID) {
+                                    let newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate)
+                                    newItem.cars.push(newCar)
+                                }
+
+                            }
+                        }
                         items.push(newItem)
+
                     }
+
                     console.debug(`WEBHOOK: Items to add ${items.length}`)
 
-                    alertInfo = { message: "Subscription Updated", alertType: alertTypes.BasicAlert }
+                    alertInfo = { message: "Subscription created", alertType: alertTypes.BasicAlert }
 
                     subscription = await SubscriptionService.addSubscription({ id: subscription.id, items: items, data: subscription, user: customer });
 
@@ -125,7 +137,7 @@ exports.webhook = async (req, res) => {
                     [customer, notification] = await UserService.addNotification(customer.id, alertInfo.message)
 
                     req.io.emit('notifications', notification);
-                    
+
                 } else {
                     console.log('customer.subscription.updated: Not Found Customer.')
                 }
@@ -198,26 +210,34 @@ exports.completeCheckoutSuccess = async (req, res) => {
             subscriptionID = subscription_id
         }
 
-        const subscription = await Stripe.getSubscriptionById(subscriptionID)
-        const cars = JSON.parse(subscription.metadata.cars)
+        let subscription = await SubscriptionService.getSubscriptionById(subscriptionID)
+        let newSubscription
 
-        let subscriptionItems = subscription.items.data
-        let items = []
-        for (subItem of subscriptionItems) {
-            let newItem = { id: subItem.id, cars: [], data: subItem }
-            for (carObj of cars) {
-                if (subItem.price.id === carObj.priceID) {
-                    let newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate)
-                    newItem.cars.push(newCar)
+        if (!subscription) {
+            subscription = await Stripe.getSubscriptionById(subscriptionID)
+
+            const cars = JSON.parse(subscription.metadata.cars)
+
+            let subscriptionItems = subscription.items.data
+            let items = []
+            for (subItem of subscriptionItems) {
+                let newItem = { id: subItem.id, cars: [], data: subItem }
+                for (carObj of cars) {
+                    if (subItem.price.id === carObj.priceID) {
+                        let newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate)
+                        newItem.cars.push(newCar)
+                    }
+
                 }
-
+                items.push(newItem)
             }
-            items.push(newItem)
+
+            let customer = await UserService.getUserByBillingID(subscription.customer)
+
+            newSubscription = await SubscriptionService.addSubscription({ id: subscription.id, data: subscription, items: items, user: customer })
+        } else {
+            newSubscription = subscription
         }
-
-        let customer = await UserService.getUserByBillingID(subscription.customer)
-
-        let newSubscription = await SubscriptionService.addSubscription({ id: subscription.id, data: subscription, items: items, user: customer })
 
         // TODO: completed message, add history
         if (newSubscription) {
