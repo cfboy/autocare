@@ -6,7 +6,8 @@ const stripeController = require('./src/controllers/stripeController'),
     dashboardsController = require('./src/controllers/dashboardsController'),
     historyController = require('./src/controllers/historyController'),
     carsController = require('./src/controllers/carsController'),
-    servicesController = require('./src/controllers/servicesController')
+    servicesController = require('./src/controllers/servicesController'),
+    reportsController = require('./src/controllers/reportsController')
 
 // Express
 const express = require('express');
@@ -122,6 +123,16 @@ router.post('/useService', checkAuthenticated, authValidateMembership, dashboard
 router.post('/carcheck', dashboardsController.carCheck)
 
 // ---------------------------------------
+
+router.get('/reports', checkAuthenticated, reportsController.reports)
+router.get('/reports/:id', checkAuthenticated, reportsController.viewReport)
+router.get('/create-report', checkAuthenticated, reportsController.createReport)
+router.get('/edit-report/:id', checkAuthenticated, reportsController.editReport)
+
+router.post('/create-report', checkAuthenticated, reportsController.save)
+router.post('/edit-report', checkAuthenticated, reportsController.update)
+router.get('/delete-report/:id', checkAuthenticated, reportsController.delete)
+
 
 //------ Stripe and Payment Routes ------
 router.get('/charges', checkAuthenticated, stripeController.charges)

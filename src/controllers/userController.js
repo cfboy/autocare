@@ -157,7 +157,11 @@ exports.save = async (req, res) => {
             req.session.message = `User Created ${user.email}.`
             req.session.alertType = alertTypes.CompletedActionAlert
             req.flash('info', 'User created.')
-            res.redirect('/users')
+
+            if (user.role === ROLES.CUSTOMER)
+                res.redirect('/customers')
+            else
+                res.redirect('/users')
 
         } else {
             let message = `That email ${user.email} already exist.`
