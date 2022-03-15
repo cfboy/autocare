@@ -235,28 +235,32 @@ const getUsersByList = (User) => async (users) => {
 
 /**
  * This function add new notification to user.
- * @param {userID, authorizedBy, location} User 
+ * @param {userID, message} User 
  * @returns user object
  */
-const addNotification = (User) => async (userID, message) => {
-    console.log(`addNotification() ID: ${userID}`)
+const addNotification = (User) => async (id, message) => {
+    console.log(`addNotification() ID: ${id}`)
     // let date = Date.now();
     let notification = {
         isRead: false,
         message: message,
         created_date: new Date()
-    }, customer = await User.findByIdAndUpdate(userID, {
-        $addToSet: { notifications: notification }
-    }, { new: true }, function (err, doc) {
-        if (err) {
-            console.error(err)
-            console.error(err.message)
-        } else {
-            console.debug("Notification Added to: ", doc?.id);
-        }
-    })
+    }
 
-    notification = (customer.notifications.find(({ created_date }) => created_date.getTime() === new Date(notification.created_date).getTime()))
+    let customer = await User.findByIdAndUpdate({ _id: id },
+        { $addToSet: { notifications: notification } },
+        { new: true })
+        .then(result => {
+            if (result) {
+                console.debug(`addNotification(): Successfully Added notification ${result.id}.`);
+                return result
+            } else {
+                console.debug("addNotification(): No document returned.");
+            }
+        })
+        .catch(err => console.error(`Failed to add notification: ${err}`));
+
+    notification = (customer?.notifications.find(({ created_date }) => created_date.getTime() === new Date(notification.created_date).getTime()))
 
     return [customer, notification]
 }

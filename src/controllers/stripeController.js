@@ -36,101 +36,113 @@ exports.webhook = async (req, res) => {
         console.log(err)
         return res.sendStatus(400)
     }
+    try {
+        const data = event.data.object
+        let customer, notification, subscription, items, subscriptionItems, alertInfo
+        console.log(event.type, data)
+        switch (event.type) {
+            case 'customer.created':
+                console.log(JSON.stringify(data))
+                if (data) {
+                    let user = await UserService.addUser({
+                        email: data.email,
+                        password: 'Test1234', //TODO: optimize
+                        billingID: data.id,
+                        role: Roles.CUSTOMER,
+                        firstName: data.name.split(' ')[0],
+                        lastName: data.name.split(' ')[1],
+                        phoneNumber: data.phone,
+                        dateOfBirth: null,
+                        city: data.address ? data.address.city : null
+                    })
+                }
+                break
+            case 'customer.deleted':
+                break
+            case 'customer.updated':
+                break
+            case 'invoice.paid':
+                break
+            case 'customer.subscription.created':
+                console.debug(`WEBHOOK: customer.subscription.created: ${data.id}`)
 
-    const data = event.data.object
-    let customer, notification, subscription, items, subscriptionItems
-    console.log(event.type, data)
-    switch (event.type) {
-        case 'customer.created':
-            console.log(JSON.stringify(data))
-            if (data) {
-                let user = await UserService.addUser({
-                    email: data.email,
-                    password: 'Test1234', //TODO: optimize
-                    billingID: data.id,
-                    role: Roles.CUSTOMER,
-                    firstName: data.name.split(' ')[0],
-                    lastName: data.name.split(' ')[1],
-                    phoneNumber: data.phone,
-                    dateOfBirth: null,
-                    city: data.address ? data.address.city : null
-                })
-            }
-            break
-        case 'customer.deleted':
-            break
-        case 'customer.updated':
-            break
-        case 'invoice.paid':
-            break
-        case 'customer.subscription.created':
-            // TODO: handle errors
-            console.debug(`WEBHOOK: customer.subscription.created: ${data.id}`)
+                subscription = data
+                subscriptionItems = subscription.items.data
 
-            subscription = data
-            subscriptionItems = subscription.items.data
-            items = []
-            for (subItem of subscriptionItems) {
-                let newItem = { id: subItem.id, cars: [], data: subItem }
-                items.push(newItem)
-            }
-            console.debug(`WEBHOOK: Items to add ${items}`)
-            customer = await UserService.getUserByBillingID(subscription.customer)
-            subscription = await SubscriptionService.addSubscription({ id: subscription.id, items: items, data: subscription, user: customer })
-            console.debug(`WEBHOOK: Add new subscription ${subscription.id} to customer ${subscription.user.email}`)
+                customer = await UserService.getUserByBillingID(subscription.customer)
+                if (customer) {
+                    items = []
+                    for (subItem of subscriptionItems) {
+                        let newItem = { id: subItem.id, cars: [], data: subItem }
+                        items.push(newItem)
+                    }
+                    console.debug(`WEBHOOK: Items to add ${items.length}`)
 
-            [customer, notification] = await UserService.addNotification(customer.id, "Subscription Updated")
+                    alertInfo = { message: "Subscription Updated", alertType: alertTypes.BasicAlert }
 
-            req.io.emit('notification', notification);
+                    subscription = await SubscriptionService.addSubscription({ id: subscription.id, items: items, data: subscription, user: customer });
 
-            break
+                    [customer, notification] = await UserService.addNotification(customer.id, alertInfo.message);
 
-        case 'customer.subscription.updated':
-            // started trial
-            subscription = data
-            customer = await UserService.getUserByBillingID(subscription.customer)
-            let alertInfo = { message: "Subscription Updated", alertType: alertTypes.BasicAlert }
+                    req.io.emit('notifications', notification);
+                } else {
+                    console.log('customer.subscription.created: Not Found Customer.')
+                }
 
-            subscriptionItems = subscription.items.data
-            let mySubscription = await SubscriptionService.getSubscriptionById(subscription.id)
+                break;
+            case 'customer.subscription.updated':
+                subscription = data
+                customer = await UserService.getUserByBillingID(subscription.customer)
+                if (customer) {
 
-            items = []
-            for (subItem of subscriptionItems) {
-                let itemToUpdate = mySubscription.items.find(item => item.id == subItem.id)
-                let newItem = { id: itemToUpdate.id, cars: itemToUpdate.cars, data: subItem }
-                items.push(newItem)
-            }
+                    alertInfo = { message: "Subscription Updated", alertType: alertTypes.BasicAlert }
 
-            updates = {
-                data: subscription,
-                items: items
-            }
+                    subscriptionItems = subscription.items.data
+                    let mySubscription = await SubscriptionService.getSubscriptionById(subscription.id)
+
+                    items = []
+                    for (subItem of subscriptionItems) {
+                        let itemToUpdate = mySubscription.items.find(item => item.id == subItem.id)
+                        let newItem = { id: itemToUpdate.id, cars: itemToUpdate.cars, data: subItem }
+                        items.push(newItem)
+                    }
+
+                    updates = {
+                        data: subscription,
+                        items: items
+                    }
 
 
-            subscription = await SubscriptionService.updateSubscription(subscription.id, updates)
+                    subscription = await SubscriptionService.updateSubscription(subscription.id, updates)
 
-            if (subscription.canceled_at) {
-                // cancelled
-                console.log(`You just canceled the subscription: ${subscription.id} at ${moment(subscription?.canceled_at * 1000).isValid() ? moment(subscription?.canceled_at * 1000).format(completeDateFormat) : 'N/A'}`)
-                alertInfo = { message: "Subscription Cancelled", alertType: alertTypes.BasicAlert }
-            }
+                    if (subscription.canceled_at) {
+                        // cancelled
+                        console.log(`You just canceled the subscription: ${subscription.id} at ${moment(subscription?.canceled_at * 1000).isValid() ? moment(subscription?.canceled_at * 1000).format(completeDateFormat) : 'N/A'}`)
+                        alertInfo = { message: "Subscription Cancelled", alertType: alertTypes.BasicAlert }
+                    }
 
-            // Add notification to user.
-            [customer, notification] = await UserService.addNotification(customer.id, alertInfo.message)
+                    // Add notification to user.
+                    [customer, notification] = await UserService.addNotification(customer.id, alertInfo.message)
 
-            req.io.emit('notifications', notification);
-            // console.debug(`Actual: hasTrial: ${user.membershipInfo.hasTrial}, current_period_end ${data.current_period_end}, User Plan: ${user.membershipInfo.plan}`)
+                    req.io.emit('notifications', notification);
+                    
+                } else {
+                    console.log('customer.subscription.updated: Not Found Customer.')
+                }
 
-            // await user.save()
-            // console.log('Customer Changed', JSON.stringify(data))
-            break
-        case 'customer.subscription.deleted':
-            break;
-        default:
-            console.log(`Unhandled event type ${event.type}`);
+                break
+            case 'customer.subscription.deleted':
+                break;
+            default:
+                console.log(`Unhandled event type ${event.type}`);
 
+        }
+        res.sendStatus(200)
+    } catch (error) {
+        console.log(`ERROR stripeController: ${error.message}`)
+        console.log(error)
+        res.sendStatus(500)
     }
-    res.sendStatus(200)
 }
 
 /**
