@@ -76,8 +76,10 @@ exports.webhook = async (req, res) => {
                         // Find subcription again for expand product information
                         subscription = await Stripe.getSubscriptionById(data.id)
                         subscriptionItems = subscription.items.data
+                        let cars = []
+                        if (subscription?.metadata?.cars)
+                            cars = JSON.parse(subscription?.metadata?.cars)
 
-                        const cars = JSON.parse(subscription?.metadata?.cars)
                         let items = []
                         for (subItem of subscriptionItems) {
                             let newItem = { id: subItem.id, cars: [], data: subItem }
