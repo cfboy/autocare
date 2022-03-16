@@ -41,62 +41,70 @@ exports.webhook = async (req, res) => {
         let customer, notification, subscription, items, subscriptionItems, alertInfo
         console.log(event.type, data)
         switch (event.type) {
-            case 'customer.created':
-                console.log(JSON.stringify(data))
-                if (data) {
-                    let user = await UserService.addUser({
-                        email: data.email,
-                        password: 'Test1234', //TODO: optimize
-                        billingID: data.id,
-                        role: Roles.CUSTOMER,
-                        firstName: data.name.split(' ')[0],
-                        lastName: data.name.split(' ')[1],
-                        phoneNumber: data.phone,
-                        dateOfBirth: null,
-                        city: data.address ? data.address.city : null
-                    })
-                }
-                break
-            case 'customer.deleted':
-                break
-            case 'customer.updated':
-                break
-            case 'invoice.paid':
-                break
+            // case 'customer.created':
+            //     console.log(JSON.stringify(data))
+            //     if (data) {
+            //         let user = await UserService.addUser({
+            //             email: data.email,
+            //             password: 'Test1234', //TODO: optimize
+            //             billingID: data.id,
+            //             role: Roles.CUSTOMER,
+            //             firstName: data.name.split(' ')[0],
+            //             lastName: data.name.split(' ')[1],
+            //             phoneNumber: data.phone,
+            //             dateOfBirth: null,
+            //             city: data.address ? data.address.city : null
+            //         })
+            //     }
+            //     break
+            // case 'customer.deleted':
+            //     break
+            // case 'customer.updated':
+            //     break
+            // case 'invoice.paid':
+            //     break
             case 'customer.subscription.created':
                 console.debug(`WEBHOOK: customer.subscription.created: ${data.id}`)
 
                 subscription = data
-                subscriptionItems = subscription.items.data
 
                 customer = await UserService.getUserByBillingID(subscription.customer)
                 if (customer) {
-                    const cars = JSON.parse(subscription?.metadata?.cars)
-                    let items = []
-                    for (subItem of subscriptionItems) {
-                        let newItem = { id: subItem.id, cars: [], data: subItem }
-                        if (cars.length > 0) {
-                            for (carObj of cars) {
-                                if (subItem.price.id === carObj.priceID) {
-                                    let newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate)
-                                    newItem.cars.push(newCar)
+                    subscription = await SubscriptionService.getSubscriptionById(subscription.id);
+
+                    if (!subscription) {
+                        // Find subcription again for expand product information
+                        subscription = await Stripe.getSubscriptionById(data.id)
+                        subscriptionItems = subscription.items.data
+
+                        const cars = JSON.parse(subscription?.metadata?.cars)
+                        let items = []
+                        for (subItem of subscriptionItems) {
+                            let newItem = { id: subItem.id, cars: [], data: subItem }
+                            if (cars.length > 0) {
+                                for (carObj of cars) {
+                                    if (subItem.price.id === carObj.priceID) {
+                                        let newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate)
+                                        newItem.cars.push(newCar)
+                                    }
+
                                 }
-
                             }
+                            items.push(newItem)
+
                         }
-                        items.push(newItem)
 
+                        console.debug(`WEBHOOK: Items to add ${items.length}`)
+
+                        alertInfo = { message: "Subscription created", alertType: alertTypes.BasicAlert }
+
+                        subscription = await SubscriptionService.addSubscription({ id: subscription.id, items: items, data: subscription, user: customer });
                     }
-
-                    console.debug(`WEBHOOK: Items to add ${items.length}`)
-
-                    alertInfo = { message: "Subscription created", alertType: alertTypes.BasicAlert }
-
-                    subscription = await SubscriptionService.addSubscription({ id: subscription.id, items: items, data: subscription, user: customer });
 
                     [customer, notification] = await UserService.addNotification(customer.id, alertInfo.message);
 
                     req.io.emit('notifications', notification);
+
                 } else {
                     console.log('customer.subscription.created: Not Found Customer.')
                 }
@@ -106,6 +114,8 @@ exports.webhook = async (req, res) => {
                 subscription = data
                 customer = await UserService.getUserByBillingID(subscription.customer)
                 if (customer) {
+
+                    subscription = await Stripe.getSubscriptionById(subscription.id)
 
                     alertInfo = { message: "Subscription Updated", alertType: alertTypes.BasicAlert }
 
