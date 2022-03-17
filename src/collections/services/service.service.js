@@ -168,6 +168,7 @@ const getServicesByCar = (Service) => async (car) => {
  */
 const getServicesByCars = (Service) => async (cars) => {
     return Service.find({ car: { $in: cars } })
+        .sort({ created_date: 'descending' })
         .populate({ path: 'location', model: 'location' })
         .populate({ path: 'authorizedBy', model: 'user' })
         .populate({ path: 'user', model: 'user' })

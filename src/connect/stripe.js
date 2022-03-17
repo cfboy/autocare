@@ -308,7 +308,7 @@ const getCustomerCharges = async (user) => {
         let chargesToReturn = []
         let charges = await Stripe.charges.list({
             // customer: customerID,
-            limit: 50
+            // limit: 50
         });
 
         if ([ROLES.ADMIN, ROLES.MANAGER].includes(role))
@@ -324,6 +324,44 @@ const getCustomerCharges = async (user) => {
             }
         }
         return chargesToReturn
+    } catch (error) {
+        console.debug(`ERROR-STRIPE: Stripe Charges Not Found`);
+        console.debug(`ERROR-STRIPE: ${error.message}`);
+
+        return null
+    }
+}
+
+/**
+ * This function get the customer charges on stripe.
+ * @param {*} user 
+ * @returns 
+ */
+const getCustomerInvoices = async (user) => {
+    try {
+        let customerID = user.billingID,
+            role = user.role
+
+        console.debug(`STRIPE: getCustomerInvoices(${customerID})`);
+        let invoicesToReturn = []
+        let invoices = await Stripe.invoices.list({
+            // customer: customerID,
+            // limit: 50
+        });
+
+        if ([ROLES.ADMIN, ROLES.MANAGER].includes(role))
+            invoicesToReturn = invoices.data
+        else
+            invoicesToReturn = invoices.data.filter(invoice => invoice?.customer === customerID)
+
+
+        console.debug(`STRIPE: Invoices Found ${invoicesToReturn.length}`);
+        if (invoicesToReturn.length > 0) {
+            for (invoice of invoicesToReturn) {
+                invoice.total = Dinero({ amount: invoice.total }).toFormat('$0,0.00')
+            }
+        }
+        return invoicesToReturn
     } catch (error) {
         console.debug(`ERROR-STRIPE: Stripe Charges Not Found`);
         console.debug(`ERROR-STRIPE: ${error.message}`);
@@ -440,6 +478,7 @@ module.exports = {
     getProductInfoById,
     getCustomerEvents,
     getCustomerCharges,
+    getCustomerInvoices,
     setStripeInfoToUser,
     getAllSubscriptions,
     getSubscriptionById,

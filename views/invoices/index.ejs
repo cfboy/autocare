@@ -5,7 +5,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Stripe Charges </title>
+    <title>Stripe Invoices </title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="../vendors/feather/feather.css">
     <link rel="stylesheet" href="../vendors/mdi/css/materialdesignicons.min.css">
@@ -45,11 +45,9 @@
                                         <div class="card-body">
                                             <div class="d-sm-flex justify-content-between align-items-start">
                                                 <div>
-                                                    <h4 class="card-title card-title-dash">Events</h4>
+                                                    <h4 class="card-title card-title-dash">Invoices</h4>
                                                 </div>
-                                                <!-- <div>
-                                                            <a href="/create-user" class="btn btn-primary btn-icon-text" type="button"><i class="mdi mdi-map-marker-plus btn-icon-prepend"></i>Add User</a>
-                                                        </div> -->
+
                                             </div>
                                             <br>
                                             <div class="table-responsive  mt-1">
@@ -57,44 +55,48 @@
                                                     <thead>
                                                         <tr>
                                                             <!-- <th>ID</th> -->
-                                                            <th>Description</th>
-                                                            <th>User</th>
                                                             <th>Amount</th>
-                                                            <th>Date</th>
+                                                            <th>Invoice Number</th>
+                                                            <th>Email</th>
+                                                            <th>Due</th>
+                                                            <th>Created</th>
                                                             <th>Status</th>
                                                             <!-- <th>Action</th> -->
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        <% if(charges) { %>
-                                                        <% for(const charge of charges) { %>
+                                                        <% if(invoices) { %>
+                                                        <% for(const invoice of invoices) { %>
                                                         <tr>
-                                                            <td>
-                                                                <a href="<%= charge.receipt_url%>" target="_blank">
-                                                                    <%= charge.description %>
-                                                                </a>
-                                                            </td>
-
-                                                            <td>
-                                                                <% if(charge.billing_details.email) { %>
-                                                                <a
-                                                                    href="/customers/<%= charge.customer%>?billingID=true">
-                                                                    <%= charge.billing_details.email %>
-                                                                </a>
-                                                                <% } else { %>
-                                                                N/A
-                                                                <% } %>
-                                                            </td>
-                                                            <td><%= charge.amount %>
-                                                                <span class="text-uppercase"> <%= charge.currency%>
+                                                            <td><%= invoice?.total %>
+                                                                <span class="text-uppercase"> <%= invoice.currency%>
                                                                 </span>
                                                             </td>
 
                                                             <td>
-                                                                <%= moment(charge.created).isValid() ? moment(charge.created * 1000).format(completeDateFormat) : 'N/A' %>
+                                                                <a href="<%= invoice?.hosted_invoice_url%>"
+                                                                    target="_blank">
+                                                                    #<%= invoice?.number %>
+                                                                </a>
+                                                            </td>
+
+                                                            <td>
+                                                                <a
+                                                                    href="/customers/<%= invoice.customer%>?billingID=true">
+                                                                    <%= invoice.customer_email %>
+                                                                </a>
 
                                                             </td>
-                                                            <td class="text-uppercase"><%= charge.status%></td>
+
+                                                            <td>
+                                                                <%= moment(invoice.due_date).isValid() ? moment(invoice.due_date * 1000).format(completeDateFormat) : 'N/A' %>
+
+                                                            </td>
+                                                            <td>
+                                                                <%= moment(invoice.created).isValid() ? moment(invoice.created * 1000).format(completeDateFormat) : 'N/A' %>
+
+                                                            </td>
+                                                            <td class="text-uppercase"><%= invoice.status%></td>
 
                                                             <!-- <td>
                                                                 <a id="deleteBtn"

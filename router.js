@@ -136,6 +136,8 @@ router.get('/delete-report/:id', checkAuthenticated, reportsController.delete)
 
 //------ Stripe and Payment Routes ------
 router.get('/charges', checkAuthenticated, stripeController.charges)
+router.get('/invoices', checkAuthenticated, stripeController.invoices)
+
 
 router.post('/webhook', stripeController.webhook)
 

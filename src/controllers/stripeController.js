@@ -351,3 +351,42 @@ exports.charges = async (req, res) => {
     }
 
 }
+
+/**
+ * This function render the stripe invoices of user.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.invoices = async (req, res) => {
+    try {
+        let user = req.user,
+            { message, alertType } = req.session
+
+        if (message) {
+            req.session.message = ''
+            req.session.alertType = ''
+        }
+        if (user) {
+            const invoices = await Stripe.getCustomerInvoices(user)
+            res.status(200).render('invoices/index.ejs', {
+                user,
+                message,
+                alertType,
+                invoices
+            })
+        } else {
+            message = 'User ID not found.'
+            alertType = alertTypes.ErrorAlert
+            console.log('User ID not found.')
+            res.redirect('/account')
+        }
+
+    } catch (error) {
+        console.error(error.message)
+        req.session.message = "Error trying to render the user invoices."
+        req.session.alertType = alertTypes.ErrorAlert
+        res.redirect('/account')
+
+    }
+
+}
