@@ -26,7 +26,6 @@ function canDeleteCar(user, carID, services) {
 
 function canAddCar(user) {
     return (
-        [ROLES.ADMIN].includes(user.role) ||
         user.subscriptions.some(sub => sub.data.items.data.some(item => item.cars.length < item.quantity))
     )
 }

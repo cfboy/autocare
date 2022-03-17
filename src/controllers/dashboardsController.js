@@ -147,9 +147,9 @@ exports.validateMembership = async (req, res) => {
         req.session.alertType = ''
     }
     let user = req.user
-    let domain = process.env.DOMAIN
+    // let domain = process.env.DOMAIN
 
-    res.render('dashboards/validateMembership.ejs', { user, message, alertType, readingQueue, domain })
+    res.render('dashboards/validateMembership.ejs', { user, message, alertType, readingQueue })
 
 }
 
@@ -193,46 +193,6 @@ exports.validate = async (req, res) => {
         console.error("ERROR: dashboardController -> Tyring to validate membership.")
         console.error(error.message)
         res.render('Error validating membership.')
-    }
-}
-
-/**
- * This function is to handle use service action. 
- * This function is called by ajax function.
- * Make a call to add new service on user schema.
- * Log the service to the history.
- * Then render the resuls of customer and service added.
- * @param {body.userID} req 
- * @param {*} res 
- */
-exports.useService = async (req, res) => {
-    try {
-        let { userID, carID } = req.body
-
-        if (userID) {
-            let authorizedBy = req.user
-            let car = await CarService.getCarByID(carID)
-            let customer = await SubscriptionService.getUserByCar(car)
-            // TODO: Change location 
-            let service = await ServiceService.addService(car, authorizedBy, authorizedBy.locations[0], customer)
-
-            if (car && service)
-                //Log this action.
-                HistoryService.addHistory(`Use Service: ${service.id}`, historyTypes.SERVICE, customer, service.location)
-
-            res.render('ajaxSnippets/useServiceResult.ejs', { customer, service, car })
-        } else {
-            req.session.message = `USER ID UNDEFINED`
-            req.session.alertType = alertTypes.ErrorAlert
-            console.debug(`userID is undefined.`)
-            res.render(`Error trying to log service.`)
-        }
-    } catch (error) {
-        console.debug("ERROR: dashboardController -> Tyring to log use service.")
-        console.debug(error)
-        req.session.message = `ERROR: ${error.message}`
-        req.session.alertType = alertTypes.ErrorAlert
-        res.render(`Error trying to log service.`)
     }
 }
 

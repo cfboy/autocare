@@ -104,6 +104,7 @@ router.post('/validatePlate', checkAuthenticated, carsController.validatePlate)
 //------ Services Routes ------
 router.get('/services', checkAuthenticated, servicesController.services)
 router.get('/service/:id', checkAuthenticated, servicesController.view)
+router.post('/useService', checkAuthenticated, authValidateMembership, servicesController.useService)
 
 //------ Location Routes ------
 router.get('/locations', checkAuthenticated, locationController.locations)
@@ -118,7 +119,6 @@ router.get('/delete-location/:id', checkAuthenticated, authDeleteLocation, locat
 
 router.get('/validateMembership', checkAuthenticated, authValidateMembership, dashboardsController.validateMembership)
 router.post('/validateMembership', checkAuthenticated, authValidateMembership, dashboardsController.validate)
-router.post('/useService', checkAuthenticated, authValidateMembership, dashboardsController.useService)
 
 router.post('/carcheck', dashboardsController.carCheck)
 

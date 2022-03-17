@@ -95,15 +95,16 @@
                 <span class="menu-title">History</span>
             </a>
         </li>
-
-        <% } %>
-        <% if([roles.ADMIN].includes(user.role)) { %>
         <li class="nav-item">
             <a class="nav-link" href="/reports">
                 <i class="fa-solid fa-square-poll-vertical menu-icon"></i>
                 <span class="menu-title">Reports</span>
             </a>
         </li>
+        <% } %>
+
+        <!-- <%# if(NODE_ENV == 'DEVELOPMENT') { %>
+      
         <li class="nav-item">
             <a class="nav-link" data-bs-toggle="collapse" href="#ui-template" aria-expanded="false"
                 aria-controls="ui-template">
@@ -207,6 +208,6 @@
                 </a>
             </li>
         </div>
-        <% } %>
+        <%# } %> -->
     </ul>
 </nav>

@@ -55,6 +55,7 @@
                                                         <tr>
                                                             <th>ID</th>
                                                             <th>Car</th>
+                                                            <th>User</th>
                                                             <th>Date</th>
                                                             <th>Authorized By</th>
                                                             <th>Location</th>
@@ -74,8 +75,15 @@
                                                             </td>
                                                             <td>
                                                                 <a class="btn-link" href="/car/<%- service?.car?.id%>">
-                                                                    <%- service?.car?.brand%> <%- service?.car?.model%>
-                                                                    <%- service?.car?.plate%>
+                                                                    Brand: <%- service?.car?.brand%> <br>
+                                                                    Model: <%- service?.car?.model%> <br>
+                                                                    Plate: <%- service?.car?.plate%>
+                                                                </a>
+                                                            </td>
+                                                            <td>
+                                                                <a class="btn-link"
+                                                                    href="/customers/<%- service?.user?.id%>">
+                                                                    <%= service.user.email%>
                                                                 </a>
                                                             </td>
                                                             <td>
