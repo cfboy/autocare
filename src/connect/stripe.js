@@ -202,6 +202,10 @@ async function getAllPrices() {
         }
 
     }
+
+    // Filter to return only the active products.
+    prices.data = prices.data.filter(price => price.product.active == true)
+
     return prices.data.sort(function (a, b) { return a.product.metadata?.order - b.product.metadata?.order })
 }
 
@@ -302,7 +306,10 @@ const getCustomerCharges = async (user) => {
 
         console.debug(`STRIPE: getCustomerCharges(${customerID})`);
         let chargesToReturn = []
-        let charges = await Stripe.charges.list({ limit: 50 });
+        let charges = await Stripe.charges.list({
+            // customer: customerID,
+            limit: 50
+        });
 
         if ([ROLES.ADMIN, ROLES.MANAGER].includes(role))
             chargesToReturn = charges.data
