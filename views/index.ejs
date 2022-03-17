@@ -28,7 +28,17 @@
 <body>
     <div class="container-scroller">
         <nav class="navbar default-layout col-lg-12 col-12 p-0 d-flex align-items-top flex-row">
-            <div class="navbar-menu-wrapper d-flex align-items-top" style="width: 100% !important;">
+            <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-start">
+                <div>
+                    <a class="navbar-brand brand-logo" href="/account">
+                        <img src="../images/mrquicks/mrQuicksLogo.png" alt="logo" style="height: auto!important;" />
+                    </a>
+                    <a class="navbar-brand brand-logo-mini" href="/account">
+                        <img src="../images/favicon.png" alt="logo" />
+                    </a>
+                </div>
+            </div>
+            <div class="navbar-menu-wrapper d-flex align-items-top">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item dropdown">
                         <a class="nav-link count-indicator" id="languageDropdown" href="#" data-bs-toggle="dropdown"
@@ -85,10 +95,10 @@
                         <div class="card h-100 shadow-lg">
                             <div class="card-body">
                                 <div class="text-center p-3">
-                                    <h5 class="card-title"><%= price.product.name %></h5>
+                                    <h1 class="h2"><%= price.product.name %></h2>
                                     <!-- <small>Individual</small> -->
                                     <br><br>
-                                    <span class="h2"><%= price.unit_amount%></span>
+                                    <span class="h3"><%= price.unit_amount%></span>
                                     <% if(price?.transform_quantity){ %>
                                     per group of
                                     <%=  price.transform_quantity?.divide_by%> / <%= price.recurring.interval%>
