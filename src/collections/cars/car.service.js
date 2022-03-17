@@ -2,13 +2,30 @@
 //Use v2.0 to use the module in code (for versions prior to version):
 const fetch = require('node-fetch');
 
+
 /**
- * This function get all cars on db.
+ * This function get all cars from the db.
+ * 
+ * @param {} Car 
+ * @returns Car list
+ */
+const getCars = (Car) => async () => {
+    return Car.find({}, function (err, docs) {
+        if (err) {
+            console.error(err)
+        } else {
+            console.debug("CAR-SERVICE: Found Cars: ", docs.length);
+        }
+    })
+}
+
+/**
+ * This function get all cars from db.
  * This function receive a list off cars (user cars) because the car schema don't have user reference.
  * @param {} Car 
  * @returns Car list
  */
-const getCars = (Car) => async (cars) => {
+const getCarsByList = (Car) => async (cars) => {
     return Car.find({ _id: { $in: cars } }, function (err, docs) {
         if (err) {
             console.error(err)
@@ -135,7 +152,7 @@ async function getAllCarsByUser(user) {
     }
 
     // Get cars to populate all infromation.
-    userCars = await this.getCars(userCars)
+    userCars = await this.getCarsByList(userCars)
 
     return userCars
 }
@@ -174,6 +191,7 @@ async function getAllMakes() {
 module.exports = (Car) => {
     return {
         getCars: getCars(Car),
+        getCarsByList: getCarsByList(Car),
         getCarByID: getCarByID(Car),
         addCar: addCar(Car),
         updateCar: updateCar(Car),

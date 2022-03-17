@@ -1,4 +1,5 @@
 const SubscriptionService = require('../collections/subscription')
+const { ROLES } = require('../collections/user/user.model')
 const ServiceService = require('../collections/services')
 const CarService = require('../collections/cars')
 const HistoryService = require('../collections/history')
@@ -34,20 +35,26 @@ exports.cars = async (req, res) => {
         if (!user) {
             res.redirect('/')
         } else {
-            let userCars = []
-            // TODO: move this to service.
-            for (customerSub of user.subscriptions) {
-                // Iterates the items on DB subscription.
-                for (customerItem of customerSub.items) {
-                    // then iterates cars in DB item.
-                    for (customerCar of customerItem.cars) {
-                        userCars.push(customerCar)
+            if ([ROLES.ADMIN, ROLES.MANAGER].includes(user.role)) {
+                cars = await CarService.getCars()
+            } else {
+                let userCars = []
+                // TODO: move this to service.
+                for (customerSub of user.subscriptions) {
+                    // Iterates the items on DB subscription.
+                    for (customerItem of customerSub.items) {
+                        // then iterates cars in DB item.
+                        for (customerCar of customerItem.cars) {
+                            userCars.push(customerCar)
+                        }
                     }
                 }
+                cars = await CarService.getCarsByList(userCars)
+
             }
-            cars = await CarService.getCars(userCars)
 
             cars = await ServiceService.setServicesToCars(cars)
+
 
             res.render('cars/index.ejs', {
                 user, cars, message, alertType,
