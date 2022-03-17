@@ -166,10 +166,14 @@ exports.validate = async (req, res) => {
         let carPlate = req.body.plateNumber,
             car = await CarService.getCarByPlate(carPlate)
 
-        let customer, subscription
+        let customer, subscription, services, hasService
 
         if (car) {
             subscription = await SubscriptionService.getSubscriptionByCar(car)
+            services = await ServiceService.getServicesByCar(car)
+
+            hasService = services.some(service => service.created_date.setHours(0, 0, 0, 0) === new Date().setHours(0, 0, 0, 0))
+            car.hasService = hasService
             customer = subscription?.user
         }
 

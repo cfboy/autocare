@@ -15,12 +15,15 @@ const addService = (Service) => async (car, authorizedBy, location, user) => {
         }
 
         console.log(`SERVICE-SERVICE: addService()`)
+        let serviceID = (car.id.substr(car?.id?.length - 4, car?.id?.length)).toUpperCase()
+        // if (serviceID === '')
+        // serviceID = Math.random().toString(36).toUpperCase().substring(2, 6)
 
         let properties = {
             // id is a random ID genetated with letters and numbers. 
             // TODO: change the id.
-            id: 'AC-' + Math.random().toString(36).toUpperCase().substring(2, 6),
-            date: Date.now(),
+            id: serviceID,
+            // date: Date.now(),
             location: location,
             authorizedBy: authorizedBy,
             user: user,

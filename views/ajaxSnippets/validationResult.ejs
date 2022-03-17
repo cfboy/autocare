@@ -71,8 +71,16 @@
                     <% } %>
                 </div>
                 <div class="col-md-6 p-3">
-                    <h4 class="text-center">Membership Status</h4>
+                    <!-- <h4 class="text-center">Membership Status</h4> -->
                     <div class="col-md-12 text-center validation-msgs">
+                        <% if(car.hasService) { %>
+                        <i class="far fa-8x fa-times-circle invalid"></i>
+
+                        <p class="alert alert-danger mt-2">This car has the maximum quantity of services per day.</p>
+                        <% } else { %>
+
+                        <h4 class="text-center">Membership Status</h4>
+
                         <% if([stripeStatus.ACTIVE, stripeStatus.TRIALING].includes(subscription?.data?.status)) { %>
                         <i class="fas fa-8x fa-check-circle valid"></i>
                         <p style="text-transform: uppercase">
@@ -97,13 +105,17 @@
                                 <!-- <i class="menu-icon mdi mdi-car-wash "></i> -->
 
                             </button>
-
+                            <% if(!car?.hasService) { %>
                             <button id="use-service-button" user-id="<%= customer?.id%>" car-id="<%= car?.id%>"
-                                class="btn btn-block btn-success btn-lg font-weight-medium btn-icon-text m-1" type="submit">
+                                class="btn btn-block btn-success btn-lg font-weight-medium btn-icon-text m-1"
+                                type="submit">
                                 USE SERVICE
                                 <i class="menu-icon mdi mdi-car-wash btn-icon-apepend"></i>
                             </button>
                             <% } %>
+                            <% } %>
+                            <% } %>
+
                         </div>
 
                     </div>
