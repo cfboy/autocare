@@ -96,16 +96,16 @@
                             <div class="card-body">
                                 <div class="text-center p-3">
                                     <h1 class="h2"><%= price.product.name %></h2>
-                                    <!-- <small>Individual</small> -->
-                                    <br><br>
-                                    <span class="h3"><%= price.unit_amount%></span>
-                                    <% if(price?.transform_quantity){ %>
-                                    per group of
-                                    <%=  price.transform_quantity?.divide_by%> / <%= price.recurring.interval%>
-                                    <% } else { %>
-                                    /month
-                                    <% } %>
-                                    <br><br>
+                                        <!-- <small>Individual</small> -->
+                                        <br><br>
+                                        <span class="h3"><%= price.unit_amount%></span>
+                                        <% if(price?.transform_quantity){ %>
+                                        per group of
+                                        <%=  price.transform_quantity?.divide_by%> / <%= price.recurring.interval%>
+                                        <% } else { %>
+                                        /month**
+                                        <% } %>
+                                        <br><br>
                                 </div>
                                 <p class="card-text"><%= price.product.description%></p>
                                 <div>
@@ -122,6 +122,9 @@
                                         <% } %>
                                     </ul>
                                 </div>
+                                <p class="alert">
+                                    **This is a subscription for 30 days upon purchase date.
+                                </p>
 
                             </div>
                             <div class="card-footer text-center"
@@ -137,6 +140,7 @@
                     <%# } %>
                     <% } %>
                     <% } %>
+
                 </div>
             </div>
         </div>
