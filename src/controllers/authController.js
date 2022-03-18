@@ -4,6 +4,7 @@ const Stripe = require('../connect/stripe')
 const alertTypes = require('../helpers/alertTypes')
 const bcrypt = require('bcrypt');
 const passport = require('passport')
+const Auth = require('../config/auth.service')
 const { municipalities } = require('../helpers/municipalities');
 
 require("../config/passport");
@@ -94,15 +95,8 @@ exports.register = async (req, res) => {
                     console.log(err);
                 }
             })
-            // if (req.session.selectedProduct) {
-            // let product = encodeURIComponent(req.session.selectedProduct);
-            // req.session.selectedProduct = '';
-            // let billingID = encodeURIComponent(customer.billingID)
-            // res.redirect(`/stripeCheckout?product=${product}&customerID=${billingID}`)
+
             res.redirect('create-subscriptions')
-            // }
-            // else
-            // res.redirect('/account')
 
         } else {
             let message = `That email already exist, please login.`
@@ -135,3 +129,95 @@ exports.logout = async (req, res) => {
     req.logOut()
     res.redirect("/");
 }
+
+/**
+ * This function render the request reset password form.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.resetPasswordRequest = async (req, res) => {
+    let { message, email, alertType } = req.session
+
+    // Clear session alerts variables.
+    if (message) {
+        req.session.message = ''
+        req.session.alertType = ''
+    }
+
+    res.render('auth/resetPasswordRequest.ejs', { message, email, alertType })
+}
+
+/**
+ * This function render the reset password form.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.resetPassword = async (req, res) => {
+    let { message, email, alertType } = req.session
+
+    let { id, token } = req.query
+
+    // Clear session alerts variables.
+    if (message) {
+        req.session.message = ''
+        req.session.alertType = ''
+    }
+
+    let [isValid, tokenMessage] = await Auth.validateToken(id, token)
+
+    if (isValid)
+        res.render('auth/resetPassword.ejs', { message, email, alertType, id, token })
+    else {
+
+        req.flash('error', tokenMessage);
+        res.redirect('/login')
+    }
+}
+
+/**
+ * This function handle the request of password reset.
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
+exports.resetPasswordRequestController = async (req, res, next) => {
+    const [requestSuccess, message] = await Auth.resetPasswordRequest(
+        req.body.email
+    );
+
+    if (requestSuccess) {
+        req.flash('info', message);
+
+        res.redirect('/login')
+    } else {
+        req.flash('error', message);
+        res.redirect('/resetPassword')
+    }
+    // return res.json(resetPasswordRequestService);
+};
+
+/**
+ * This function handle the reset password.
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
+exports.resetPasswordController = async (req, res, next) => {
+    const [requestSuccess, message] = await Auth.resetPassword(
+        req.body.userId,
+        req.body.token,
+        req.body.password
+    );
+
+    if (requestSuccess) {
+        req.flash('info', message);
+        req.session.message = `Password Updated.`
+        req.session.alertType = alertTypes.CompletedActionAlert
+    } else {
+        req.flash('error', message);
+        req.session.message = message
+        req.session.alertType = alertTypes.ErrorAlert
+    }
+
+    res.redirect('/login')
+};

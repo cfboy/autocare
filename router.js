@@ -61,6 +61,12 @@ router.post('/register', checkNotAuthenticated, authController.register)
 
 router.delete('/logout', checkAuthenticated, authController.logout)
 
+//------ Forgot Password Routes ------
+router.get('/resetPasswordRequest', checkNotAuthenticated, authController.resetPasswordRequest)
+router.get('/resetPassword', checkNotAuthenticated, authController.resetPassword)
+router.post("/resetPasswordRequest", checkNotAuthenticated, authController.resetPasswordRequestController);
+router.post("/resetPassword", checkNotAuthenticated, authController.resetPasswordController);
+
 //------ History Routes ------
 router.get('/history', checkAuthenticated, historyController.history)
 router.get('/activity', checkAuthenticated, historyController.activity)

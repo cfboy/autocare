@@ -1,6 +1,8 @@
-if (process.env.NODE_ENV !== 'production') {
-    require('dotenv').config() //Loads environment variables from .env file into the process
-}
+// if (process.env.NODE_ENV !== 'production') {
+require('dotenv').config() //Loads environment variables from .env file into the process
+// }
+require("express-async-errors");
+
 const bodyParser = require('body-parser'),
     express = require('express'),
     session = require('express-session'),
@@ -91,6 +93,10 @@ app.use(lingua(app, {
 }));
 
 app.use('/', router);
+
+app.use((error, req, res, next) => {
+    res.status(500).json({ error: error.message });
+});
 
 const port = process.env.PORT || 3000
 
