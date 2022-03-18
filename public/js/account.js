@@ -32,6 +32,7 @@ $(document).ready(function () {
 
         const userID = $(this).attr("user-id");
         const carID = $(this).attr("car-id");
+        const inputType = $(this).attr("inputType");
 
         $.ajax({
             url: "/useService",
@@ -39,7 +40,8 @@ $(document).ready(function () {
             contentType: "application/json",
             data: JSON.stringify({
                 userID: userID,
-                carID: carID
+                carID: carID,
+                inputType: inputType
             }),
             beforeSend: function () {
                 showResult('#useServiceUpdate',

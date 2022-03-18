@@ -164,6 +164,7 @@ exports.validate = async (req, res) => {
     try {
         // TODO: handle multiple cars with the same plate
         let carPlate = req.body.plateNumber,
+        inputType = req.body.inputType,
             car = await CarService.getCarByPlate(carPlate)
 
         let customer, subscription, services, hasService
@@ -190,6 +191,7 @@ exports.validate = async (req, res) => {
 
         res.render('ajaxSnippets/validationResult.ejs', {
             customer,
+            inputType,
             car,
             subscription
         })

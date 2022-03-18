@@ -107,6 +107,7 @@
                             </button>
                             <% if(!car?.hasService) { %>
                             <button id="use-service-button" user-id="<%= customer?.id%>" car-id="<%= car?.id%>"
+                                inputType="<%= inputType%>"
                                 class="btn btn-block btn-success btn-lg font-weight-medium btn-icon-text m-1"
                                 type="submit">
                                 USE SERVICE

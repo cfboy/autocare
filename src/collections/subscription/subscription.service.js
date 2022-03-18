@@ -167,7 +167,7 @@ const getSubscriptionItemByCar = (Subscription) => async (car) => {
     }).populate('user').populate({ path: 'items.cars', model: 'car' })
         .then(result => {
             if (result) {
-                console.debug(`getSubscriptionItemByCar(): Successfully found ${result}.`);
+                console.debug(`getSubscriptionItemByCar(): Successfully found ${result?.id}.`);
                 let itemToReturn = result.items.find(item => item.cars.find(carObj => carObj.id == car.id))
                 return itemToReturn
             } else {

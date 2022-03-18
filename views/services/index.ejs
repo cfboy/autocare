@@ -59,6 +59,7 @@
                                                             <th>User</th>
                                                             <th>Date</th>
                                                             <th>Authorized By</th>
+                                                            <th>Input By</th>
                                                             <th>Location</th>
                                                         </tr>
                                                     </thead>
@@ -94,6 +95,9 @@
                                                             </td>
                                                             <td>
                                                                 <%- service?.authorizedBy?.personalInfo?.firstName + ' ' + service?.authorizedBy?.personalInfo?.lastName %>
+                                                            </td>
+                                                            <td>
+                                                                <%- service?.inputType %>
                                                             </td>
                                                             <td>
                                                                 <%- service?.location?.name %>

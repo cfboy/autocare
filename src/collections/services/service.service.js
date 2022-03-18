@@ -3,7 +3,7 @@
  * @param {car, authorizedBy, location, user} Service 
  * @returns Service object
  */
-const addService = (Service) => async (car, authorizedBy, location, user, product) => {
+const addService = (Service) => async (car, authorizedBy, location, user, product, inputType) => {
     // TODO: change this to find first then create new car.
     try {
         if (!car || !authorizedBy || !location || !user || !product) {
@@ -29,8 +29,8 @@ const addService = (Service) => async (car, authorizedBy, location, user, produc
             authorizedBy: authorizedBy,
             user: user,
             car: car,
-            product: product
-
+            product: product,
+            inputType: inputType
         }
 
         const service = new Service(properties)

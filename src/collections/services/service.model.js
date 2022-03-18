@@ -8,7 +8,8 @@ const serviceSchema = new Schema({
     authorizedBy: { type: Schema.Types.ObjectId, ref: 'user', default: null },
     car: { type: Schema.Types.ObjectId, ref: 'car', default: null },
     user: { type: Schema.Types.ObjectId, ref: 'user', default: null },
-    product: String
+    product: String,
+    inputType: { type: String, enum: ['System', 'Manual'], default: 'Manual' },
 })
 
 

@@ -77,6 +77,7 @@
                                                                         <label class="required" for="name">Plate
                                                                             Number</label>
                                                                         <input autocomplete="off" type="text"
+                                                                            onchange="setInputType('Manual')"
                                                                             id="plateNumber" name="plateNumber"
                                                                             class="form-control form-control-lg text-uppercase"
                                                                             required />
@@ -86,6 +87,8 @@
                                                                 <!-- </div>
                                                                 <div class="row"> -->
                                                                 <div class="mt-3 mb-3">
+                                                                    <input type="hidden" id="inputType" name="inputType"
+                                                                        value="User" />
                                                                     <button id="validateMembershipBtn"
                                                                         class="btn btn-block btn-inverse-dark btn-lg font-weight-medium auth-form-btn float-end"
                                                                         type="submit">Validate</button>
@@ -168,8 +171,14 @@
             }
         })
 
+        function setInputType(value) {
+            $("#inputType").val(value);
+            console.log($("#inputType").val())
+        }
+
         function setPlateValue(plate) {
             $("#plateNumber").val(plate);
+            setInputType('System');
             $("#validateMembershipBtn").click();
             $(`#plate-${plate}`).remove();
         }
@@ -178,6 +187,7 @@
             event.preventDefault();
             event.stopPropagation();
             var valueToValidate = $("#plateNumber");
+            var inputType = $('#inputType');
             // reportValidity and checkValidity validate inputs on form.
             valueToValidate[0].reportValidity();
             if (valueToValidate[0].checkValidity()) {
@@ -186,7 +196,8 @@
                     type: "POST",
                     contentType: "application/json",
                     data: JSON.stringify({
-                        plateNumber: valueToValidate.val()
+                        plateNumber: valueToValidate.val(),
+                        inputType: inputType.val()
                     }),
                     beforeSend: function () {
                         showResult('#membershipDetails',

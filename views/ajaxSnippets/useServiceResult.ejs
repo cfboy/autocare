@@ -11,6 +11,9 @@
                 <h4>Approved By: <%= service?.authorizedBy?.email%></h4>
             </li>
             <li>
+                <h4>Input By: <%= service?.inputType%></h4>
+            </li>
+            <li>
                 <h4>Date :
                     <%= moment(service?.created_date).isValid() ? moment(service?.created_date).format(completeDateFormat) : 'N/A' %>
                 </h4>
