@@ -101,9 +101,10 @@ exports.useService = async (req, res) => {
         if (userID) {
             let authorizedBy = req.user
             let car = await CarService.getCarByID(carID)
+            let item = await SubscriptionService.getSubscriptionItemByCar(car)
             let customer = await SubscriptionService.getUserByCar(car)
             // TODO: Change location 
-            let service = await ServiceService.addService(car, authorizedBy, authorizedBy.locations[0], customer)
+            let service = await ServiceService.addService(car, authorizedBy, authorizedBy.locations[0], customer, item?.data?.price?.product?.name)
 
             if (car && service)
                 //Log this action.

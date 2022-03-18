@@ -3,15 +3,16 @@
  * @param {car, authorizedBy, location, user} Service 
  * @returns Service object
  */
-const addService = (Service) => async (car, authorizedBy, location, user) => {
+const addService = (Service) => async (car, authorizedBy, location, user, product) => {
     // TODO: change this to find first then create new car.
     try {
-        if (!car || !authorizedBy || !location || !user) {
+        if (!car || !authorizedBy || !location || !user || !product) {
             throw new Error(`Missing Data. Please provide all data=>
              car: ${car}
              authorizedBy: ${authorizedBy}
              location: ${location},
-             user: ${user}.`)
+             user: ${user},
+             product: ${product}.`)
         }
 
         console.log(`SERVICE-SERVICE: addService()`)
@@ -27,7 +28,8 @@ const addService = (Service) => async (car, authorizedBy, location, user) => {
             location: location,
             authorizedBy: authorizedBy,
             user: user,
-            car: car
+            car: car,
+            product: product
 
         }
 

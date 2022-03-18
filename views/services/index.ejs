@@ -55,6 +55,7 @@
                                                         <tr>
                                                             <th>ID</th>
                                                             <th>Car</th>
+                                                            <th>Product</th>
                                                             <th>User</th>
                                                             <th>Date</th>
                                                             <th>Authorized By</th>
@@ -80,6 +81,7 @@
                                                                     Plate: <%- service?.car?.plate%>
                                                                 </a>
                                                             </td>
+                                                            <td><%= service?.product%></td>
                                                             <td>
                                                                 <a class="btn-link"
                                                                     href="/customers/<%- service?.user?.id%>">

@@ -157,6 +157,27 @@ const getSubscriptionByCar = (Subscription) => async (car) => {
 }
 
 /**
+ * This function get subscription by car.
+ * @param {*} Subscription 
+ * @returns Subscription
+ */
+const getSubscriptionItemByCar = (Subscription) => async (car) => {
+    return await Subscription.findOne({
+        "items.cars": { _id: car.id }
+    }).populate('user').populate({ path: 'items.cars', model: 'car' })
+        .then(result => {
+            if (result) {
+                console.debug(`getSubscriptionItemByCar(): Successfully found ${result}.`);
+                let itemToReturn = result.items.find(item => item.cars.find(carObj => carObj.id == car.id))
+                return itemToReturn
+            } else {
+                console.debug("getSubscriptionItemByCar(): No document matches the provided query.");
+            }
+        })
+        .catch(err => console.error(`Failed to find document: ${err}`));
+}
+
+/**
  * This function get all cars on subcription by user.
  * @param {*} Subscription 
  * @returns Subscription
@@ -222,6 +243,7 @@ module.exports = (Subscription) => {
         getSubscriptionsByUser: getSubscriptionsByUser(Subscription),
         getSubscriptionById: getSubscriptionById(Subscription),
         getSubscriptionByCar: getSubscriptionByCar(Subscription),
+        getSubscriptionItemByCar: getSubscriptionItemByCar(Subscription),
         getAllCarsByUser: getAllCarsByUser(Subscription),
         getUserByCar: getUserByCar(Subscription)
     }
