@@ -17,7 +17,7 @@ const resetPasswordRequest = async (email) => {
     var requestSuccess = false
     if (!user) {
         // throw new Error("Email does not exist");
-        return [requestSuccess, "Email does not exist"]
+        return [requestSuccess, "Email does not exist."]
     }
 
     let token = await Token.findOne({ userId: user._id });
@@ -45,7 +45,7 @@ const resetPasswordRequest = async (email) => {
     )
 
     if (resultEmail) {
-        console.debug('Result Email: ' + resultEmail?.accepted[0])
+        console.debug('Email Sent: ' + resultEmail?.accepted[0])
         requestSuccess = true
         return [requestSuccess, `Verify your email ${resultEmail?.accepted[0]} to complete reset password process.`]
     } else {
