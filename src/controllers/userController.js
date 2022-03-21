@@ -190,7 +190,8 @@ exports.save = async (req, res) => {
 exports.viewUser = async (req, res) => {
     try {
         let { message, alertType } = req.session,
-            findByBillingID = req?.query?.billingID ? true : false
+            findByBillingID = req?.query?.billingID ? true : false,
+            cars
 
         if (message) {
             req.session.message = ''
@@ -211,17 +212,20 @@ exports.viewUser = async (req, res) => {
             }
 
             let customerCars = []
-            for (customerSub of customer.subscriptions) {
-                // Iterates the items on DB subscription.
-                for (customerItem of customerSub.items) {
-                    // then iterates cars in DB item.
-                    for (car of customerItem.cars) {
-                        customerCars.push(car)
+            if (customer?.subscriptions) {
+                for (customerSub of customer.subscriptions) {
+                    // Iterates the items on DB subscription.
+                    for (customerItem of customerSub.items) {
+                        // then iterates cars in DB item.
+                        for (car of customerItem.cars) {
+                            customerCars.push(car)
+                        }
                     }
                 }
-            }
 
-            let cars = await ServiceService.setServicesToCars(customerCars)
+
+                cars = await ServiceService.setServicesToCars(customerCars)
+            }
 
             res.status(200).render('user/view.ejs', {
                 user: req.user,
@@ -239,6 +243,7 @@ exports.viewUser = async (req, res) => {
             res.redirect('/users', { message, alertType })
         }
     } catch (error) {
+        console.error(error)
         console.error(error.message)
         req.session.message = "Error trying to render the user information."
         req.session.alertType = alertTypes.ErrorAlert
