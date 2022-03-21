@@ -59,6 +59,7 @@
                                                             <!-- <th>ID</th> -->
                                                             <th>Description</th>
                                                             <th>User</th>
+                                                            <th>Phone Number</th>
                                                             <th>Amount</th>
                                                             <th>Date</th>
                                                             <th>Status</th>
@@ -81,6 +82,15 @@
                                                                     href="/customers/<%= charge.customer%>?billingID=true">
                                                                     <%= charge.billing_details.email %>
                                                                 </a>
+                                                                <% } else { %>
+                                                                N/A
+                                                                <% } %>
+                                                            </td>
+                                                            <td>
+                                                                <% if(charge.billing_details.phone) { %>
+
+                                                                <%= charge.billing_details.phone %>
+
                                                                 <% } else { %>
                                                                 N/A
                                                                 <% } %>

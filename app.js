@@ -77,6 +77,7 @@ app.locals.stripeStatus = STATUS
 
 app.locals.version = pjson.version
 app.locals.domain = process.env.DOMAIN
+app.locals.financialReports = process.env.FINANCIAL_REPORTS_LINK
 
 // Lingua configuration
 app.use(lingua(app, {

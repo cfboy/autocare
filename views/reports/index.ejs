@@ -54,10 +54,14 @@
                                                     <h4 class="card-title card-title-dash">Reports</h4>
                                                 </div>
                                                 <div>
+                                                    <a href="<%= financialReports%>" target="_blank"
+                                                        class="btn btn-primary btn-icon-text" type="button">Financial
+                                                        Reports <i
+                                                            class="fa-solid fa-arrow-up-right-from-square btn-icon-append"></i></a>
                                                     <a href="/create-report" class="btn btn-primary btn-icon-text"
-                                                        type="button"><i
-                                                            class="mdi mdi-map-marker-plus btn-icon-prepend"></i>Add
-                                                        Report</a>
+                                                        type="button">
+                                                        <i class="fas fa-plus btn-icon-prepend btn-icon-prepend"></i>
+                                                        Add Report</a>
                                                 </div>
                                             </div>
                                             <br>
@@ -77,7 +81,7 @@
                                                                 <a class="btn-link" href="/reports/<%- report.id%>">
                                                                     <%- report.name %>
                                                                 </a>
-                                                            </td>                    
+                                                            </td>
                                                             <td>
                                                                 <a href="/edit-report/<%- report.id%>?url=/reports"
                                                                     type="button"
