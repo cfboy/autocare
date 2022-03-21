@@ -61,7 +61,8 @@
                                                         <tr>
                                                             <td><%= notification?.message%>
                                                                 <% if(!notification.isRead) { %>
-                                                                <i class="fa-solid fa-circle-dot m-1 mb-0 mt-0 text-primary"></i>
+                                                                <i
+                                                                    class="fa-solid fa-circle-dot m-1 mb-0 mt-0 text-primary"></i>
                                                                 <% } %>
                                                             </td>
 
@@ -83,10 +84,8 @@
                 </div>
             </div>
         </div>
+        <%- include('../partials/footer.ejs'); %>
     </div>
-    <!-- page-body-wrapper ends -->
-    </div>
-    <!-- container-scroller -->
 
     <!-- plugins:js -->
     <script src="../vendors/js/vendor.bundle.base.js"></script>

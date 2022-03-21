@@ -95,7 +95,8 @@
                                                                 <ul>
                                                                     <% for(user of location.users){ %>
                                                                     <li>
-                                                                        <%- user.personalInfo.firstName + ' ' + user.personalInfo.lastName %> (<%- user.role%>)
+                                                                        <%- user.personalInfo.firstName + ' ' + user.personalInfo.lastName %>
+                                                                        (<%- user.role%>)
                                                                     </li>
                                                                     <% } %>
                                                                 </ul>
@@ -117,6 +118,8 @@
                 </div>
             </div>
         </div>
+        <!-- partial:partials/_footer.html -->
+        <%- include('../partials/footer.ejs'); %>
     </div>
 
     <script src="../vendors/js/vendor.bundle.base.js"></script>

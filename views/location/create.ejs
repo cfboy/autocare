@@ -80,7 +80,8 @@
                                                                 multiple="multiple">
                                                                 <% for(const user of users) { %>
                                                                 <option value="<%= user.id%>">
-                                                                    <%= user.personalInfo.firstName +' '+ user.personalInfo.lastName %> (<%= user.role%>)
+                                                                    <%= user.personalInfo.firstName +' '+ user.personalInfo.lastName %>
+                                                                    (<%= user.role%>)
                                                                 </option>
                                                                 <% } %>
                                                             </select>
@@ -109,6 +110,8 @@
             </div>
         </div>
         <!-- page-body-wrapper ends -->
+        <!-- partial:partials/_footer.html -->
+        <%- include('../partials/footer.ejs'); %>
     </div>
     <!-- container-scroller -->
 
