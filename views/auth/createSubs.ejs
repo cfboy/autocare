@@ -44,7 +44,7 @@
             <div class="main-panel">
                 <div class="content-wrapper">
                     <div class="row">
-                        <div class="col-sm-12 col-md-12 col-lg-6 mb-3">
+                        <div class="col-sm-12 col-md-12 col-lg-4 mb-3">
                             <div class="card">
                                 <div class="card-body">
                                     <div class="card-title">
@@ -82,7 +82,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-12 col-md-12 col-lg-6 mb-3">
+                        <div class="col-sm-12 col-md-12 col-lg-8 mb-3">
                             <div class="card">
                                 <div class="card-body">
                                     <h4 class="card-title"> My Cart</h4>
@@ -100,25 +100,23 @@
                                             <tfoot>
                                                 <tr>
                                                     <th></th>
+                                                    <th style="text-align:right">Sub Total:</th>
                                                     <th></th>
-                                                    <th colspan="1" style="text-align:right">Sub Total:</th>
                                                     <th></th>
                                                 </tr>
                                             </tfoot>
                                         </table>
                                     </div>
-
-                                </div>
-                                <br>
-                                <div class="m-3">
-                                    <input id="subscription-list" type="text" hidden value="">
-                                    <button id="checkout-btn" hidden value="<%- user.billingID%>"
-                                        email="<%- user.email%>"
-                                        class="btn btn-block btn-checkout btn-lg font-weight-medium auth-form-btn float-end"
-                                        type="submit">
-                                        <%# lingua.create%>
-                                        Proceed to Checkout
-                                    </button>
+                                    <div class="m-3">
+                                        <input id="subscription-list" type="text" hidden value="">
+                                        <button id="checkout-btn" hidden value="<%- user.billingID%>"
+                                            email="<%- user.email%>"
+                                            class="btn btn-block btn-checkout btn-lg font-weight-medium auth-form-btn float-end"
+                                            type="submit">
+                                            <%# lingua.create%>
+                                            Proceed to Checkout
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 

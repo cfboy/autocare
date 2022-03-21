@@ -5,7 +5,11 @@
     <div class="col-md-12 doc-credits">
         <ul>
             <li>
-                <h4>Service ID : <b><%= service.id%></b></h4>
+                <h4>
+                    <span class="bg-warning">
+                        Service ID : <b><%= service.id%></b>
+                    </span>
+                </h4>
             </li>
             <li>
                 <h4>Approved By: <%= service?.authorizedBy?.email%></h4>
@@ -22,7 +26,11 @@
                 <h4>Car: <%= car?.brand%>, <%= car?.model%> (<%= car?.plate%>)</h4>
             </li>
             <li>
-                <h4>Product: <%= service?.product%></h4>
+                <h4>
+                    <span class="bg-warning">
+                        Product: <%= service?.product%>
+                    </span>
+                </h4>
             </li>
             <li>
                 <h4>

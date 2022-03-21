@@ -164,7 +164,7 @@ exports.validate = async (req, res) => {
     try {
         // TODO: handle multiple cars with the same plate
         let carPlate = req.body.plateNumber,
-        inputType = req.body.inputType,
+            inputType = req.body.inputType,
             car = await CarService.getCarByPlate(carPlate)
 
         let customer, subscription, services, hasService
