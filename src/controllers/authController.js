@@ -191,7 +191,7 @@ exports.resetPasswordRequestController = async (req, res, next) => {
         res.redirect('/login')
     } else {
         req.flash('error', message);
-        res.redirect('/resetPassword')
+        res.redirect('/resetPasswordRequest')
     }
     // return res.json(resetPasswordRequestService);
 };
