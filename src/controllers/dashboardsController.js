@@ -53,52 +53,45 @@ exports.account = async (req, res) => {
 
         params = { user, prices, message, alertType }
 
-        if (user?.billingID) {
-            user = await Stripe.setStripeInfoToUser(user)
-        }
+        // if (user?.billingID) {
+        //     user = await Stripe.setStripeInfoToUser(user)
+        // }
         params = {
             ...params,
             subscriptions: user?.subscriptions
         }
 
-        if (user?.subscriptions?.length < 1 && [ROLES.CUSTOMER].includes(user.role)) {
-            req.flash('warning', 'Create a subscription to continue.')
-            res.redirect('/create-subscriptions')
-        } else {
+        switch (role) {
+            case ROLES.ADMIN:
+                // Get Customers
+                customers = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
+                params = { ...params, customers }
+                res.render('dashboards/mainDashboard.ejs', params)
+                break;
+            case ROLES.CUSTOMER:
+                res.render('dashboards/customer.ejs', params)
+                break;
+            case ROLES.MANAGER:
+                // Get Customers
+                customers = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
+                params = { ...params, customers }
 
-            // let analytics = await AnalyticsService.getAnalytics()
+                res.render('dashboards/mainDashboard.ejs', params)
+                break;
 
-            switch (role) {
-                case ROLES.ADMIN:
-                    // Get Customers
-                    customers = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
-                    params = { ...params, customers }
-                    res.render('dashboards/mainDashboard.ejs', params)
-                    break;
-                case ROLES.CUSTOMER:
-                    res.render('dashboards/customer.ejs', params)
-                    break;
-                case ROLES.MANAGER:
-                    // Get Customers
-                    customers = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
-                    params = { ...params, customers }
+            case ROLES.CASHIER:
+                if (message) {
+                    req.session.message = message
+                    req.session.alertType = alertType
+                }
 
-                    res.render('dashboards/mainDashboard.ejs', params)
-                    break;
-
-                case ROLES.CASHIER:
-                    if (message) {
-                        req.session.message = message
-                        req.session.alertType = alertType
-                    }
-
-                    res.redirect('/validateMembership')
-                    break;
-                default:
-                    console.log('No ROLE detected.');
-                    res.redirect('/logout')
-            }
+                res.redirect('/validateMembership')
+                break;
+            default:
+                console.log('No ROLE detected.');
+                res.redirect('/logout')
         }
+
     } catch (error) {
         console.error("ERROR: dashboardController -> Tyring to find stripeInfo.")
         console.error(error.message)

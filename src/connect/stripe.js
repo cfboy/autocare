@@ -371,7 +371,7 @@ const getCustomerInvoices = async (user) => {
 }
 
 /**
- * This function set the stripe information temporary on .stripe property in the user object.
+ * This function set the subscription information temporary on .subscriptons property in the user object.
  * @param {*} customerObj 
  * @param {*} prices 
  * @returns customer object
@@ -386,31 +386,32 @@ const setStripeInfoToUser = async (customerObj) => {
 
         if (customer.subscriptions.length > 0) {
             customer.hasSubscription = true
+            // TODO: Remove if its not necessary
+            // for (subscription of customer.subscriptions) {
+            // subscription.data = await getSubscriptionById(subscription.id)
 
-            for (subscription of customer.subscriptions) {
-                subscription.data = await getSubscriptionById(subscription.id)
-
-                if (subscription.data) {
-                    // TODO: Optimize this logic.
-                    // this for loop iterates: Stripe info.
-                    for (item of subscription.data.items.data) {
-                        let itemCars = []
-                        // Iterates the DB customer.subscriptions.
-                        for (customerSub of customer.subscriptions) {
-                            // Iterates the items on DB subscription.
-                            for (customerItem of customerSub.items) {
-                                // If the item match with stripe subs item, then iterates cars in DB item.
-                                if (customerItem.id === item.id) {
-                                    for (car of customerItem.cars) {
-                                        itemCars.push(car)
-                                    }
-                                }
-                            }
-                        }
-                        item.cars = itemCars
-                    }
-                }
-            }
+            // if (subscription.data) {
+            //     // TODO: Optimize this logic.
+            //     // this for loop iterates: Stripe info.
+            //     for (item of subscription.data.items.data) {
+            //         let itemCars = []
+            //         // Iterates the DB customer.subscriptions.
+            //         for (customerSub of customer.subscriptions) {
+            //             // Iterates the items on DB subscription.
+            //             for (customerItem of customerSub.items) {
+            //                 // If the item match with stripe subs item, then iterates cars in DB item.
+            //                 if (customerItem.id === item.id) {
+            //                     for (car of customerItem.cars) {
+            //                         itemCars.push(car)
+            //                     }
+            //                 }
+            //             }
+            //         }
+            //         item.cars = itemCars
+            //         item.isValid = await validateItemQty(item)
+            //     }
+            // }
+            // }
         }
 
         console.debug(`STRIPE: Set Stripe Info to User done.`);
@@ -463,6 +464,59 @@ async function getSubscriptionItemById(id) {
     return subscriptionItem
 }
 
+
+/**
+ * This function set the stripe information temporary on .stripe property in the user object.
+ * @param {*} customerObj 
+ * @param {*} prices 
+ * @returns customer object
+ */
+
+const validateItemQty = async (item) => {
+    try {
+
+        let itemObj = item
+        let isValid = false
+
+        if (itemObj) {
+            console.log('Cars Qty: ' + itemObj?.cars?.length)
+            console.log('Item Qty: ' + itemObj?.quantity)
+
+            if (itemObj?.cars?.length == itemObj?.quantity) {
+                console.log('Item has the same quantity. ')
+                isValid = true
+            }
+            else if (itemObj?.cars?.length > itemObj?.quantity) {
+                // This case is when the item has more cars than it can have. 
+                console.log('Item has more cars than quantity. ')
+                // Verify if any car dont have cancel_date set. 
+                let notNeedSetCancelDate = itemObj.cars.filter(car => car.cancel_date == null)?.length === itemObj?.quantity
+
+                if (notNeedSetCancelDate)
+                    isValid = true
+
+            }
+            else if (itemObj?.cars?.length < itemObj?.quantity) {
+                // Need add more cars.
+
+                console.log('Item has less cars than quantity. ')
+            }
+
+        }
+
+
+        console.debug(`STRIPE: validateSubscriptionItems() done.`);
+        return isValid
+
+    } catch (error) {
+        console.debug(`ERROR-STRIPE: validateSubscriptionItems()`);
+        console.debug(`ERROR-STRIPE: ${error.message}`);
+        console.debug(error);
+
+        return null
+    }
+}
+
 module.exports = {
     STATUS,
     getCustomerByID,
@@ -482,5 +536,6 @@ module.exports = {
     setStripeInfoToUser,
     getAllSubscriptions,
     getSubscriptionById,
-    getSubscriptionItemById
+    getSubscriptionItemById,
+    validateItemQty
 }

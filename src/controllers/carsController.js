@@ -80,7 +80,7 @@ exports.cars = async (req, res) => {
 exports.view = async (req, res) => {
     try {
         let { message, alertType } = req.session,
-            user = await Stripe.setStripeInfoToUser(req.user);
+            user = req.user;
 
         if (message) {
             req.session.message = ''
@@ -138,8 +138,8 @@ exports.create = async (req, res) => {
         user = await Stripe.setStripeInfoToUser(user)
         for (subscription of user.subscriptions) {
             for (item of subscription.items) {
-                stripeItem = await Stripe.getSubscriptionItemById(item.id)
-                if (item.cars.length < stripeItem.quantity) {
+                // stripeItem = await Stripe.getSubscriptionItemById(item.id)
+                if (item.cars.length < item.data.quantity) {
                     siToAddCar.push(stripeItem)
                 }
             }
@@ -168,6 +168,31 @@ exports.edit = async (req, res) => {
             let { allMakes, allModels } = await CarService.getAllMakes()
             res.status(200).render('cars/edit.ejs', { user: req.user, car, allMakes, allModels, url: (url == '/cars' || url == '/account') ? url : `${url}/${carID}` })
         }
+
+    } catch (error) {
+        console.error(error.message)
+        req.session.message = "Error trying to render edit cars form."
+        req.session.alertType = alertTypes.ErrorAlert
+        res.redirect('/cars')
+    }
+}
+
+/**
+ * This function renders the edit car.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.handleInvalidItems = async (req, res) => {
+    try {
+        console.log('handleInvalidItems')
+        const user = req.user
+        //     url = req.query.url ? req.query.url : '/account',
+        //     car = await CarService.getCarByID(carID)
+
+        // if (car) {
+        //     let { allMakes, allModels } = await CarService.getAllMakes()
+        res.status(200).render('cars/handleExpiredCars.ejs', { user, message: null, alertType: null })
+        // }
 
     } catch (error) {
         console.error(error.message)

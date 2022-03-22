@@ -54,7 +54,10 @@ async function authAddCar(req, res, next) {
 
 async function authEditCar(req, res, next) {
     let carID = req.body.id ? req.body.id : req.params.id ? req.params.id : ''
-    let user = await Stripe.setStripeInfoToUser(req.user)
+    // TODO:Not necessary
+    // let user = await Stripe.setStripeInfoToUser(req.user)
+    let user = req.user
+
     let services = await ServiceService.getServicesByCar(carID)
 
     if (carID && canEditCar(user, carID, services)) {

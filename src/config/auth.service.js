@@ -49,7 +49,7 @@ const resetPasswordRequest = async (email) => {
         requestSuccess = true
         return [requestSuccess, `Verify your email ${resultEmail?.accepted[0]} to complete reset password process.`]
     } else {
-        return [requestSuccess, "Password Reset Request Not Send."]
+        return [requestSuccess, "Password Reset Request Not Send"]
 
     }
 };

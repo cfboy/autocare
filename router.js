@@ -25,6 +25,8 @@ const { checkAuthenticated,
     authValidateMembership,
     authChangePassword } = require('./src/middleware/authFunctions')
 
+const { checkSubscriptions, checkItems } = require('./src/middleware/validateFunctions')
+
 // Main Route
 router.get('/', checkAuthenticated, (req, res) => {
     res.redirect('/account')
@@ -34,7 +36,7 @@ router.get('/', checkAuthenticated, (req, res) => {
 
 router.get('/home', dashboardsController.home)
 
-router.get('/account', checkAuthenticated, dashboardsController.account)
+router.get('/account', checkAuthenticated, checkSubscriptions, checkItems, dashboardsController.account)
 
 router.get('/create-subscriptions', checkAuthenticated, dashboardsController.createSubscriptions)
 
@@ -100,6 +102,8 @@ router.get('/cars', checkAuthenticated, carsController.cars)
 router.get('/car/:id', checkAuthenticated, carsController.view)
 router.get('/cars/create', checkAuthenticated, authAddCar, carsController.create)
 router.get('/edit-car/:id', checkAuthenticated, authEditCar, carsController.edit)
+
+router.get('/handleInvalidItems', checkAuthenticated, carsController.handleInvalidItems)
 
 router.post('/cars/create', checkAuthenticated, authAddCar, carsController.save)
 router.post('/edit-car', checkAuthenticated, authEditCar, carsController.update)

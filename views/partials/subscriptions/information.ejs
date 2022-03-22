@@ -39,10 +39,11 @@
             <% for(stripeSubscription of subscriptions) { %>
             <tr>
                 <td>
-                    <% for(item of stripeSubscription.data.items.data) { %>
+                    <% for(item of stripeSubscription.items) { %>
                     <p>
-                        <b><%- item.price.product.name %></b> (<%= item.cars.length %>/<%= item.quantity%>)
+                        <b><%- item.data.price.product.name %></b> (<%= item.cars.length %>/<%= item.data.quantity%>)
                     </p>
+                    <%= item?.isValid%>
                     <ul class="mb-0">
                         <!-- Show all item cars -->
                         <% if(item.cars.length > 0) { %>
@@ -53,7 +54,7 @@
                         <% } %>
                         <% } %>
                         <!-- If the length of cars is less than item quantity, then show add car btn. -->
-                        <% if(item.cars.length < item.quantity) { %>
+                        <% if(item.cars.length < item.data.quantity) { %>
                         <li class="mt-0 mb-0 m-3">
                             <a href="/cars/create?itemID=<%- item.id%>" id="add-car-button" class="btn btn-link p-0"
                                 style="margin: 0;" type="submit">

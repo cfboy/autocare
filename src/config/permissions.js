@@ -26,7 +26,7 @@ function canDeleteCar(user, carID, services) {
 
 function canAddCar(user) {
     return (
-        user.subscriptions.some(sub => sub.data.items.data.some(item => item.cars.length < item.quantity))
+        user.subscriptions.some(sub => sub.items.some(item => item?.cars?.length < item.data.quantity))
     )
 }
 

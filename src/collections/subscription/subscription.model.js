@@ -11,7 +11,7 @@ const subscriptionSchema = new Schema({
         cars: [{ type: Schema.Types.ObjectId, ref: 'car', default: null }]
     }],
     user: { type: Schema.Types.ObjectId, ref: 'user', default: null },
-    created_date: { type: Date, default: Date.now },
+    created_date: { type: Date, default: Date.now }
 })
 
 const Subscription = mongoose.model('subscription', subscriptionSchema, 'subscription')
