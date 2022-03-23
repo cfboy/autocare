@@ -15,37 +15,42 @@ const path = require("path");
  */
 const sendEmail = async (email, subject, payload, template) => {
     try {
-        const OAUTH_PLAYGROUND = 'https://developers.google.com/oauthplayground';
+        // const OAUTH_PLAYGROUND = 'https://developers.google.com/oauthplayground';
         const {
-            MAILING_SERVICE_CLIENT_ID,
-            MAILING_SERVICE_CLIENT_SECRET,
-            MAILING_SERVICE_REFRESH_TOKEN,
+            // MAILING_SERVICE_CLIENT_ID,
+            // MAILING_SERVICE_CLIENT_SECRET,
+            // MAILING_SERVICE_REFRESH_TOKEN,
             SENDER_EMAIL_ADDRESS,
+            SENDER_EMAIL_PASSWORD,
+            EMAIL_SERVICE
         } = process.env;
 
-        const oauth2Client = new OAuth2(
-            MAILING_SERVICE_CLIENT_ID,
-            MAILING_SERVICE_CLIENT_SECRET,
-            OAUTH_PLAYGROUND
-        );
+        // const oauth2Client = new OAuth2(
+        //     MAILING_SERVICE_CLIENT_ID,
+        //     MAILING_SERVICE_CLIENT_SECRET,
+        //     OAUTH_PLAYGROUND
+        // );
 
-        oauth2Client.setCredentials({
-            refresh_token: MAILING_SERVICE_REFRESH_TOKEN,
-        });
+        // oauth2Client.setCredentials({
+        //     refresh_token: MAILING_SERVICE_REFRESH_TOKEN,
+        // });
 
-        const accessToken = await oauth2Client.getAccessToken();
+        // const accessToken = await oauth2Client.getAccessToken();
 
         // create reusable transporter object using the default SMTP transport
         let transporter = nodemailer.createTransport({
-            service: "Gmail",
-            auth: {
-                type: 'OAuth2',
-                user: SENDER_EMAIL_ADDRESS,
-                clientId: MAILING_SERVICE_CLIENT_ID,
-                clientSecret: MAILING_SERVICE_CLIENT_SECRET,
-                refreshToken: MAILING_SERVICE_REFRESH_TOKEN,
-                accessToken,
-            }
+            service: EMAIL_SERVICE,
+            auth: { user: SENDER_EMAIL_ADDRESS, pass: SENDER_EMAIL_PASSWORD },
+
+            // service: "Gmail",
+            // auth: {
+            //     type: 'OAuth2',
+            //     user: SENDER_EMAIL_ADDRESS,
+            //     clientId: MAILING_SERVICE_CLIENT_ID,
+            //     clientSecret: MAILING_SERVICE_CLIENT_SECRET,
+            //     refreshToken: MAILING_SERVICE_REFRESH_TOKEN,
+            //     accessToken,
+            // }
         });
 
         const source = fs.readFileSync(path.join(__dirname, template), "utf8");
