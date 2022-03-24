@@ -7,7 +7,8 @@ const stripeController = require('./src/controllers/stripeController'),
     historyController = require('./src/controllers/historyController'),
     carsController = require('./src/controllers/carsController'),
     servicesController = require('./src/controllers/servicesController'),
-    reportsController = require('./src/controllers/reportsController')
+    reportsController = require('./src/controllers/reportsController'),
+    subscriptionsController = require('./src/controllers/subscriptionsController')
 
 // Express
 const express = require('express');
@@ -103,7 +104,7 @@ router.get('/car/:id', checkAuthenticated, carsController.view)
 router.get('/cars/create', checkAuthenticated, authAddCar, carsController.create)
 router.get('/edit-car/:id', checkAuthenticated, authEditCar, carsController.edit)
 
-router.get('/handleInvalidItems', checkAuthenticated, carsController.handleInvalidItems)
+router.get('/handleInvalidSubscriptions', checkAuthenticated, subscriptionsController.handleInvalidSubscriptions)
 
 router.post('/cars/create', checkAuthenticated, authAddCar, carsController.save)
 router.post('/edit-car', checkAuthenticated, authEditCar, carsController.update)

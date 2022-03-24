@@ -72,6 +72,7 @@ const addCar = (Car) => async (brand, model, plate) => {
 
         return await car.save()
     } catch (error) {
+        console.debug(error)
         console.log(`ERROR: CAR-SERVICE: addCar()`)
         return null
     }

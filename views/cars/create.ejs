@@ -60,12 +60,12 @@
                                                                 <option value="">Select One</option>
                                                                 <% for(item of siToAddCar) { %>
 
-                                                                <% var selected = (item.id === itemID) ? "selected" : ""; %>
+                                                                <% var selected = (item.data.id === itemID) ? "selected" : ""; %>
 
-                                                                <option value="<%= item.subscription%>/<%= item.id%>"
+                                                                <option value="<%= item.data?.subscription%>/<%= item.data.id%>"
                                                                     <%= selected%>>
-                                                                    <%= item.price.product.name%>
-                                                                    (<%= moment(item.created).isValid() ? moment(item.created * 1000).format(completeDateFormat) : 'N/A' %>)
+                                                                    <%= item.data.price.product.name%>
+                                                                    (<%= moment(item?.data?.created).isValid() ? moment(item.data?.created * 1000).format(completeDateFormat) : 'N/A' %>)
                                                                 </option>
                                                                 <% } %>
 

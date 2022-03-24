@@ -116,7 +116,7 @@ const getSubscriptions = (Subscription) => () => {
  * @param {*} Subscription 
  * @returns Subscription
  */
-const getSubscriptionsByUser = (Subscription) => (user) => {
+const getSubscriptionsByUser = (Subscription) => async (user) => {
     return Subscription.find({ user: user }).populate('user')
         .populate({ path: 'items.cars', model: 'car' })
 }
@@ -232,6 +232,108 @@ const getUserByCar = (Subscription) => async (car) => {
     return user
 }
 
+
+/**
+ * This function set the subscription information temporary on .subscriptons property in the user object.
+ * @param {*} customerObj 
+ * @param {*} prices 
+ * @returns customer object
+ */
+
+async function setStripeInfoToUser(customerObj) {
+    try {
+
+        let customer = customerObj
+
+        if (customer?.subscriptions) {
+            console.debug(`STRIPE: The customer is already has the subscriptions set.`);
+        }
+        else {
+            customer.subscriptions = await this.getSubscriptionsByUser(customer)
+            customer.hasSubscription = false
+
+            if (customer.subscriptions.length > 0) {
+                customer.hasSubscription = true
+                // TODO: Remove if its not necessary
+                for (subscription of customer.subscriptions) {
+                    // subscription.data = await getSubscriptionById(subscription.id)
+                    // if (subscription.data) {
+                    // TODO: Optimize this logic.
+                    // this for loop iterates: Stripe info.
+                    for (item of subscription.items) {
+                        item.isValid = await validateItemQty(item)
+                    }
+                    // }
+                }
+            }
+
+            console.debug(`STRIPE: Set Stripe Info to User done.`);
+        }
+
+        return customer
+
+
+    } catch (error) {
+        console.debug(`ERROR-STRIPE: setStripeInfoToUser()`);
+        console.debug(`ERROR-STRIPE: ${error.message}`);
+
+        return null
+    }
+}
+
+/**
+ * This function set the stripe information temporary on .stripe property in the user object.
+ * @param {*} customerObj 
+ * @param {*} prices 
+ * @returns customer object
+ */
+
+async function validateItemQty(item) {
+    try {
+
+        let itemObj = item
+        let isValid = false
+
+        if (itemObj) {
+            console.log('Cars Qty: ' + itemObj?.cars?.length)
+            console.log('Item Qty: ' + itemObj?.data?.quantity)
+
+            if (itemObj?.cars?.length == itemObj?.data?.quantity) {
+                console.log('Item has the same quantity. ')
+                isValid = true
+            }
+            else if (itemObj?.cars?.length > itemObj?.data?.quantity) {
+                // This case is when the item has more cars than it can have. 
+                console.log('Item has more cars than quantity. ')
+                // Verify if any car dont have cancel_date set. 
+                let notNeedSetCancelDate = itemObj.cars.filter(car => car.cancel_date == null)?.length === itemObj?.data?.quantity
+
+                if (notNeedSetCancelDate)
+                    isValid = true
+
+            }
+            else if (itemObj?.cars?.length < itemObj?.data?.quantity) {
+                // Need add more cars.
+
+                console.log('Item has less cars than quantity. ')
+            }
+
+        }
+
+
+        console.debug(`STRIPE: validateSubscriptionItems() done.`);
+        return isValid
+
+    } catch (error) {
+        console.debug(`ERROR-STRIPE: validateSubscriptionItems()`);
+        console.debug(`ERROR-STRIPE: ${error.message}`);
+        console.debug(error);
+
+        return null
+    }
+}
+
+
 module.exports = (Subscription) => {
     return {
         addSubscription: addSubscription(Subscription),
@@ -245,6 +347,8 @@ module.exports = (Subscription) => {
         getSubscriptionByCar: getSubscriptionByCar(Subscription),
         getSubscriptionItemByCar: getSubscriptionItemByCar(Subscription),
         getAllCarsByUser: getAllCarsByUser(Subscription),
-        getUserByCar: getUserByCar(Subscription)
+        getUserByCar: getUserByCar(Subscription),
+        setStripeInfoToUser: setStripeInfoToUser,
+        validateItemQty: validateItemQty
     }
 }

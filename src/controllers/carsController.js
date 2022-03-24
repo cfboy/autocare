@@ -24,7 +24,7 @@ exports.cars = async (req, res) => {
         let { message, alertType } = req.session,
             cars,
             // Passport store the user in req.user
-            user = await Stripe.setStripeInfoToUser(req.user)
+            user = await SubscriptionService.setStripeInfoToUser(req.user)
 
         // clear message y alertType
         if (message) {
@@ -54,7 +54,6 @@ exports.cars = async (req, res) => {
             }
 
             cars = await ServiceService.setServicesToCars(cars)
-
 
             res.render('cars/index.ejs', {
                 user, cars, message, alertType,
@@ -135,12 +134,12 @@ exports.create = async (req, res) => {
 
         let siToAddCar = []
         let stripeItem
-        user = await Stripe.setStripeInfoToUser(user)
+        user = await SubscriptionService.setStripeInfoToUser(user)
         for (subscription of user.subscriptions) {
             for (item of subscription.items) {
                 // stripeItem = await Stripe.getSubscriptionItemById(item.id)
                 if (item.cars.length < item.data.quantity) {
-                    siToAddCar.push(stripeItem)
+                    siToAddCar.push(item)
                 }
             }
         }
@@ -178,31 +177,6 @@ exports.edit = async (req, res) => {
 }
 
 /**
- * This function renders the edit car.
- * @param {*} req 
- * @param {*} res 
- */
-exports.handleInvalidItems = async (req, res) => {
-    try {
-        console.log('handleInvalidItems')
-        const user = req.user
-        //     url = req.query.url ? req.query.url : '/account',
-        //     car = await CarService.getCarByID(carID)
-
-        // if (car) {
-        //     let { allMakes, allModels } = await CarService.getAllMakes()
-        res.status(200).render('cars/handleExpiredCars.ejs', { user, message: null, alertType: null })
-        // }
-
-    } catch (error) {
-        console.error(error.message)
-        req.session.message = "Error trying to render edit cars form."
-        req.session.alertType = alertTypes.ErrorAlert
-        res.redirect('/cars')
-    }
-}
-
-/**
  * This function save/create the new car.
  * @param {*} req 
  * @param {*} res 
@@ -214,23 +188,29 @@ exports.save = async (req, res) => {
 
         let car = await CarService.addCar(fields.brand, fields.model, fields.plate)
 
-        console.debug(`A new car added to DB. ID: ${car.id}.`)
+        if (car) {
+            console.debug(`A new car added to DB. ID: ${car.id}.`)
 
-        // Add car to subscription
-        // fields.subItem.split('/')[0] has the subscription ID
-        // fields.subItem.split('/')[1] has the subItem ID 
-        let subscription = await SubscriptionService.addSubscriptionCar(fields.subItem.split('/')[0], car, fields.subItem.split('/')[1])
+            // Add car to subscription
+            // fields.subItem.split('/')[0] has the subscription ID
+            // fields.subItem.split('/')[1] has the subItem ID 
+            let subscription = await SubscriptionService.addSubscriptionCar(fields.subItem.split('/')[0], car, fields.subItem.split('/')[1])
 
-        if (subscription) {
-            req.session.message = `
+            if (subscription) {
+                req.session.message = `
             Added Car to subscription: ${subscription.id}
 
             New Car:  ${car.brand} - ${car.model} - ${car.plate}`
-        }
+            }
 
-        req.session.message = `New Car:  ${car.brand} - ${car.model} - ${car.plate}.`
-        req.session.alertType = alertTypes.CompletedActionAlert
-        req.flash('info', 'Car created.')
+            req.session.message = `New Car:  ${car.brand} - ${car.model} - ${car.plate}.`
+            req.session.alertType = alertTypes.CompletedActionAlert
+            req.flash('info', 'Car created.')
+        } else {
+            req.session.message = `Car not created..`
+            req.session.alertType = alertTypes.ErrorAlert
+            // req.flash('er', 'Car created.')
+        }
         res.redirect('/cars')
 
     } catch (error) {

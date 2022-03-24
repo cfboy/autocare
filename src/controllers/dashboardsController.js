@@ -51,13 +51,8 @@ exports.account = async (req, res) => {
             prices = await Stripe.getAllPrices(),
             params
 
-        params = { user, prices, message, alertType }
-
-        // if (user?.billingID) {
-        //     user = await Stripe.setStripeInfoToUser(user)
-        // }
         params = {
-            ...params,
+            user, prices, message, alertType,
             subscriptions: user?.subscriptions
         }
 
@@ -172,7 +167,7 @@ exports.validate = async (req, res) => {
         }
 
         if (customer) {
-            customer = await Stripe.setStripeInfoToUser(customer)
+            customer = await SubscriptionService.setStripeInfoToUser(customer)
             subscription = customer.subscriptions.find(subscription => subscription.items.filter(item => item.cars.filter(itemCar => itemCar.id = car.id)))
             // TODO: use selected location 
             //Log this action.

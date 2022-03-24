@@ -8,6 +8,7 @@ const bcrypt = require('bcrypt');
 const { municipalities } = require('../helpers/municipalities')
 const CarService = require('../collections/cars')
 const ServiceService = require('../collections/services')
+const SubscriptionService = require('../collections/subscription')
 const cars = require('../collections/cars')
 
 
@@ -208,7 +209,7 @@ exports.viewUser = async (req, res) => {
         if (customer) {
             isMyProfile = (req.user.id === customer.id)
             if (customer.billingID) {
-                customer = await Stripe.setStripeInfoToUser(customer)
+                customer = await SubscriptionService.setStripeInfoToUser(customer)
             }
 
             let customerCars = []

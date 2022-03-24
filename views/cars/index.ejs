@@ -68,6 +68,7 @@
                                                             <th>Model</th>
                                                             <th>Plate</th>
                                                             <th>Services (Qty.)</th>
+                                                            <th>Created Date</th>
                                                             <%# if(canManageCars) { %>
                                                             <th>Action</th>
                                                             <%# } %>
@@ -85,6 +86,10 @@
                                                             <td><%- car.model%></td>
                                                             <td><%- car.plate%></td>
                                                             <td><%- car?.services?.length%></td>
+                                                            <td>
+                                                                <%= moment(car?.created_date).isValid() ? moment(car?.created_date).format(completeDateFormat) : 'N/A' %>
+
+                                                            </td>
 
                                                             <td>
                                                                 <% let hasServices = car?.services?.length > 0 %>
@@ -154,7 +159,7 @@
     <script src="../js/helper-functions.js"></script>
     <!-- Alerts Code -->
     <%- include('../partials/alerts.ejs', {message, alertType}); %>
-    <%- include('../partials/dataTable.ejs', {tableID : '#users'}); %>
+    <%- include('../partials/dataTable.ejs', {tableID : '#users', dateColumn: 4 }); %>
 </body>
 
 </html>

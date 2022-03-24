@@ -13,7 +13,7 @@ exports.services = async (req, res) => {
         let { message, alertType } = req.session
         // Passport store the user in req.user
         // TODO: implement for othe user.
-        user = await Stripe.setStripeInfoToUser(req.user)
+        user = await SubscriptionService.setStripeInfoToUser(req.user)
 
         // clear message y alertType
         if (message) {
