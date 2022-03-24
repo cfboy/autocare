@@ -272,11 +272,11 @@ exports.delete = async (req, res) => {
         let car = await CarService.getCarByID(carID),
             subscription = await SubscriptionService.getSubscriptionByCar(car)
 
-        subscription = subscription.items.find(item =>
+        let item = subscription.items.find(item =>
             item.cars.find(itemCar =>
                 itemCar.id = car.id))
 
-        let updatedSubscription = await SubscriptionService.removeSubscriptionCar(subscription.id, subscription.items[0].id, car)
+        let updatedSubscription = await SubscriptionService.removeSubscriptionCar(subscription.id, item.id, car)
 
 
         // Validate if the car is removed from user.
@@ -295,6 +295,7 @@ exports.delete = async (req, res) => {
         }
 
     } catch (error) {
+        console.debug(error)
         console.log(`ERROR-CAR-CONTROLLER : ${error.message}`)
         req.session.message = "Can't delete car."
         req.session.alertType = alertTypes.ErrorAlert

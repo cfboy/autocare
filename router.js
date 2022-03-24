@@ -26,7 +26,7 @@ const { checkAuthenticated,
     authValidateMembership,
     authChangePassword } = require('./src/middleware/authFunctions')
 
-const { checkSubscriptions, checkItems } = require('./src/middleware/validateFunctions')
+const { checkSubscriptions } = require('./src/middleware/validateFunctions')
 
 // Main Route
 router.get('/', checkAuthenticated, (req, res) => {
@@ -37,7 +37,7 @@ router.get('/', checkAuthenticated, (req, res) => {
 
 router.get('/home', dashboardsController.home)
 
-router.get('/account', checkAuthenticated, checkSubscriptions, checkItems, dashboardsController.account)
+router.get('/account', checkAuthenticated, checkSubscriptions, dashboardsController.account)
 
 router.get('/create-subscriptions', checkAuthenticated, dashboardsController.createSubscriptions)
 
