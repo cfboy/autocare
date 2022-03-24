@@ -1,5 +1,6 @@
 const SubscriptionService = require('../collections/subscription')
 const { ROLES } = require('../collections/user/user.model')
+const alertTypes = require('../helpers/alertTypes')
 
 
 async function checkSubscriptions(req, res, next) {
@@ -7,7 +8,12 @@ async function checkSubscriptions(req, res, next) {
     let user = await SubscriptionService.setStripeInfoToUser(req.user)
     let invalidSubs = user?.subscriptions.filter(subs => subs.items.some(item => !item.isValid))
 
-    if (user?.subscriptions?.length < 1 && [ROLES.CUSTOMER].includes(user.role)) {
+    if (!user) {
+        req.session.message = 'ERROR setting the subscriptions information.'
+        re.session.alertType = alertTypes.ErrorAlert
+        return next()
+    }
+    else if (user?.subscriptions?.length < 1 && [ROLES.CUSTOMER].includes(user.role)) {
         req.flash('warning', 'Create a subscription to continue.')
         res.redirect('/create-subscriptions')
     } else if (invalidSubs?.length > 0) {

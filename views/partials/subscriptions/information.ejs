@@ -18,7 +18,7 @@
 
 </div>
 <div class="table-responsive mt-1">
-    <table class="table table-hover">
+    <table class="table">
         <thead>
             <tr>
                 <th>
@@ -41,26 +41,83 @@
                 <td>
                     <% for(item of stripeSubscription.items) { %>
                     <p>
-                        <b><%- item.data.price.product.name %></b> (<%= item.cars.length %>/<%= item.data.quantity%>)
+                        <b><%- item.data.price.product.name %></b> (<%= item.cars.length %>/<%= item.data.quantity%>
+                        <small> cars qty.</small>)
                     </p>
-                    <%= item?.isValid%>
-                    <ul class="mb-0">
-                        <!-- Show all item cars -->
-                        <% if(item.cars.length > 0) { %>
+                    <ul class="mb-0">                            
+                        <% if(item.isValid) { %>
                         <% for(car of item.cars) { %>
                         <li class="mt-0 mb-0 m-3">
                             <%- car.brand %> - <%- car.model %> - <%- car.plate %>
+                            <% if(car?.cancel_date) { %>
+                            <b>
+                                (Valid until:
+                                <%= moment(car?.cancel_date * 1000).isValid() ? moment(car?.cancel_date * 1000).format(shortDateFormat) : 'N/A' %>
+                                )
+                            </b>
+                            <% } %>
                         </li>
                         <% } %>
-                        <% } %>
+
+                        <% } else { %>
                         <!-- If the length of cars is less than item quantity, then show add car btn. -->
                         <% if(item.cars.length < item.data.quantity) { %>
+                        <% for(car of item.cars) { %>
+                        <li class="mt-0 mb-0 m-3">
+                            <%- car.brand %> - <%- car.model %> - <%- car.plate %>
+                            <% if(car?.cancel_date) { %>
+                            <b>
+                                (Valid until:
+                                <%= moment(car?.cancel_date * 1000).isValid() ? moment(car?.cancel_date * 1000).format(shortDateFormat) : 'N/A' %>
+                                )
+                            </b>
+                            <% } %>
+                        </li>
+                        <% } %>
                         <li class="mt-0 mb-0 m-3">
                             <a href="/cars/create?itemID=<%- item.id%>" id="add-car-button" class="btn btn-link p-0"
                                 style="margin: 0;" type="submit">
                                 Add Missing Car</a>
-                            <% } %>
                         </li>
+                        <% } else if(item.cars.length > item.data.quantity) { %>
+
+                        <form id="handle-valid-cars-form-<%= item.id%>" action="/confirmValidCars" method="post">
+                            <input id="subscriptionID" name="subscriptionID" value="<%=  stripeSubscription.id%>"
+                                hidden>
+
+                            <!-- <input id="itemID" name="itemID" value="<%=  item.id%>" hidden> -->
+                            <input id="requiredQty" name="requiredQty" value="<%=  item.data.quantity %>" hidden>
+                            <input type="text" name="selectedCars" id="selectedCars" value="" hidden>
+                            <input type="text" name="carsToRemove" id="carsToRemove" value="" hidden>
+                            <p class="alert badge-outline-warning text-center">Select <b> <%=  item.data.quantity %>
+                                </b> to use on
+                                next period.</p>
+                            <div class="form-group">
+                                <% for(car of item.cars) { %>
+
+                                <div class="form-check form-check-primary">
+
+                                    <label class="form-check-label">
+
+                                        <input type="checkbox" class="form-check-input" name="cars"
+                                            onclick="validateCheckboxes(`<%= item.id%>`)" value="<%= car._id%>">
+                                        <%- car.brand %> - <%- car.model %> - <%- car.plate %>
+
+                                    </label>
+
+                                </div>
+                                <% } %>
+
+                            </div>
+                            <div id="validationTxt"></div>
+                            <button id="confirm-valid-cars-button" class="btn btn-secondary" style="margin: 0;"
+                                type="submit" itemid="<%= item.id%>" disabled>
+                                Confirm cars for next period <span
+                                    id="selectedDisplay">(0/<%=  item.data.quantity %>)</span>
+                            </button>
+                        </form>
+                        <% } %>
+                        <% } %>
                     </ul>
                     <br>
                     <% } %>
@@ -81,3 +138,51 @@
         </tbody>
     </table>
 </div>
+
+<script>
+
+    const confirmValidCarsButton = $('#confirm-valid-cars-button');
+    const requiredQty = $('#requiredQty').val();
+
+    function validateCheckboxes(itemid) {
+        var selected = [];
+        var carsToRemove = [];
+
+        $(`#handle-valid-cars-form-${itemid} input:checkbox[type=checkbox]`).each(function () {
+            carsToRemove.push($(this).val());
+        });
+
+
+
+        $(`#handle-valid-cars-form-${itemid} input:checkbox[type=checkbox]:checked`).each(function () {
+            selected.push($(this).val());
+            carsToRemove.splice($.inArray($(this).val(), carsToRemove), 1);
+        });
+        console.log('Selected: ' + selected);
+
+        console.log('carsToRemove: ' + carsToRemove);
+
+        $('#selectedDisplay').html(`(${selected.length?.toString()}/${requiredQty?.toString()})`);
+
+        if (selected.length == requiredQty) {
+            $(`#handle-valid-cars-form-${itemid} input:checkbox[type=checkbox]:not(:checked)`).each(function () {
+                $(this).attr('disabled', 'disabled');
+            });
+            $('#validationTxt').html(`<p class="valid"> Maximum car selected. Press confirm button to continue.<p>`)
+            confirmValidCarsButton.removeClass('btn-secondary').addClass('btn-primary').removeAttr('disabled');
+
+        } else if (selected.length < requiredQty) {
+            $(`#handle-valid-cars-form-${itemid} input:checkbox[type=checkbox]`).each(function () {
+                $(this).removeAttr('disabled');
+            });
+            $('#validationTxt').html(``)
+            confirmValidCarsButton.removeClass('btn-primary').addClass('btn-secondary').attr('disabled', 'disabled');
+
+        }
+
+        document.getElementById('selectedCars').value = selected;
+        document.getElementById('carsToRemove').value = carsToRemove;
+
+
+    }
+</script>

@@ -91,7 +91,8 @@
                                                                 <%- user.personalInfo.phoneNumber %>
                                                             </td>
                                                             <td>
-                                                                <a href="/edit-user/<%- user.id%>?url=/users"
+                                                                <% var url = [roles.ADMIN].includes(user.role) ? 'users' : 'customers' %>
+                                                                <a href="/edit-user/<%- user.id%>?url=/<%- url%>"
                                                                     type="button"
                                                                     class="btn btn-icon btn-icon-no-border no-margin">
                                                                     <i class="far fa-edit icon-sm"></i>

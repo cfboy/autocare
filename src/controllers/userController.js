@@ -269,7 +269,7 @@ exports.editUser = async (req, res) => {
             if (ROLES)
                 selectRoles = Object.entries(ROLES)
 
-            res.status(200).render('user/edit.ejs', { user: req.user, customer, municipalities, selectRoles, url: (url == '/users' || url == '/account' || url == '/validateMembership') ? url : `${url}/${id}` })
+            res.status(200).render('user/edit.ejs', { user: req.user, customer, municipalities, selectRoles, url: (url == '/users' || url == '/customers' || url == '/account' || url == '/validateMembership') ? url : `${url}/${id}` })
         } else {
             console.log('User not found.')
             res.redirect(`${url}`)

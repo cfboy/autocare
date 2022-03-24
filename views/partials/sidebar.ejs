@@ -32,13 +32,12 @@
                 <span class="menu-title">Invoices</span>
             </a>
         </li>
-        <li class="nav-item">
+        <!-- <li class="nav-item">
             <a class="nav-link" href="/charges">
-                <!-- <i class="fa-solid fa-file-invoice menu-icon"></i> -->
                 <i class="fa-solid fa-receipt menu-icon"></i>
                 <span class="menu-title">Billing History</span>
             </a>
-        </li>
+        </li> -->
         <% } %>
 
         <% if([roles.CUSTOMER].includes(user.role)) { %>
@@ -62,13 +61,12 @@
                 <span class="menu-title">My Invoices</span>
             </a>
         </li>
-        <li class="nav-item">
+        <!-- <li class="nav-item">
             <a class="nav-link" href="/charges">
                 <i class="fa-solid fa-receipt menu-icon"></i>
-                <!-- <i class="fa-solid fa-file-invoice menu-icon"></i> -->
                 <span class="menu-title">Billing History</span>
             </a>
-        </li>
+        </li> -->
         <% } %>
         <% if([roles.ADMIN, roles.MANAGER, roles.CASHIER].includes(user.role)) { %>
         <li class="nav-item">
@@ -87,7 +85,7 @@
         </li>
         <% } %>
 
-        <% if([roles.ADMIN, roles.MANAGER].includes(user.role)) { %>
+        <% if([roles.ADMIN].includes(user.role)) { %>
         <li class="nav-item">
             <a class="nav-link" href="/users">
                 <!-- <i class="fas fa-solid fa-users-between-lines menu-icon"></i> -->
