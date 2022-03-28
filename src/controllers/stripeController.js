@@ -127,6 +127,7 @@ exports.webhook = async (req, res) => {
                     items = []
                     for (subItem of subscriptionItems) {
                         let itemToUpdate = mySubscription.items.find(item => item.id == subItem.id)
+                        // TODO: reset cancel_date of cars
                         let newItem = { id: itemToUpdate.id, cars: itemToUpdate.cars, data: subItem }
                         items.push(newItem)
                     }

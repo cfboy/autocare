@@ -1,7 +1,6 @@
 const stripe = require('stripe')
 const Dinero = require('dinero.js')
 const { ROLES } = require('../collections/user/user.model')
-const SubscriptionService = require('../collections/subscription')
 
 const STATUS = {
     NONE: "none",

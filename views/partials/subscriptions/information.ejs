@@ -44,7 +44,7 @@
                         <b><%- item.data.price.product.name %></b> (<%= item.cars.length %>/<%= item.data.quantity%>
                         <small> cars qty.</small>)
                     </p>
-                    <ul class="mb-0">                            
+                    <ul class="mb-0">
                         <% if(item.isValid) { %>
                         <% for(car of item.cars) { %>
                         <li class="mt-0 mb-0 m-3">
@@ -52,7 +52,7 @@
                             <% if(car?.cancel_date) { %>
                             <b>
                                 (Valid until:
-                                <%= moment(car?.cancel_date * 1000).isValid() ? moment(car?.cancel_date * 1000).format(shortDateFormat) : 'N/A' %>
+                                <%= moment(car?.cancel_date).isValid() ? moment(car?.cancel_date).format(shortDateFormat) : 'N/A' %>
                                 )
                             </b>
                             <% } %>
@@ -86,9 +86,10 @@
                                 hidden>
 
                             <!-- <input id="itemID" name="itemID" value="<%=  item.id%>" hidden> -->
-                            <input id="requiredQty" name="requiredQty" value="<%=  item.data.quantity %>" hidden>
-                            <input type="text" name="selectedCars" id="selectedCars" value="" hidden>
-                            <input type="text" name="carsToRemove" id="carsToRemove" value="" hidden>
+                            <input id="requiredQty-<%=  item.id%>" name="requiredQty" value="<%=  item.data.quantity %>"
+                                hidden>
+                            <input type="text" name="selectedCars" id="selectedCars-<%=  item.id%>" value="" hidden>
+                            <input type="text" name="carsToRemove" id="carsToRemove-<%=  item.id%>" value="" hidden>
                             <p class="alert badge-outline-warning text-center">Select <b> <%=  item.data.quantity %>
                                 </b> to use on
                                 next period.</p>
@@ -109,9 +110,9 @@
                                 <% } %>
 
                             </div>
-                            <div id="validationTxt"></div>
-                            <button id="confirm-valid-cars-button" class="btn btn-secondary" style="margin: 0;"
-                                type="submit" itemid="<%= item.id%>" disabled>
+                            <div id="validationTxt-<%= item.id%>"></div>
+                            <button id="confirm-valid-cars-button-<%= item.id%>" class="btn btn-secondary"
+                                style="margin: 0;" type="submit" itemid="<%= item.id%>" disabled>
                                 Confirm cars for next period <span
                                     id="selectedDisplay">(0/<%=  item.data.quantity %>)</span>
                             </button>
@@ -141,26 +142,30 @@
 
 <script>
 
-    const confirmValidCarsButton = $('#confirm-valid-cars-button');
-    const requiredQty = $('#requiredQty').val();
 
     function validateCheckboxes(itemid) {
         var selected = [];
-        var carsToRemove = [];
+        var toRemove = [];
+        var confirmValidCarsButton = $(`#confirm-valid-cars-button-${itemid}`);
+        var validationTxt = $(`#validationTxt-${itemid}`);
+        var selectedCars = document.getElementById(`selectedCars-${itemid}`);
+        var carsToRemove = document.getElementById(`carsToRemove-${itemid}`);
+        var requiredQty = $(`#requiredQty-${itemid}`).val();
+
+
 
         $(`#handle-valid-cars-form-${itemid} input:checkbox[type=checkbox]`).each(function () {
-            carsToRemove.push($(this).val());
+            toRemove.push($(this).val());
         });
-
 
 
         $(`#handle-valid-cars-form-${itemid} input:checkbox[type=checkbox]:checked`).each(function () {
             selected.push($(this).val());
-            carsToRemove.splice($.inArray($(this).val(), carsToRemove), 1);
+            toRemove.splice($.inArray($(this).val(), toRemove), 1);
         });
         console.log('Selected: ' + selected);
 
-        console.log('carsToRemove: ' + carsToRemove);
+        console.log('toRemove: ' + toRemove);
 
         $('#selectedDisplay').html(`(${selected.length?.toString()}/${requiredQty?.toString()})`);
 
@@ -168,21 +173,20 @@
             $(`#handle-valid-cars-form-${itemid} input:checkbox[type=checkbox]:not(:checked)`).each(function () {
                 $(this).attr('disabled', 'disabled');
             });
-            $('#validationTxt').html(`<p class="valid"> Maximum car selected. Press confirm button to continue.<p>`)
+            validationTxt.html(`<p class="valid"> Maximum car selected. Press confirm button to continue.<p>`)
             confirmValidCarsButton.removeClass('btn-secondary').addClass('btn-primary').removeAttr('disabled');
 
         } else if (selected.length < requiredQty) {
             $(`#handle-valid-cars-form-${itemid} input:checkbox[type=checkbox]`).each(function () {
                 $(this).removeAttr('disabled');
             });
-            $('#validationTxt').html(``)
+            validationTxt.html(``)
             confirmValidCarsButton.removeClass('btn-primary').addClass('btn-secondary').attr('disabled', 'disabled');
 
         }
 
-        document.getElementById('selectedCars').value = selected;
-        document.getElementById('carsToRemove').value = carsToRemove;
-
+        selectedCars.value = selected;
+        carsToRemove.value = toRemove;
 
     }
 </script>

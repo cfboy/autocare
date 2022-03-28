@@ -42,11 +42,11 @@
                         <%- car?.plate%>
                     </p>
                     <% if(car?.cancel_date) { %>
-                    <p>
+                    <p class="bg-warning">
                         <b>
                             Valid until:
                         </b>
-                        <%= moment(car?.cancel_date * 1000).isValid() ? moment(car?.cancel_date * 1000).format(shortDateFormat) : 'N/A' %>
+                        <%= moment(car?.cancel_date).isValid() ? moment(car.cancel_date).format(shortDateFormat) : 'N/A' %>
                     </p>
                     <% } %>
                     <p>
@@ -86,7 +86,7 @@
 
                         <p class="alert alert-danger mt-2">This car has the maximum quantity of services per day.</p>
                         <% }
-                         else if (car.isValid) { %>
+                         else if (!car.isValid) { %>
                         <i class="far fa-8x fa-times-circle invalid"></i>
 
                         <p class="alert alert-danger mt-2">This car expired on
@@ -120,8 +120,6 @@
                                 type="submit" value="<%- customer.billingID%>" email="<%- customer.email%>">
                                 Manage Billing
                                 <i class="fab fa-stripe-s btn-icon-apepend"></i>
-                                <!-- <i class="menu-icon mdi mdi-car-wash "></i> -->
-
                             </button>
                             <% if(!car?.hasService) { %>
                             <button id="use-service-button" user-id="<%= customer?.id%>" car-id="<%= car?.id%>"

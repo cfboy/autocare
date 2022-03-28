@@ -39,8 +39,6 @@ router.get('/home', dashboardsController.home)
 
 router.get('/account', checkAuthenticated, checkSubscriptions, dashboardsController.account)
 
-router.get('/create-subscriptions', checkAuthenticated, dashboardsController.createSubscriptions)
-
 //------ Auth Routes ------
 
 router.get('/login', checkNotAuthenticated, (req, res) => {
@@ -104,6 +102,11 @@ router.get('/car/:id', checkAuthenticated, carsController.view)
 router.get('/cars/create', checkAuthenticated, authAddCar, carsController.create)
 router.get('/edit-car/:id', checkAuthenticated, authEditCar, carsController.edit)
 
+//------ Subscriptions/Memberships Routes ------
+router.get('/validateMembership', checkAuthenticated, authValidateMembership, subscriptionsController.validateMembership)
+router.post('/validateMembership', checkAuthenticated, authValidateMembership, subscriptionsController.validate)
+router.post('/carcheck', subscriptionsController.carCheck)
+router.get('/create-subscriptions', checkAuthenticated, subscriptionsController.createSubscriptions)
 router.get('/handleInvalidSubscriptions', checkAuthenticated, subscriptionsController.handleInvalidSubscriptions)
 router.post('/confirmValidCars', checkAuthenticated, subscriptionsController.confirmValidCars)
 
@@ -128,11 +131,6 @@ router.get('/edit-location/:id', checkAuthenticated, authEditLocation, locationC
 router.post('/create-location', checkAuthenticated, locationController.save)
 router.post('/edit-location', checkAuthenticated, authEditLocation, locationController.update)
 router.get('/delete-location/:id', checkAuthenticated, authDeleteLocation, locationController.delete)
-
-router.get('/validateMembership', checkAuthenticated, authValidateMembership, dashboardsController.validateMembership)
-router.post('/validateMembership', checkAuthenticated, authValidateMembership, dashboardsController.validate)
-
-router.post('/carcheck', dashboardsController.carCheck)
 
 // ---------------------------------------
 
