@@ -1,6 +1,6 @@
 const nodemailer = require("nodemailer");
-const { google } = require("googleapis")
-const { OAuth2 } = google.auth
+// const { google } = require("googleapis")
+// const { OAuth2 } = google.auth
 const handlebars = require("handlebars");
 const fs = require("fs");
 const path = require("path");
@@ -17,22 +17,22 @@ const sendEmail = async (email, subject, payload, template) => {
     try {
         // const OAUTH_PLAYGROUND = 'https://developers.google.com/oauthplayground';
         const {
-            // MAILING_SERVICE_CLIENT_ID,
-            // MAILING_SERVICE_CLIENT_SECRET,
-            // MAILING_SERVICE_REFRESH_TOKEN,
+            //     MAILING_SERVICE_CLIENT_ID,
+            //     MAILING_SERVICE_CLIENT_SECRET,
+            //     MAILING_SERVICE_REFRESH_TOKEN,
             SENDER_EMAIL_ADDRESS,
             SENDER_EMAIL_PASSWORD,
             EMAIL_SERVICE
         } = process.env;
 
         // const oauth2Client = new OAuth2(
-        //     MAILING_SERVICE_CLIENT_ID,
-        //     MAILING_SERVICE_CLIENT_SECRET,
+        //     MAILING_SERVICE_CLIENT_ID_2,
+        //     MAILING_SERVICE_CLIENT_SECRET_2,
         //     OAUTH_PLAYGROUND
         // );
 
         // oauth2Client.setCredentials({
-        //     refresh_token: MAILING_SERVICE_REFRESH_TOKEN,
+        //     refresh_token: MAILING_SERVICE_REFRESH_TOKEN_2,
         // });
 
         // const accessToken = await oauth2Client.getAccessToken();
@@ -46,10 +46,10 @@ const sendEmail = async (email, subject, payload, template) => {
             // auth: {
             //     type: 'OAuth2',
             //     user: SENDER_EMAIL_ADDRESS,
-            //     clientId: MAILING_SERVICE_CLIENT_ID,
-            //     clientSecret: MAILING_SERVICE_CLIENT_SECRET,
-            //     refreshToken: MAILING_SERVICE_REFRESH_TOKEN,
-            //     accessToken,
+            //     clientId: MAILING_SERVICE_CLIENT_ID_2,
+            //     clientSecret: MAILING_SERVICE_CLIENT_SECRET_2,
+            //     // refreshToken: MAILING_SERVICE_REFRESH_TOKEN_2,
+            //     // accessToken,
             // }
         });
 

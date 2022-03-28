@@ -33,7 +33,6 @@ exports.handleInvalidSubscriptions = async (req, res) => {
 exports.confirmValidCars = async (req, res) => {
     try {
         console.debug('confirmValidCars')
-        let { message, alertType } = req.session
 
         let { subscriptionID, selectedCars, carsToRemove } = req.body
 

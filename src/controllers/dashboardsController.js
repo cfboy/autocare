@@ -159,16 +159,17 @@ exports.validate = async (req, res) => {
 
         if (car) {
             subscription = await SubscriptionService.getSubscriptionByCar(car)
+            customer = subscription?.user
             services = await ServiceService.getServicesByCar(car)
-
             hasService = services.some(service => service.created_date.setHours(0, 0, 0, 0) === new Date().setHours(0, 0, 0, 0))
             car.hasService = hasService
-            customer = subscription?.user
-        }
+            car.isValid = car?.cancel_date ? (car.cancel_date.setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0)) : true
 
-        if (customer) {
-            customer = await SubscriptionService.setStripeInfoToUser(customer)
-            subscription = customer.subscriptions.find(subscription => subscription.items.filter(item => item.cars.filter(itemCar => itemCar.id = car.id)))
+            // }
+
+            // if (customer) {
+            // customer = await SubscriptionService.setStripeInfoToUser(customer)
+            // subscription = customer.subscriptions.find(subscription => subscription.items.filter(item => item.cars.filter(itemCar => itemCar.id = car.id)))
             // TODO: use selected location 
             //Log this action.
             HistoryService.addHistory(`Validate Membership: ${carPlate}`, historyTypes.USER_ACTION, req.user, req?.user?.locations[0])

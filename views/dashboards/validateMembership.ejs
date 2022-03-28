@@ -152,6 +152,16 @@
     <%# include('../partials/dataTable.ejs', {tableID : '#users'}); %>
 
     <script>
+
+        $("#plateNumber").on({
+            keydown: function (e) {
+                if (e.which === 32)
+                    return false;
+            },
+            change: function () {
+                this.value = this.value.replace(/\s/g, "");
+            }
+        });
         // The socket is already define on navbar.
         socket.on('reading-plates', () => {
 

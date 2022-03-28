@@ -41,6 +41,14 @@
                         </b>
                         <%- car?.plate%>
                     </p>
+                    <% if(car?.cancel_date) { %>
+                    <p>
+                        <b>
+                            Valid until:
+                        </b>
+                        <%= moment(car?.cancel_date * 1000).isValid() ? moment(car?.cancel_date * 1000).format(shortDateFormat) : 'N/A' %>
+                    </p>
+                    <% } %>
                     <p>
                         <b>Product:</b>
                         <%- subscription?.data?.items.data[0].price?.product?.name%>
@@ -49,14 +57,14 @@
                         <b>
                             Current Period Start:
                         </b>
-                        <%= moment(subscription?.data?.current_period_start * 1000).isValid() ? moment(subscription?.data?.current_period_start * 1000).format(completeDateFormat) : 'N/A' %>
+                        <%= moment(subscription?.data?.current_period_start * 1000).isValid() ? moment(subscription?.data?.current_period_start * 1000).format(shortDateFormat) : 'N/A' %>
 
                     </p>
                     <p>
                         <b>
                             Current Period End Date:
                         </b>
-                        <%= moment(subscription?.data?.current_period_end * 1000).isValid() ? moment(subscription?.data?.current_period_end * 1000).format(completeDateFormat) : 'N/A' %>
+                        <%= moment(subscription?.data?.current_period_end * 1000).isValid() ? moment(subscription?.data?.current_period_end * 1000).format(shortDateFormat) : 'N/A' %>
 
                     </p>
 
@@ -65,7 +73,7 @@
                         <b>
                             Trial Expiration Date:
                         </b>
-                        <%= moment(subscription?.data?.trial_end * 1000).isValid() ? moment(subscription?.data?.trial_end * 1000).format(completeDateFormat) : 'N/A' %>
+                        <%= moment(subscription?.data?.trial_end * 1000).isValid() ? moment(subscription?.data?.trial_end * 1000).format(shortDateFormat) : 'N/A' %>
 
                     </p>
                     <% } %>
@@ -77,6 +85,16 @@
                         <i class="far fa-8x fa-times-circle invalid"></i>
 
                         <p class="alert alert-danger mt-2">This car has the maximum quantity of services per day.</p>
+                        <% }
+                         else if (car.isValid) { %>
+                        <i class="far fa-8x fa-times-circle invalid"></i>
+
+                        <p class="alert alert-danger mt-2">This car expired on
+                            <%= moment(car?.cancel_date * 1000).isValid() ? moment(car?.cancel_date * 1000).format(shortDateFormat) : 'N/A' %>.
+                            <br>
+                            Create another membership to use the service for this car.
+                        </p>
+
                         <% } else { %>
 
                         <h4 class="text-center">Membership Status</h4>
