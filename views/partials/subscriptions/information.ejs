@@ -48,7 +48,10 @@
                         <% if(item.isValid) { %>
                         <% for(car of item.cars) { %>
                         <li class="mt-0 mb-0 m-3">
-                            <%- car.brand %> - <%- car.model %> - <%- car.plate %>
+                            <a href="/car/<%= car.id%>">
+
+                                <%- car.brand%> - <%- car.model%> - <%- car.plate%>
+                            </a>
                             <% if(car?.cancel_date) { %>
                             <b>
                                 (Valid until:
@@ -64,7 +67,9 @@
                         <% if(item.cars.length < item.data.quantity) { %>
                         <% for(car of item.cars) { %>
                         <li class="mt-0 mb-0 m-3">
-                            <%- car.brand %> - <%- car.model %> - <%- car.plate %>
+                            <a href="/car/<%= car.id%>">
+                                <%- car.brand%> - <%- car.model%> - <%- car.plate%>
+                            </a>
                             <% if(car?.cancel_date) { %>
                             <b>
                                 (Valid until:
@@ -75,7 +80,7 @@
                         </li>
                         <% } %>
                         <li class="mt-0 mb-0 m-3">
-                            <a href="/cars/create?itemID=<%- item.id%>" id="add-car-button" class="btn btn-link p-0"
+                            <a href="/cars/create?itemID=<%- item.id%>" id="add-car-button" class="btn btn-warning p-2"
                                 style="margin: 0;" type="submit">
                                 Add Missing Car</a>
                         </li>
@@ -114,7 +119,7 @@
                             <button id="confirm-valid-cars-button-<%= item.id%>" class="btn btn-secondary"
                                 style="margin: 0;" type="submit" itemid="<%= item.id%>" disabled>
                                 Confirm cars for next period <span
-                                    id="selectedDisplay">(0/<%=  item.data.quantity %>)</span>
+                                    id="selectedDisplay-<%= item.id%>">(0/<%=  item.data.quantity %>)</span>
                             </button>
                         </form>
                         <% } %>
@@ -151,6 +156,7 @@
         var selectedCars = document.getElementById(`selectedCars-${itemid}`);
         var carsToRemove = document.getElementById(`carsToRemove-${itemid}`);
         var requiredQty = $(`#requiredQty-${itemid}`).val();
+        var selectedDisplay = $(`#selectedDisplay-${itemid}`)
 
 
 
@@ -167,7 +173,7 @@
 
         console.log('toRemove: ' + toRemove);
 
-        $('#selectedDisplay').html(`(${selected.length?.toString()}/${requiredQty?.toString()})`);
+        selectedDisplay.html(`(${selected.length?.toString()}/${requiredQty?.toString()})`);
 
         if (selected.length == requiredQty) {
             $(`#handle-valid-cars-form-${itemid} input:checkbox[type=checkbox]:not(:checked)`).each(function () {

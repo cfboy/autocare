@@ -2,27 +2,29 @@ const SubscriptionService = require('../collections/subscription')
 const { ROLES } = require('../collections/user/user.model')
 const alertTypes = require('../helpers/alertTypes')
 
-
-async function checkSubscriptions(req, res, next) {
-    console.debug('checkSubscriptions')
+async function validateSubscriptions(req, res, next) {
+    console.debug('validateSubscriptions')
     let user = await SubscriptionService.setStripeInfoToUser(req.user)
     let invalidSubs = user?.subscriptions.filter(subs => subs.items.some(item => !item.isValid))
+    req.session.invalidSubs = invalidSubs
+    return next()
+}
 
-    if (!user) {
-        req.session.message = 'ERROR setting the subscriptions information.'
-        re.session.alertType = alertTypes.ErrorAlert
-        return next()
-    }
-    else if (user?.subscriptions?.length < 1 && [ROLES.CUSTOMER].includes(user.role)) {
+async function redirectBySubscriptionStatus(req, res, next) {
+    console.debug('redirectBySubscriptionStatus')
+    let user = req.user
+    let invalidSubs = req.session.invalidSubs
+
+    if (user?.subscriptions?.length < 1 && [ROLES.CUSTOMER].includes(user.role)) {
         req.flash('warning', 'Create a subscription to continue.')
         res.redirect('/create-subscriptions')
     } else if (invalidSubs?.length > 0) {
-        req.session.invalidSubs = invalidSubs
         res.redirect('/handleInvalidSubscriptions')
     } else
         return next()
 }
 
 module.exports = {
-    checkSubscriptions
+    validateSubscriptions,
+    redirectBySubscriptionStatus
 }

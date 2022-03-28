@@ -86,6 +86,12 @@
                                                             </td>
                                                         </tr>
                                                         <tr>
+                                                            <td>Valid Until</td>
+                                                            <td>
+                                                                <%= moment(car?.cancel_date).isValid() ? moment(car?.cancel_date).format(shortDateFormat) : 'N/A' %>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
                                                             <td>Services (Qty.)</td>
                                                             <td>
                                                                 <%- car.services.length%>
