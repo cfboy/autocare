@@ -20,6 +20,12 @@ exports.home = async (req, res) => {
     })
 }
 
+exports.termsAndConditions = async (req, res) => {
+    let lang = res.lingua.locale
+
+    res.render('termsAndConditions.ejs', { lang })
+}
+
 /**
  * This function handle the dashboards of the different roles. 
  * @param {*} req 

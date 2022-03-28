@@ -37,6 +37,8 @@ router.get('/', checkAuthenticated, (req, res) => {
 
 router.get('/home', dashboardsController.home)
 
+router.get('/termsandconditions', dashboardsController.termsAndConditions)
+
 router.get('/account', checkAuthenticated, validateSubscriptions, redirectBySubscriptionStatus, dashboardsController.account)
 
 //------ Auth Routes ------
