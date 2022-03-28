@@ -5,6 +5,7 @@ const ServiceService = require('../collections/services')
 const { STATUS } = require('../connect/stripe');
 const HistoryService = require('../collections/history')
 const { historyTypes } = require('../collections/history/history.model')
+const Stripe = require('../connect/stripe')
 
 let readingObjs = {}
 let readingQueue = []

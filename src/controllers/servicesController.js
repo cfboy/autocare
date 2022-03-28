@@ -28,7 +28,7 @@ exports.services = async (req, res) => {
             if ([ROLES.ADMIN, ROLES.MANAGER].includes(user.role))
                 cars = await CarService.getCars()
             else
-                cars = await SubscriptionService.getAllCarsByUser(user)
+                cars = await CarService.getAllCarsByUser(user)
 
 
             let services = await ServiceService.getServicesByCars(cars)

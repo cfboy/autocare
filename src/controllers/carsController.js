@@ -1,6 +1,7 @@
 const SubscriptionService = require('../collections/subscription')
 const { ROLES } = require('../collections/user/user.model')
 const ServiceService = require('../collections/services')
+const UserService = require('../collections/user')
 const CarService = require('../collections/cars')
 const HistoryService = require('../collections/history')
 const { historyTypes } = require('../collections/history/history.model')
@@ -11,6 +12,7 @@ const { canDeleteCar,
     canEditCar,
     canAddCar
 } = require('../config/permissions')
+const userService = require('../collections/user/user.service')
 
 /**
  * This function render all cars of current user.
@@ -35,24 +37,16 @@ exports.cars = async (req, res) => {
         if (!user) {
             res.redirect('/')
         } else {
+            // Handle invalid Cars
+            let nullUserCars = await CarService.getCarsWithUserNull()
+            if (nullUserCars)
+                await CarService.handleCarsWithUserNull(nullUserCars)
+
             if ([ROLES.ADMIN, ROLES.MANAGER].includes(user.role)) {
                 cars = await CarService.getCars()
             } else {
-                let userCars = []
-                // TODO: move this to service.
-                for (customerSub of user.subscriptions) {
-                    // Iterates the items on DB subscription.
-                    for (customerItem of customerSub.items) {
-                        // then iterates cars in DB item.
-                        for (customerCar of customerItem.cars) {
-                            userCars.push(customerCar)
-                        }
-                    }
-                }
-                cars = await CarService.getCarsByList(userCars)
-
+                cars = await CarService.getAllCarsByUser(user)
             }
-
             cars = await ServiceService.setServicesToCars(cars)
 
             res.render('cars/index.ejs', {
@@ -123,8 +117,12 @@ exports.view = async (req, res) => {
 exports.create = async (req, res) => {
     let { message, alertType } = req.session
     // This values are filled if click Add Car Btn in a subscription item.
-    let { itemID } = req.query
+    let { itemID, userID } = req.query
     let user = req.user
+
+    if (userID) {
+        user = await UserService.getUserById(userID)
+    }
     // clear message y alertType
     req.session.message = ''
     req.session.alertType = ''
@@ -133,7 +131,7 @@ exports.create = async (req, res) => {
         let { allMakes, allModels } = await CarService.getAllMakes()
 
         let siToAddCar = []
-        let stripeItem
+        // let stripeItem
         user = await SubscriptionService.setStripeInfoToUser(user)
         for (subscription of user.subscriptions) {
             for (item of subscription.items) {
@@ -186,7 +184,7 @@ exports.save = async (req, res) => {
     try {
         console.log('Creating New Car: ', fields.brand)
 
-        let car = await CarService.addCar(fields.brand, fields.model, fields.plate)
+        let car = await CarService.addCar(fields.brand, fields.model, fields.plate, fields.userID)
 
         if (car) {
             console.debug(`A new car added to DB. ID: ${car.id}.`)

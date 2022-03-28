@@ -86,7 +86,7 @@ exports.webhook = async (req, res) => {
                             if (cars.length > 0) {
                                 for (carObj of cars) {
                                     if (subItem.price.id === carObj.priceID) {
-                                        let newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate)
+                                        let newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate, customer.id)
                                         newItem.cars.push(newCar)
                                     }
 
@@ -228,6 +228,7 @@ exports.completeCheckoutSuccess = async (req, res) => {
 
         if (!subscription) {
             subscription = await Stripe.getSubscriptionById(subscriptionID)
+            let customer = await UserService.getUserByBillingID(subscription.customer)
 
             const cars = JSON.parse(subscription.metadata.cars)
 
@@ -237,7 +238,7 @@ exports.completeCheckoutSuccess = async (req, res) => {
                 let newItem = { id: subItem.id, cars: [], data: subItem }
                 for (carObj of cars) {
                     if (subItem.price.id === carObj.priceID) {
-                        let newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate)
+                        let newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate, customer.id)
                         newItem.cars.push(newCar)
                     }
 
@@ -245,7 +246,6 @@ exports.completeCheckoutSuccess = async (req, res) => {
                 items.push(newItem)
             }
 
-            let customer = await UserService.getUserByBillingID(subscription.customer)
 
             newSubscription = await SubscriptionService.addSubscription({ id: subscription.id, data: subscription, items: items, user: customer })
         } else {

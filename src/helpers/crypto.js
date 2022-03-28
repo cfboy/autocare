@@ -1,7 +1,7 @@
+// @DEPRECATED
 // crypto module
 var Crypto = require('crypto');
 
-// TODO: move to another location
 var secret_key = 'fd85b494-aaa'
 var secret_iv = 'smslt';
 var encryptionMethod = "aes-256-cbc";

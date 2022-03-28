@@ -1,4 +1,5 @@
 const ServiceService = require('../collections/services')
+const UserService = require('../collections/user')
 const SubscriptionService = require('../collections/subscription')
 const { canDeleteCar,
     canEditCar,
@@ -42,7 +43,15 @@ async function authDeleteCar(req, res, next) {
 
 async function authAddCar(req, res, next) {
 
-    let user = await SubscriptionService.setStripeInfoToUser(req.user)
+    let user = req.user
+
+    if (req.query?.userID) { // This is come from GET route.
+        user = await UserService.getUserById(req.query?.userID)
+    } else if (req.body.userID) { // This is come from POST rout.
+        user = await UserService.getUserById(req.body.userID)
+    }
+
+    user = await SubscriptionService.setStripeInfoToUser(user)
 
     if (canAddCar(user)) {
         return next()

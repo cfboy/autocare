@@ -22,7 +22,6 @@ const addService = (Service) => async (car, authorizedBy, location, user, produc
 
         let properties = {
             // id is a random ID genetated with letters and numbers. 
-            // TODO: change the id.
             id: serviceID,
             // date: Date.now(),
             location: location,
@@ -200,10 +199,10 @@ const setServicesToCars = (Service) => async (cars) => {
         .populate({ path: 'car', model: 'car' })
         .then(result => {
             if (result.length > 0) {
-                console.debug(`getServicesByCars(): Successfully found ${result.length} documents.`);
+                console.debug(`SERVICE-SERVICE: getServicesByCars(): Successfully found ${result.length} services.`);
                 return result
             } else {
-                console.debug("getServicesByCars(): No document matches the provided query.");
+                console.debug("SERVICE-SERVICE: getServicesByCars(): No services found for this cars.");
             }
         })
         .catch(err => console.error(`Failed to find document: ${err}`));

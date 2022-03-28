@@ -1,7 +1,7 @@
 //Use node-fetch to call externals API. 
 //Use v2.0 to use the module in code (for versions prior to version):
 const fetch = require('node-fetch');
-
+const SubscriptionService = require('../subscription')
 
 /**
  * This function get all cars from the db.
@@ -17,6 +17,38 @@ const getCars = (Car) => async () => {
             console.debug("CAR-SERVICE: Found Cars: ", docs.length);
         }
     })
+}
+
+const getCarsWithUserNull = (Car) => async () => {
+    return Car.find({ user_id: { $eq: null } }, function (err, docs) {
+        if (err) {
+            console.error(err)
+        } else {
+            console.debug("CAR-SERVICE: Found Cars with user null: ", docs.length);
+        }
+    })
+}
+
+/**
+ * This function get all cars from the db.
+ * 
+ * @param {} Car 
+ * @returns Car list
+ */
+async function handleCarsWithUserNull(carsWithNull) {
+    if (carsWithNull) {
+        for (carObj of carsWithNull) {
+            let subscription = await SubscriptionService.getSubscriptionByCar(carObj)
+            // if (!carObj.user_id || carObj.user_id !== subscription.user.id) {
+            if (subscription) {
+                let updatedCar = await this.updateCar(carObj.id, { user_id: subscription.user.id })
+                console.debug('Updated Car: ' + updatedCar.brand)
+            }else{
+                console.debug('This Car not have subscription.')
+            }
+            // }
+        }
+    }
 }
 
 /**
@@ -55,7 +87,7 @@ const getCarByID = (Car) => async (carID) => {
  * @param {brand, model, plate} Car 
  * @returns car object
  */
-const addCar = (Car) => async (brand, model, plate) => {
+const addCar = (Car) => async (brand, model, plate, user_id) => {
     // TODO: change this to find first then create new car.
     try {
         if (!brand || !model || !plate) {
@@ -67,7 +99,8 @@ const addCar = (Car) => async (brand, model, plate) => {
         const car = new Car({
             brand,
             model,
-            plate
+            plate,
+            user_id
         })
 
         return await car.save()
@@ -137,25 +170,15 @@ const getCarByPlate = (Car) => async (plate) => {
  * @returns car list
  */
 // TODO: to optimize this method need to add a userID on car schema.
-async function getAllCarsByUser(user) {
+const getAllCarsByUser = (Car) => async (user) => {
     console.debug("getAllCarsByUser()...")
-
-    let userCars = []
-    // TODO: move this to service.
-    for (customerSub of user?.subscriptions) {
-        // Iterates the items on DB subscription.
-        for (customerItem of customerSub?.items) {
-            // then iterates cars in DB item.
-            for (car of customerItem?.cars) {
-                userCars.push(car)
-            }
+    return Car.find({ user_id: user.id }, function (err, docs) {
+        if (err) {
+            console.error(err)
+        } else {
+            console.debug(`CAR-SERVICE: Found Cars ${docs.length} By user: ${user.email}`);
         }
-    }
-
-    // Get cars to populate all infromation.
-    userCars = await this.getCarsByList(userCars)
-
-    return userCars
+    })
 }
 
 
@@ -192,6 +215,7 @@ async function getAllMakes() {
 module.exports = (Car) => {
     return {
         getCars: getCars(Car),
+        getCarsWithUserNull: getCarsWithUserNull(Car),
         getCarsByList: getCarsByList(Car),
         getCarByID: getCarByID(Car),
         addCar: addCar(Car),
@@ -199,6 +223,7 @@ module.exports = (Car) => {
         deleteCar: deleteCar(Car),
         getCarByPlate: getCarByPlate(Car),
         getAllMakes: getAllMakes,
-        getAllCarsByUser: getAllCarsByUser,
+        getAllCarsByUser: getAllCarsByUser(Car),
+        handleCarsWithUserNull: handleCarsWithUserNull
     }
 }

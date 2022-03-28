@@ -177,39 +177,6 @@ const getSubscriptionItemByCar = (Subscription) => async (car) => {
         .catch(err => console.error(`Failed to find document: ${err}`));
 }
 
-/**
- * This function get all cars on subcription by user.
- * @param {*} Subscription 
- * @returns Subscription
- */
-const getAllCarsByUser = (Subscription) => async (user) => {
-    console.log(`getAllCarsByUser() by ID: ${user.email}`)
-
-    let subscriptions = await Subscription.find({
-        user: user, function(err, docs) {
-            if (err) {
-                console.error(err)
-            } else {
-                console.debug("Subscription-SERVICE: Found subscriptions: ", docs);
-            }
-        }
-    }).populate('user')
-        .populate({ path: 'items.cars', model: 'car' })
-
-    let cars = []
-
-    for (subscription of subscriptions) {
-        for (item of subscription.items) {
-            for (car of item.cars) {
-                cars.push(car)
-            }
-        }
-    }
-
-    console.debug(`Found ${cars.length} cars.`)
-
-    return cars
-}
 
 const getUserByCar = (Subscription) => async (car) => {
     console.debug(`getUserByCar() by ID: ${car.id}`)
@@ -254,16 +221,10 @@ async function setStripeInfoToUser(customerObj) {
 
             if (customer.subscriptions.length > 0) {
                 customer.hasSubscription = true
-                // TODO: Remove if its not necessary
                 for (subscription of customer.subscriptions) {
-                    // subscription.data = await getSubscriptionById(subscription.id)
-                    // if (subscription.data) {
-                    // TODO: Optimize this logic.
-                    // this for loop iterates: Stripe info.
                     for (item of subscription.items) {
                         item.isValid = await validateItemQty(item)
                     }
-                    // }
                 }
             }
 
@@ -346,7 +307,6 @@ module.exports = (Subscription) => {
         getSubscriptionById: getSubscriptionById(Subscription),
         getSubscriptionByCar: getSubscriptionByCar(Subscription),
         getSubscriptionItemByCar: getSubscriptionItemByCar(Subscription),
-        getAllCarsByUser: getAllCarsByUser(Subscription),
         getUserByCar: getUserByCar(Subscription),
         setStripeInfoToUser: setStripeInfoToUser,
         validateItemQty: validateItemQty
