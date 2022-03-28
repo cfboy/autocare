@@ -39,7 +39,7 @@ exports.cars = async (req, res) => {
         } else {
             // Handle invalid Cars
             let nullUserCars = await CarService.getCarsWithUserNull()
-            if (nullUserCars)
+            if (nullUserCars.length > 0)
                 await CarService.handleCarsWithUserNull(nullUserCars)
 
             if ([ROLES.ADMIN, ROLES.MANAGER].includes(user.role)) {

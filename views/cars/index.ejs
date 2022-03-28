@@ -81,6 +81,17 @@
                                                             <td>
                                                                 <a class="btn-link"
                                                                     href="/car/<%- car.id%>"><%- car.brand%></a>
+                                                                <% if(car?.cancel_date) { %>
+                                                                <br>
+                                                                <p class="mt-1">
+                                                                    <small>
+
+                                                                        (Valid Until:
+                                                                        <%= moment(car?.cancel_date).isValid() ? moment(car?.cancel_date).format(shortDateFormat) : 'N/A' %>)
+
+                                                                    </small>
+                                                                </p>
+                                                                <% } %>
                                                             </td>
 
                                                             <td><%- car.model%></td>
@@ -90,7 +101,6 @@
                                                                 <%= moment(car?.created_date).isValid() ? moment(car?.created_date).format(completeDateFormat) : 'N/A' %>
 
                                                             </td>
-
                                                             <td>
                                                                 <% let hasServices = car?.services?.length > 0 %>
 
