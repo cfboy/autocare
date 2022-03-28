@@ -52,6 +52,8 @@ function findModel(makeName, carModel = null) {
 }
 
 $('#carPlate').on('input', function () {
+    this.setCustomValidity("");
+
     var c = this.selectionStart,
         r = /[^a-z0-9]/gi,
         v = $(this).val();
