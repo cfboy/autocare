@@ -31161,7 +31161,7 @@ div.tagsinput span.tag a {
 
 .navbar .navbar-brand-wrapper .navbar-brand img {
     max-width: 100%;
-    height: 34px;
+    /* height: 34px; */
     margin: auto;
     vertical-align: middle;
 }
@@ -31274,7 +31274,7 @@ div.tagsinput span.tag a {
 
 @media (max-width: 991px) {
     .navbar .navbar-menu-wrapper .navbar-toggler.navbar-toggler-right {
-        padding-left: 15px;
+        padding-left: 10px;
         padding-right: 0;
     }
     .navbar .navbar-menu-wrapper .navbar-toggler.navbar-toggler-right:focus {
@@ -31309,8 +31309,8 @@ div.tagsinput span.tag a {
 
 @media (max-width: 767px) {
     .navbar .navbar-menu-wrapper .navbar-nav .nav-item .nav-link {
-        margin-left: 0.5rem;
-        margin-right: 0.5rem;
+        margin-left: 0.1rem;
+        margin-right: 0.1rem;
     }
 }
 
@@ -31579,6 +31579,12 @@ div.tagsinput span.tag a {
 
 .navbar .navbar-menu-wrapper .navbar-nav .nav-item.dropdown .navbar-dropdown .dropdown-item .badge {
     margin-left: 2.5rem;
+    /* margin-left: 1rem; */
+}
+@media (max-width: 320px) {
+    .navbar .navbar-menu-wrapper .navbar-nav .nav-item.dropdown .navbar-dropdown .dropdown-item .badge {
+        margin-left: 0.5rem;
+    }
 }
 
 .navbar .navbar-menu-wrapper .navbar-nav .nav-item.dropdown .navbar-dropdown .dropdown-item .ellipsis {

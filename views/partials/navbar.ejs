@@ -7,7 +7,8 @@
     <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-start">
         <div class="me-3">
             <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-bs-toggle="minimize">
-                <span class="icon-menu"></span>
+                <!-- <span class="icon-menu"></span> -->
+                <i class="fa-solid fa-bars"></i>
             </button>
         </div>
         <div>
@@ -69,9 +70,10 @@
                     </a>
                 </div>
             </li>
-            <li class="nav-item d-none d-lg-block">
+            <li class="nav-item">
                 <a class="nav-link" href="/create-subscriptions" aria-expanded="false" title="Add Membership">
                     <i class="fa-solid fa-cart-plus text-primary"></i>
+                    <!-- TODO: implement cart qty -->
                     <!-- <i class="fa-solid fa-list"></i> -->
                 </a>
             </li>
@@ -136,8 +138,8 @@
                         <i class="dropdown-item-icon far fa-user text-primary me-2"></i> My Profile
                         <!-- <span class="badge badge-pill badge-danger">1</span> -->
                     </a>
-                    <a id="manage-billing-button" class="dropdown-item manage-billing-button"
-                        style="margin: 0;" type="submit" value="<%- user.billingID%>" email="<%- user.email%>">
+                    <a id="manage-billing-button" class="dropdown-item manage-billing-button" style="margin: 0;"
+                        type="submit" value="<%- user.billingID%>" email="<%- user.email%>">
                         <i class="dropdown-item-icon fab fa-stripe-s  text-primary me-2"></i> Manage Billing</a>
                     <!-- <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-message-text-outline text-primary me-2"></i> Messages</a> -->
                     <a class="dropdown-item" href="/activity">
@@ -160,7 +162,8 @@
         </ul>
         <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button"
             data-bs-toggle="offcanvas">
-            <span class="mdi mdi-menu"></span>
+            <i class="fa-solid fa-bars"></i>
+            <!-- <span class="mdi mdi-menu"></span> -->
         </button>
     </div>
 </nav>

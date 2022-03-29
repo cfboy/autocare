@@ -213,6 +213,8 @@ exports.completeCheckoutSuccess = async (req, res) => {
         let { session_id, subscription_id } = req.query,
             session, subscriptionID
 
+        // clean cart items.
+        req.session.cart = []
         if (session_id) {
             console.debug("sessionID: " + session_id)
             session = await Stripe.getSessionByID(session_id)

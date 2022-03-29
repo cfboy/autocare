@@ -17,7 +17,7 @@ let readingQueue = []
  */
 exports.createSubscriptions = async (req, res) => {
     try {
-        let { message, alertType } = req.session
+        let { message, alertType, cart } = req.session
         // clear message y alertType
         req.session.message = ''
         req.session.alertType = ''
@@ -27,7 +27,7 @@ exports.createSubscriptions = async (req, res) => {
 
         const prices = await Stripe.getAllPrices()
 
-        res.render('auth/createSubs.ejs', { message, alertType, user, allMakes, allModels, prices })
+        res.render('auth/createSubs.ejs', { cart, message, alertType, user, allMakes, allModels, prices })
     }
     catch (error) {
         console.error(error)
@@ -37,6 +37,14 @@ exports.createSubscriptions = async (req, res) => {
     }
 }
 
+exports.removeFromCart = async (req, res) => {
+
+    let itemToRemove = req.body.item
+
+    req.session.cart = req.session.cart.filter(item => item.id != itemToRemove.id)
+
+    res.send({ itemRemoved: true, subscriptionList: req.session.cart })
+}
 /**
  * This function render the validateMembership template. 
  * @param {*} req 
