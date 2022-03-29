@@ -48,7 +48,7 @@
                     <ul class="mb-0">
                         <% if(item.isValid) { %>
                         <% for(car of item.cars) { %>
-                        <li class="mt-0 mb-0 m-3">
+                        <li class="mt-1 mb-1 m-3">
                             <a href="/car/<%= car.id%>">
 
                                 <%- car.brand%> - <%- car.model%> - <%- car.plate%>
@@ -67,7 +67,7 @@
                         <!-- If the length of cars is less than item quantity, then show add car btn. -->
                         <% if(item.cars.length < item.data.quantity) { %>
                         <% for(car of item.cars) { %>
-                        <li class="mt-0 mb-0 m-3">
+                        <li class="mt-1 mb-1 m-3">
                             <a href="/car/<%= car.id%>">
                                 <%- car.brand%> - <%- car.model%> - <%- car.plate%>
                             </a>
@@ -80,11 +80,13 @@
                             <% } %>
                         </li>
                         <% } %>
-                        <li class="mt-0 mb-0 m-3">
+                        <% for(let i=0; i < (item.data.quantity-item.cars.length); i++) { %>
+                        <li class="mt-1 mb-1 m-3">
                             <a href="/cars/create?itemID=<%- item.id%>&userID=<%- customer.id%>" id="add-car-button"
                                 class="btn btn-warning p-2" style="margin: 0;" type="submit">
                                 Add Missing Car</a>
                         </li>
+                        <% } %>
                         <% } else if(item.cars.length > item.data.quantity) { %>
 
                         <form id="handle-valid-cars-form-<%= item.id%>" action="/confirmValidCars" method="post">
