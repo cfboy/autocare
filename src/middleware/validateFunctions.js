@@ -16,7 +16,7 @@ async function redirectBySubscriptionStatus(req, res, next) {
     let invalidSubs = req.session.invalidSubs
 
     if (user?.subscriptions?.length < 1 && [ROLES.CUSTOMER].includes(user.role)) {
-        req.flash('warning', 'Create a subscription to continue.')
+        req.flash('warning', 'Create a membership to continue.')
         res.redirect('/create-subscriptions')
     } else if (invalidSubs?.length > 0) {
         res.redirect('/handleInvalidSubscriptions')
