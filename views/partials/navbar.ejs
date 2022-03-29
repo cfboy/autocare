@@ -176,6 +176,27 @@
     window.onload = function () {
         //YOUR JQUERY CODE
         manageLangDropdown();
+
+        const manageBillingButton = $('.manage-billing-button');
+        manageBillingButton.click(function () {
+            const billingID = $(this).attr("value");
+            const email = $(this).attr("email");
+            const requestOptions = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    email: email
+                },
+                body: JSON.stringify({
+                    customer: billingID
+                })
+            }
+
+            fetch('/billing', requestOptions)
+                .then((response) => response.json())
+                .then((result) => window.location.replace(result.url))
+                .catch((error) => console.log('error', error))
+        })
     };
 
     var readFlag = false;

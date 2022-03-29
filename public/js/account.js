@@ -2,29 +2,29 @@ $(document).ready(function () {
     const publishableKey = 'pk_test_51JbqswL5YqSpFl3KswbblP5qXQFWDBV6sNxKnsqfP1Sckl8KaXzpKfAL6aErdRj7M2kp6E3igZVFjrY79ywN9ewT00Rcp2wiCp'
     const stripe = Stripe(publishableKey)
     // const checkoutButton = $('#checkout-button') //Old checkout btn TODO: delete
-    const manageBillingButton = $('.manage-billing-button')
+    // const manageBillingButton = $('.manage-billing-button')
     const useServiceButton = $('#use-service-button')
     const checkoutBtn = $('#checkout-btn'); //New checkout btn
 
-    manageBillingButton.click(function () {
-        const billingID = $(this).attr("value");
-        const email = $(this).attr("email");
-        const requestOptions = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                email: email
-            },
-            body: JSON.stringify({
-                customer: billingID
-            })
-        }
+    // manageBillingButton.click(function () {
+    //     const billingID = $(this).attr("value");
+    //     const email = $(this).attr("email");
+    //     const requestOptions = {
+    //         method: 'POST',
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //             email: email
+    //         },
+    //         body: JSON.stringify({
+    //             customer: billingID
+    //         })
+    //     }
 
-        fetch('/billing', requestOptions)
-            .then((response) => response.json())
-            .then((result) => window.location.replace(result.url))
-            .catch((error) => console.log('error', error))
-    })
+    //     fetch('/billing', requestOptions)
+    //         .then((response) => response.json())
+    //         .then((result) => window.location.replace(result.url))
+    //         .catch((error) => console.log('error', error))
+    // })
 
     useServiceButton.click(function (event) {
         event.preventDefault();
