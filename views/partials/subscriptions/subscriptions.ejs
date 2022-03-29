@@ -30,21 +30,7 @@
 
                         <% } else { %>
                         <!-- Loop of subscriptions -->
-                        <!-- <div class="d-sm-flex justify-content-between align-items-start"> -->
-                            <!-- <div>
-                                <h4 class="card-title card-title-dash">Subscriptions</h4>
-                            </div> -->
-
-                        <!-- </div> -->
-                        <!-- <br> -->
                         <%- include('./information.ejs' , {templateTitle: "Memberships", subscriptions, showManageBtn : false, customer : user, showCreateBtn: true}); %>
-                        <p class="mt-4 text-muted">
-                            Not happy with your current plan? Cancel or Upgrade by clicking the
-                            button below.
-                        </p>
-                        <button class="btn btn-primary btn-lg text-white mb-0 me-0 manage-billing-button"
-                            id="manage-billing-button" type="submit" value="<%- user.billingID%>"
-                            email="<%- user.email%>">Manage Billing</button>
                         <% } %>
                     </div>
                 </div>

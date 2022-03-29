@@ -115,12 +115,14 @@
                         <div class="mt-3 mb-3">
                             <% var subscriptionOnValidPeriod = moment(new Date()).isBefore(subscription?.data?.current_period_end * 1000)%>
                             <% if(subscriptionOnValidPeriod) { %>
+                                <% if([roles.ADMIN].includes(user.role)) { %>
                             <button
                                 class="btn btn-block btn-primary btn-lg font-weight-medium btn-icon-text manage-billing-button m-1"
                                 type="submit" value="<%- customer.billingID%>" email="<%- customer.email%>">
                                 Manage Billing
                                 <i class="fab fa-stripe-s btn-icon-apepend"></i>
                             </button>
+                            <% } %>
                             <% if(!car?.hasService) { %>
                             <button id="use-service-button" user-id="<%= customer?.id%>" car-id="<%= car?.id%>"
                                 inputType="<%= inputType%>"

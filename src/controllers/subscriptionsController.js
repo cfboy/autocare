@@ -69,7 +69,8 @@ exports.validate = async (req, res) => {
         // TODO: handle multiple cars with the same plate
         let carPlate = req.body.plateNumber,
             inputType = req.body.inputType,
-            car = await CarService.getCarByPlate(carPlate)
+            car = await CarService.getCarByPlate(carPlate),
+            user = req.user
 
         let customer, subscription, services, hasService
 
@@ -89,6 +90,7 @@ exports.validate = async (req, res) => {
         readingQueue = readingQueue.filter(item => carPlate !== item.plate)
 
         res.render('ajaxSnippets/validationResult.ejs', {
+            user,
             customer,
             inputType,
             car,

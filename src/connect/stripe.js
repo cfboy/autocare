@@ -25,9 +25,20 @@ const createCheckoutSession = async (customerID, subscriptions, subscriptionsEnt
         // The first position [0] has the priceID (divided by groups)
         // The second position [1] has the list of cars per priceID.
         for (sub of subscriptionsEntries) {
-            items.push({ price: sub[0], quantity: sub[1].length })
+            items.push({
+                price: sub[0], quantity: sub[1].length
+            })
         }
     }
+
+    const taxes = await Stripe.taxRates.list({
+        active: true
+    });
+
+    let defaultTaxes = []
+    if (taxes.data.length > 0)
+        defaultTaxes = taxes?.data?.map(({ id }) => (id));
+
 
     const session = await Stripe.checkout.sessions.create({
         mode: 'subscription',
@@ -37,7 +48,9 @@ const createCheckoutSession = async (customerID, subscriptions, subscriptionsEnt
         subscription_data: {
             metadata: {
                 cars: JSON.stringify(cars_price)
-            }
+            },
+            default_tax_rates: defaultTaxes,
+
         },
         success_url: `${process.env.DOMAIN}/completeCheckoutSuccess?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${process.env.DOMAIN}`
