@@ -5,7 +5,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Stripe Charges </title>
+    <title><%= lingua.stripeCharges%></title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="../vendors/feather/feather.css">
     <link rel="stylesheet" href="../vendors/mdi/css/materialdesignicons.min.css">
@@ -45,7 +45,7 @@
                                         <div class="card-body">
                                             <div class="d-sm-flex justify-content-between align-items-start">
                                                 <div>
-                                                    <h4 class="card-title card-title-dash">Events</h4>
+                                                    <h4 class="card-title card-title-dash"><%= lingua.events%></h4>
                                                 </div>
                                                 <!-- <div>
                                                             <a href="/create-user" class="btn btn-primary btn-icon-text" type="button"><i class="mdi mdi-map-marker-plus btn-icon-prepend"></i>Add User</a>
@@ -58,11 +58,11 @@
                                                         <tr>
                                                             <!-- <th>ID</th> -->
                                                             <th>Description</th>
-                                                            <th>User</th>
-                                                            <th>Phone Number</th>
-                                                            <th>Amount</th>
-                                                            <th>Date</th>
-                                                            <th>Status</th>
+                                                            <th><%= lingua.user.name%></th>
+                                                            <th><%= lingua.user.phoneNumber%></th>
+                                                            <th><%= lingua.amount%></th>
+                                                            <th><%= lingua.date%></th>
+                                                            <th><%= lingua.membership.status%></th>
                                                             <!-- <th>Action</th> -->
                                                         </tr>
                                                     </thead>

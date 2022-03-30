@@ -5,7 +5,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>View Location </title>
+    <title><%= lingua.location.view%></title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="../vendors/feather/feather.css">
     <link rel="stylesheet" href="../vendors/mdi/css/materialdesignicons.min.css">
@@ -48,32 +48,36 @@
                                                     <a href="/edit-location/<%- location.id%>?url=/view-location"
                                                         data-id="location" type="button"
                                                         class="btn btn-primary btn-icon-text">
-                                                        <i class=" mdi mdi-square-edit-outline"></i> Edit
+                                                        <i class=" mdi mdi-square-edit-outline"></i> <%= lingua.edit%>
                                                     </a>
                                                 </div>
                                                 <table class="table table-hover">
                                                     <thead>
                                                         <tr>
-                                                            <th>Location Datails</th>
+                                                            <th><%= lingua.location.details%></th>
                                                             <th></th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         <tr>
-                                                            <td>Name</td>
+                                                            <td><%= lingua.name%></td>
                                                             <td>
                                                                 <%- location.name%>
                                                             </td>
                                                         </tr>
 
                                                         <tr>
-                                                            <td>Active</td>
+                                                            <td><%= lingua.active%></td>
                                                             <td>
-                                                                <%- location.isActive ? "Yes" : "No"%>
+                                                                <% if(location.isActive) { %>
+                                                                <%= lingua.yes%>
+                                                                <% } else { %>
+                                                                <%= lingua.no%>
+                                                                <% } %>
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td>Services</td>
+                                                            <td><%= lingua.services%></td>
                                                             <td>
                                                                 <% if(location.services.length > 0){ %>
                                                                 <ul>
@@ -89,7 +93,7 @@
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td>Users</td>
+                                                            <td><%= lingua.user.name%></td>
                                                             <td>
                                                                 <% if(location?.users?.length > 0){ %>
                                                                 <ul>

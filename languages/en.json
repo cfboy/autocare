@@ -7,7 +7,7 @@
     "login": "Login",
     "signOut": "Sing Out",
     "register": "Register",
-    "pricingList" : "Pricing List",
+    "pricingList": "Pricing List",
     "dontHaveAccount": "Don't have an account?",
     "create": "Create",
     "createAccount": "Create Account",
@@ -44,6 +44,7 @@
         "edit": "Edit User",
         "add": "Add User",
         "create": "Create User",
+        "selectMultiple": "Select Users",
         "myProfile": "My Profile",
         "info": "Customer Information",
         "personalInfo": "Personal Information",
@@ -111,7 +112,11 @@
     },
     "location": {
         "name": "Location",
-        "all": "Locations"
+        "all": "Locations",
+        "add": "Add Location",
+        "edit": "Edit Location",
+        "view": "View Location",
+        "details": "Location Details"
     },
     "validation": {
         "missingCredentials": "Missing email or password",
@@ -126,6 +131,10 @@
     "notifications": "Notifications",
     "newNotifications": "You have {qty} new notifications",
     "myNotifications": "My Notifications",
+    "stripeCharges": "Stripe Carges",
+    "invoices": "Invoices",
+    "invoiceNumber": "Invoice Number",
+    "events": "Events",
     "date": "Date",
     "action": "Action",
     "quantity": "Quantity",
@@ -147,16 +156,30 @@
     "content": {
         "description": "A little description."
     },
+    "amount": "Amount",
+    "type": "Type",
+    "description": "Description",
     "inputBy": "Input By",
     "viewAll": "View All",
     "activity": "Activity",
+    "viewActivity": "View Activity",
+    "myActivity": "My Activity",
     "customers": "Customers",
     "dashboard": "Dashboard",
     "myPlans": "My Plans",
     "history": "History",
+    "historyInfo": "History Information",
     "reports": "Reports",
     "validate": "Validate",
     "done": "Done",
     "myCart": "My Cart",
-    "createdDate": "Created Date"
+    "createdDate": "Created Date",
+    "dueDate": "Due Date",
+    "name": "Name",
+    "services": "Services",
+    "selectServices": "Select Services",
+    "active": "Active",
+    "yes": "Yes",
+    "no": "No",
+    "edit": "Edit"
 }

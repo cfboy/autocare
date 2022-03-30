@@ -5,7 +5,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Stripe Invoices</title>
+    <title><%= lingua.invoices%></title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="../vendors/feather/feather.css">
     <link rel="stylesheet" href="../vendors/mdi/css/materialdesignicons.min.css">
@@ -45,23 +45,24 @@
                                         <div class="card-body">
                                             <div class="d-sm-flex justify-content-between align-items-start">
                                                 <div>
-                                                    <h4 class="card-title card-title-dash">Invoices</h4>
+                                                    <h4 class="card-title card-title-dash"><%= lingua.invoices%>
+                                                    </h4>
                                                 </div>
 
                                             </div>
                                             <br>
                                             <div class="table-responsive  mt-1">
-                                                <table id="history" class="table table-hover stripe">
+                                                <table id="invoice" class="table table-hover stripe">
                                                     <thead>
                                                         <tr>
                                                             <!-- <th>ID</th> -->
-                                                            <th>Amount</th>
-                                                            <th>Invoice Number</th>
-                                                            <th>Email</th>
-                                                            <th>Phone Number</th>
-                                                            <th>Due</th>
-                                                            <th>Created</th>
-                                                            <th>Status</th>
+                                                            <th><%= lingua.amount%></th>
+                                                            <th><%= lingua.invoiceNumber%></th>
+                                                            <th><%= lingua.user.email%></th>
+                                                            <th><%= lingua.user.phoneNumber%></th>
+                                                            <th><%= lingua.dueDate%></th>
+                                                            <th><%= lingua.createdDate%></th>
+                                                            <th><%= lingua.membership.status%></th>
                                                             <!-- <th>Action</th> -->
                                                         </tr>
                                                     </thead>
@@ -160,7 +161,7 @@
 
     <!-- Alerts Code -->
     <%- include('../partials/alerts.ejs', {message, alertType}); %>
-    <%- include('../partials/dataTable.ejs', {tableID : '#history', dateColumn : 3}); %>
+    <%- include('../partials/dataTable.ejs', {tableID : '#invoice', dateColumn : 3}); %>
 </body>
 
 </html>

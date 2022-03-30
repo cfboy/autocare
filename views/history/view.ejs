@@ -5,7 +5,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>View Activity </title>
+    <title><%= lingua.viewActivity%></title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="../vendors/feather/feather.css">
     <link rel="stylesheet" href="../vendors/mdi/css/materialdesignicons.min.css">
@@ -42,9 +42,9 @@
                 <div class="content-wrapper">
                     <h4>
                         <% if(isMyActivity) { %>
-                        My Activity
+                        <%= lingua.myActivity%>
                         <% } else { %>
-                        History
+                        <%= lingua.history%>
                         <% } %>
                     </h4>
                     <% if(history) { %>
@@ -58,31 +58,31 @@
                                                 <table class="table table-hover">
                                                     <thead>
                                                         <tr>
-                                                            <th>History Information</th>
+                                                            <th><%= lingua.historyInfo%></th>
                                                             <th></th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         <tr>
-                                                            <td>Description</td>
+                                                            <td><%= lingua.description%></td>
                                                             <td>
                                                                 <%- history.description%>
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td>Type</td>
+                                                            <td><%= lingua.type%></td>
                                                             <td>
                                                                 <%- history.type%>
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td>Date</td>
+                                                            <td><%= lingua.date%></td>
                                                             <td>
                                                                 <%= moment(history?.created_date).isValid() ? moment(history?.created_date).format(completeDateFormat) : 'N/A' %>
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td>User</td>
+                                                            <td><%= lingua.user.name%></td>
                                                             <td>
                                                                 <%- history.user.personalInfo.firstName + ' ' + history.user.personalInfo.lastName %>
                                                                 <br>
@@ -92,7 +92,7 @@
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td>Location</td>
+                                                            <td><%= lingua.location.name%></td>
                                                             <td>
                                                                 <%- history?.location?.name ?  history?.location?.name  : 'N/A'%>
                                                             </td>

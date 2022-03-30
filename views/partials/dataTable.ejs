@@ -6,6 +6,7 @@
     $(document).ready(function () {
     
     $('<%= tableID %>').DataTable({
+        // TODO: implement multiple date columns support.
         <% if (typeof dateColumn == 'number') { %>
             columnDefs: [
 

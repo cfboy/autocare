@@ -5,7 +5,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Locations </title>
+    <title><%= lingua.location.all%></title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="../vendors/feather/feather.css">
     <link rel="stylesheet" href="../vendors/mdi/css/materialdesignicons.min.css">
@@ -51,13 +51,13 @@
                                         <div class="card-body">
                                             <div class="d-sm-flex justify-content-between align-items-start">
                                                 <div>
-                                                    <h4 class="card-title card-title-dash">Locations</h4>
+                                                    <h4 class="card-title card-title-dash"><%= lingua.location.all%>
+                                                    </h4>
                                                 </div>
                                                 <div>
                                                     <a href="/create-location" class="btn btn-primary btn-icon-text"
                                                         type="button"><i
-                                                            class="mdi mdi-map-marker-plus btn-icon-prepend"></i>Add
-                                                        location</a>
+                                                            class="mdi mdi-map-marker-plus btn-icon-prepend"></i><%= lingua.location.add%></a>
                                                 </div>
                                             </div>
                                             <br>
@@ -66,9 +66,9 @@
                                                 <table id="locations" class="table table-hover stripe">
                                                     <thead>
                                                         <tr>
-                                                            <th>Name</th>
-                                                            <th>Active</th>
-                                                            <th>Action</th>
+                                                            <th><%= lingua.name%></th>
+                                                            <th><%= lingua.active%></th>
+                                                            <th><%= lingua.action%></th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -81,7 +81,11 @@
                                                                 </a>
                                                             </td>
                                                             <td>
-                                                                <%- location.isActive ? "Yes" : "No" %>
+                                                                <% if(location.isActive) { %>
+                                                                <%= lingua.yes%>
+                                                                <% } else { %>
+                                                                <%= lingua.no%>
+                                                                <% } %>
 
                                                             </td>
                                                             <td>

@@ -1,8 +1,13 @@
 //If add more cases of alerts, please keep updated AlertTypes on /src/helpers/alertTypes.js 
-function sweetAlerts(AlertTypes, type, message) {
+function sweetAlerts(AlertTypes, type, message, lingua) {
     if (AlertTypes) {
         AlertTypes = JSON.parse(AlertTypes)
     }
+
+    if (lingua) {
+        lingua = JSON.parse(lingua)
+    }
+
     switch (type) {
         case AlertTypes.BasicAlert:
             basicAlert(message);
@@ -17,7 +22,7 @@ function sweetAlerts(AlertTypes, type, message) {
             completedActionAlert(message);
             break;
         case AlertTypes.ConfirmAlert:
-            confirmAlert(message);
+            confirmAlert(message, lingua);
             break;
 
         default:
@@ -53,20 +58,20 @@ function completedActionAlert(message) {
     })
 }
 
-function confirmAlert(message) {
+function confirmAlert(message, lingua) {
     Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
+        title: `${lingua.areYouSure}`,
+        text: `${lingua.youWontRevert}`,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
+        confirmButtonText: `${lingua.deleted}`
     }).then((result) => {
         if (result.isConfirmed) {
             Swal.fire(
-                'Deleted!',
-                `${message} has been deleted.`,
+                `${lingua.deleted}`,
+                `${lingua.hasBeenDeleted(message)}`,
                 'success'
             )
         }
