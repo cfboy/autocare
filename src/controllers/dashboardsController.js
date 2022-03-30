@@ -1,6 +1,7 @@
 const UserService = require('../collections/user')
 const { ROLES } = require('../collections/user/user.model')
 const Stripe = require('../connect/stripe')
+const ReportsService = require('../collections/reports')
 
 /**
  * This function renders the home page / pricing page.
@@ -51,20 +52,24 @@ exports.account = async (req, res) => {
             subscriptions: user?.subscriptions
         }
 
+        let reports = await ReportsService.getReports()
+        let reportURL
         switch (role) {
             case ROLES.ADMIN:
+                reportURL = reports.find(report => report.name.indexOf('Dashboard') != -1).url
                 // Get Customers
                 customers = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
-                params = { ...params, customers }
+                params = { ...params, customers, reportURL }
                 res.render('dashboards/mainDashboard.ejs', params)
                 break;
             case ROLES.CUSTOMER:
                 res.render('dashboards/customer.ejs', params)
                 break;
             case ROLES.MANAGER:
+                reportURL = reports.find(report => report.name.indexOf('Service') != -1).url
                 // Get Customers
                 customers = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
-                params = { ...params, customers }
+                params = { ...params, customers, reportURL }
 
                 res.render('dashboards/mainDashboard.ejs', params)
                 break;

@@ -10,24 +10,10 @@
                             <%= lingua.membership.notPlan%>
                         </p>
                         <br>
-                        <% for(const price of prices) { %>
-
-                        <input type="radio" id="<%= price?.id%>" name="product" value="<%= price?.id%>" />
-
-                        <label for="<%= price?.id%>">
-                            <%= price.product.name %>
-                            for
-                            <%= price.unit_amount%>
-                            <% if(price?.transform_quantity){ %>
-                            <%= lingua.membership.perGroupOf%>
-                            <%=  price.transform_quantity?.divide_by%> / <%= price.recurring.interval%>
-                            <% } %>
-                        </label><br><br>
-                        <% }; %>
-
-                        <button class="btn btn-primary upgrade-btn" id="checkout-button" type="submit"
-                            value="<%- user.billingID%>" email="<%- user.email%>">Buy
-                            now</button>
+                        <a href="/create-subscriptions" class="btn btn-primary btn-icon-text text-white m-1"
+                            type="button">
+                            <i class="fas fa-plus btn-icon-prepend"></i> <%= lingua.membership.createSubscriptions%>
+                        </a>
 
                         <% } else { %>
                         <!-- Loop of subscriptions -->
