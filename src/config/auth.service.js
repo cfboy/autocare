@@ -12,12 +12,13 @@ const clientURL = process.env.DOMAIN;
  * @param {*} email 
  * @returns 
  */
-const resetPasswordRequest = async (email) => {
+const resetPasswordRequest = async (lingua, email) => {
+
     const user = await User.findOne({ email });
     var requestSuccess = false
     if (!user) {
         // throw new Error("Email does not exist");
-        return [requestSuccess, "Email does not exist."]
+        return [requestSuccess, lingua.validation.emailNotExist]
     }
 
     let token = await Token.findOne({ userId: user._id });
@@ -36,7 +37,7 @@ const resetPasswordRequest = async (email) => {
 
     var resultEmail = await sendEmail(
         user.email,
-        "Auto Care Password Reset Request",
+        lingua.email.title,
         {
             name: user?.personalInfo?.firstName + ' ' + user?.personalInfo?.lastName,
             link: link,
@@ -47,9 +48,9 @@ const resetPasswordRequest = async (email) => {
     if (resultEmail) {
         console.debug('Email Sent: ' + resultEmail?.accepted[0])
         requestSuccess = true
-        return [requestSuccess, `Verify your email ${resultEmail?.accepted[0]} to complete reset password process.`]
+        return [requestSuccess, lingua.email.verifyEmail(resultEmail?.accepted[0])]
     } else {
-        return [requestSuccess, "Password Reset Request Not Send"]
+        return [requestSuccess, lingua.validation.requestNotSend]
 
     }
 };
@@ -62,11 +63,11 @@ const resetPasswordRequest = async (email) => {
  * @param {*} password 
  * @returns 
  */
-const resetPassword = async (userId, token, password) => {
+const resetPassword = async (lingua, userId, token, password) => {
     let resetPasswordToken = await Token.findOne({ userId });
     let requestSuccess = false
 
-    let [isValid, message] = await validateToken(userId, token)
+    let [isValid, message] = await validateToken(lingua, userId, token)
 
     if (!isValid) {
         message = message;
@@ -85,7 +86,7 @@ const resetPassword = async (userId, token, password) => {
 
     var resultEmail = await sendEmail(
         user.email,
-        "Auto Care Password Reset Successfully",
+        lingua.email.resetSucessfully,
         {
             name: user?.personalInfo?.firstName + ' ' + user?.personalInfo?.lastName,
         },
@@ -95,12 +96,12 @@ const resetPassword = async (userId, token, password) => {
         console.debug('Result Email: ' + resultEmail?.accepted[0])
         requestSuccess = true
     } else {
-        return [requestSuccess, "Email Not Send of Password Reset."]
+        return [requestSuccess, lingua.email.notSend]
 
     }
     await resetPasswordToken.deleteOne();
 
-    return [requestSuccess, `Password Updated ${resultEmail?.accepted[0]}.`]
+    return [requestSuccess, lingua.validation.passwordUpdated(resultEmail.accepted[0])]
 };
 
 /**
@@ -109,19 +110,20 @@ const resetPassword = async (userId, token, password) => {
  * @param {*} token 
  * @returns 
  */
-const validateToken = async (userId, token) => {
+const validateToken = async (lingua, userId, token) => {
     let resetPasswordToken = await Token.findOne({ userId });
     let isValid = false
-    let message = 'Valid Token'
+    let message = lingua.validLink
+
     if (!resetPasswordToken) {
-        message = "Invalid or expired password reset token"
+        message = lingua.invalidLink
         return [isValid, message]
     }
 
     isValid = await bcrypt.compare(token, resetPasswordToken.token);
 
     if (!isValid)
-        message = "Invalid or expired password reset token"
+        message = lingua.invalidLink
 
     return [isValid, message]
 }

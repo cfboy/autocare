@@ -49,6 +49,8 @@ exports.register = async (req, res) => {
             city
         } = req.body
 
+        const lingua = req.res.lingua.content
+
         var { password } = req.body
 
         console.debug('email', email)
@@ -85,9 +87,9 @@ exports.register = async (req, res) => {
                 `A new user added to DB. The ID for ${customer.email} is ${customer.id}`
             )
 
-            req.session.message = `Account Created.`
+            req.session.message = lingua.accountCreated
             req.session.alertType = alertTypes.CompletedActionAlert
-            req.flash('info', 'Account Created!');
+            req.flash('info', lingua.accountCreated);
 
             // Login the user
             req.login(customer, function (err) {
@@ -99,8 +101,8 @@ exports.register = async (req, res) => {
             res.redirect('create-subscriptions')
 
         } else {
-            let message = `That email already exist, please login.`
-            req.flash('info', message);
+            let message = lingua.existEmail
+            req.flash('warning', message);
             console.log(
                 `The existing ID for ${email} is ${JSON.stringify(customerInfo)}`
             )
@@ -154,7 +156,7 @@ exports.resetPasswordRequest = async (req, res) => {
  */
 exports.resetPassword = async (req, res) => {
     let { message, email, alertType } = req.session
-
+    const lingua = req.res.lingua.content
     let { id, token } = req.query
 
     // Clear session alerts variables.
@@ -163,7 +165,7 @@ exports.resetPassword = async (req, res) => {
         req.session.alertType = ''
     }
 
-    let [isValid, tokenMessage] = await Auth.validateToken(id, token)
+    let [isValid, tokenMessage] = await Auth.validateToken(lingua, id, token)
 
     if (isValid)
         res.render('auth/resetPassword.ejs', { message, email, alertType, id, token })
@@ -181,7 +183,9 @@ exports.resetPassword = async (req, res) => {
  * @param {*} next 
  */
 exports.resetPasswordRequestController = async (req, res, next) => {
-    const [requestSuccess, message] = await Auth.resetPasswordRequest(
+    const lingua = req.res.lingua.content
+
+    const [requestSuccess, message] = await Auth.resetPasswordRequest(lingua,
         req.body.email
     );
 
@@ -203,7 +207,9 @@ exports.resetPasswordRequestController = async (req, res, next) => {
  * @param {*} next 
  */
 exports.resetPasswordController = async (req, res, next) => {
-    const [requestSuccess, message] = await Auth.resetPassword(
+    const lingua = req.res.lingua.content
+
+    const [requestSuccess, message] = await Auth.resetPassword(lingua,
         req.body.userId,
         req.body.token,
         req.body.password
@@ -211,7 +217,7 @@ exports.resetPasswordController = async (req, res, next) => {
 
     if (requestSuccess) {
         req.flash('info', message);
-        req.session.message = `Password Updated.`
+        req.session.message = message
         req.session.alertType = alertTypes.CompletedActionAlert
     } else {
         req.flash('error', message);

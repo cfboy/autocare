@@ -11,6 +11,10 @@
     "dontHaveAccount": "Don't have an account?",
     "create": "Create",
     "createAccount": "Create Account",
+    "accountCreated": "Account Created",
+    "validLink": "Valid Link",
+    "invalidLink": "Invalid Link",
+    "existEmail": "That email already exist, please login.",
     "members": "Members",
     "add": "Add",
     "car": {
@@ -121,7 +125,10 @@
     "validation": {
         "missingCredentials": "Missing email or password",
         "userNotExist": "User with email {email} does not exist. Please Register.",
-        "wrongPassword": "Incorrect password provided"
+        "wrongPassword": "Incorrect password provided",
+        "emailNotExist": "Email does not exist.",
+        "requestNotSend": "Password Reset Request Not Send",
+        "passwordUpdated": "Password Updated {email}."
     },
     "invoice": {
         "all": "Invoices",
@@ -181,5 +188,16 @@
     "active": "Active",
     "yes": "Yes",
     "no": "No",
-    "edit": "Edit"
+    "edit": "Edit",
+    "areYouSure": "Are you sure?",
+    "youWontRevert": "You won't be able to revert this!",
+    "yesDeleteIt": "Yes, delete it!",
+    "deleted": "Deleted",
+    "hasBeenDeleted": "${message} has been deleted.",
+    "email": {
+        "title": "Auto Care Password Reset Request",
+        "verifyEmail": "Verify your email {email} to complete reset password process.",
+        "resetSucessfully": "Auto Care Password Reset Successfully",
+        "notSend": "Email Not Send."
+    }
 }
