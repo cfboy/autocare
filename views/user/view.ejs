@@ -5,7 +5,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>View User </title>
+    <title><%= lingua.user.view%></title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="../vendors/feather/feather.css">
     <link rel="stylesheet" href="../vendors/mdi/css/materialdesignicons.min.css">
@@ -47,21 +47,21 @@
                                             <div class="d-sm-flex justify-content-between align-items-start">
                                                 <div>
                                                     <h4 class="card-title card-title-dash">
-                                                        <% if(isMyProfile) {%>
-                                                        My Profile
+                                                        <% if(isMyProfile) { %>
+                                                        <%= lingua.user.myProfile%>
                                                         <% } else { %>
-                                                        View User
+                                                        <%= lingua.user.view%>
                                                         <% } %></h4>
                                                 </div>
-                                                <div
-                                                    class="d-sm-flex justify-content-between align-items-start">
+                                                <div class="d-sm-flex justify-content-between align-items-start">
                                                     <a href="/changePassword/<%- customer.id%>?url=/customers"
                                                         type="button" class="btn btn-primary btn-icon-text m-1">
-                                                        <i class="fa-solid fa-key"></i> Change Password
+                                                        <i class="fa-solid fa-key"></i> <%= lingua.user.password.changePassword%>
                                                     </a>
                                                     <a href="/edit-user/<%- customer.id%>?url=/customers" data-id="user"
                                                         type="button" class="btn btn-primary btn-icon-text m-1">
-                                                        <i class="fa-solid fa-user-pen"></i> Edit Personal Info
+                                                        <i class="fa-solid fa-user-pen"></i>
+                                                        <%= lingua.user.editPersonalInfo%>
                                                     </a>
                                                 </div>
                                             </div>
@@ -71,51 +71,44 @@
                                                 <table class="table table-hover">
                                                     <thead>
                                                         <tr>
-                                                            <th>Personal Information</th>
+                                                            <th><%= lingua.user.personalInfo%></th>
                                                             <th></th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         <tr>
-                                                            <td>Email</td>
+                                                            <td><%= lingua.user.email%></td>
                                                             <td>
                                                                 <%- customer.email%>
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <!-- <td>Password</td>
-                                                            <td id="password">
-                                                                <!- <%# customer.password%> -->
-                                                            <!-- ********* -->
-                                                            <!-- </td> -->
-                                                        </tr>
-                                                        <tr>
-                                                            <td>Role</td>
+                                                            <td><%= lingua.user.role%></td>
                                                             <td>
                                                                 <%- customer.role%>
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td>Name</td>
+                                                            <td><%= lingua.user.firstName%></td>
                                                             <td>
                                                                 <%- customer.personalInfo.firstName + ' ' + customer.personalInfo.lastName %>
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td>Phone Number</td>
+                                                            <td><%= lingua.user.phoneNumber%></td>
                                                             <td>
                                                                 <%- customer.personalInfo.phoneNumber %>
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td>Birth Date</td>
+                                                            <td><%= lingua.user.dateOfBirth%></td>
                                                             <td>
                                                                 <%= moment(customer.personalInfo.dateOfBirth).isValid() ? moment(customer.personalInfo.dateOfBirth).utc().format(shortDateFormat) : 'N/A' %>
 
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td>City</td>
+                                                            <td><%= lingua.user.city%></td>
                                                             <td>
                                                                 <%- customer.personalInfo.city %>
                                                             </td>
@@ -140,10 +133,10 @@
                                                 <table id="users" class="table table-hover stripe">
                                                     <thead>
                                                         <tr>
-                                                            <th>Brand</th>
-                                                            <th>Model</th>
-                                                            <th>Plate</th>
-                                                            <th>Action</th>
+                                                            <th><%= lingua.car.brand%></th>
+                                                            <th><%= lingua.car.model%></th>
+                                                            <th><%= lingua.car.plate%></th>
+                                                            <th><%= lingua.action%></th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -190,7 +183,7 @@
                                 <div class="col-md-12 grid-margin stretch-card">
                                     <div class="card card-rounded">
                                         <div class="card-body">
-                                            <%- include('../partials/subscriptions/information.ejs' , {templateTitle: "Memberships", subscriptions, showManageBtn : true, customer : customer, showCreateBtn: false}); %>
+                                            <%- include('../partials/subscriptions/information.ejs' , {invalid: false, subscriptions, showManageBtn : true, customer : customer, showCreateBtn: false}); %>
                                         </div>
                                     </div>
                                 </div>

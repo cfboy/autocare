@@ -43,10 +43,10 @@
                             <a class="btn btn-outline-primary btn-icon-text float-start" id="close-registration"
                                 href="/home">
                                 <i class="fa-solid fa-angle-left m-1 mb-0 mt-0"></i>
-                                Pricing List
+                                <%= lingua.pricingList%>
                             </a>
                             <a class="btn btn-outline-primary btn-icon-text float-end" id="close-registration" href="/">
-                                Login <i class="fa-solid fa-arrow-right-to-bracket m-1 mb-0 mt-0"></i>
+                                <%= lingua.login%> <i class="fa-solid fa-arrow-right-to-bracket m-1 mb-0 mt-0"></i>
                             </a>
                             <div class="brand-logo text-center">
                                 <img src="/images/mrquicks-logo.png" alt="logo">
@@ -60,7 +60,7 @@
                                 <div class="row">
                                     <div class="col-lg-6">
                                         <div class="form-group">
-                                            <label class="required" for="email"><%= lingua.email%></label>
+                                            <label class="required" for="email"><%= lingua.user.email%></label>
                                             <input type="email" id="email" name="email"
                                                 class="form-control form-control-lg" placeholder="example@gmail.com"
                                                 required />
@@ -69,7 +69,8 @@
                                     </div>
                                     <div class="col-lg-6">
                                         <div class="form-group">
-                                            <label for="password" class="required"><%= lingua.password%></label>
+                                            <label for="password"
+                                                class="required"><%= lingua.user.password.name%></label>
 
                                             <input type="password" id="password" name="password"
                                                 class="form-control mb-3 form-control-lg"
@@ -78,40 +79,43 @@
                                                 placeholder="Password" required />
                                             <div id="message">
                                                 <p>
-                                                    <%= lingua.passwordRequirement%>
+                                                    <%= lingua.user.password.nameRequirement%>
                                                 </p>
-                                                <p> <span id="letter" class="invalid"> <b>1 <%= lingua.lowerCase%></b>
+                                                <p> <span id="letter" class="invalid"> <b>1
+                                                            <%= lingua.user.password.lowerCase%></b>
                                                     </span>, <span id="capital" class="invalid"><b>1
-                                                            <%= lingua.upperCase%></b></span>, <span id="number"
-                                                        class="invalid"> <b>1 <%= lingua.number%></b></span>,
+                                                            <%= lingua.user.password.upperCase%></b></span>, <span
+                                                        id="number" class="invalid"> <b>1
+                                                            <%= lingua.user.password.number%></b></span>,
                                                     <span id="length" class="invalid"> <b>8
-                                                            <%= lingua.characters%></b></span>
+                                                            <%= lingua.user.password.characters%></b></span>
                                                 </p>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="col-lg-6">
                                         <div class="form-group">
-                                            <label for="firstName" class="required"><%= lingua.name%></label>
+                                            <label for="firstName" class="required"><%= lingua.user.firstName%></label>
 
                                             <input type="text" id="firstName" name="firstName"
                                                 class="form-control mb-3 form-control-lg"
-                                                placeholder="<%= lingua.name%>" required autofocus />
+                                                placeholder="<%= lingua.user.firstName%>" required autofocus />
                                         </div>
                                     </div>
                                     <div class="col-lg-6">
 
                                         <div class="form-group">
-                                            <label for="lastName" class="required"><%= lingua.lastName%></label>
+                                            <label for="lastName" class="required"><%= lingua.user.lastName%></label>
 
                                             <input type="text" id="lastName" name="lastName"
                                                 class="form-control mb-3 form-control-lg"
-                                                placeholder="<%= lingua.lastName%>" required autofocus />
+                                                placeholder="<%= lingua.user.lastName%>" required autofocus />
                                         </div>
                                     </div>
                                     <div class="col-lg-6">
                                         <div class="form-group">
-                                            <label for="phoneNumber" class="required"><%= lingua.phoneNumber%></label>
+                                            <label for="phoneNumber"
+                                                class="required"><%= lingua.user.phoneNumber%></label>
 
                                             <input type="tel" id="phoneNumber" name="phoneNumber"
                                                 class="form-control mb-3 form-control-lg" placeholder="XXX-XXX-XXXX"
@@ -120,7 +124,8 @@
                                     </div>
                                     <div class="col-lg-6">
                                         <div class="form-group">
-                                            <label for="dateOfBirth" class="required"><%= lingua.dateOfBirth%></label>
+                                            <label for="dateOfBirth"
+                                                class="required"><%= lingua.user.dateOfBirth%></label>
 
                                             <input type="text" id="dateOfBirth" onfocus="(this.type='date')"
                                                 name="dateOfBirth" placeholder="mm/dd/yyyy"
@@ -130,7 +135,7 @@
                                     <div class="col-lg-6">
 
                                         <div class="form-group">
-                                            <label for="city" class="required"><%= lingua.city%></label>
+                                            <label for="city" class="required"><%= lingua.user.city%></label>
 
                                             <select id="city" name="city" required
                                                 class="form-control mb-3 form-control-lg js-example-basic-single w-100">

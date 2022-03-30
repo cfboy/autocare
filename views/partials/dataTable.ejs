@@ -27,7 +27,7 @@
         <% if (typeof ordering == 'boolean') { %>
             "ordering": <%= ordering %>,
         <% } %>
-        "language": {
+            "language": {
             "emptyTable": "<%= lingua.emptyTable%>",
             "info": "<%= lingua.infoNotEmpty%>",
             "infoEmpty": "<%= lingua.infoEmpty%>",
@@ -38,10 +38,10 @@
             "loadingRecords": "Loading...",
             "processing": "Processing...",
             "search": "<%= lingua.search%>:",
-            "zeroRecords": "No matching records found",
+            "zeroRecords": "<%= lingua.zeroRecords%>",
             "paginate": {
-                "first": "First",
-                "last": "Last",
+                "first": "<%= lingua.first%>",
+                "last": "<%= lingua.last%>",
                 "next": "<%= lingua.next%>",
                 "previous": "<%= lingua.previous%>"
             },
@@ -60,7 +60,7 @@
 
                 quantity = api.column(0).data().count();
                 $(api.column(0).footer()).html(
-                    'Quantity: ' + quantity
+                    '<%= lingua.quantity%>: ' + quantity
                 );
                 // Total over all pages
                 total = api

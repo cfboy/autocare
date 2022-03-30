@@ -5,7 +5,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>View User </title>
+    <title><%= lingua.user.create%></title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="../vendors/feather/feather.css">
     <link rel="stylesheet" href="../vendors/mdi/css/materialdesignicons.min.css">
@@ -46,13 +46,14 @@
                                 <div class="col-12 grid-margin stretch-card">
                                     <div class="card card-rounded">
                                         <div class="card-body">
-                                            <h4>Create User</h4>
+                                            <h4><%= lingua.user.create%></h4>
                                             <form id="form-create-user" class="pt-3" action="/create-user"
                                                 method="post">
                                                 <div class="row">
                                                     <div class="col-lg-6">
                                                         <div class="form-group">
-                                                            <label class="required" for="email">Email</label>
+                                                            <label class="required"
+                                                                for="email"><%= lingua.user.email%></label>
                                                             <input autocomplete="off" type="email" id="email"
                                                                 name="email" class="form-control form-control-lg"
                                                                 placeholder="example@gmail.com" required />
@@ -61,23 +62,26 @@
                                                     </div>
                                                     <div class="col-lg-6">
                                                         <div class="form-group">
-                                                            <label for="password" class="required">Password</label>
+                                                            <label for="password"
+                                                                class="required"><%= lingua.user.password.name%></label>
 
                                                             <input autocomplete="off" type="password" id="password"
                                                                 name="password"
                                                                 class="form-control mb-3 form-control-lg"
                                                                 pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
                                                                 title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters"
-                                                                placeholder="Password" required />
+                                                                placeholder="<%= lingua.user.password.name%>"
+                                                                required />
                                                             <div id="message">
-                                                                <p>Password must contain the following:</p>
-                                                                <p> <span id="letter" class="invalid"> <b>1 lowercase
-                                                                            letter</b> </span>, <span id="capital"
-                                                                        class="invalid"><b>1 capital (uppercase)
-                                                                            letter</b></span>, <span id="number"
-                                                                        class="invalid"> <b>1 number</b></span>,
+                                                                <p><%= lingua.user.password.passwordRequirement%>:</p>
+                                                                <p> <span id="letter" class="invalid"> <b>1
+                                                                            <%= lingua.user.password.lowerCase%></b>
+                                                                    </span>, <span id="capital" class="invalid"><b>1
+                                                                            <%= lingua.user.password.upperCase%></b></span>,
+                                                                    <span id="number" class="invalid"> <b>1
+                                                                            <%= lingua.user.password.number%></b></span>,
                                                                     <span id="length" class="invalid"> <b>8
-                                                                            characters</b></span>
+                                                                            <%= lingua.user.password.characters%></b></span>
                                                                 </p>
                                                             </div>
                                                         </div>
@@ -85,26 +89,30 @@
                                                     <div class="col-lg-6">
 
                                                         <div class="form-group">
-                                                            <label for="firstName" class="required">First Name</label>
+                                                            <label for="firstName"
+                                                                class="required"><%= lingua.user.firstName%></label>
 
                                                             <input type="text" id="firstName" name="firstName"
                                                                 class="form-control mb-3 form-control-lg"
-                                                                placeholder="First Name" required autofocus />
+                                                                placeholder="<%= lingua.user.firstName%>" required
+                                                                autofocus />
                                                         </div>
                                                     </div>
                                                     <div class="col-lg-6">
                                                         <div class="form-group">
-                                                            <label for="lastName" class="required">Last Name</label>
+                                                            <label for="lastName"
+                                                                class="required"><%= lingua.user.lastName%></label>
 
                                                             <input type="text" id="lastName" name="lastName"
                                                                 class="form-control mb-3 form-control-lg"
-                                                                placeholder="LastName" required autofocus />
+                                                                placeholder="<%= lingua.user.lastName%>" required
+                                                                autofocus />
                                                         </div>
                                                     </div>
                                                     <div class="col-lg-6">
                                                         <div class="form-group">
-                                                            <label for="phoneNumber" class="required">Phone
-                                                                Number</label>
+                                                            <label for="phoneNumber"
+                                                                class="required"><%= lingua.user.phoneNumber%></label>
 
                                                             <input type="tel" id="phoneNumber" name="phoneNumber"
                                                                 class="form-control mb-3 form-control-lg"
@@ -113,8 +121,8 @@
                                                     </div>
                                                     <div class="col-lg-6">
                                                         <div class="form-group">
-                                                            <label for="dateOfBirth" class="required">Date Of
-                                                                Birth</label>
+                                                            <label for="dateOfBirth"
+                                                                class="required"><%= lingua.user.dateOfBirth%></label>
                                                             <input type="text" id="dateOfBirth"
                                                                 onfocus="(this.type='date')" name="dateOfBirth"
                                                                 placeholder="mm/dd/yyyy"
@@ -124,10 +132,11 @@
                                                     </div>
                                                     <div class="col-lg-6">
                                                         <div class="form-group">
-                                                            <label class="required" for="role">Role</label>
+                                                            <label class="required"
+                                                                for="role"><%= lingua.user.role%></label>
                                                             <select name="role" id="role"
                                                                 class="form-control form-control-lg">
-                                                                <option value="">Select Role</option>
+                                                                <option value=""><%= lingua.selectOne%></option>
                                                                 <% for(const [key, value] of selectRoles) { %>
                                                                 <option value="<%= value %>"><%= key %></option>
                                                                 <% }%>
@@ -136,11 +145,12 @@
                                                     </div>
                                                     <div class="col-lg-6">
                                                         <div class="form-group">
-                                                            <label for="city" class="required">City</label>
+                                                            <label for="city"
+                                                                class="required"><%= lingua.user.city%></label>
 
                                                             <select id="city" name="city" required
                                                                 class="form-control mb-3 form-control-lg js-example-basic-single w-100">
-                                                                <option value="">Select One</option>
+                                                                <option value=""><%= lingua.selectOne%></option>
                                                                 <% for(const municipality of municipalities) { %>
                                                                 <option value="<%= municipality%>"><%= municipality%>
                                                                 </option>
@@ -153,11 +163,11 @@
                                                     <div class="mt-3">
 
                                                         <a href="/account"
-                                                            class="btn btn-block btn-light btn-lg font-weight-medium auth-form-btn float-end">Cancel</a>
+                                                            class="btn btn-block btn-light btn-lg font-weight-medium auth-form-btn float-end"><%= lingua.cancel%></a>
 
                                                         <button
                                                             class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn float-end"
-                                                            type="submit">Save</button>
+                                                            type="submit"><%= lingua.save%></button>
                                                     </div>
                                                 </div>
                                             </form>

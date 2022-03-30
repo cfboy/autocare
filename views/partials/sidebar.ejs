@@ -5,7 +5,7 @@
         <li class="nav-item">
             <a class="nav-link" href="/account">
                 <i class="fas fa-home menu-icon"></i>
-                <span class="menu-title">Home</span>
+                <span class="menu-title"><%= lingua.home%></span>
             </a>
         </li>
         <% } %>
@@ -16,28 +16,22 @@
             <a class="nav-link" href="/cars">
                 <i class="fas fa-car menu-icon"></i>
                 <span class="menu-title">
-                    All Cars
+                    <%= lingua.car.all%>
                 </span>
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="/services">
                 <i class="fa-solid fa-calendar menu-icon"></i>
-                <span class="menu-title">All Services</span>
+                <span class="menu-title"><%= lingua.service.all%></span>
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="/invoices">
                 <i class="fa-solid fa-file-invoice menu-icon"></i>
-                <span class="menu-title">Invoices</span>
+                <span class="menu-title"><%= lingua.invoice.all%></span>
             </a>
         </li>
-        <!-- <li class="nav-item">
-            <a class="nav-link" href="/charges">
-                <i class="fa-solid fa-receipt menu-icon"></i>
-                <span class="menu-title">Billing History</span>
-            </a>
-        </li> -->
         <% } %>
 
         <% if([roles.CUSTOMER].includes(user.role)) { %>
@@ -45,20 +39,20 @@
             <a class="nav-link" href="/cars">
                 <i class="fas fa-car menu-icon"></i>
                 <span class="menu-title">
-                    Manage My Cars
+                    <%= lingua.car.manageMyCars%>
                 </span>
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="/services">
                 <i class="fa-solid fa-calendar menu-icon"></i>
-                <span class="menu-title">My Services</span>
+                <span class="menu-title"><%= lingua.service.myServices%></span>
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="/invoices">
                 <i class="fa-solid fa-file-invoice menu-icon"></i>
-                <span class="menu-title">My Invoices</span>
+                <span class="menu-title"><%= lingua.invoice.myInvoices%></span>
             </a>
         </li>
         <!-- <li class="nav-item">
@@ -72,7 +66,7 @@
         <li class="nav-item">
             <a class="nav-link" href="/validateMembership">
                 <i class="fas fa-warehouse menu-icon"></i>
-                <span class="menu-title">Validate Membership</span>
+                <span class="menu-title"><%= lingua.membership.validate%></span>
             </a>
         </li>
         <% } %>
@@ -80,7 +74,7 @@
         <li class="nav-item">
             <a class="nav-link" href="/customers">
                 <i class="fas fa-users menu-icon"></i>
-                <span class="menu-title">Customers</span>
+                <span class="menu-title"><%= lingua.customers%></span>
             </a>
         </li>
         <% } %>
@@ -91,25 +85,25 @@
                 <!-- <i class="fas fa-solid fa-users-between-lines menu-icon"></i> -->
                 <i class="fa-solid fa-user-gear menu-icon"></i>
                 <!-- <i class="fas fa-users menu-icon"></i> -->
-                <span class="menu-title">Users</span>
+                <span class="menu-title"><%= lingua.user.users%></span>
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="/locations">
                 <i class="fas fa-map-marker-alt menu-icon"></i>
-                <span class="menu-title">Locations</span>
+                <span class="menu-title"><%= lingua.location.all%></span>
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="/history">
                 <i class="fas fa-history menu-icon"></i>
-                <span class="menu-title">History</span>
+                <span class="menu-title"><%= lingua.history%></span>
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="/reports">
                 <i class="fa-solid fa-square-poll-vertical menu-icon"></i>
-                <span class="menu-title">Reports</span>
+                <span class="menu-title"><%= lingua.reports%></span>
             </a>
         </li>
         <% } %>

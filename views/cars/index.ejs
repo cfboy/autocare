@@ -5,7 +5,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>My Cars </title>
+    <title><%= lingua.car.cars%></title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="../vendors/feather/feather.css">
     <link rel="stylesheet" href="../vendors/mdi/css/materialdesignicons.min.css">
@@ -49,13 +49,14 @@
                                         <div class="card-body">
                                             <div class="d-sm-flex justify-content-between align-items-start">
                                                 <div>
-                                                    <h4 class="card-title card-title-dash">My Cars</h4>
+                                                    <h4 class="card-title card-title-dash"><%= lingua.car.cars%></h4>
                                                 </div>
                                                 <% if(canAddCar) { %>
                                                 <div>
                                                     <a href="/cars/create" class="btn btn-primary btn-icon-text"
                                                         type="button">
-                                                        <i class="fas fa-plus btn-icon-prepend"></i>Add Car</a>
+                                                        <i
+                                                            class="fas fa-plus btn-icon-prepend"></i><%= lingua.car.add%></a>
                                                 </div>
                                                 <% } %>
                                             </div>
@@ -64,13 +65,13 @@
                                                 <table id="users" class="table table-hover stripe">
                                                     <thead>
                                                         <tr>
-                                                            <th>Brand</th>
-                                                            <th>Model</th>
-                                                            <th>Plate</th>
-                                                            <th>Services (Qty.)</th>
-                                                            <th>Created Date</th>
+                                                            <th><%= lingua.car.brand%></th>
+                                                            <th><%= lingua.car.model%></th>
+                                                            <th><%= lingua.car.plate%></th>
+                                                            <th><%= lingua.service.qty%></th>
+                                                            <th><%= lingua.createdDate%></th>
                                                             <%# if(canManageCars) { %>
-                                                            <th>Action</th>
+                                                            <th><%= lingua.action%></th>
                                                             <%# } %>
                                                         </tr>
                                                     </thead>
@@ -86,7 +87,7 @@
                                                                 <p class="mt-1">
                                                                     <small>
 
-                                                                        (Valid Until:
+                                                                        (<%= lingua.membership.validUntil%>:
                                                                         <%= moment(car?.cancel_date).isValid() ? moment(car?.cancel_date).format(shortDateFormat) : 'N/A' %>)
 
                                                                     </small>

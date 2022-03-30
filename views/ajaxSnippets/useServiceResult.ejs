@@ -1,5 +1,5 @@
 <div class="p-3">
-    <h4 class="text-center">Service Recipe</h4>
+    <h4 class="text-center"><%= lingua.service.recipe%></h4>
     <br>
     <% if(service) { %>
     <div class="col-md-12 doc-credits">
@@ -7,34 +7,34 @@
             <li>
                 <h4>
                     <span class="bg-warning">
-                        Service ID : <b><%= service.id%></b>
+                        <%= lingua.service.id%>: <b><%= service.id%></b>
                     </span>
                 </h4>
             </li>
             <li>
                 <h4>
                     <span class="bg-warning">
-                        Product: <%= service?.product%>
+                        <%= lingua.membership.product%>: <%= service?.product%>
                     </span>
                 </h4>
             </li>
             <li>
-                <h4>Approved By: <%= service?.authorizedBy?.email%></h4>
+                <h4><%= lingua.user.authorizedBy%>: <%= service?.authorizedBy?.email%></h4>
             </li>
             <li>
-                <h4>Input By: <%= service?.inputType%></h4>
+                <h4><%= lingua.inputBy%>: <%= service?.inputType%></h4>
             </li>
             <li>
-                <h4>Date :
+                <h4><%= lingua.date%>:
                     <%= moment(service?.created_date).isValid() ? moment(service?.created_date).format(completeDateFormat) : 'N/A' %>
                 </h4>
             </li>
             <li>
-                <h4>Car: <%= car?.brand%>, <%= car?.model%> (<%= car?.plate%>)</h4>
+                <h4><%= lingua.car.name%>: <%= car?.brand%>, <%= car?.model%> (<%= car?.plate%>)</h4>
             </li>
             <li>
                 <h4>
-                    Location : <%= service?.location?.name%>
+                    <%= lingua.location.name%>: <%= service?.location?.name%>
                 </h4>
             </li>
         </ul>
@@ -42,13 +42,13 @@
     <% } else { %>
     <div class="col-md-12 text-center validation-msgs">
         <i class="fas fa-8x fa-exclamation-triangle warning"></i>
-        <p>Service not found.</p>
+        <p><%= lingua.service.notFound%>.</p>
 
     </div>
     <% } %>
     <div class="col-md-12 text-center">
         <button id="doneServiceBtn" class="btn btn-block btn-inverse-dark btn-lg font-weight-medium auth-form-btn"
-            type="submit">Done</button>
+            type="submit"><%= lingua.done%></button>
     </div>
 </div>
 

@@ -5,7 +5,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>View Service </title>
+    <title><%= lingua.service.view%></title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="../vendors/feather/feather.css">
     <link rel="stylesheet" href="../vendors/mdi/css/materialdesignicons.min.css">
@@ -38,7 +38,7 @@
             <div class="main-panel">
                 <div class="content-wrapper">
                     <h4>
-                        Service
+                        <%= lingua.service.name%>
                     </h4>
                     <% if(service) { %>
                     <div class="row text-left">
@@ -51,7 +51,7 @@
                                                 <table class="table table-hover">
                                                     <thead>
                                                         <tr>
-                                                            <th>Service Information</th>
+                                                            <th><%= lingua.service.info%></th>
                                                             <th></th>
                                                         </tr>
                                                     </thead>
@@ -63,21 +63,23 @@
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td>Car</td>
+                                                            <td><%= lingua.car.name%></td>
                                                             <td>
-                                                                Brand: <%- car?.brand%> <br>
-                                                                Model: <%- car?.model%> <br>
-                                                                Plate: <%- car?.plate%>
+                                                                <%= lingua.car.brand%>: <%- car?.brand%>
+                                                                <br>
+                                                                <%= lingua.car.model%>: <%- car?.model%>
+                                                                <br>
+                                                                <%= lingua.car.plate%>: <%- car?.plate%>
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td>Date</td>
+                                                            <td><%= lingua.date%></td>
                                                             <td>
                                                                 <%= moment(service?.created_date).isValid() ? moment(service?.created_date).format(completeDateFormat) : 'N/A' %>
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td>Authorized By</td>
+                                                            <td><%= lingua.user.authorizedBy%></td>
                                                             <td>
                                                                 <%- service?.authorizedBy?.personalInfo.firstName + ' ' + service?.authorizedBy?.personalInfo.lastName %>
                                                                 <br>
@@ -87,7 +89,7 @@
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td>Location</td>
+                                                            <td><%= lingua.location.name%></td>
                                                             <td>
                                                                 <%- service?.location?.name ?  service?.location?.name  : 'N/A'%>
                                                             </td>

@@ -5,7 +5,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>View Car </title>
+    <title><%= lingua.car.view%></title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="../vendors/feather/feather.css">
     <link rel="stylesheet" href="../vendors/mdi/css/materialdesignicons.min.css">
@@ -49,12 +49,12 @@
                                             <div class="d-sm-flex justify-content-between align-items-start">
 
                                                 <div>
-                                                    <h4 class="card-title card-title-dash">Car Information</h4>
+                                                    <h4 class="card-title card-title-dash"><%= lingua.car.info%></h4>
                                                 </div>
                                                 <% if(canEditCar) { %>
                                                 <a href="/edit-car/<%- car.id%>?url=/car" type="button"
                                                     class="btn btn-primary btn-icon-text">
-                                                    <i class=" mdi mdi-square-edit-outline"></i> Edit
+                                                    <i class=" mdi mdi-square-edit-outline"></i> <%= lingua.car.edit%>
                                                 </a>
                                                 <% } %>
 
@@ -63,37 +63,37 @@
                                                 <table class="table table-hover">
                                                     <thead>
                                                         <tr>
-                                                            <th>Car information</th>
+                                                            <th><%= lingua.car.info%></th>
                                                             <th></th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         <tr>
-                                                            <td>Brand</td>
+                                                            <td><%= lingua.car.brand%></td>
                                                             <td>
                                                                 <%- car.brand%>
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td>Model</td>
+                                                            <td><%= lingua.car.model%></td>
                                                             <td>
                                                                 <%- car.model%>
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td>Plate</td>
+                                                            <td><%= lingua.car.plate%></td>
                                                             <td>
                                                                 <%- car.plate%>
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td>Valid Until</td>
+                                                            <td><%= lingua.membership.validUntil%></td>
                                                             <td>
                                                                 <%= moment(car?.cancel_date).isValid() ? moment(car?.cancel_date).format(shortDateFormat) : 'N/A' %>
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td>Services (Qty.)</td>
+                                                            <td><%= lingua.service.qty%></td>
                                                             <td>
                                                                 <%- car.services.length%>
                                                             </td>

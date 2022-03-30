@@ -5,7 +5,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Home </title>
+    <title><%= lingua.home%></title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="./vendors/feather/feather.css">
     <link rel="stylesheet" href="./vendors/mdi/css/materialdesignicons.min.css">
@@ -100,10 +100,10 @@
                                         <br><br>
                                         <span class="h3"><%= price.unit_amount%></span>
                                         <% if(price?.transform_quantity){ %>
-                                        per group of
+                                        <%= lingua.membership.perGroupOf%>**
                                         <%=  price.transform_quantity?.divide_by%> / <%= price.recurring.interval%>
                                         <% } else { %>
-                                        /month**
+                                        /<%= lingua.month%>**
                                         <% } %>
                                         <br><br>
                                 </div>
@@ -123,7 +123,7 @@
                                     </ul>
                                 </div>
                                 <p class="alert">
-                                    **This is a subscription for 30 days upon purchase date.
+                                    **<%= lingua.membership.disclaimer%>
                                 </p>
 
                             </div>
@@ -132,8 +132,9 @@
                                 <!-- <button class="btn btn-primary btn-lg select-product-btn m-2"
                                     value="<%# price.id%>">Create Subscriptions</button> -->
                                 <a href="/create-subscriptions" class="btn btn-primary btn-lg m-2"
-                                    value="<%- price.id%>">Create
-                                    Memberships</a>
+                                    value="<%- price.id%>">
+                                    <%= lingua.membership.createSubscriptions%>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -172,6 +173,7 @@
             manageLangDropdown();
         };
 
+        // TODO: Maybe remove. This logic is unused.
         $(document).ready(function () {
             const selectProductBtn = $('.select-product-btn');
             selectProductBtn.click(function () {

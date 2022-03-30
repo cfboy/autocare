@@ -1,18 +1,24 @@
 <div class="d-sm-flex justify-content-between align-items-start">
     <div>
         <h4 class="card-title card-title-dash">
-            <%= templateTitle%>
+            <% if(invalid) { %>
+            <%= lingua.membership.invalidMemberships%>
+            <% } else { %>
+            <%= lingua.membership.memberships%>
+            <% } %>
         </h4>
     </div>
     <div class="d-sm-flex justify-content-between align-items-start">
         <% if(showManageBtn) { %>
         <a id="manage-billing-button" class="btn btn-primary btn-icon-text text-white manage-billing-button m-1"
             style="margin: 0;" type="submit" value="<%- customer.billingID%>" email="<%- customer.email%>">
-            <i class="fab fa-stripe-s"></i> Manage Billing</a>
+            <i class="fab fa-stripe-s"></i> <%= lingua.membership.manageBilling%>
+        </a>
         <% } %>
         <% if(showCreateBtn) { %>
         <a href="/create-subscriptions" class="btn btn-primary btn-icon-text text-white m-1" type="button">
-            <i class="fas fa-plus btn-icon-prepend"></i>Create Memberships</a>
+            <i class="fas fa-plus btn-icon-prepend"></i> <%= lingua.membership.createSubscriptions%>
+        </a>
         <% } %>
 
     </div>
@@ -23,16 +29,16 @@
         <thead>
             <tr>
                 <th>
-                    Membership Information
+                    <%= lingua.membership.info%>
                 </th>
                 <th>
-                    Period
+                    <%= lingua.membership.period%>
                     <br>
-                    <small>(start date) / (end date)</small>
+                    <small>( <%= lingua.membership.startDate%>) / <%= lingua.membership.endDate%></small>
 
                 </th>
                 <th class="text-center">
-                    Status
+                    <%= lingua.membership.status%>
                 </th>
             </tr>
         </thead>
@@ -43,7 +49,7 @@
                     <% for(item of stripeSubscription.items) { %>
                     <p>
                         <b><%- item.data.price.product.name %></b> (<%= item.cars.length %>/<%= item.data.quantity%>
-                        <small> cars qty.</small>)
+                        <small> <%= lingua.car.carsQty%></small>)
                     </p>
                     <ul class="mb-0">
                         <% if(item.isValid) { %>
@@ -55,7 +61,7 @@
                             </a>
                             <% if(car?.cancel_date) { %>
                             <b>
-                                (Valid until:
+                                (<%= lingua.membership.validUntil%>:
                                 <%= moment(car?.cancel_date).isValid() ? moment(car?.cancel_date).format(shortDateFormat) : 'N/A' %>
                                 )
                             </b>
@@ -73,7 +79,7 @@
                             </a>
                             <% if(car?.cancel_date) { %>
                             <b>
-                                (Valid until:
+                                (<%= lingua.membership.validUntil%>:
                                 <%= moment(car?.cancel_date * 1000).isValid() ? moment(car?.cancel_date * 1000).format(shortDateFormat) : 'N/A' %>
                                 )
                             </b>
@@ -84,7 +90,7 @@
                         <li class="mt-1 mb-1 m-3">
                             <a href="/cars/create?itemID=<%- item.id%>&userID=<%- customer.id%>" id="add-car-button"
                                 class="btn btn-warning p-2" style="margin: 0;" type="submit">
-                                Add Missing Car</a>
+                                <%= lingua.car.addMissingCar%></a>
                         </li>
                         <% } %>
                         <% } else if(item.cars.length > item.data.quantity) { %>
@@ -98,9 +104,9 @@
                                 hidden>
                             <input type="text" name="selectedCars" id="selectedCars-<%=  item.id%>" value="" hidden>
                             <input type="text" name="carsToRemove" id="carsToRemove-<%=  item.id%>" value="" hidden>
-                            <p class="alert badge-outline-warning text-center">Select <b> <%=  item.data.quantity %>
-                                </b> to use on
-                                next period.</p>
+                            <p class="alert badge-outline-warning text-center"><%= lingua.select%> <b>
+                                    <%=  item.data.quantity %>
+                                </b> <%= lingua.car.toUseOnNextPeriod%>.</p>
                             <div class="form-group">
                                 <% for(car of item.cars) { %>
 
@@ -121,7 +127,7 @@
                             <div id="validationTxt-<%= item.id%>"></div>
                             <button id="confirm-valid-cars-button-<%= item.id%>" class="btn btn-secondary"
                                 style="margin: 0;" type="submit" itemid="<%= item.id%>" disabled>
-                                Confirm cars for next period <span
+                                <%= lingua.car.confirmCarsForNextPeriod%> <span
                                     id="selectedDisplay-<%= item.id%>">(0/<%=  item.data.quantity %>)</span>
                             </button>
                         </form>
@@ -150,7 +156,6 @@
 
 <script>
 
-
     function validateCheckboxes(itemid) {
         var selected = [];
         var toRemove = [];
@@ -161,8 +166,6 @@
         var requiredQty = $(`#requiredQty-${itemid}`).val();
         var selectedDisplay = $(`#selectedDisplay-${itemid}`)
 
-
-
         $(`#handle-valid-cars-form-${itemid} input:checkbox[type=checkbox]`).each(function () {
             toRemove.push($(this).val());
         });
@@ -172,9 +175,9 @@
             selected.push($(this).val());
             toRemove.splice($.inArray($(this).val(), toRemove), 1);
         });
-        console.log('Selected: ' + selected);
+        console.debug('Selected: ' + selected);
 
-        console.log('toRemove: ' + toRemove);
+        console.debug('toRemove: ' + toRemove);
 
         selectedDisplay.html(`(${selected.length?.toString()}/${requiredQty?.toString()})`);
 
@@ -191,11 +194,9 @@
             });
             validationTxt.html(``)
             confirmValidCarsButton.removeClass('btn-primary').addClass('btn-secondary').attr('disabled', 'disabled');
-
         }
 
         selectedCars.value = selected;
         carsToRemove.value = toRemove;
-
     }
 </script>

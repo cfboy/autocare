@@ -5,6 +5,7 @@
                 <div class="card card-rounded">
                     <div class="card-body">
                         <% if (!hasSubscription) { %>
+                        <!-- This section of code is not used. -->
                         <p class="lead">
                             <%= lingua.membership.notPlan%>
                         </p>
@@ -18,7 +19,7 @@
                             for
                             <%= price.unit_amount%>
                             <% if(price?.transform_quantity){ %>
-                            per group of
+                            <%= lingua.membership.perGroupOf%>
                             <%=  price.transform_quantity?.divide_by%> / <%= price.recurring.interval%>
                             <% } %>
                         </label><br><br>
@@ -30,7 +31,7 @@
 
                         <% } else { %>
                         <!-- Loop of subscriptions -->
-                        <%- include('./information.ejs' , {templateTitle: "Memberships", subscriptions, showManageBtn : false, customer : user, showCreateBtn: true}); %>
+                        <%- include('./information.ejs' , {invalid: false, subscriptions, showManageBtn : false, customer : user, showCreateBtn: true}); %>
                         <% } %>
                     </div>
                 </div>

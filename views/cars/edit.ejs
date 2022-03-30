@@ -5,7 +5,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Edit Car </title>
+    <title><%= lingua.car.edit%></title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="../vendors/feather/feather.css">
     <link rel="stylesheet" href="../vendors/mdi/css/materialdesignicons.min.css">
@@ -40,7 +40,7 @@
                                 <div class="col-12 grid-margin stretch-card">
                                     <div class="card card-rounded">
                                         <div class="card-body">
-                                            <h4>Edit Car</h4>
+                                            <h4><%= lingua.car.edit%></h4>
                                             <% if(car) { %>
                                             <form id="form-register" class="pt-3" action="/edit-car/?url=<%- url%>"
                                                 method="post">
@@ -52,11 +52,11 @@
                                                     <div class="mt-3">
 
                                                         <a href="<%- url%>"
-                                                            class="btn btn-block btn-light btn-lg font-weight-medium auth-form-btn float-end">Cancel</a>
+                                                            class="btn btn-block btn-light btn-lg font-weight-medium auth-form-btn float-end"><%= lingua.cancel%></a>
 
                                                         <button
                                                             class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn float-end"
-                                                            type="submit">Save</button>
+                                                            type="submit"><%= lingua.save%></button>
                                                     </div>
                                                 </div>
                                             </form>

@@ -5,7 +5,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Services </title>
+    <title><%= lingua.service.services%></title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="../vendors/feather/feather.css">
     <link rel="stylesheet" href="../vendors/mdi/css/materialdesignicons.min.css">
@@ -45,7 +45,8 @@
                                         <div class="card-body">
                                             <div class="d-sm-flex justify-content-between align-items-start">
                                                 <div>
-                                                    <h4 class="card-title card-title-dash">Services</h4>
+                                                    <h4 class="card-title card-title-dash"><%= lingua.service.services%>
+                                                    </h4>
                                                 </div>
                                             </div>
                                             <br>
@@ -54,13 +55,13 @@
                                                     <thead>
                                                         <tr>
                                                             <th>ID</th>
-                                                            <th>Car</th>
-                                                            <th>Product</th>
-                                                            <th>User</th>
-                                                            <th>Date</th>
-                                                            <th>Authorized By</th>
-                                                            <th>Input By</th>
-                                                            <th>Location</th>
+                                                            <th><%= lingua.car.name%></th>
+                                                            <th><%= lingua.membership.product%></th>
+                                                            <th><%= lingua.user.firstName%></th>
+                                                            <th><%= lingua.date%></th>
+                                                            <th><%= lingua.user.authorizedBy%></th>
+                                                            <th><%= lingua.inputBy%></th>
+                                                            <th><%= lingua.location.name%></th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -77,9 +78,11 @@
                                                             </td>
                                                             <td>
                                                                 <a class="btn-link" href="/car/<%- service?.car?.id%>">
-                                                                    Brand: <%- service?.car?.brand%> <br>
-                                                                    Model: <%- service?.car?.model%> <br>
-                                                                    Plate: <%- service?.car?.plate%>
+                                                                    <%= lingua.car.brand%>: <%- service?.car?.brand%>
+                                                                    <br>
+                                                                    <%= lingua.car.model%>: <%- service?.car?.model%>
+                                                                    <br>
+                                                                    <%= lingua.car.plate%>: <%- service?.car?.plate%>
                                                                 </a>
                                                             </td>
                                                             <td><%= service?.product%></td>

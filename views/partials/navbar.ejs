@@ -90,12 +90,12 @@
                 <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list pb-0 notifications-dropdown"
                     aria-labelledby="notificationDropdown" onclick="">
                     <a class="dropdown-item py-3 border-bottom">
-                        <p class="mb-0 font-weight-medium float-left">You have
-                            <%= user?.notifications?.filter(notification => notification.isRead == false).length %> new
-                            notifications </p>
+                        <p class="mb-0 font-weight-medium float-left">
+                            <%= lingua.newNotifications(user?.notifications?.filter(notification => notification.isRead == false).length)%>
+                        </p>
                         <span onclick="window.location.href='/notifications';"
                             class="badge badge-pill badge-primary float-right">
-                            View all</span>
+                            <%= lingua.viewAll%></span>
                     </a>
                     <% if(user?.notifications) { %>
                     <div id="notifications">
@@ -135,16 +135,18 @@
                     </div>
                     <a href="/customers/<%- user.id%>?viewType=myProfile" class="dropdown-item">
                         <!-- <i class="dropdown-item-icon mdi mdi-account-outline text-primary me-2"></i>  -->
-                        <i class="dropdown-item-icon far fa-user text-primary me-2"></i> My Profile
+                        <i class="dropdown-item-icon far fa-user text-primary me-2"></i> <%= lingua.user.myProfile%>
                         <!-- <span class="badge badge-pill badge-danger">1</span> -->
                     </a>
                     <a id="manage-billing-button" class="dropdown-item manage-billing-button" style="margin: 0;"
                         type="submit" value="<%- user.billingID%>" email="<%- user.email%>">
-                        <i class="dropdown-item-icon fab fa-stripe-s  text-primary me-2"></i> Manage Billing</a>
+                        <i class="dropdown-item-icon fab fa-stripe-s  text-primary me-2"></i>
+                        <%= lingua.membership.manageBilling%></a>
                     <!-- <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-message-text-outline text-primary me-2"></i> Messages</a> -->
                     <a class="dropdown-item" href="/activity">
                         <!-- <i class="dropdown-item-icon mdi mdi-calendar-check-outline text-primary me-2"></i> -->
-                        <i class="dropdown-item-icon far fa-calendar-check text-primary me-2"></i> Activity
+                        <i class="dropdown-item-icon far fa-calendar-check text-primary me-2"></i>
+                        <%= lingua.activity%>
                     </a>
                     <!-- <a class="dropdown-item">
                         <i class="dropdown-item-icon mdi mdi-help-circle-outline text-primary me-2"></i>
@@ -154,7 +156,7 @@
                         <button type="submit" class="dropdown-item">
                             <!-- <i class="dropdown-item-icon mdi mdi-power text-primary me-2"></i> -->
                             <i class="ropdown-item-icon fas fa-sign-out-alt text-primary me-2"></i>
-                            Sign Out
+                            <%= lingua.signOut%>
                         </button>
                     </form>
                 </div>
