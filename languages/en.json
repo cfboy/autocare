@@ -199,5 +199,6 @@
         "verifyEmail": "Verify your email {email} to complete the reset password process.",
         "resetSucessfully": "Auto Care Password Reset Successfully",
         "notSend": "Email Not Send."
-    }
+    },
+    "clear" : "Clear"
 }

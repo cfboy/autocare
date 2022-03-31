@@ -320,15 +320,15 @@ exports.delete = async (req, res) => {
  */
 exports.validatePlate = async (req, res) => {
     try {
-        let { plateNumber, newItem } = req.body,
+        let { plateNumber, newItem, addToCart } = req.body,
             car = await CarService.getCarByPlate(plateNumber),
             subscriptionList = req.body.subscriptionList,
             existingCar = false
 
 
-        if (car || subscriptionList.some(car => car.plate === plateNumber)) {
+        if (car || subscriptionList?.some(car => car.plate === plateNumber)) {
             existingCar = true
-        } else {
+        } else if (addToCart) {
             req.session.cart = req.session.cart || []
             req.session.cart.push(newItem)
         }

@@ -206,7 +206,8 @@
                     data: JSON.stringify({
                         plateNumber: plate,
                         newItem: newItem,
-                        subscriptionList: subscriptionList ? subscriptionList : []
+                        subscriptionList: subscriptionList ? subscriptionList : [],
+                        addToCart: true
                     }),
                 }).done(function (result) {
                     if (result.existingCar) {

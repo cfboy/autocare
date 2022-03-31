@@ -51,14 +51,20 @@
                                             <div class="row">
                                                 <div class="col-lg-4 p-3">
                                                     <div class="card p-3">
-                                                        <h5><%= lingua.membership.readyByCamera%>:</h5>
+                                                        <div
+                                                            class="d-sm-flex justify-content-between align-items-start">
+                                                            <h5><%= lingua.membership.readyByCamera%>:</h5>
+
+                                                            <button id="clearQueueBtn"
+                                                                class="btn btn-sm btn-outline-dark p-2 br-5"><%= lingua.clear%></button>
+                                                        </div>
                                                         <div id="resultOfCameraScanLoading"></div>
                                                         <div id="resultOfCameraScan">
                                                             <% if(readingQueue?.length > 0) { %>
                                                             <% for(car of readingQueue) { %>
                                                             <a id="plate-<%= car.plate%>" class="btn btn-link"
                                                                 onclick="setPlateValue('<%= car.plate%>')">
-                                                                <%= lingua.car.name%> : <%= car.plate%>
+                                                                <b><%= car.plate%></b>
                                                             </a>
                                                             <br>
                                                             <% } %>
@@ -166,20 +172,32 @@
         // The socket is already define on navbar.
         socket.on('reading-plates', () => {
 
-            showResult('#resultOfCameraScan',
-                `<div class="spinner text-center">
-                                <div class="spinner-grow" style="width: 2rem; height: 2rem"></div>
-                            </div>`
-            );
+            showResult('#resultOfCameraScanLoading', '<p>Reading...</p>')
+            document.querySelector('#resultOfCameraScan').innerHTML = '';
+
+            // showResult('#resultOfCameraScan',
+            //     `<div class="spinner text-center">
+            //                     <div class="spinner-grow" style="width: 2rem; height: 2rem"></div>
+            //                 </div>`
+            // );
         })
 
         // Receive data
         socket.on('read-plates', (data) => {
             console.log(JSON.stringify(data));
-            document.querySelector('#resultOfCameraScan').innerHTML = '';
+            document.querySelector('#resultOfCameraScanLoading').innerHTML = '';
+
+            let readingQueue = <%- JSON.stringify(readingQueue) %>
+            if (readingQueue)
+                readingQueue = readingQueue.map(({ plate }) => (plate));
+
+            console.log(readingQueue);
             for (car of data) {
-                document.querySelector('#resultOfCameraScan').innerHTML += (`
-                <a id="plate-${car.plate}" class="btn btn-link" onclick="setPlateValue('${car.plate}')"> Car: ${car.plate} </a>` + '<br>')
+                if (!readingQueue.includes(car.plate)) {
+                    document.querySelector('#resultOfCameraScan').innerHTML += (`
+                    <a id="plate-${car.plate}" class="btn btn-link" onclick="setPlateValue('${car.plate}')"><b>${car.plate}</b></a>` + '<br>')
+                    readingQueue.push(car.plate)
+                }
             }
         })
 
@@ -226,6 +244,23 @@
                     console.log(err);
                 })
             }
+        });
+
+        $("#clearQueueBtn").on("click", function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            $.ajax({
+                url: "/clearQueue",
+                type: "POST",
+                contentType: "application/json",
+                data: {},
+            }).done(function (result) {
+                document.querySelector('#resultOfCameraScan').innerHTML = ('')
+            }).fail(function (err) {
+                console.log(err);
+            })
+
         });
 
         var showResult = function (updateDiv, result) {
