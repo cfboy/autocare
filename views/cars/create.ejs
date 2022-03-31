@@ -82,7 +82,7 @@
                                                         <a href="/cars"
                                                             class="btn btn-block btn-light btn-lg font-weight-medium auth-form-btn float-end"><%= lingua.cancel%></a>
 
-                                                        <button
+                                                        <button id="add-btn"
                                                             class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn float-end"
                                                             type="submit"><%= lingua.save%></button>
                                                     </div>
@@ -133,7 +133,39 @@
 
     <!-- End custom js for this page-->
     <%- include('../partials/alerts.ejs', {message, alertType}); %>
+    <script>
+        $('#add-btn').on('click', function (e) {
+            e.preventDefault();
+            var plate = $("#carPlate").val().toUpperCase()
+            showResult('#plateValidationResult', ``);
+            $.ajax({
+                url: "/validatePlate",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    plateNumber: plate,
+                    addToCart: false
+                }),
+            }).done(function (result) {
+                if (result.existingCar) {
+                    document.getElementById("carPlate").setCustomValidity("<%= lingua.car.existingCar%>");
+                    document.getElementById("carPlate").reportValidity();
+                    let reportMessage = `<p class="error"><%= lingua.car.existingCar%>.</p>`
+                    showResult('#plateValidationResult', reportMessage);
+                    // return false
+                } else {
+                    $('#form-create-car').submit();
+                }
+            }).fail(function (err) {
+                console.log(err);
+                // return false
+            })
+        });
 
+        var showResult = function (updateDiv, result) {
+            $(updateDiv).html(result);
+        }
+    </script>
 </body>
 
 </html>
