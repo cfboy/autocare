@@ -326,7 +326,7 @@ exports.validatePlate = async (req, res) => {
             existingCar = false
 
 
-        if (car || subscriptionList.some(car => car.plate === carPlate)) {
+        if (car || subscriptionList.some(car => car.plate === plateNumber)) {
             existingCar = true
         } else {
             req.session.cart = req.session.cart || []

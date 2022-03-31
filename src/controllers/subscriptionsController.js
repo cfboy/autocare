@@ -23,11 +23,17 @@ exports.createSubscriptions = async (req, res) => {
         req.session.alertType = ''
 
         let user = req.user
-        let { allMakes, allModels } = await CarService.getAllMakes()
+        if (user.billingID) {
+            let { allMakes, allModels } = await CarService.getAllMakes()
 
-        const prices = await Stripe.getAllPrices()
+            const prices = await Stripe.getAllPrices()
 
-        res.render('auth/createSubs.ejs', { cart, message, alertType, user, allMakes, allModels, prices })
+            res.render('auth/createSubs.ejs', { cart, message, alertType, user, allMakes, allModels, prices })
+        } else {
+            req.session.message = "This user don't have stripe account."
+            req.session.alertType = alertTypes.WarningAlert
+            res.redirect('/account')
+        }
     }
     catch (error) {
         console.error(error)
@@ -62,6 +68,13 @@ exports.validateMembership = async (req, res) => {
     let user = req.user
 
     res.render('dashboards/validateMembership.ejs', { user, message, alertType, readingQueue })
+
+}
+
+exports.clearQueue = async (req, res) => {
+    console.debug('Clearing Queue...')
+    readingQueue = []
+    res.send({ readingQueue })
 
 }
 
@@ -131,7 +144,7 @@ exports.carCheck = async (req, res) => {
                     req.io.emit('reading-plates');
 
                     // Timer to delay
-                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    // await new Promise(resolve => setTimeout(resolve, 2000));
 
                     /**
                      * Scout generates an alpr_results JSON value for every

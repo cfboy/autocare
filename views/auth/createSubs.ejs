@@ -188,7 +188,7 @@
                 // Get all values
                 var brand = $("#brand").val(),
                     model = $("#carModel").val(),
-                    plate = $("#carPlate").val(),
+                    plate = $("#carPlate").val().toUpperCase(),
                     priceID = $("#product").val(),
                     product = $("#product").find('option:selected').attr("name"),
                     price = $("#product").find('option:selected').attr("price"),

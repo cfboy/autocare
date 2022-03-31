@@ -66,18 +66,22 @@ $(document).ready(function () {
         const billingID = $(this).attr("value");
         const email = $(this).attr("email");
 
-        fetch('/checkout', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'email': email
-            },
-            body: JSON.stringify({
-                subscriptions,
-                customerID: billingID
+        if (billingID) {
+            fetch('/checkout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'email': email
+                },
+                body: JSON.stringify({
+                    subscriptions,
+                    customerID: billingID
+                })
             })
-        })
-            .then((result) => result.json())
-            .then(({ sessionId }) => stripe.redirectToCheckout({ sessionId }))
+                .then((result) => result.json())
+                .then(({ sessionId }) => stripe.redirectToCheckout({ sessionId }))
+        } else {
+            alert("This user don't have billing id.")
+        }
     })
 })
