@@ -29971,6 +29971,12 @@ table.dataTable tbody td.select-checkbox:after {
     line-height: 2.5;
 }
 
+.br-0 {
+    border-radius: 0 !important;
+}
+.br-5 {
+    border-radius: 5px !important;
+}
 
 /* Select2 */
 

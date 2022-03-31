@@ -70,6 +70,7 @@
                     </a>
                 </div>
             </li>
+            <% if(user.billingID) { %>
             <li class="nav-item">
                 <a class="nav-link" href="/create-subscriptions" aria-expanded="false" title="Add Membership">
                     <i class="fa-solid fa-cart-plus text-primary"></i>
@@ -77,6 +78,7 @@
                     <!-- <i class="fa-solid fa-list"></i> -->
                 </a>
             </li>
+            <% } %>
             <% var hasNotifi = (user?.notifications?.filter(notification => notification.isRead == false).length > 0) ? true : false %>
 
             <li class="nav-item dropdown" onclick="<%= hasNotifi ? `changeNotificationState('', true, true)` : '' %>">
@@ -138,10 +140,12 @@
                         <i class="dropdown-item-icon far fa-user text-primary me-2"></i> <%= lingua.user.myProfile%>
                         <!-- <span class="badge badge-pill badge-danger">1</span> -->
                     </a>
+                    <% if(user.billingID) { %>
                     <a id="manage-billing-button" class="dropdown-item manage-billing-button" style="margin: 0;"
                         type="submit" value="<%- user.billingID%>" email="<%- user.email%>">
                         <i class="dropdown-item-icon fab fa-stripe-s  text-primary me-2"></i>
                         <%= lingua.membership.manageBilling%></a>
+                    <% } %>
                     <!-- <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-message-text-outline text-primary me-2"></i> Messages</a> -->
                     <a class="dropdown-item" href="/activity">
                         <!-- <i class="dropdown-item-icon mdi mdi-calendar-check-outline text-primary me-2"></i> -->

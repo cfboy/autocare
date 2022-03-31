@@ -152,7 +152,7 @@
     "next": "Próximo",
     "search": "Buscar",
     "emptyTable": "No hay data disponible en la tabla",
-    "infoNotEmpty": "Mostrando _Principio_ a _Final_ de _TOTAL_ entradas",
+    "infoNotEmpty": "Mostrando _START_ a _END_ de _TOTAL_ entradas",
     "infoEmpty": "Mostrando 0 a 0 de 0 entradas",
     "lengthMenu": "Muestra _MENU_ entradas",
     "selectLanguage": "Seleccionar Lenguaje",

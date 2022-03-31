@@ -56,7 +56,8 @@
                                                 <div class="d-sm-flex justify-content-between align-items-start">
                                                     <a href="/changePassword/<%- customer.id%>?url=/customers"
                                                         type="button" class="btn btn-primary btn-icon-text m-1">
-                                                        <i class="fa-solid fa-key"></i> <%= lingua.user.password.changePassword%>
+                                                        <i class="fa-solid fa-key"></i>
+                                                        <%= lingua.user.password.changePassword%>
                                                     </a>
                                                     <a href="/edit-user/<%- customer.id%>?url=/customers" data-id="user"
                                                         type="button" class="btn btn-primary btn-icon-text m-1">
@@ -153,18 +154,19 @@
                                                             <td><%- car.model%></td>
                                                             <td><%- car.plate%></td>
 
-                                                            <td>
+                                                            <td class="text-center">
                                                                 <% if(enableActions) { %>
                                                                 <a href="/edit-car/<%- car.id%>?url=/cars" type="button"
-                                                                    class="btn btn-icon btn-icon-no-border no-margin">
+                                                                    class="btn btn-icon btn-icon-no-border no-margin pt-0 pb-0">
                                                                     <i class="far fa-edit icon-sm"></i>
                                                                 </a>
-
+                                                                <% if([roles.ADMIN].includes(user.role)) { %>
                                                                 <a id="deleteBtn"
                                                                     onclick="return confirmDelete('/delete-car', '<%- car.id%>')"
-                                                                    class="btn btn-icon btn-icon-no-border no-margin">
+                                                                    class="btn btn-icon btn-icon-no-border no-margin pt-0 pb-0">
                                                                     <i class="fas fa-trash-alt icon-sm text-danger"></i>
                                                                 </a>
+                                                                <% } %>
                                                                 <% } else { %>
                                                                 N/A
                                                                 <% } %>
