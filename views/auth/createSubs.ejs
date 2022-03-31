@@ -165,8 +165,8 @@
             var cartString = '<%- JSON.stringify(cart) %>'
             if (cartString) {
                 var cart = JSON.parse(cartString);
-                if (cart?.length > 0) {
-                    for (item of cart) {
+                if (cart?.items?.length > 0) {
+                    for (item of cart.items) {
                         rowIdx++;
                         addDataToTable(item)
                     }

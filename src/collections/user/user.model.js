@@ -28,7 +28,14 @@ const userSchema = new Schema({
         isRead: { type: Boolean, default: false },
         message: String,
         created_date: { type: Date, default: Date.now },
-    }]
+    }],
+    cart: {
+        items: [{
+            id: String,
+            brand: String, model: String, plate: String,
+            product: String, price: String, priceID: String
+        }]
+    }
 })
 
 const User = mongoose.model('user', userSchema, 'user')

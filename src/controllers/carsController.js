@@ -329,8 +329,10 @@ exports.validatePlate = async (req, res) => {
         if (car || subscriptionList?.some(car => car.plate === plateNumber)) {
             existingCar = true
         } else if (addToCart) {
-            req.session.cart = req.session.cart || []
-            req.session.cart.push(newItem)
+            let [customer, item] = await UserService.addItemToCart(req.user.id, newItem)
+
+            if (customer && item)
+                console.debug('Item Added successfully')
         }
 
         res.send({ existingCar: existingCar })

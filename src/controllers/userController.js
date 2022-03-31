@@ -464,3 +464,17 @@ exports.changeNotificationState = async (req, res) => {
 
     }
 }
+
+exports.removeFromCart = async (req, res) => {
+
+    let itemToRemove = req.body.item
+    let returnValues
+
+    let user = await UserService.removeItemFromCart(req.user.id, itemToRemove)
+    if (user)
+        returnValues = { itemRemoved: true, subscriptionList: user.cart }
+    else
+        returnValues = { itemRemoved: false, subscriptionList: [] }
+
+    res.send(returnValues)
+}

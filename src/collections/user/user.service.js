@@ -327,6 +327,71 @@ const readAllNotifications = (User) => async (userID) => {
     return customer
 }
 
+
+/**
+ * This function add new item to user cart.
+ * @param {userID, item} User 
+ * @returns user object
+ */
+const addItemToCart = (User) => async (id, item) => {
+    console.log(`addItemToCart() ID: ${id}`)
+
+    let customer = await User.findByIdAndUpdate({ _id: id },
+        { $addToSet: { 'cart.items': item } },
+        { new: true })
+        .then(result => {
+            if (result) {
+                console.debug(`addItemToCart(): Successfully Added item to cart: ${result.email}.`);
+                return result
+            } else {
+                console.debug("addItemToCart(): No document returned.");
+            }
+        })
+        .catch(err => console.error(`Failed to add item to cart: ${err}`));
+
+    let itemToRtrn = customer?.cart.items.find(obj => obj.plate == item.plate)
+
+    return [customer, itemToRtrn]
+}
+
+/**
+ * This function remove the item from user cart.
+ * @param {id, item} User 
+ * @returns User
+ */
+const removeItemFromCart = (User) => async (id, item) => {
+    console.log(`removeItemFromCart() ID: ${id}`)
+
+    return await User.findByIdAndUpdate({ _id: id },
+        { $pull: { 'cart.items': item } },
+        { new: true }, function (err, doc) {
+            if (err) {
+                console.error(err.message)
+            } else {
+                console.debug("Item from cart Removed of user: ", doc.email);
+            }
+        })
+}
+
+/**
+ * This function empty the user cart.
+ * @param {id, item} User 
+ * @returns User
+ */
+const emptyCart = (User) => async (id) => {
+    console.log(`emptyCart() ID: ${id}`)
+
+    return await User.findByIdAndUpdate({ _id: id },
+        { $set: { 'cart.items': [] } },
+        { new: true }, function (err, doc) {
+            if (err) {
+                console.error(err.message)
+            } else {
+                console.debug("The cart is empty for user: ", doc.email);
+            }
+        })
+}
+
 module.exports = (User) => {
     return {
         addUser: addUser(User),
@@ -346,6 +411,9 @@ module.exports = (User) => {
         getUsersByList: getUsersByList(User),
         addNotification: addNotification(User),
         changeNotificationState: changeNotificationState(User),
-        readAllNotifications: readAllNotifications(User)
+        readAllNotifications: readAllNotifications(User),
+        addItemToCart: addItemToCart(User),
+        removeItemFromCart: removeItemFromCart(User),
+        emptyCart: emptyCart(User)
     }
 }

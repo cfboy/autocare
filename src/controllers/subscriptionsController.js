@@ -17,12 +17,13 @@ let readingQueue = []
  */
 exports.createSubscriptions = async (req, res) => {
     try {
-        let { message, alertType, cart } = req.session
+        let { message, alertType } = req.session
         // clear message y alertType
         req.session.message = ''
         req.session.alertType = ''
 
         let user = req.user
+        let cart = user.cart
         if (user.billingID) {
             let { allMakes, allModels } = await CarService.getAllMakes()
 
@@ -43,14 +44,6 @@ exports.createSubscriptions = async (req, res) => {
     }
 }
 
-exports.removeFromCart = async (req, res) => {
-
-    let itemToRemove = req.body.item
-
-    req.session.cart = req.session.cart.filter(item => item.id != itemToRemove.id)
-
-    res.send({ itemRemoved: true, subscriptionList: req.session.cart })
-}
 /**
  * This function render the validateMembership template. 
  * @param {*} req 
