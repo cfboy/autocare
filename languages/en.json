@@ -5,7 +5,7 @@
     "title": "Membership Portal",
     "welcome": "Welcome",
     "login": "Login",
-    "signOut": "Sing Out",
+    "signOut": "Sign Out",
     "register": "Register",
     "pricingList": "Pricing List",
     "dontHaveAccount": "Don't have an account?",
@@ -14,7 +14,7 @@
     "accountCreated": "Account Created",
     "validLink": "Valid Link",
     "invalidLink": "Invalid Link",
-    "existEmail": "That email already exist, please login.",
+    "existEmail": "That email already exists in our system, please login.",
     "members": "Members",
     "add": "Add",
     "car": {
@@ -34,12 +34,12 @@
         "addMissingCar": "Add Missing Car",
         "toUseOnNextPeriod": "to use on next period",
         "confirmCarsForNextPeriod": "Confirm cars for next period",
-        "maxServiceQty": "This car has the maximum quantity of services per day",
+        "maxServiceQty": "This car has the maximum quantity of services for the day",
         "carExpiredOn": "This car expired on {date}",
         "notFound": "Car not found",
-        "existingCar": "Existing Car Plate in the system. Please provide another plate",
+        "existingCar": "This is an existing Car Plate in the system. Please provide another plate",
         "validCar": "Valid Car Plate",
-        "membershipToAddCar": "Membership to add aCar"
+        "membershipToAddCar": "Membership to add a Car"
     },
     "user": {
         "name": "User",
@@ -81,7 +81,7 @@
         "memberships": "Memberships",
         "invalidMemberships": "Invalid Memberships",
         "createSubscriptions": "Create Memberships",
-        "notPlan": "You are currently not on any plan. Purchase a subscription below.",
+        "notPlan": "You are currently not in any plan. Please purchase a subscription below.",
         "notHappy": "Not happy with your current plan? Cancel or Upgrade by clicking the button below.",
         "disclaimer": "This is a subscription for 30 days upon purchase date.",
         "perGroupOf": "per group of",
@@ -138,7 +138,7 @@
     "notifications": "Notifications",
     "newNotifications": "You have {qty} new notifications",
     "myNotifications": "My Notifications",
-    "stripeCharges": "Stripe Carges",
+    "stripeCharges": "Stripe Charges",
     "invoices": "Invoices",
     "invoiceNumber": "Invoice Number",
     "events": "Events",
@@ -196,7 +196,7 @@
     "hasBeenDeleted": "${message} has been deleted.",
     "email": {
         "title": "Auto Care Password Reset Request",
-        "verifyEmail": "Verify your email {email} to complete reset password process.",
+        "verifyEmail": "Verify your email {email} to complete the reset password process.",
         "resetSucessfully": "Auto Care Password Reset Successfully",
         "notSend": "Email Not Send."
     }

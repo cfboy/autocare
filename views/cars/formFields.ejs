@@ -7,7 +7,8 @@
         <input type="text" id="brand" name="brand" class="form-control mb-3 form-control-lg text-uppercase"
             placeholder="Brand" autofocus required />
         <% } else { %>
-        <select id="brand" name="brand" required autofocus onchange="findModel(this.value)"
+        <select id="brand" name="brand" required autofocus
+            onchange="findModel(this.value, null, `<%= lingua.selectOne%>`)"
             class="form-control mb-3 form-control-lg js-example-basic-single w-100">
             <option value=""><%= lingua.selectOne%></option>
             <% for(const make of allMakes) { %>

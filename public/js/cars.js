@@ -3,7 +3,7 @@
  * @param {*} makeName 
  * @param {*} carModel 
  */
-function findModel(makeName, carModel = null) {
+function findModel(makeName, carModel = null, select) {
     console.log("Make Name: " + makeName);
     // Call to Cars API to get the Model of selected Make.
     let modelSelect = $('#carModel'); //Get the Select element of the Car Model.
@@ -12,7 +12,7 @@ function findModel(makeName, carModel = null) {
         // Removed ajax call to avoid go to server and back.
         // $.ajax({
         // success: function () {
-        modelSelect.empty().append(new Option("Select One", "", false, false)).trigger("change");
+        modelSelect.empty().append(new Option(select, "", false, false)).trigger("change");
         // }
         // });
     } else {
@@ -31,7 +31,7 @@ function findModel(makeName, carModel = null) {
 
                 // console.log(result);
                 // Append the models to select element.
-                modelSelect.empty().append(new Option("Select One", "", false, false));
+                modelSelect.empty().append(new Option(select, "", false, false));
 
                 $.each(models, function () {
                     let selected = (carModel && carModel == this.Model_Name)

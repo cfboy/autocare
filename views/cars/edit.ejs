@@ -111,7 +111,7 @@
             var makeSelect = $('#brand');
 
             if (makeSelect.val() !== '')
-                findModel(makeSelect.val(), '<%= car?.model%>');
+                findModel(makeSelect.val(), '<%= car?.model%>', '<%= lingua.selectOne%>');
         });
     </script>
 </body>
