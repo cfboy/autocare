@@ -173,8 +173,12 @@
             if (data.plate) {
                 console.debug(JSON.stringify(data));
                 document.querySelector('#resultOfCameraScanLoading').innerHTML = '';
-                document.querySelector('#resultOfCameraScan').innerHTML = (`
+                let exist = document.querySelector(`#plate-${data.plate}`) !== null;
+                if (!exist) {
+                    console.log('New Plate to show')
+                    document.querySelector('#resultOfCameraScan').innerHTML = (`
                     <a id="plate-${data.plate}" class="btn btn-icon-md btn-outline-behance" onclick="setPlateValue('${data.plate}')"><b>${data.plate}</b></a>` + '<br>')
+                }
             }
         })
 
