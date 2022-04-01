@@ -5,7 +5,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Users </title>
+    <title><%= lingua.user.users%></title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="../vendors/feather/feather.css">
     <link rel="stylesheet" href="../vendors/mdi/css/materialdesignicons.min.css">
@@ -14,9 +14,6 @@
     <link rel="stylesheet" href="../vendors/simple-line-icons/css/simple-line-icons.css">
     <link rel="stylesheet" href="../vendors/css/vendor.bundle.base.css">
     <link rel="stylesheet" href="../../css/register.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-        integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- endinject -->
     <!-- Plugin css for this page -->
     <!-- <link rel="stylesheet" href="../vendors/datatables.net-bs4/dataTables.bootstrap4.css"> -->
@@ -47,28 +44,31 @@
                                 <div class="col-12 grid-margin stretch-card">
                                     <div class="card card-rounded">
                                         <div class="card-body">
-                                            <div class="d-sm-flex justify-content-between align-items-start">
+                                            <div class="d-flex justify-content-between align-items-start">
                                                 <div>
-                                                    <h4 class="card-title card-title-dash">Users</h4>
+                                                    <h4 class="card-title card-title-dash"><%= lingua.user.users%></h4>
                                                 </div>
+                                                <% if([roles.ADMIN].includes(user.role)) { %>
                                                 <div>
                                                     <a href="/create-user" class="btn btn-primary btn-icon-text"
-                                                        type="button"><i
-                                                            class="mdi mdi-map-marker-plus btn-icon-prepend"></i>Add
-                                                        User</a>
+                                                        type="button">
+                                                        <i class="fas fa-plus btn-icon-prepend btn-icon-prepend"></i>
+                                                        <%= lingua.user.add%></a>
                                                 </div>
+                                                <% } %>
+
                                             </div>
                                             <br>
                                             <div class="table-responsive  mt-1">
                                                 <table id="users" class="table table-hover stripe">
                                                     <thead>
                                                         <tr>
-                                                            <th>Name</th>
-                                                            <th>Role</th>
-                                                            <th>Email</th>
-                                                            <th>Phone</th>
+                                                            <th><%= lingua.user.name%></th>
+                                                            <th><%= lingua.user.role%></th>
+                                                            <th><%= lingua.user.email%></th>
+                                                            <th><%= lingua.user.phoneNumber%></th>
                                                             <!-- <th>Plan</th> -->
-                                                            <th>Action</th>
+                                                            <th><%= lingua.action%></th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -76,7 +76,7 @@
                                                         <% for(const user of users) { %>
                                                         <tr>
                                                             <td>
-                                                                <a class="btn-link" href="/view-user/<%- user.id%>">
+                                                                <a class="btn-link" href="/customers/<%- user.id%>">
                                                                     <%- user.personalInfo.firstName + ' ' + user.personalInfo.lastName %>
                                                                     <% if(!user.hasAllInformation) {%>
                                                                     <i class="mdi mdi-alert text-warning"
@@ -93,30 +93,26 @@
                                                             <td>
                                                                 <%- user.personalInfo.phoneNumber %>
                                                             </td>
-
-                                                            <!-- <td> -->
-                                                            <!-- <%# user.membershipInfo.plan%> -->
-                                                            <!-- </td> -->
-
                                                             <td>
-                                                                <a href="/edit-user/<%- user.id%>?url=/users"
+                                                                <% var url = [roles.ADMIN].includes(user.role) ? 'users' : 'customers' %>
+                                                                <a href="/edit-user/<%- user.id%>?url=/<%- url%>"
                                                                     type="button"
                                                                     class="btn btn-icon btn-icon-no-border no-margin">
                                                                     <i class="far fa-edit icon-sm"></i>
                                                                 </a>
-
+                                                                <% if([roles.ADMIN].includes(user.role)) { %>
                                                                 <a class="btn btn-icon btn-icon-no-border no-margin manage-billing-button"
                                                                     style="margin: 0;" type="submit"
                                                                     value="<%- user.billingID%>"
                                                                     email="<%- user.email%>">
                                                                     <i class="fab fa-stripe-s icon-sm"></i>
                                                                 </a>
-
                                                                 <a id="deleteBtn"
                                                                     onclick="return confirmDelete('/delete-user', '<%- user.id%>')"
                                                                     class="btn btn-icon btn-icon-no-border no-margin">
                                                                     <i class="fas fa-trash-alt icon-sm text-danger"></i>
                                                                 </a>
+                                                                <% } %>
                                                             </td>
                                                         </tr>
                                                         <% } %>
@@ -133,8 +129,8 @@
                 </div>
             </div>
         </div>
-    </div>
-    <!-- page-body-wrapper ends -->
+        <!-- partial:partials/_footer.html -->
+        <%- include('../partials/footer.ejs'); %>
     </div>
     <!-- container-scroller -->
 

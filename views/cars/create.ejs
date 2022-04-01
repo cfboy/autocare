@@ -5,7 +5,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Create Car </title>
+    <title><%= lingua.car.add%></title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="../vendors/feather/feather.css">
     <link rel="stylesheet" href="../vendors/mdi/css/materialdesignicons.min.css">
@@ -14,7 +14,8 @@
     <link rel="stylesheet" href="../vendors/simple-line-icons/css/simple-line-icons.css">
     <link rel="stylesheet" href="../vendors/css/vendor.bundle.base.css">
     <link rel="stylesheet" href="../../css/register.css">
-
+    <link rel="stylesheet" href="../vendors/select2/select2.min.css">
+    <link rel="stylesheet" href="../vendors/select2-bootstrap-theme/select2-bootstrap.min.css">
     <!-- endinject -->
     <!-- Plugin css for this page -->
     <!-- <link rel="stylesheet" href="../vendors/datatables.net-bs4/dataTables.bootstrap4.css"> -->
@@ -44,61 +45,46 @@
                                 <div class="col-12 grid-margin stretch-card">
                                     <div class="card card-rounded">
                                         <div class="card-body">
-                                            <h4>Create Car</h4>
-                                            <form id="form-create-car" class="pt-3" action="/create-car" method="post">
+                                            <h4><%= lingua.car.add%></h4>
+                                            <form id="form-create-car" class="pt-3" action="/cars/create" method="post">
                                                 <input id="userID" name="userID" value="<%= user.id%>" hidden />
                                                 <div class="row">
-                                                    <div class="col-lg-6">
+                                                    <% if(siToAddCar.length > 0) { %>
+                                                    <div class="col-lg-12">
                                                         <div class="form-group">
-                                                            <label for="carName" class="sr-only">Name</label>
+                                                            <label for="subItem"
+                                                                class="required"><%= lingua.car.membershipToAddCar%></label>
 
-                                                            <input type="text" id="carName" name="name"
-                                                                class="form-control mb-3 form-control-lg"
-                                                                placeholder="Car Name" autofocus />
+                                                            <select id="subItem" name="subItem" required autofocus
+                                                                class="form-control mb-3 form-control-lg js-example-basic-single w-100">
+                                                                <option value=""><%= lingua.selectOne%></option>
+                                                                <% for(item of siToAddCar) { %>
+
+                                                                <% var selected = (item.data.id === itemID) ? "selected" : ""; %>
+
+                                                                <option
+                                                                    value="<%= item.data?.subscription%>/<%= item.data.id%>"
+                                                                    <%= selected%>>
+                                                                    <%= item.data.price.product.name%>
+                                                                    (<%= moment(item?.data?.created).isValid() ? moment(item.data?.created * 1000).format(completeDateFormat) : 'N/A' %>)
+                                                                </option>
+                                                                <% } %>
+
+                                                            </select>
                                                         </div>
                                                     </div>
-                                                    <div class="col-lg-6">
-                                                        <div class="form-group">
-                                                            <label for="carBrand" class="sr-only required">Car
-                                                                Brand</label>
-
-                                                            <input type="text" id="carBrand" name="brand"
-                                                                class="form-control mb-3 form-control-lg"
-                                                                placeholder="Car Brand" autofocus required />
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-6">
-
-                                                        <div class="form-group">
-                                                            <label for="carModel" class="sr-only required">Car
-                                                                Model</label>
-
-                                                            <input type="text" id="carModel" name="model"
-                                                                class="form-control mb-3 form-control-lg"
-                                                                placeholder="Car Model" autofocus required />
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-6">
-
-                                                        <div class="form-group">
-                                                            <label for="carPlate" class="sr-only required">Car
-                                                                Plate</label>
-
-                                                            <input type="text" id="carPlate" name="plate"
-                                                                class="form-control mb-3 form-control-lg"
-                                                                placeholder="Car Plate" autofocus required />
-                                                        </div>
-                                                    </div>
+                                                    <% } %>
+                                                    <%- include('./formFields.ejs', {allMakes, car: null}); %>
                                                 </div>
                                                 <div class="row">
                                                     <div class="mt-3">
 
                                                         <a href="/cars"
-                                                            class="btn btn-block btn-light btn-lg font-weight-medium auth-form-btn float-end">Cancel</a>
+                                                            class="btn btn-block btn-light btn-lg font-weight-medium auth-form-btn float-end"><%= lingua.cancel%></a>
 
-                                                        <button
+                                                        <button id="add-btn"
                                                             class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn float-end"
-                                                            type="submit">Save</button>
+                                                            type="submit"><%= lingua.save%></button>
                                                     </div>
                                                 </div>
                                             </form>
@@ -112,6 +98,8 @@
             </div>
         </div>
         <!-- page-body-wrapper ends -->
+        <!-- partial:partials/_footer.html -->
+        <%- include('../partials/footer.ejs'); %>
     </div>
     <!-- container-scroller -->
 
@@ -130,8 +118,9 @@
     <script src="../js/off-canvas.js"></script>
     <script src="../js/hoverable-collapse.js"></script>
     <script src="../js/template.js"></script>
-    <script src="../js/settings.js"></script>
-    <script src="../js/todolist.js"></script>
+    <!-- <script src="../js/settings.js"></script> -->
+    <!-- <script src="../js/todolist.js"></script> -->
+
     <!-- endinject -->
     <!-- Custom js for this page-->
 
@@ -139,10 +128,44 @@
     <script type="text/javascript" src="../js/account.js"></script>
     <script src="../js/jquery.cookie.js" type="text/javascript"></script>
     <script src="../js/Chart.roundedBarCharts.js"></script>
+    <script src="../vendors/select2/select2.min.js"></script>
+    <script src="../js/select2.js"></script>
 
     <!-- End custom js for this page-->
-
     <%- include('../partials/alerts.ejs', {message, alertType}); %>
+    <script>
+        $('#add-btn').on('click', function (e) {
+            e.preventDefault();
+            var plate = $("#carPlate").val().toUpperCase()
+            showResult('#plateValidationResult', ``);
+            $.ajax({
+                url: "/validatePlate",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    plateNumber: plate,
+                    addToCart: false
+                }),
+            }).done(function (result) {
+                if (result.existingCar) {
+                    document.getElementById("carPlate").setCustomValidity("<%= lingua.car.existingCar%>");
+                    document.getElementById("carPlate").reportValidity();
+                    let reportMessage = `<p class="error"><%= lingua.car.existingCar%>.</p>`
+                    showResult('#plateValidationResult', reportMessage);
+                    // return false
+                } else {
+                    $('#form-create-car').submit();
+                }
+            }).fail(function (err) {
+                console.log(err);
+                // return false
+            })
+        });
+
+        var showResult = function (updateDiv, result) {
+            $(updateDiv).html(result);
+        }
+    </script>
 </body>
 
 </html>

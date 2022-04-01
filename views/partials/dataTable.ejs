@@ -1,19 +1,34 @@
 <!-- Datatables -->
-<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<!-- <script src="https://code.jquery.com/jquery-3.5.1.js"></script> -->
 <script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap5.min.js"></script>
 <script>
     $(document).ready(function () {
-        
-    let dateColumn = null;
-    <% if (typeof dateColumn == 'number') {%>
-        dateColumn = <%= dateColumn %>;
-    <% } %>
     
     $('<%= tableID %>').DataTable({
-        columnDefs: dateColumn ? [{ type: 'date', 'targets': [dateColumn] }] : '',
-        order: dateColumn ? [[dateColumn, 'desc']] : '',
-        "language": {
+        // TODO: implement multiple date columns support.
+        <% if (typeof dateColumn == 'number') { %>
+            columnDefs: [
+
+                { type: 'date', 'targets': [<%= dateColumn %>] }
+            ],
+                order: [[<%= dateColumn %>, 'desc']],
+        <% } %> 
+
+        <% if (typeof paging == 'boolean') { %>
+            "paging": <%= paging %>,
+        <% } %>
+        <% if (typeof info == 'boolean') { %>
+            "info": <%= info %>,
+        <% } %>
+        <% if (typeof searching == 'boolean') { %>
+            "searching": <%= searching %>,
+        <% } %>
+
+        <% if (typeof ordering == 'boolean') { %>
+            "ordering": <%= ordering %>,
+        <% } %>
+            "language": {
             "emptyTable": "<%= lingua.emptyTable%>",
             "info": "<%= lingua.infoNotEmpty%>",
             "infoEmpty": "<%= lingua.infoEmpty%>",
@@ -24,14 +39,43 @@
             "loadingRecords": "Loading...",
             "processing": "Processing...",
             "search": "<%= lingua.search%>:",
-            "zeroRecords": "No matching records found",
+            "zeroRecords": "<%= lingua.zeroRecords%>",
             "paginate": {
-                "first": "First",
-                "last": "Last",
+                "first": "<%= lingua.first%>",
+                "last": "<%= lingua.last%>",
                 "next": "<%= lingua.next%>",
                 "previous": "<%= lingua.previous%>"
             },
-        }
+        },
+        <% if (typeof footerCheckout == 'boolean' && footerCheckout == true) { %>
+            "footerCallback": function (row, data, start, end, display) {
+                var api = this.api();
+
+                // Remove the formatting to get integer data for summation
+                var intVal = function (i) {
+                    return typeof i === 'string' ?
+                        i.replace(/[\$,]/g, '') * 1 :
+                        typeof i === 'number' ?
+                            i : 0.0;
+                };
+
+                quantity = api.column(0).data().count();
+                $(api.column(0).footer()).html(
+                    '<%= lingua.quantity%>: ' + quantity
+                );
+                // Total over all pages
+                total = api
+                    .column(2)
+                    .data()
+                    .reduce(function (a, b) {
+                        return (intVal(a) + intVal(b)).toFixed(2);
+                    }, (0).toFixed(2));
+                // Update footer
+                $(api.column(2).footer()).html(
+                    '$' + total
+                );
+            }
+        <% } %>
     });
     });
 </script>

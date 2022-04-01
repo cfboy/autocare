@@ -1,6 +1,8 @@
-if (process.env.NODE_ENV !== 'production') {
-    require('dotenv').config() //Loads environment variables from .env file into the process
-}
+// if (process.env.NODE_ENV !== 'production') {
+require('dotenv').config() //Loads environment variables from .env file into the process
+// }
+require("express-async-errors");
+
 const bodyParser = require('body-parser'),
     express = require('express'),
     session = require('express-session'),
@@ -16,6 +18,9 @@ const bodyParser = require('body-parser'),
 var MemoryStore = require('memorystore')(session),
     router = require('./router'),
     moment = require('moment');
+
+const pjson = require('./package.json');
+
 
 // Connections
 require('./src/connect/mongodb') //Connection to MongoDB
@@ -70,6 +75,10 @@ app.locals.alertTypes = alertTypes //To use this on the client side is necessary
 app.locals.roles = ROLES
 app.locals.stripeStatus = STATUS
 
+app.locals.version = pjson.version
+app.locals.domain = process.env.DOMAIN
+app.locals.financialReports = process.env.FINANCIAL_REPORTS_LINK
+
 // Lingua configuration
 app.use(lingua(app, {
     defaultLocale: 'es',
@@ -85,6 +94,10 @@ app.use(lingua(app, {
 }));
 
 app.use('/', router);
+
+app.use((error, req, res, next) => {
+    res.status(500).json({ error: error.message });
+});
 
 const port = process.env.PORT || 3000
 

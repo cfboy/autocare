@@ -5,7 +5,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>My Cars </title>
+    <title><%= lingua.car.cars%></title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="../vendors/feather/feather.css">
     <link rel="stylesheet" href="../vendors/mdi/css/materialdesignicons.min.css">
@@ -47,15 +47,16 @@
                                 <div class="col-12 grid-margin stretch-card">
                                     <div class="card card-rounded">
                                         <div class="card-body">
-                                            <div class="d-sm-flex justify-content-between align-items-start">
+                                            <div class="d-flex justify-content-between align-items-start">
                                                 <div>
-                                                    <h4 class="card-title card-title-dash">My Cars</h4>
+                                                    <h4 class="card-title card-title-dash"><%= lingua.car.cars%></h4>
                                                 </div>
-                                                <% if(user.cars.length < 1) { %>
+                                                <% if(canAddCar) { %>
                                                 <div>
-                                                    <a href="/create-car" class="btn btn-primary btn-icon-text"
+                                                    <a href="/cars/create" class="btn btn-primary btn-icon-text"
                                                         type="button">
-                                                        <i class="fas fa-plus btn-icon-prepend"></i>Add Car</a>
+                                                        <i
+                                                            class="fas fa-plus btn-icon-prepend"></i><%= lingua.car.add%></a>
                                                 </div>
                                                 <% } %>
                                             </div>
@@ -64,11 +65,14 @@
                                                 <table id="users" class="table table-hover stripe">
                                                     <thead>
                                                         <tr>
-                                                            <th>Name</th>
-                                                            <th>Brand</th>
-                                                            <th>Model</th>
-                                                            <th>Plate</th>
-                                                            <th>Action</th>
+                                                            <th><%= lingua.car.brand%></th>
+                                                            <th><%= lingua.car.model%></th>
+                                                            <th><%= lingua.car.plate%></th>
+                                                            <th><%= lingua.service.qty%></th>
+                                                            <th><%= lingua.createdDate%></th>
+                                                            <%# if(canManageCars) { %>
+                                                            <th><%= lingua.action%></th>
+                                                            <%# } %>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -76,31 +80,43 @@
                                                         <% for(const car of cars) { %>
                                                         <tr>
                                                             <td>
-                                                                <a class="btn-link" href="/car/<%- car.id%>">
-                                                                    <%- car.name %>
-                                                                </a>
-                                                            </td>
-                                                            <td>
-                                                                <%- car.brand%>
-                                                            </td>
-                                                            <td>
-                                                                <%- car.model%>
-                                                            </td>
-                                                            <td>
-                                                                <%- car.plate %>
+                                                                <a class="btn-link"
+                                                                    href="/car/<%- car.id%>"><%- car.brand%></a>
+                                                                <% if(car?.cancel_date) { %>
+                                                                <br>
+                                                                <p class="mt-1">
+                                                                    <small>
+
+                                                                        (<%= lingua.membership.validUntil%>:
+                                                                        <%= moment(car?.cancel_date).isValid() ? moment(car?.cancel_date).format(shortDateFormat) : 'N/A' %>)
+
+                                                                    </small>
+                                                                </p>
+                                                                <% } %>
                                                             </td>
 
+                                                            <td><%- car.model%></td>
+                                                            <td><%- car.plate%></td>
+                                                            <td><%- car?.services?.length%></td>
                                                             <td>
-                                                                <a href="/edit-car/<%- car.id%>?url=/cars" type="button"
-                                                                    class="btn btn-icon btn-icon-no-border no-margin">
+                                                                <%= moment(car?.created_date).isValid() ? moment(car?.created_date).format(completeDateFormat) : 'N/A' %>
+
+                                                            </td>
+                                                            <td>
+                                                                <% let hasServices = car?.services?.length > 0 %>
+
+                                                                <a <%- !hasServices ? `href="/edit-car/${car.id}?url=/cars"` : ''%>
+                                                                    type="button"
+                                                                    class="btn btn-icon btn-icon-no-border no-margin pt-0 pb-0 <%= hasServices ? 'disabled' : '' %>">
                                                                     <i class="far fa-edit icon-sm"></i>
                                                                 </a>
 
                                                                 <a id="deleteBtn"
-                                                                    onclick="return confirmDelete('/delete-car', '<%- car.id%>')"
-                                                                    class="btn btn-icon btn-icon-no-border no-margin">
+                                                                    <%- !hasServices ? `onclick="return confirmDelete('/delete-car', '${car.id}')"` : ''%>
+                                                                    class="btn btn-icon btn-icon-no-border no-margin pt-0 pb-0 <%= hasServices ? 'disabled' : '' %>">
                                                                     <i class="fas fa-trash-alt icon-sm text-danger"></i>
                                                                 </a>
+
                                                             </td>
                                                         </tr>
                                                         <% } %>
@@ -117,6 +133,8 @@
                 </div>
             </div>
         </div>
+        <!-- partial:partials/_footer.html -->
+        <%- include('../partials/footer.ejs'); %>
     </div>
     <!-- page-body-wrapper ends -->
     </div>
@@ -152,7 +170,7 @@
     <script src="../js/helper-functions.js"></script>
     <!-- Alerts Code -->
     <%- include('../partials/alerts.ejs', {message, alertType}); %>
-    <%- include('../partials/dataTable.ejs', {tableID : '#users'}); %>
+    <%- include('../partials/dataTable.ejs', {tableID : '#users', dateColumn: 4 }); %>
 </body>
 
 </html>

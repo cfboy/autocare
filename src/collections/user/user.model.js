@@ -13,9 +13,6 @@ const userSchema = new Schema({
     password: String,
     billingID: String, //Stripe ID
     role: { type: String, enum: Object.values(ROLES), default: ROLES.CUSTOMER },
-    locations: [{ type: Schema.Types.ObjectId, ref: 'location', default: null }],
-    hasAllInformation: { type: Boolean, default: false },
-
     personalInfo: {
         firstName: String,
         middleName: String,
@@ -24,22 +21,20 @@ const userSchema = new Schema({
         dateOfBirth: { type: Date, default: null },
         city: String
     },
-    services: [{
-        id: String,
-        date: { type: Date, default: Date.now },
-        location: { type: Schema.Types.ObjectId, ref: 'location', default: null },
-        authorizedBy: { type: Schema.Types.ObjectId, ref: 'user', default: null },
+    locations: [{ type: Schema.Types.ObjectId, ref: 'location', default: null }],
+    hasAllInformation: { type: Boolean, default: false },
+    created_date: { type: Date, default: Date.now },
+    notifications: [{
+        isRead: { type: Boolean, default: false },
+        message: String,
+        created_date: { type: Date, default: Date.now },
     }],
-    cars: [{ type: Schema.Types.ObjectId, ref: 'car', default: null }],
-    membershipInfo: {
-        plan: { type: String, enum: ['none', 'basic', 'pro'], default: 'none' },
-        hasTrial: { type: Boolean, default: false },
-        endDate: { type: Date, default: null }
-    },
-    tagInfo: {
-        isttached: { type: Boolean, default: false },
-        attachDate: { type: Date, default: null },
-        tagID: String
+    cart: {
+        items: [{
+            id: String,
+            brand: String, model: String, plate: String,
+            product: String, price: String, priceID: String
+        }]
     }
 })
 

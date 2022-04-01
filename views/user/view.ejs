@@ -5,7 +5,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>View User </title>
+    <title><%= lingua.user.view%></title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="../vendors/feather/feather.css">
     <link rel="stylesheet" href="../vendors/mdi/css/materialdesignicons.min.css">
@@ -13,10 +13,7 @@
     <link rel="stylesheet" href="../vendors/typicons/typicons.css">
     <link rel="stylesheet" href="../vendors/simple-line-icons/css/simple-line-icons.css">
     <link rel="stylesheet" href="../vendors/css/vendor.bundle.base.css">
-    <link rel="stylesheet" href="../../css/register.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-        integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
     <!-- endinject -->
     <!-- Plugin css for this page -->
     <!-- <link rel="stylesheet" href="../vendors/datatables.net-bs4/dataTables.bootstrap4.css"> -->
@@ -40,72 +37,81 @@
             <!-- partial -->
             <div class="main-panel">
                 <div class="content-wrapper">
-                    <h4>
-                        <% if(isMyProfile) {%>
-                        My Profile
-                        <% } else { %>
-                        View User
-                        <% } %>
-                    </h4>
                     <% if(customer) { %>
                     <div class="row text-left">
                         <div class="col-lg-12 d-flex flex-column">
                             <div class="row flex-grow">
-                                <div class="col-6 grid-margin stretch-card">
+                                <div class="col-sm-12 col-md-12 grid-margin stretch-card">
                                     <div class="card card-rounded">
                                         <div class="card-body">
-                                            <div class="table-responsive mt-1">
-                                                <div
-                                                    class="d-sm-flex justify-content-between align-items-start float-end">
-                                                    <a href="/edit-user/<%- customer.id%>?url=/view-user" data-id="user"
-                                                        type="button" class="btn btn-primary btn-icon-text">
-                                                        <i class=" mdi mdi-square-edit-outline"></i> Edit
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <h4 class="card-title card-title-dash">
+                                                        <% if(isMyProfile) { %>
+                                                        <%= lingua.user.myProfile%>
+                                                        <% } else { %>
+                                                        <%= lingua.user.view%>
+                                                        <% } %></h4>
+                                                </div>
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <a href="/changePassword/<%- customer.id%>?url=/customers"
+                                                        type="button" class="btn btn-primary btn-icon-text m-1">
+                                                        <i class="fa-solid fa-key"></i>
+                                                        <%= lingua.user.password.changePassword%>
+                                                    </a>
+                                                    <a href="/edit-user/<%- customer.id%>?url=/customers" data-id="user"
+                                                        type="button" class="btn btn-primary btn-icon-text m-1">
+                                                        <i class="fa-solid fa-user-pen"></i>
+                                                        <%= lingua.user.editPersonalInfo%>
                                                     </a>
                                                 </div>
+                                            </div>
+                                            <br>
+
+                                            <div class="table-responsive mt-1">
                                                 <table class="table table-hover">
                                                     <thead>
                                                         <tr>
-                                                            <th>Personal Information</th>
+                                                            <th><%= lingua.user.personalInfo%></th>
                                                             <th></th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         <tr>
-                                                            <td>Email</td>
+                                                            <td><%= lingua.user.email%></td>
                                                             <td>
                                                                 <%- customer.email%>
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td>Password</td>
-                                                            <td id="password">
-                                                                <!-- <%- customer.password%> -->
-                                                                *********
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>Role</td>
+                                                            <td><%= lingua.user.role%></td>
                                                             <td>
                                                                 <%- customer.role%>
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td>Name</td>
+                                                            <td><%= lingua.user.firstName%></td>
                                                             <td>
                                                                 <%- customer.personalInfo.firstName + ' ' + customer.personalInfo.lastName %>
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td>Phone Number</td>
+                                                            <td><%= lingua.user.phoneNumber%></td>
                                                             <td>
                                                                 <%- customer.personalInfo.phoneNumber %>
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td>Birth Date</td>
+                                                            <td><%= lingua.user.dateOfBirth%></td>
                                                             <td>
                                                                 <%= moment(customer.personalInfo.dateOfBirth).isValid() ? moment(customer.personalInfo.dateOfBirth).utc().format(shortDateFormat) : 'N/A' %>
 
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><%= lingua.user.city%></td>
+                                                            <td>
+                                                                <%- customer.personalInfo.city %>
                                                             </td>
                                                         </tr>
                                                     </tbody>
@@ -114,11 +120,72 @@
                                         </div>
                                     </div>
                                 </div>
-                                <% if(customer.hasSubscription){ %>
-                                <div class="col-6 grid-margin stretch-card">
+                                <% if(cars) { %>
+                                <div class="col-sm-12 col-md-12 grid-margin stretch-card">
                                     <div class="card card-rounded">
                                         <div class="card-body">
-                                            <%- include('../partials/subscriptions/information.ejs' , {showManageBtn : true, customer : user, stripeSubscription, membershipStatus}); %>
+                                            <div class="d-sm-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <h4 class="card-title card-title-dash">Cars</h4>
+                                                </div>
+                                            </div>
+                                            <br>
+                                            <div class="table-responsive  mt-1">
+                                                <table id="users" class="table table-hover stripe">
+                                                    <thead>
+                                                        <tr>
+                                                            <th><%= lingua.car.brand%></th>
+                                                            <th><%= lingua.car.model%></th>
+                                                            <th><%= lingua.car.plate%></th>
+                                                            <th><%= lingua.action%></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <% if(cars) { %>
+                                                        <% for(car of cars) { %>
+                                                        <% let enableActions = (user.role === roles.ADMIN || car?.services?.length < 1) %>
+
+                                                        <tr>
+                                                            <td>
+                                                                <a class="btn-link"
+                                                                    href="/car/<%- car.id%>"><%- car.brand%></a>
+                                                            </td>
+
+                                                            <td><%- car.model%></td>
+                                                            <td><%- car.plate%></td>
+
+                                                            <td class="text-center">
+                                                                <% if(enableActions) { %>
+                                                                <a href="/edit-car/<%- car.id%>?url=/cars" type="button"
+                                                                    class="btn btn-icon btn-icon-no-border no-margin pt-0 pb-0">
+                                                                    <i class="far fa-edit icon-sm"></i>
+                                                                </a>
+                                                                <% if([roles.ADMIN].includes(user.role)) { %>
+                                                                <a id="deleteBtn"
+                                                                    onclick="return confirmDelete('/delete-car', '<%- car.id%>')"
+                                                                    class="btn btn-icon btn-icon-no-border no-margin pt-0 pb-0">
+                                                                    <i class="fas fa-trash-alt icon-sm text-danger"></i>
+                                                                </a>
+                                                                <% } %>
+                                                                <% } else { %>
+                                                                N/A
+                                                                <% } %>
+                                                            </td>
+                                                        </tr>
+                                                        <% } %>
+                                                        <% } %>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <% } %>
+                                <% if(customer.hasSubscription){ %>
+                                <div class="col-md-12 grid-margin stretch-card">
+                                    <div class="card card-rounded">
+                                        <div class="card-body">
+                                            <%- include('../partials/subscriptions/information.ejs' , {invalid: false, subscriptions, showManageBtn : true, customer : customer, showCreateBtn: false}); %>
                                         </div>
                                     </div>
                                 </div>
@@ -130,10 +197,8 @@
                 </div>
             </div>
         </div>
+        <%- include('../partials/footer.ejs'); %>
     </div>
-    <!-- page-body-wrapper ends -->
-    </div>
-    <!-- container-scroller -->
 
     <!-- plugins:js -->
     <script src="../vendors/js/vendor.bundle.base.js"></script>
@@ -150,22 +215,10 @@
     <script src="../js/off-canvas.js"></script>
     <script src="../js/hoverable-collapse.js"></script>
     <script src="../js/template.js"></script>
-    <script src="../js/settings.js"></script>
-    <script src="../js/todolist.js"></script>
-    <!-- endinject -->
-    <!-- Custom js for this page-->
-    <!-- <script>
-        var customer = <%# JSON.stringify(customer) %>;
-        console.log(customer);
-    </script> -->
     <script type="text/javascript" src="https://js.stripe.com/v3/"></script>
-    <script type="text/javascript" src="../js/account.js"></script>
     <script src="../js/jquery.cookie.js" type="text/javascript"></script>
-    <script src="../js/dashboard.js"></script>
-    <script src="../js/Chart.roundedBarCharts.js"></script>
-    <script src="../../js/register.js"></script>
-
     <!-- End custom js for this page-->
+    <script type="text/javascript" src="../js/account.js"></script>
 
     <!-- Alerts Code -->
     <%- include('../partials/alerts.ejs', {message, alertType}); %>

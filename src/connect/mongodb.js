@@ -1,16 +1,17 @@
 const mongoose = require('mongoose')
 mongoose.Promise = global.Promise
 
-const db = process.env.MONGODB
+const db = process.env.NODE_ENV === "development" ? process.env.MONGODB : process.env.MONGODB
 
 mongoose.connect(db, {
     useUnifiedTopology: true,
     useNewUrlParser: true,
-    useFindAndModify: false
+    useFindAndModify: false,
+    useCreateIndex: true
 })
 
 mongoose.connection.on('connected', function () {
-    console.log('Mongoose default connection open to ' + process.env.MONGODB)
+    console.log('Mongoose default connection open to ' + db)
 })
 
 mongoose.connection.on('error', function (err) {

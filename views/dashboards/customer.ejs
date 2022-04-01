@@ -5,7 +5,7 @@
   <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Customer Dashboard </title>
+  <title><%= lingua.dashboard%></title>
   <!-- plugins:css -->
   <link rel="stylesheet" href="./vendors/feather/feather.css">
   <link rel="stylesheet" href="./vendors/mdi/css/materialdesignicons.min.css">
@@ -29,14 +29,11 @@
 
 <body>
   <div class="container-scroller">
-    <!-- partial:partials/_navbar.html -->
     <%- include('../partials/navbar.ejs' , {user}); %>
     <!-- partial -->
     <div class="container-fluid page-body-wrapper">
-      <!-- partial:partials/_settings-panel.html -->
       <%- include('../partials/settings-panel.ejs', {user}); %>
       <!-- partial -->
-      <!-- partial:partials/_sidebar.html -->
       <%- include('../partials/sidebar.ejs', {user}); %>
       <!-- partial -->
       <div class="main-panel">
@@ -48,14 +45,14 @@
                   <ul class="nav nav-tabs" role="tablist">
                     <li class="nav-item">
                       <a class="nav-link active ps-0" id="profile-tab" data-bs-toggle="tab" href="#plan" role="tab"
-                        aria-selected="true">My Plan</a>
+                        aria-selected="true"><%= lingua.myPlans%></a>
                     </li>
                   </ul>
 
                 </div>
                 <div class="tab-content tab-content-basic">
                   <div class="tab-pane show active" id="plan" role="tabpanel" aria-labelledby="plan">
-                    <%- include('../partials/subscriptions/subscriptions.ejs' , {user, hasSubscription : user?.hasSubscription, products, stripeSubscription, membershipStatus}); %>
+                    <%- include('../partials/subscriptions/subscriptions.ejs' , {user, hasSubscription : user?.hasSubscription, prices, subscriptions}); %>
                   </div>
                 </div>
 
@@ -63,14 +60,11 @@
             </div>
           </div>
         </div>
-        <!-- content-wrapper ends -->
-        <!-- partial:partials/_footer.html -->
-        <%- include('../partials/footer.ejs'); %>
-        <!-- partial -->
       </div>
-      <!-- main-panel ends -->
     </div>
     <!-- page-body-wrapper ends -->
+    <!-- partial:partials/_footer.html -->
+    <%- include('../partials/footer.ejs'); %>
   </div>
   <!-- container-scroller -->
 
@@ -93,10 +87,6 @@
   <script src="./js/todolist.js"></script>
   <!-- endinject -->
   <!-- Custom js for this page-->
-  <!-- <script>
-        // This variables is important for checkout and manage billing.
-        var customer = <%# JSON.stringify(user) %>;
-        console.debug(customer); -->
   </script>
   <script type="text/javascript" src="https://js.stripe.com/v3/"></script>
   <script type="text/javascript" src="./js/account.js"></script>

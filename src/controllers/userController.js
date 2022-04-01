@@ -5,6 +5,11 @@ const { historyTypes } = require('../collections/history/history.model')
 const Stripe = require('../connect/stripe')
 const alertTypes = require('../helpers/alertTypes')
 const bcrypt = require('bcrypt');
+const { municipalities } = require('../helpers/municipalities')
+const CarService = require('../collections/cars')
+const ServiceService = require('../collections/services')
+const SubscriptionService = require('../collections/subscription')
+const cars = require('../collections/cars')
 
 
 // ------------------------------- Create -------------------------------
@@ -31,13 +36,10 @@ exports.users = async (req, res) => {
         if (!user) {
             res.redirect('/')
         } else {
-            let users
-            if (user.role == ROLES.MANAGER)
-                users = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
-            else
-                if (user.role == ROLES.ADMIN)
-                    users = await UserService.getUsers(user.id)
+            let users = []
 
+            if ([ROLES.ADMIN, ROLES.MANAGER].includes(user.role))
+                users = await UserService.getUsers(user.id)
 
             res.render('user/index.ejs', { user, users, message, alertType })
 
@@ -46,6 +48,42 @@ exports.users = async (req, res) => {
         console.error("ERROR: userController -> Tyring to find users.")
         console.error(error.message)
         req.session.message = 'Error tyring to find users.'
+        req.session.alertType = alertTypes.ErrorAlert
+        res.redirect('/account')
+    }
+}
+
+/**
+ * This function render all users except the current user.
+ * If the current user is ROLE.MANAGER then find only CUSTOMERS users.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.customers = async (req, res) => {
+    try {
+        // Message for alerts
+        let { message, alertType } = req.session
+
+        // clear message y alertType
+        if (message) {
+            req.session.message = ''
+            req.session.alertType = ''
+        }
+        // Passport store the user in req.user
+        let user = req.user
+
+        if (!user) {
+            res.redirect('/')
+        } else {
+            let users = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
+
+            res.render('user/index.ejs', { user, users, message, alertType })
+
+        }
+    } catch (error) {
+        console.error("ERROR: userController -> Tyring to find customers.")
+        console.error(error.message)
+        req.session.message = 'Error tyring to find customers.'
         req.session.alertType = alertTypes.ErrorAlert
         res.redirect('/account')
     }
@@ -74,7 +112,7 @@ exports.createUser = async (req, res) => {
             selectRoles = Object.entries(subset)
         }
 
-        res.render('user/create.ejs', { user: req.user, message, alertType, selectRoles })
+        res.render('user/create.ejs', { user: req.user, municipalities, message, alertType, selectRoles })
     }
 }
 
@@ -120,7 +158,11 @@ exports.save = async (req, res) => {
             req.session.message = `User Created ${user.email}.`
             req.session.alertType = alertTypes.CompletedActionAlert
             req.flash('info', 'User created.')
-            res.redirect('/users')
+
+            if (user.role === ROLES.CUSTOMER)
+                res.redirect('/customers')
+            else
+                res.redirect('/users')
 
         } else {
             let message = `That email ${user.email} already exist.`
@@ -142,13 +184,15 @@ exports.save = async (req, res) => {
 
 /**
  * This function renders the user information.
+ * Find by billingID when the call comes from validate membership.
  * @param {*} req 
  * @param {*} res 
  */
 exports.viewUser = async (req, res) => {
     try {
         let { message, alertType } = req.session,
-            findByBillingID = req?.query?.billingID ? true : false
+            findByBillingID = req?.query?.billingID ? true : false,
+            cars
 
         if (message) {
             req.session.message = ''
@@ -165,15 +209,31 @@ exports.viewUser = async (req, res) => {
         if (customer) {
             isMyProfile = (req.user.id === customer.id)
             if (customer.billingID) {
-                customer = await Stripe.setStripeInfoToUser(customer)
+                customer = await SubscriptionService.setStripeInfoToUser(customer)
+            }
+
+            let customerCars = []
+            if (customer?.subscriptions) {
+                for (customerSub of customer.subscriptions) {
+                    // Iterates the items on DB subscription.
+                    for (customerItem of customerSub.items) {
+                        // then iterates cars in DB item.
+                        for (car of customerItem.cars) {
+                            customerCars.push(car)
+                        }
+                    }
+                }
+
+
+                cars = await ServiceService.setServicesToCars(customerCars)
             }
 
             res.status(200).render('user/view.ejs', {
                 user: req.user,
                 isMyProfile,
                 customer,
-                stripeSubscription: customer?.stripe?.subscription,
-                membershipStatus: customer?.stripe?.subscription ? customer?.stripe?.subscription?.status : Stripe.STATUS.NONE,
+                subscriptions: customer?.subscriptions,
+                cars,
                 message,
                 alertType
             })
@@ -184,6 +244,7 @@ exports.viewUser = async (req, res) => {
             res.redirect('/users', { message, alertType })
         }
     } catch (error) {
+        console.error(error)
         console.error(error.message)
         req.session.message = "Error trying to render the user information."
         req.session.alertType = alertTypes.ErrorAlert
@@ -208,7 +269,7 @@ exports.editUser = async (req, res) => {
             if (ROLES)
                 selectRoles = Object.entries(ROLES)
 
-            res.status(200).render('user/edit.ejs', { user: req.user, customer, selectRoles, url: (url == '/users' || url == '/account' || url == '/validateMembership') ? url : `${url}/${id}` })
+            res.status(200).render('user/edit.ejs', { user: req.user, customer, municipalities, selectRoles, url: (url == '/users' || url == '/customers' || url == '/account' || url == '/validateMembership') ? url : `${url}/${id}` })
         } else {
             console.log('User not found.')
             res.redirect(`${url}`)
@@ -218,6 +279,31 @@ exports.editUser = async (req, res) => {
         req.session.message = "Error trying to render edit user form."
         req.session.alertType = alertTypes.ErrorAlert
         // res.status(400).send(error)
+        res.redirect('/account')
+    }
+}
+
+/**
+ * This function renders the change password form.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.changePassword = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const url = req.query.url ? req.query.url : '/account'
+        const customer = await UserService.getUserById(id)
+
+        if (customer) {
+            res.status(200).render('user/changePassword.ejs', { user: req.user, customer, url: (url == '/users' || url == '/account' || url == '/validateMembership') ? url : `${url}/${id}` })
+        } else {
+            console.log('User not found.')
+            res.redirect(`${url}`)
+        }
+    } catch (error) {
+        console.error(error.message)
+        req.session.message = "Error trying to render change password form."
+        req.session.alertType = alertTypes.ErrorAlert
         res.redirect('/account')
     }
 }
@@ -264,6 +350,35 @@ exports.update = async (req, res) => {
 }
 
 /**
+ * This function updates the user password.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.updatePassword = async (req, res) => {
+    const url = req.query.url
+    try {
+        req.body.password = await bcrypt.hash(req.body.password, 10)
+
+        const user = await UserService.updateUser(req.body.id, req.body)
+
+        if (!user) {
+            req.session.message = `Can't update User  ${req.body.email}`
+            req.session.alertType = alertTypes.WarningAlert
+        } else {
+            req.flash('info', 'Password Updated Completed.')
+            req.session.message = `Password updated ${user.email}`
+            req.session.alertType = alertTypes.CompletedActionAlert
+        }
+        res.redirect(`${url}`)
+
+    } catch (error) {
+        req.session.message = error.message
+        req.session.alertType = alertTypes.ErrorAlert
+        res.redirect(`${url}`)
+    }
+}
+
+/**
  * This function delete the user object.
  * @param {*} req 
  * @param {*} res 
@@ -291,4 +406,75 @@ exports.delete = async (req, res) => {
         req.session.alertType = alertTypes.ErrorAlert
     }
     res.redirect('/users')
+}
+
+exports.notifications = async (req, res) => {
+    try {
+        let user = await UserService.getUserById(req.user.id)
+        let { message, alertType } = req.session
+
+        if (message) {
+            req.session.message = ''
+            req.session.alertType = ''
+        }
+
+        if (user) {
+            let notifications = user.notifications
+            res.status(200).render('user/notifications.ejs', {
+                user: req.user,
+                notifications,
+                message,
+                alertType
+            })
+        } else {
+            message = 'Customer not found.'
+            alertType = alertTypes.ErrorAlert
+            console.log('Customer not found.')
+            res.redirect('/account', { message, alertType })
+        }
+    } catch (error) {
+        console.error(error.message)
+        req.session.message = "Error trying to render the user notifications."
+        req.session.alertType = alertTypes.ErrorAlert
+        res.redirect('/account')
+
+    }
+}
+
+exports.changeNotificationState = async (req, res) => {
+    let changed = false
+    try {
+        let { userId, notificationId, newStatus, allNotifications } = req.body
+        let customer
+        if (notificationId) {
+            customer = await UserService.changeNotificationState(userId, notificationId, newStatus)
+        } else if (allNotifications) {
+            console.debug("readAllNotifications")
+            customer = await UserService.readAllNotifications(userId)
+        }
+
+        if (customer)
+            changed = true
+
+        res.send({ changed })
+    } catch (error) {
+        console.error("ERROR: userController -> Tyring to change notification state.")
+        console.error(error.message)
+        res.send({ changed })
+
+    }
+}
+
+exports.removeFromCart = async (req, res) => {
+
+    let itemToRemove = req.body.item
+    let returnValues
+
+    let user = await UserService.removeItemFromCart(req.user.id, itemToRemove)
+    if (user)
+        returnValues = { itemRemoved: true, subscriptionList: user.cart }
+    else
+        returnValues = { itemRemoved: false, subscriptionList: [] }
+
+    res.send(returnValues)
 }

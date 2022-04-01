@@ -1,13 +1,14 @@
 <link rel="stylesheet" href="../../vendors/flag-icon-css/css/flag-icon.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA=="
-crossorigin="anonymous" referrerpolicy="no-referrer" />
+    integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
 
 <nav class="navbar default-layout col-lg-12 col-12 p-0 fixed-top d-flex align-items-top flex-row">
     <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-start">
         <div class="me-3">
             <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-bs-toggle="minimize">
-                <span class="icon-menu"></span>
+                <!-- <span class="icon-menu"></span> -->
+                <i class="fa-solid fa-bars"></i>
             </button>
         </div>
         <div>
@@ -15,7 +16,7 @@ crossorigin="anonymous" referrerpolicy="no-referrer" />
                 <img src="../../images/mrquicks/mrQuicksLogo.png" alt="logo" style="height: auto!important;" />
             </a>
             <a class="navbar-brand brand-logo-mini" href="/account">
-                <img src="../../images/mrquicks/mrQuicksLogo2.png" alt="logo" />
+                <img src="../../images/favicon.png" alt="logo" />
             </a>
         </div>
     </div>
@@ -37,145 +38,16 @@ crossorigin="anonymous" referrerpolicy="no-referrer" />
                     <%= messages.info %>
                 </p>
                 <% } %>
+                <% if (messages.warning) { %>
+                <p class="warning">
+                    <%= messages.warning %>
+                </p>
+                <% } %>
             </li>
         </ul>
         <ul class="navbar-nav ms-auto">
-            <%# if([roles.ADMIN].includes(user.role)) { %>
-            <!-- <li class="nav-item dropdown d-none d-lg-block">
-                <a class="nav-link dropdown-bordered dropdown-toggle dropdown-toggle-split" id="messageDropdown"
-                    href="#" data-bs-toggle="dropdown" aria-expanded="false"> Select Category </a>
-                <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list pb-0"
-                    aria-labelledby="messageDropdown">
-                    <a class="dropdown-item py-3">
-                        <p class="mb-0 font-weight-medium float-left">Select category</p>
-                    </a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item preview-item">
-                        <div class="preview-item-content flex-grow py-2">
-                            <p class="preview-subject ellipsis font-weight-medium text-dark">Bootstrap Bundle </p>
-                            <p class="fw-light small-text mb-0">This is a Bundle featuring 16 unique dashboards</p>
-                        </div>
-                    </a>
-                    <a class="dropdown-item preview-item">
-                        <div class="preview-item-content flex-grow py-2">
-                            <p class="preview-subject ellipsis font-weight-medium text-dark">Angular Bundle</p>
-                            <p class="fw-light small-text mb-0">Everything you’ll ever need for your Angular projects
-                            </p>
-                        </div>
-                    </a>
-                    <a class="dropdown-item preview-item">
-                        <div class="preview-item-content flex-grow py-2">
-                            <p class="preview-subject ellipsis font-weight-medium text-dark">VUE Bundle</p>
-                            <p class="fw-light small-text mb-0">Bundle of 6 Premium Vue Admin Dashboard</p>
-                        </div>
-                    </a>
-                    <a class="dropdown-item preview-item">
-                        <div class="preview-item-content flex-grow py-2">
-                            <p class="preview-subject ellipsis font-weight-medium text-dark">React Bundle</p>
-                            <p class="fw-light small-text mb-0">Bundle of 8 Premium React Admin Dashboard</p>
-                        </div>
-                    </a>
-                </div>
-            </li>
-            <li class="nav-item d-none d-lg-block">
-                <div id="datepicker-popup" class="input-group date datepicker navbar-date-picker">
-                    <span class="input-group-addon input-group-prepend border-right">
-                        <span class="icon-calendar input-group-text calendar-icon"></span>
-                    </span>
-                    <input type="text" class="form-control">
-                </div>
-            </li>
-            <li class="nav-item">
-                <form class="search-form" action="#">
-                    <i class="icon-search"></i>
-                    <input type="search" class="form-control" placeholder="Search Here" title="Search here">
-                </form>
-            </li>
             <li class="nav-item dropdown">
-                <a class="nav-link count-indicator" id="notificationDropdown" href="#" data-bs-toggle="dropdown">
-                    <i class="icon-mail icon-lg"></i>
-                </a>
-                <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list pb-0"
-                    aria-labelledby="notificationDropdown">
-                    <a class="dropdown-item py-3 border-bottom">
-                        <p class="mb-0 font-weight-medium float-left">You have 4 new notifications </p>
-                        <span class="badge badge-pill badge-primary float-right">View all</span>
-                    </a>
-                    <a class="dropdown-item preview-item py-3">
-                        <div class="preview-thumbnail">
-                            <i class="mdi mdi-alert m-auto text-primary"></i>
-                        </div>
-                        <div class="preview-item-content">
-                            <h6 class="preview-subject fw-normal text-dark mb-1">Application Error</h6>
-                            <p class="fw-light small-text mb-0"> Just now </p>
-                        </div>
-                    </a>
-                    <a class="dropdown-item preview-item py-3">
-                        <div class="preview-thumbnail">
-                            <i class="mdi mdi-settings m-auto text-primary"></i>
-                        </div>
-                        <div class="preview-item-content">
-                            <h6 class="preview-subject fw-normal text-dark mb-1">Settings</h6>
-                            <p class="fw-light small-text mb-0"> Private message </p>
-                        </div>
-                    </a>
-                    <a class="dropdown-item preview-item py-3">
-                        <div class="preview-thumbnail">
-                            <i class="mdi mdi-airballoon m-auto text-primary"></i>
-                        </div>
-                        <div class="preview-item-content">
-                            <h6 class="preview-subject fw-normal text-dark mb-1">New user registration</h6>
-                            <p class="fw-light small-text mb-0"> 2 days ago </p>
-                        </div>
-                    </a>
-                </div>
-            </li>
-            <li class="nav-item dropdown">
-                <a class="nav-link count-indicator" id="countDropdown" href="#" data-bs-toggle="dropdown"
-                    aria-expanded="false">
-                    <i class="icon-bell"></i>
-                    <span class="count"></span>
-                </a>
-                <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list pb-0"
-                    aria-labelledby="countDropdown">
-                    <a class="dropdown-item py-3">
-                        <p class="mb-0 font-weight-medium float-left">You have 7 unread mails </p>
-                        <span class="badge badge-pill badge-primary float-right">View all</span>
-                    </a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item preview-item">
-                        <div class="preview-thumbnail">
-                            <img src="../../images/faces/face10.jpg" alt="image" class="img-sm profile-pic">
-                        </div>
-                        <div class="preview-item-content flex-grow py-2">
-                            <p class="preview-subject ellipsis font-weight-medium text-dark">Marian Garner </p>
-                            <p class="fw-light small-text mb-0"> The meeting is cancelled </p>
-                        </div>
-                    </a>
-                    <a class="dropdown-item preview-item">
-                        <div class="preview-thumbnail">
-                            <img src="../../images/faces/face12.jpg" alt="image" class="img-sm profile-pic">
-                        </div>
-                        <div class="preview-item-content flex-grow py-2">
-                            <p class="preview-subject ellipsis font-weight-medium text-dark">David Grey </p>
-                            <p class="fw-light small-text mb-0"> The meeting is cancelled </p>
-                        </div>
-                    </a>
-                    <a class="dropdown-item preview-item">
-                        <div class="preview-thumbnail">
-                            <img src="../../images/faces/face1.jpg" alt="image" class="img-sm profile-pic">
-                        </div>
-                        <div class="preview-item-content flex-grow py-2">
-                            <p class="preview-subject ellipsis font-weight-medium text-dark">Travis Jenkins </p>
-                            <p class="fw-light small-text mb-0"> The meeting is cancelled </p>
-                        </div>
-                    </a>
-                </div>
-            </li> -->
-            <%# } %>
-            <li class="nav-item dropdown">
-                <a class="nav-link count-indicator" id="languageDropdown" href="#" data-bs-toggle="dropdown"
-                    aria-expanded="false">
+                <a class="nav-link" id="languageDropdown" href="#" data-bs-toggle="dropdown" aria-expanded="false">
                     <!-- <i class="icon-globe"></i> -->
                     <!-- <i class="fas fa-globe-americas"></i> -->
                     <div id="showLang" style="display: contents;">
@@ -198,7 +70,54 @@ crossorigin="anonymous" referrerpolicy="no-referrer" />
                     </a>
                 </div>
             </li>
-            <li class="nav-item dropdown d-none d-lg-block user-dropdown">
+            <% if(user.billingID) { %>
+            <li class="nav-item">
+                <a class="nav-link" href="/create-subscriptions" aria-expanded="false" title="Add Membership">
+                    <i class="fa-solid fa-cart-plus text-primary"></i>
+                    <!-- TODO: implement cart qty -->
+                    <!-- <i class="fa-solid fa-list"></i> -->
+                </a>
+            </li>
+            <% } %>
+            <% var hasNotifi = (user?.notifications?.filter(notification => notification.isRead == false).length > 0) ? true : false %>
+
+            <li class="nav-item dropdown" onclick="<%= hasNotifi ? `changeNotificationState('', true, true)` : '' %>">
+                <a class="nav-link count-indicator" id="notificationDropdownBtn" href="#" data-bs-toggle="dropdown">
+                    <i class="fa-solid fa-bell text-primary"></i>
+                    <% if(hasNotifi) { %>
+                    <span class="count"></span>
+                    <% } %>
+
+                </a>
+                <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list pb-0 notifications-dropdown"
+                    aria-labelledby="notificationDropdown" onclick="">
+                    <a class="dropdown-item py-3 border-bottom">
+                        <p class="mb-0 font-weight-medium float-left">
+                            <%= lingua.newNotifications(user?.notifications?.filter(notification => notification.isRead == false).length)%>
+                        </p>
+                        <span onclick="window.location.href='/notifications';"
+                            class="badge badge-pill badge-primary float-right">
+                            <%= lingua.viewAll%></span>
+                    </a>
+                    <% if(user?.notifications) { %>
+                    <div id="notifications">
+                    </div>
+
+                    <% for(notification of user.notifications.filter(notification => notification.isRead == false)) { %>
+                    <a id="a-<%= notification.id%>" class="dropdown-item preview-item py-3">
+                        <div class="preview-item-content">
+                            <h6 class="preview-subject fw-normal text-dark mb-1"><%= notification?.message%></h6>
+                            <p class="fw-light small-text mb-0"> <%# moment(notification?.created_date).%>
+
+                                <%= moment(notification?.created_date).isValid() ? moment(notification?.created_date).format(completeDateFormat) : 'N/A' %>
+                            </p>
+                        </div>
+                    </a>
+                    <% } %>
+                    <% } %>
+                </div>
+            </li>
+            <li class="nav-item dropdown d-lg-block user-dropdown">
                 <a class="nav-link" id="UserDropdown" href="#" data-bs-toggle="dropdown" aria-expanded="false">
                     <img class="img-xs rounded-circle" src="../../images/faces/profile/user.png" alt="Profile image">
                 </a>
@@ -216,25 +135,32 @@ crossorigin="anonymous" referrerpolicy="no-referrer" />
                             <%- user.email%>
                         </p>
                     </div>
-                    <a href="/view-user/<%- user.id%>?viewType=myProfile" class="dropdown-item">
+                    <a href="/customers/<%- user.id%>?viewType=myProfile" class="dropdown-item">
                         <!-- <i class="dropdown-item-icon mdi mdi-account-outline text-primary me-2"></i>  -->
-                        <i class="dropdown-item-icon far fa-user text-primary me-2"></i> My Profile
+                        <i class="dropdown-item-icon far fa-user text-primary me-2"></i> <%= lingua.user.myProfile%>
                         <!-- <span class="badge badge-pill badge-danger">1</span> -->
                     </a>
+                    <% if(user.billingID) { %>
+                    <a id="manage-billing-button" class="dropdown-item manage-billing-button" style="margin: 0;"
+                        type="submit" value="<%- user.billingID%>" email="<%- user.email%>">
+                        <i class="dropdown-item-icon fab fa-stripe-s  text-primary me-2"></i>
+                        <%= lingua.membership.manageBilling%></a>
+                    <% } %>
                     <!-- <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-message-text-outline text-primary me-2"></i> Messages</a> -->
                     <a class="dropdown-item" href="/activity">
                         <!-- <i class="dropdown-item-icon mdi mdi-calendar-check-outline text-primary me-2"></i> -->
-                        <i class="dropdown-item-icon far fa-calendar-check text-primary me-2"></i> Activity
+                        <i class="dropdown-item-icon far fa-calendar-check text-primary me-2"></i>
+                        <%= lingua.activity%>
                     </a>
-                    <a class="dropdown-item">
-                        <!-- <i class="dropdown-item-icon mdi mdi-help-circle-outline text-primary me-2"></i> -->
+                    <!-- <a class="dropdown-item">
+                        <i class="dropdown-item-icon mdi mdi-help-circle-outline text-primary me-2"></i>
                         <i class="dropdown-item-icon far fa-question-circle text-primary me-2"></i> FAQ
-                    </a>
+                    </a> -->
                     <form action="/logout?_method=DELETE" method="POST">
                         <button type="submit" class="dropdown-item">
                             <!-- <i class="dropdown-item-icon mdi mdi-power text-primary me-2"></i> -->
                             <i class="ropdown-item-icon fas fa-sign-out-alt text-primary me-2"></i>
-                            Sign Out
+                            <%= lingua.signOut%>
                         </button>
                     </form>
                 </div>
@@ -242,15 +168,94 @@ crossorigin="anonymous" referrerpolicy="no-referrer" />
         </ul>
         <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button"
             data-bs-toggle="offcanvas">
-            <span class="mdi mdi-menu"></span>
+            <i class="fa-solid fa-bars"></i>
+            <!-- <span class="mdi mdi-menu"></span> -->
         </button>
     </div>
 </nav>
+
 <script src="../js/helper-functions.js"></script>
+<script src="https://cdn.socket.io/socket.io-3.0.1.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
 <script>
     window.onload = function () {
         //YOUR JQUERY CODE
         manageLangDropdown();
+
+        const manageBillingButton = $('.manage-billing-button');
+        manageBillingButton.click(function () {
+            const billingID = $(this).attr("value");
+            const email = $(this).attr("email");
+            const requestOptions = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    email: email
+                },
+                body: JSON.stringify({
+                    customer: billingID
+                })
+            }
+
+            fetch('/billing', requestOptions)
+                .then((response) => response.json())
+                .then((result) => window.location.replace(result.url))
+                .catch((error) => console.log('error', error))
+        })
     };
+
+    var readFlag = false;
+
+    const socket = io('<%= domain%>');
+
+    // Receive data
+    socket.on('notifications', (data) => {
+        console.log(JSON.stringify(data));
+
+        $('#notifications').prepend(`
+        <a id="a-${data.id}" class="dropdown-item preview-item py-3">
+                        <div class="preview-item-content">
+                            <h6 class="preview-subject fw-normal text-dark mb-1">${data?.message}</h6>
+                            <p class="fw-light small-text mb-0">
+                                Now
+                            </p>
+                        </div>
+                    </a>`);
+
+        $('#notificationDropdownBtn').append(`
+        <span class="count"></span>`)
+
+    })
+
+    function changeNotificationState(notificationId, newStatus, allNotifications) {
+        var userId = '<%- user.id%>';
+
+        if (!readFlag && userId && newStatus && allNotifications) {
+            $.ajax({
+                url: "/changeNotificationState",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    userId,
+                    notificationId,
+                    newStatus,
+                    allNotifications
+                })
+            }).done(function (result) {
+                readFlag = true;
+                // if (newStatus == "true")
+                // $(`#a-${notificationId}`).remove();
+                // else
+                // $(`#${notificationId}`).addClass('text-primary');
+
+            }).fail(function (err) {
+                console.log(err);
+            })
+        }
+    }
+
+    $('.notifications-dropdown').on('click', function (e) {
+        e.stopPropagation();
+    });
 </script>

@@ -1,10 +1,16 @@
+const ServiceService = require('../collections/services')
+const UserService = require('../collections/user')
+const SubscriptionService = require('../collections/subscription')
 const { canDeleteCar,
     canEditCar,
     canDeleteLocation,
+    canAddCar,
     canEditLocation,
     canDeleteUser,
-    canValidateMemberships } = require('../config/permissions'),
+    canValidateMemberships,
+    canChangePassword } = require('../config/permissions'),
     alertTypes = require('../helpers/alertTypes')
+
 
 async function checkAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
@@ -24,8 +30,10 @@ async function checkNotAuthenticated(req, res, next) {
 
 async function authDeleteCar(req, res, next) {
     let carID = req.params.id
+    let user = await SubscriptionService.setStripeInfoToUser(req.user)
+    let services = await ServiceService.getServicesByCar(carID)
 
-    if (carID && canDeleteCar(req.user, carID)) {
+    if (carID && canDeleteCar(user, carID, services)) {
         return next()
     }
     req.session.message = `Not allowed to delete this car.`
@@ -33,10 +41,33 @@ async function authDeleteCar(req, res, next) {
     res.status(401).redirect('/cars')
 }
 
+async function authAddCar(req, res, next) {
+
+    let user = req.user
+
+    if (req.query?.userID) { // This is come from GET route.
+        user = await UserService.getUserById(req.query?.userID)
+    } else if (req.body.userID) { // This is come from POST rout.
+        user = await UserService.getUserById(req.body.userID)
+    }
+
+    user = await SubscriptionService.setStripeInfoToUser(user)
+
+    if (canAddCar(user)) {
+        return next()
+    }
+    req.session.message = `Not allowed to add a car.`
+    req.session.alertType = alertTypes.WarningAlert
+    res.status(401).redirect('/account')
+}
+
 async function authEditCar(req, res, next) {
     let carID = req.body.id ? req.body.id : req.params.id ? req.params.id : ''
+    let user = req.user
 
-    if (carID && canEditCar(req.user, carID)) {
+    let services = await ServiceService.getServicesByCar(carID)
+
+    if (carID && canEditCar(user, carID, services)) {
         return next()
     }
     req.session.message = `Not allowed to edit this car.`
@@ -80,13 +111,26 @@ async function authValidateMembership(req, res, next) {
     res.status(401).redirect('/account')
 }
 
+async function authChangePassword(req, res, next) {
+    let userID = req.body.id ? req.body.id : req.params.id ? req.params.id : ''
+
+    if (userID && canChangePassword(req.user, userID)) {
+        return next()
+    }
+    req.session.message = `Not allowed to change password.`
+    req.session.alertType = alertTypes.WarningAlert
+    res.status(401).redirect('/account')
+}
+
 module.exports = {
     checkAuthenticated,
     checkNotAuthenticated,
+    authAddCar,
     authDeleteCar,
     authEditCar,
     authDeleteLocation,
     authEditLocation,
     authDeleteUser,
-    authValidateMembership
+    authValidateMembership,
+    authChangePassword
 }

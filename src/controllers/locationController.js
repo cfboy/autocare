@@ -78,7 +78,7 @@ exports.save = async (req, res) => {
         let location = await LocationService.getLocationByName(fields.name)
         if (!location) {
             console.debug(`Location ${fields.name} does not exist. Making one...`)
-            // TODO: Add Location to DB
+            // Add Location to DB
             location = await LocationService.addLocation({ name: fields.name, services: fields.services, users: fields.users })
 
             if (location.users) {
@@ -268,7 +268,7 @@ exports.delete = async (req, res) => {
     try {
         LocationService.deleteLocation(id)
         // TODO: remove location form user
-        
+
         // Set the message for alert. 
         req.session.message = `Location Deleted.`
         req.session.alertType = alertTypes.CompletedActionAlert

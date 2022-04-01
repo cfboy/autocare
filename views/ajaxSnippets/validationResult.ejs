@@ -4,13 +4,11 @@
             <div class="row">
                 <% if(customer && car) { %>
                 <div class="col-md-6 p-3">
-                    <div class="d-sm-flex justify-content-between align-items-start">
+                    <div class="d-flex justify-content-between align-items-start">
                         <div>
-                            <h4>Customer Information </h4>
+                            <h4><%= lingua.user.info%></h4>
                         </div>
                         <div>
-                            <!-- <a href="/create-user" class="btn btn-primary btn-icon-text" type="button"><i class="mdi mdi-map-marker-plus btn-icon-prepend"></i>Add
-                            User</a> -->
                             <a href="/edit-user/<%- customer?.id%>?url=/validateMembership" type="button"
                                 data-toggle="tooltip" title="Edit user"
                                 class="btn btn-icon btn-icon-no-border no-margin">
@@ -20,128 +18,142 @@
                     </div>
                     <p>
                         <b>
-                            Name:
+                            <%= lingua.user.firstName%>:
                         </b>
                         <%- customer?.personalInfo.firstName + ' ' + customer?.personalInfo.lastName %>
                     </p>
-
                     <p>
                         <b>
-                            Email:
-                        </b>
-                        <%- customer?.email%>
-                    </p>
-                    <p>
-                        <b>
-                            Car Name:
-                        </b>
-                        <%- car?.name%>
-
-                    </p>
-                    <p>
-                        <b>
-                            Car Brand:
+                            <%= lingua.car.brand%>:
                         </b>
                         <%- car?.brand%>
 
                     </p>
                     <p>
                         <b>
-                            Model:
+                            <%= lingua.car.model%>:
                         </b>
                         <%- car?.model%>
                     </p>
                     <p>
                         <b>
-                            Plate:
+                            <%= lingua.car.plate%>:
                         </b>
                         <%- car?.plate%>
                     </p>
-
-                    <p>
+                    <% if(car?.cancel_date) { %>
+                    <p class="bg-warning">
                         <b>
-                            Membership:
+                            <%= lingua.membership.validUntil%>:
                         </b>
-                        <span style="text-transform: uppercase;">
-                            <%- membershipStatus%>
-                        </span>
+                        <%= moment(car?.cancel_date).isValid() ? moment(car.cancel_date).format(shortDateFormat) : 'N/A' %>
                     </p>
+                    <% } %>
                     <p>
-                        <b>Product:</b>
-                        <%- stripeSubscription.product.name%>
-                    </p>
-                    <p>
-                        <b>
-                            Current Period Start:
-                        </b>
-                        <%= moment(stripeSubscription?.current_period_start * 1000).isValid() ? moment(stripeSubscription?.current_period_start * 1000).format(completeDateFormat) : 'N/A' %>
-
+                        <b><%= lingua.membership.product%>:</b>
+                        <%- subscription?.data?.items.data[0].price?.product?.name%>
                     </p>
                     <p>
                         <b>
-                            Current Period End Date:
+                            <%= lingua.membership.currentPeriodStart%>:
                         </b>
-                        <%= moment(stripeSubscription?.current_period_end * 1000).isValid() ? moment(stripeSubscription?.current_period_end * 1000).format(completeDateFormat) : 'N/A' %>
+                        <%= moment(subscription?.data?.current_period_start * 1000).isValid() ? moment(subscription?.data?.current_period_start * 1000).format(shortDateFormat) : 'N/A' %>
+
+                    </p>
+                    <p>
+                        <b>
+                            <%= lingua.membership.currentPeriodEnd%>:
+                        </b>
+                        <%= moment(subscription?.data?.current_period_end * 1000).isValid() ? moment(subscription?.data?.current_period_end * 1000).format(shortDateFormat) : 'N/A' %>
 
                     </p>
 
-                    <% if(stripeSubscription?.trial_end) { %>
+                    <% if(subscription?.data?.trial_end) { %>
                     <p>
                         <b>
                             Trial Expiration Date:
                         </b>
-                        <%= moment(stripeSubscription?.trial_end * 1000).isValid() ? moment(stripeSubscription?.trial_end * 1000).format(completeDateFormat) : 'N/A' %>
+                        <%= moment(subscription?.data?.trial_end * 1000).isValid() ? moment(subscription?.data?.trial_end * 1000).format(shortDateFormat) : 'N/A' %>
 
                     </p>
                     <% } %>
-
                 </div>
                 <div class="col-md-6 p-3">
-                    <h4 class="text-center">Membership Status</h4>
-                    <br>
+                    <!-- <h4 class="text-center">Membership Status</h4> -->
                     <div class="col-md-12 text-center validation-msgs">
-                        <% if([stripeStatus.ACTIVE, stripeStatus.TRIALING].includes(membershipStatus)) { %>
+                        <% if(car.hasService) { %>
+                        <i class="far fa-8x fa-times-circle invalid"></i>
+
+                        <p class="alert alert-danger mt-2"><%= lingua.car.maxServiceQty%>.</p>
+                        <% }
+                         else if (!car.isValid) { %>
+                        <i class="far fa-8x fa-times-circle invalid"></i>
+
+                        <p class="alert alert-danger mt-2">
+                            <%= lingua.car.carExpiredOn(moment(car?.cancel_date * 1000).isValid() ? moment(car?.cancel_date * 1000).format(shortDateFormat) : 'N/A')%>:
+
+                            // <br>
+                            // Create another membership to use the service for this car.
+                        </p>
+
+                        <% } else { %>
+
+                        <h4 class="text-center"> <%= lingua.membership.status%>:</h4>
+
+                        <% if([stripeStatus.ACTIVE, stripeStatus.TRIALING].includes(subscription?.data?.status)) { %>
                         <i class="fas fa-8x fa-check-circle valid"></i>
                         <p style="text-transform: uppercase">
-                            <%= membershipStatus %>
+                            <%= subscription?.data?.status %>
                         </p>
-                        <br>
-                        <div class="mt-3 mb-3">
-                            <button id="use-service-button" user-id="<%= customer?.id%>"
-                                class="btn btn-block btn-primary btn-lg font-weight-medium btn-icon-text" type="submit">
-                                USE SERVICE
-                                <i class="menu-icon mdi mdi-car-wash btn-icon-apepend"></i>
-                            </button>
-                        </div>
 
-                        <% } else if([stripeStatus.CANCELED, stripeStatus.UNPAID, stripeStatus.NONE].includes(membershipStatus)) { %>
+                        <% } else if([stripeStatus.CANCELED, stripeStatus.UNPAID, stripeStatus.NONE].includes(subscription?.data?.status)) { %>
                         <i class="far fa-8x fa-times-circle invalid"></i>
                         <p style="text-transform: uppercase">
-                            <%= membershipStatus %>
+                            <%= subscription?.data?.status %>
                         </p>
-                        <br>
-                        <button class="btn btn-primary btn-lg text-white mb-0 me-0 manage-billing-button" type="submit"
-                            value="<%- customer.billingID%>" email="<%- customer.email%>">
-                            Manage Billing
-                        </button>
                         <% } %>
+                        <br>
+                        <div class="mt-3 mb-3">
+                            <% var subscriptionOnValidPeriod = moment(new Date()).isBefore(subscription?.data?.current_period_end * 1000)%>
+                            <% if(subscriptionOnValidPeriod) { %>
+                            <% if([roles.ADMIN].includes(user.role)) { %>
+                            <button
+                                class="btn btn-block btn-primary btn-lg font-weight-medium btn-icon-text manage-billing-button m-1"
+                                type="submit" value="<%- customer.billingID%>" email="<%- customer.email%>">
+                                <%= lingua.membership.manageBilling%>
+                                <i class="fab fa-stripe-s btn-icon-apepend"></i>
+                            </button>
+                            <% } %>
+                            <% if(!car?.hasService) { %>
+                            <button id="use-service-button" user-id="<%= customer?.id%>" car-id="<%= car?.id%>"
+                                inputType="<%= inputType%>"
+                                class="btn btn-block btn-success btn-lg font-weight-medium btn-icon-text m-1"
+                                type="submit">
+                                <%= lingua.service.use%>
+                                <i class="menu-icon mdi mdi-car-wash btn-icon-apepend"></i>
+                            </button>
+                            <% } %>
+                            <% } %>
+                            <% } %>
+
+                        </div>
+
                     </div>
                 </div>
                 <% } else if(!customer){ %>
                 <div class="col-md-12 text-center validation-msgs">
                     <i class="fas fa-8x fa-exclamation-triangle warning"></i>
-                    <p>Customer not found.</p>
+                    <p><%= lingua.user.notFound%>.</p>
 
                 </div>
-                <% } else if(!car) {%>
+                <% } else if(!car) { %>
                 <div class="col-md-12 text-center validation-msgs">
                     <i class="fas fa-8x fa-exclamation-triangle warning"></i>
-                    <p>Customer not found.</p>
+                    <p><%= lingua.car.notFound%>.</p>
 
                 </div>
                 <% } %>
             </div>
-
         </div>
     </div>
 </div>

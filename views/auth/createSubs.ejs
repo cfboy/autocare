@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>
+        <%= lingua.membership.createSusbscriptions%>
+    </title>
+    <!-- plugins:css -->
+    <link rel="stylesheet" href="../../vendors/feather/feather.css">
+    <link rel="stylesheet" href="../../vendors/mdi/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="../../vendors/ti-icons/css/themify-icons.css">
+    <link rel="stylesheet" href="../../vendors/typicons/typicons.css">
+    <link rel="stylesheet" href="../../vendors/simple-line-icons/css/simple-line-icons.css">
+    <link rel="stylesheet" href="../../vendors/css/vendor.bundle.base.css">
+    <link rel="stylesheet" href="../../css/register.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+        integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="../../vendors/select2/select2.min.css">
+    <link rel="stylesheet" href="../../vendors/select2-bootstrap-theme/select2-bootstrap.min.css">
+    <!-- endinject -->
+    <!-- Plugin css for this page -->
+    <link rel="stylesheet" href="../../js/select.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.4/css/dataTables.bootstrap5.min.css">
+    <!-- End plugin css for this page -->
+    <!-- inject:css -->
+    <link rel="stylesheet" href="../../css/vertical-layout-light/style.css">
+    <!-- endinject -->
+    <link rel="shortcut icon" href="../../images/favicon.png" />
+</head>
+
+<body class="sidebar-icon-only">
+    <div class="container-scroller">
+        <%- include('../partials/navbar.ejs' , {user}); %>
+        <!-- partial -->
+        <div class="container-fluid page-body-wrapper">
+            <%#- include('../partials/settings-panel.ejs', {user}); %>
+            <!-- partial -->
+            <%- include('../partials/sidebar.ejs', {user}); %>
+            <!-- partial -->
+            <div class="main-panel">
+                <div class="content-wrapper">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-12 col-lg-4 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="card-title">
+                                        <%= lingua.membership.createSubscriptions%>
+                                    </div>
+                                    <form id="form-subscriptions" class="pt-3" method="post">
+                                        <div class="row">
+                                            <input id="userID" name="userID" value="<%= user.id%>" hidden />
+                                            <%- include('../cars/formFields.ejs', {allMakes, car: null}); %>
+                                            <div class="col-lg-12">
+                                                <div class="form-group">
+                                                    <label for="product"
+                                                        class="required"><%= lingua.membership.name%></label>
+
+                                                    <select id="product" name="product" required autofocus
+                                                        class="form-control mb-3 form-control-lg js-example-basic-single w-100">
+                                                        <option value=""><%= lingua.selectOne%></option>
+                                                        <% for(const price of prices) { %>
+                                                        <option value="<%= price.id%>" name="<%= price.product.name%>"
+                                                            price="<%= price.unit_amount%>">
+                                                            (<%= price.unit_amount%>) <%= price.product.name%>
+                                                        </option>
+                                                        <% } %>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="mt-3">
+                                                <button id="addSub" type="submit"
+                                                    class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn float-end">
+                                                    <%= lingua.car.add%></button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-12 col-lg-8 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title"> <%= lingua.myCart%></h4>
+                                    <div class="table-responsive">
+                                        <table id="cart-table" class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th><%= lingua.car.name%></th>
+                                                    <th><%= lingua.car.product%></th>
+                                                    <th><%= lingua.membership.price%></th>
+                                                    <th><%= lingua.action%></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tbody"></tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <th></th>
+                                                    <th style="text-align:right"><%= lingua.membership.subTotal%>:</th>
+                                                    <th></th>
+                                                    <th></th>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                    <div class="m-3">
+                                        <input id="subscription-list" type="text" hidden value="">
+                                        <button id="checkout-btn" hidden value="<%- user.billingID%>"
+                                            email="<%- user.email%>"
+                                            class="btn btn-block btn-checkout btn-lg font-weight-medium auth-form-btn float-end"
+                                            type="submit">
+                                            <%= lingua.membership.proceedToCheckout%>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <%- include('../partials/footer.ejs'); %>
+            </div>
+        </div>
+        <!-- page-body-wrapper ends -->
+    </div>
+    <!-- container-scroller -->
+    <!-- plugins:js -->
+    <script src="../../vendors/js/vendor.bundle.base.js"></script>
+    <!-- endinject -->
+    <!-- Plugin js for this page -->
+    <script src="../../vendors/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
+    <!-- End plugin js for this page -->
+    <!-- inject:js -->
+    <script src="../../js/off-canvas.js"></script>
+    <script src="../../js/hoverable-collapse.js"></script>
+    <script src="../../js/template.js"></script>
+
+    <!-- endinject -->
+    <!-- Custom js for this page-->
+    <script src="./js/jquery.cookie.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.10/jquery.mask.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.8/js/select2.min.js" defer></script>
+    <script src="../../vendors/select2/select2.min.js"></script>
+    <script src="../../js/select2.js"></script>
+    <script type="text/javascript" src="https://js.stripe.com/v3/"></script>
+    <script type="text/javascript" src="../js/account.js"></script>
+    <script src="../js/helper-functions.js"></script>
+
+    <!-- End custom js for this page-->
+    <%- include('../partials/dataTable.ejs', {tableID : '#cart-table', ordering: false, searching: false , info: false, paging: false, footerCheckout: true}); %>
+    <%- include('../partials/alerts.ejs', {message, alertType}); %>
+    <script>
+        var rowIdx = 0; //This field is used to filter the list when remove any from de list.
+        let subscriptionList = [];
+        var form = $("#form-subscriptions");
+        var checkoutBtn = $('#checkout-btn'); //This btn is hidden for default
+
+        $(document).ready(function () {
+            var cartString = '<%- JSON.stringify(cart) %>'
+            if (cartString) {
+                var cart = JSON.parse(cartString);
+                if (cart?.items?.length > 0) {
+                    for (item of cart.items) {
+                        rowIdx++;
+                        addDataToTable(item)
+                    }
+                }
+            }
+
+        });
+
+        // Add subscription
+        $('#addSub').on('click', function (event) {
+            // Clean plate input validator.
+            document.getElementById("carPlate").setCustomValidity("");
+            showResult('#plateValidationResult', ``);
+            // Validate form before submit.
+            event.preventDefault();
+            event.stopPropagation();
+            form[0].reportValidity();
+            if (form[0].checkValidity()) {
+                // Get all values
+                var brand = $("#brand").val(),
+                    model = $("#carModel").val(),
+                    plate = $("#carPlate").val().toUpperCase(),
+                    priceID = $("#product").val(),
+                    product = $("#product").find('option:selected').attr("name"),
+                    price = $("#product").find('option:selected').attr("price"),
+                    // Prepare newItem Obj.
+                    newItem = {
+                        id: ++rowIdx,
+                        brand: brand, model: model, plate: plate,
+                        product: product, price: price, priceID: priceID
+                    };
+
+                $.ajax({
+                    url: "/validatePlate",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        plateNumber: plate,
+                        newItem: newItem,
+                        subscriptionList: subscriptionList ? subscriptionList : [],
+                        addToCart: true
+                    }),
+                }).done(function (result) {
+                    if (result.existingCar) {
+                        document.getElementById("carPlate").setCustomValidity("<%= lingua.car.existingCar%>");
+                        document.getElementById("carPlate").reportValidity();
+                        let reportMessage = `<p class="error"><%= lingua.car.existingCar%>.</p>`
+                        showResult('#plateValidationResult', reportMessage);
+
+                    } else {
+                        console.log("newItem: " + newItem);
+                        showResult('#plateValidationResult',
+                            `<p class="success"><%= lingua.car.validCar%></p>`);
+
+                        addDataToTable(newItem);
+                        // Clear all elements on form for next submit.
+                        clearForm(form);
+                        showResult('#plateValidationResult', ``);
+                    }
+
+                }).fail(function (err) {
+                    console.log(err);
+                })
+            }
+        });
+        // Remove subscription
+        $('#cart-table tbody').on('click', '.remove', function () {
+            var t = $('#cart-table').DataTable();
+            var id = $(this).attr('id');
+            let itemToRemove = subscriptionList.find(item => item.id == id);
+
+            // Remove from the table.
+            t.row($(this).parents('tr')).remove().draw();
+            // Decrease the row index.
+            rowIdx--;
+
+            $.ajax({
+                url: "/removeFromCart",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    item: itemToRemove
+                }),
+            }).done(function (result) {
+
+                if (result.itemRemoved) {
+                    // Remove the deleted item from de subscriptionList.
+                    subscriptionList = result.subscriptionList;
+
+                    $('#subscription-list').val(JSON.stringify(subscriptionList));
+
+                    // If the susbcription list is empty, then hide ckeckout btn.
+                    if (subscriptionList.length < 1)
+                        checkoutBtn.attr("hidden", true);
+                } else {
+                    console.log('not removed')
+                }
+
+            }).fail(function (err) {
+                console.log(err);
+            })
+        });
+
+        var showResult = function (updateDiv, result) {
+            $(updateDiv).html(result);
+        }
+
+        function addDataToTable(newItem) {
+            // Initialize DataTable
+            var t = $('#cart-table').DataTable();
+            // Add row to table.
+            // Set the rowIdx to btn id to get the id of deleted element.
+            t.row.add([
+                `<p> Brand: ${newItem.brand} </p> <br> 
+                            <p> Model: ${newItem.model} </p> <br>
+                            <p> Plate: ${newItem.plate} </p>`,
+                newItem.product,
+                newItem.price,
+                `<td class="text-center">
+                                <button  id="${rowIdx}" class="btn btn-icon btn-icon-no-border no-margin remove">
+                                    <i class="fas fa-trash-alt icon-sm text-danger"></i>
+                                </button>
+                            </td>`
+            ]).draw(false);
+            // Add newItem to subscriptionList
+            subscriptionList.push(newItem);
+            // Stringify the value to store on input element for checkout.
+            var stringSubscriptionList = JSON.stringify(subscriptionList)
+            $('#subscription-list').val(stringSubscriptionList);
+            console.log("List: " + stringSubscriptionList);
+            // If the susbcription has at least one item, then show ckeckout btn.
+            if (subscriptionList.length > 0)
+                checkoutBtn.removeAttr('hidden');
+        }
+    </script>
+
+</body>
+
+
+</html>

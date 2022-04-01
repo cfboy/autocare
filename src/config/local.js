@@ -8,19 +8,19 @@ passport.use(new LocalStrategy({ usernameField: 'email', passReqToCallback: true
         const lingua = req.res.lingua.content
 
         if (!email && !password) {
-            return done(null, false, { message: lingua.missingCredentials });
+            return done(null, false, { message: lingua.validation.missingCredentials });
         }
         const currentUser = await UserService.getUserByEmail(email)
 
         if (!currentUser) {
-            return done(null, false, { message: lingua.userNotExist(email) });
+            return done(null, false, { message: lingua.validation.userNotExist(email) });
         }
 
         console.debug("PASSPORT: Currentuser: ", currentUser)
 
         try {
             if (!bcrypt.compareSync(password, currentUser.password)) {
-                return done(null, false, { message: lingua.wrongPassword });
+                return done(null, false, { message: lingua.validation.wrongPassword });
             }
         } catch (error) {
             return done(null, false, { message: error })

@@ -38,7 +38,6 @@ const addUser = (User) => async ({
     return await user.save()
 }
 
-// TODO: Finish this
 /**
  * This function updates the user properties.
  * @param {*} User 
@@ -93,39 +92,6 @@ const removeUserLocation = (User) => async (id, location) => {
     })
 }
 
-/**
- * This function add a new car to user cars.
- * @param {id, car} User 
- * @returns User
- */
-const addUserCar = (User) => async (id, car) => {
-    console.log(`addUserCar() ID: ${id}`)
-    // findByIdAndUpdate returns the user
-    // updateOne is more quickly but not return the user.
-    return await User.findByIdAndUpdate({ _id: id }, { $addToSet: { cars: car } }, function (err, doc) {
-        if (err) {
-            console.error(err.message)
-        } else {
-            console.debug("Car Added to: ", doc.email);
-        }
-    }).populate('cars')
-}
-
-/**
- * This function remove the car from user cars.
- * @param {id, car} User 
- * @returns User
- */
-const removeUserCar = (User) => async (id, car) => {
-    console.log(`removeUserCar() ID: ${id}`)
-    return await User.findByIdAndUpdate({ _id: id }, { $pull: { cars: car } }, function (err, doc) {
-        if (err) {
-            console.error(err.message)
-        } else {
-            console.debug(`Car ${car.name} Removed of User: ${doc.email}`);
-        }
-    })
-}
 // TODO: maybe need delete customer on Stripe 
 /**
  * This function delete the user on DB.
@@ -150,7 +116,7 @@ const deleteUser = (User) => (id) => {
  * @returns 
  */
 const getUsers = (User) => (userID) => {
-    return User.find({ _id: { $ne: userID } }).populate('location')
+    return User.find({ _id: { $ne: userID } }).populate('locations')
 }
 
 /**
@@ -159,7 +125,7 @@ const getUsers = (User) => (userID) => {
  * @returns user
  */
 const getUsersPerRole = (User) => (req, role) => {
-    return User.find({ role: role }).populate('location')
+    return User.find({ role: role }).populate('locations')
 }
 
 /**
@@ -168,7 +134,7 @@ const getUsersPerRole = (User) => (req, role) => {
  * @returns user
  */
 const getUsersPerRoles = (User) => (roles) => {
-    return User.find({ role: { $in: roles } }).populate('location')
+    return User.find({ role: { $in: roles } }).populate('locations')
 }
 
 /**
@@ -185,7 +151,7 @@ const getUserById = (User) => (id) => {
         } else {
             console.debug("USER-SERVICE: Found user to edit: ", docs);
         }
-    }).populate('location')
+    }).populate('locations').populate({ path: 'subscriptions.items.cars', model: 'car' })
 }
 
 /**
@@ -196,7 +162,7 @@ const getUserById = (User) => (id) => {
 const getUserByEmail = (User) => async (email) => {
     console.log(`getUserByEmail(): ${email}`)
 
-    return await User.findOne({ email })
+    return await User.findOne({ email }).populate({ path: 'subscriptions.items.cars', model: 'car' })
 }
 
 /**
@@ -225,20 +191,22 @@ const updateBillingID = (User) => async (id, billingID) => {
     })
 }
 
-// Get User By Car Plate
 /**
  * This function get user by plate number.
  * @param {*} User 
  * @returns user
  */
 const getUserByCar = (User) => async (car) => {
-    return User.findOne({ cars: car }, function (err, docs) {
-        if (err) {
-            console.error(err)
-        } else {
-            console.debug("USER-SERVICE: Found user: ", docs.email);
-        }
-    })
+    return User.findOne({
+        "subscriptions.items.cars": { _id: car.id }
+    },
+        function (err, docs) {
+            if (err) {
+                console.error(err)
+            } else {
+                console.debug("USER-SERVICE: Found user: ", docs?.email);
+            }
+        })
 }
 
 /**
@@ -247,7 +215,7 @@ const getUserByCar = (User) => async (car) => {
  * @returns user list
  */
 const getUsersByLocationID = (User) => async (location) => {
-    return await User.find({ location })
+    return await User.find({ "locations": { _id: location.id } })
 }
 
 /**
@@ -266,34 +234,162 @@ const getUsersByList = (User) => async (users) => {
 }
 
 /**
- * This function add new service to user.
- * Find the user and add new service.
- * @param {userID, authorizedBy, location} User 
- * @returns user object, service object
+ * This function add new notification to user.
+ * @param {userID, message} User 
+ * @returns user object
  */
-const addNewService = (User) => async (userID, authorizedBy, location) => {
-    console.log(`addNewService() ID: ${userID}`)
+const addNotification = (User) => async (id, message) => {
+    console.log(`addNotification() ID: ${id}`)
+    // let date = Date.now();
+    let notification = {
+        isRead: false,
+        message: message,
+        created_date: new Date()
+    }
 
-    let service = {
-        // id is a random ID genetated with letters and numbers. 
-        id: 'AC-' + Math.random().toString(36).toUpperCase().substring(2, 6),
-        date: Date.now(),
-        location: location,
-        authorizedBy: authorizedBy?._id
+    let customer = await User.findByIdAndUpdate({ _id: id },
+        { $addToSet: { notifications: notification } },
+        { new: true })
+        .then(result => {
+            if (result) {
+                console.debug(`addNotification(): Successfully Added notification ${result.id}.`);
+                return result
+            } else {
+                console.debug("addNotification(): No document returned.");
+            }
+        })
+        .catch(err => console.error(`Failed to add notification: ${err}`));
 
-    }, customer = await User.findByIdAndUpdate({ _id: userID }, { $addToSet: { services: service } },
-        { new: true }, function (err, doc) {
+    notification = (customer?.notifications.find(({ created_date }) => created_date.getTime() === new Date(notification.created_date).getTime()))
+
+    return [customer, notification]
+}
+
+/**
+ * This function add new notification to user.
+ * @param {userID, authorizedBy, location} User 
+ * @returns user object
+ */
+const changeNotificationState = (User) => async (userID, notificationID, value) => {
+    console.log(`readNotification() ID: ${userID}`)
+    let customer = await User.findByIdAndUpdate(
+        {
+            "_id": userID,
+            "notifications": {
+                "_id": notificationID
+            }
+        },
+        {
+            $set: { 'notifications.$[outer].isRead': JSON.parse(value) }
+        },
+        {
+            "arrayFilters": [{ "outer._id": notificationID }]
+        }, function (err, doc) {
             if (err) {
                 console.error(err)
                 console.error(err.message)
             } else {
-                console.debug("Service Added : ", service?.id);
+                console.debug("Notification Changed.");
             }
-        }).populate({ path: 'services.location', model: 'location' }).populate({ path: 'services.authorizedBy', model: 'user' })
+        })
 
-    service = (customer.services.find(({ id }) => id === service.id))
+    let notification = (customer.notifications.find(({ id }) => id === notificationID))
 
-    return [customer, service]
+    return [customer, notification]
+}
+
+
+/**
+ * This function marks as read all unread notifications.
+ * @param {userID, authorizedBy, location} User 
+ * @returns user object
+ */
+const readAllNotifications = (User) => async (userID) => {
+    console.log(`readAllNotifications() ID: ${userID}`)
+    let customer = await User.findByIdAndUpdate(
+        {
+            "_id": userID
+        },
+        {
+            $set: { 'notifications.$[outer].isRead': true }
+        },
+        {
+            "arrayFilters": [{ "outer.isRead": false }]
+        }, function (err, doc) {
+            if (err) {
+                console.error(err)
+                console.error(err.message)
+            } else {
+                console.debug("Notification Changed.");
+            }
+        })
+
+    return customer
+}
+
+
+/**
+ * This function add new item to user cart.
+ * @param {userID, item} User 
+ * @returns user object
+ */
+const addItemToCart = (User) => async (id, item) => {
+    console.log(`addItemToCart() ID: ${id}`)
+
+    let customer = await User.findByIdAndUpdate({ _id: id },
+        { $addToSet: { 'cart.items': item } },
+        { new: true })
+        .then(result => {
+            if (result) {
+                console.debug(`addItemToCart(): Successfully Added item to cart: ${result.email}.`);
+                return result
+            } else {
+                console.debug("addItemToCart(): No document returned.");
+            }
+        })
+        .catch(err => console.error(`Failed to add item to cart: ${err}`));
+
+    let itemToRtrn = customer?.cart.items.find(obj => obj.plate == item.plate)
+
+    return [customer, itemToRtrn]
+}
+
+/**
+ * This function remove the item from user cart.
+ * @param {id, item} User 
+ * @returns User
+ */
+const removeItemFromCart = (User) => async (id, item) => {
+    console.log(`removeItemFromCart() ID: ${id}`)
+
+    return await User.findByIdAndUpdate({ _id: id },
+        { $pull: { 'cart.items': item } },
+        { new: true }, function (err, doc) {
+            if (err) {
+                console.error(err.message)
+            } else {
+                console.debug("Item from cart Removed of user: ", doc.email);
+            }
+        })
+}
+
+/**
+ * This function empty the user cart.
+ * @param {id, item} User 
+ * @returns User
+ */
+const emptyCart = (User) => async (id) => {
+    console.log(`emptyCart() ID: ${id}`)
+
+    return await User.findByIdAndUpdate({ _id: id },
+        { $set: { 'cart.items': [] } },
+        { new: true }, function (err, doc) {
+            if (err) {
+                console.error(err.message)
+            } else {
+                console.debug("The cart is empty for user: ", doc.email);
+            }
+        })
 }
 
 module.exports = (User) => {
@@ -302,8 +398,6 @@ module.exports = (User) => {
         updateUser: updateUser(User),
         addUserLocation: addUserLocation(User),
         removeUserLocation: removeUserLocation(User),
-        addUserCar: addUserCar(User),
-        removeUserCar: removeUserCar(User),
         deleteUser: deleteUser(User),
         getUsers: getUsers(User),
         getUsersPerRole: getUsersPerRole(User),
@@ -315,6 +409,11 @@ module.exports = (User) => {
         getUserByCar: getUserByCar(User),
         getUsersByLocationID: getUsersByLocationID(User),
         getUsersByList: getUsersByList(User),
-        addNewService: addNewService(User)
+        addNotification: addNotification(User),
+        changeNotificationState: changeNotificationState(User),
+        readAllNotifications: readAllNotifications(User),
+        addItemToCart: addItemToCart(User),
+        removeItemFromCart: removeItemFromCart(User),
+        emptyCart: emptyCart(User)
     }
 }

@@ -10729,6 +10729,11 @@ progress {
     color: #6c757d;
 }
 
+.select2-container {
+    display: block !important;
+    width: 100% !important;
+}
+
 .form-control,
 .asColorPicker-input,
 .dataTables_wrapper select,
@@ -10739,7 +10744,8 @@ progress {
 .tt-hint {
     display: block;
     width: 100%;
-    padding: 0.875rem 1.375rem;
+    /* padding: 0.875rem 1.375rem; */
+    padding: .4375rem 0;
     font-size: 0.875rem;
     font-weight: 400;
     line-height: 1;
@@ -10750,6 +10756,10 @@ progress {
     appearance: none;
     border-radius: 2px;
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control {
+    display: block!important;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -10976,7 +10986,7 @@ progress {
 
 .form-control-lg {
     min-height: 3.175rem;
-    padding: 0.94rem 1.94rem;
+    padding: 0.94rem 1.94rem !important;
     font-size: 1.25rem;
     border-radius: 0.3rem;
 }
@@ -12110,7 +12120,7 @@ textarea.is-invalid.tt-hint {
     user-select: none;
     background-color: transparent;
     border: 1px solid transparent;
-    padding: 0.875rem 1.5rem;
+    padding: 0.875rem 1.5rem !important;
     font-size: 0.875rem;
     border-radius: 0.1875rem;
     transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
@@ -12335,6 +12345,12 @@ fieldset:disabled .swal2-modal .swal2-buttonswrapper .swal2-styled,
     color: #000;
     background-color: #52CDFF;
     border-color: #52CDFF;
+}
+
+.btn-checkout {
+    background-color: #ffd814;
+    color: black;
+    border-color: #ffd814;
 }
 
 .btn-warning {
@@ -28857,7 +28873,7 @@ body.avgrund-active {
 }
 
 .dataTables_wrapper .dataTable thead th {
-    border-bottom-width: 0;
+    border-bottom-width: 1px;
 }
 
 .dataTables_wrapper .dataTable thead .sorting:before,
@@ -29955,6 +29971,12 @@ table.dataTable tbody td.select-checkbox:after {
     line-height: 2.5;
 }
 
+.br-0 {
+    border-radius: 0 !important;
+}
+.br-5 {
+    border-radius: 5px !important;
+}
 
 /* Select2 */
 
@@ -29976,10 +29998,13 @@ table.dataTable tbody td.select-checkbox:after {
 
 .select2-container--default .select2-selection--single {
     height: auto;
+    min-height: 3.175rem;
 }
 
 .select2-container--default .select2-selection--single .select2-selection__rendered {
-    line-height: 14px;
+    line-height: 2.5;
+    /* padding: 0; */
+    padding: 0 1.94rem;
 }
 
 .select2-container--default .select2-dropdown {
@@ -30692,7 +30717,8 @@ div.tagsinput span.tag a {
 
 .content-wrapper {
     background: #F4F5F7;
-    padding: 1.5rem 2.187rem 1.5rem 3.5rem;
+    /* padding: 1.5rem 2.187rem 1.5rem 1.5rem; */
+    padding: 1rem;
     width: 100%;
     -webkit-flex-grow: 1;
     flex-grow: 1;
@@ -31141,7 +31167,7 @@ div.tagsinput span.tag a {
 
 .navbar .navbar-brand-wrapper .navbar-brand img {
     max-width: 100%;
-    height: 34px;
+    /* height: 34px; */
     margin: auto;
     vertical-align: middle;
 }
@@ -31254,7 +31280,7 @@ div.tagsinput span.tag a {
 
 @media (max-width: 991px) {
     .navbar .navbar-menu-wrapper .navbar-toggler.navbar-toggler-right {
-        padding-left: 15px;
+        padding-left: 10px;
         padding-right: 0;
     }
     .navbar .navbar-menu-wrapper .navbar-toggler.navbar-toggler-right:focus {
@@ -31289,8 +31315,8 @@ div.tagsinput span.tag a {
 
 @media (max-width: 767px) {
     .navbar .navbar-menu-wrapper .navbar-nav .nav-item .nav-link {
-        margin-left: 0.5rem;
-        margin-right: 0.5rem;
+        margin-left: 0.1rem;
+        margin-right: 0.1rem;
     }
 }
 
@@ -31559,6 +31585,12 @@ div.tagsinput span.tag a {
 
 .navbar .navbar-menu-wrapper .navbar-nav .nav-item.dropdown .navbar-dropdown .dropdown-item .badge {
     margin-left: 2.5rem;
+    /* margin-left: 1rem; */
+}
+@media (max-width: 320px) {
+    .navbar .navbar-menu-wrapper .navbar-nav .nav-item.dropdown .navbar-dropdown .dropdown-item .badge {
+        margin-left: 0.5rem;
+    }
 }
 
 .navbar .navbar-menu-wrapper .navbar-nav .nav-item.dropdown .navbar-dropdown .dropdown-item .ellipsis {
@@ -33973,7 +34005,7 @@ label.required:after {
 }
 
 .validation-msgs {
-    margin: 50px 0;
+    margin: 20px 0;
 }
 
 .validation-msgs > p {

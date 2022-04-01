@@ -5,7 +5,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>History </title>
+    <title><%= lingua.history%></title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="../vendors/feather/feather.css">
     <link rel="stylesheet" href="../vendors/mdi/css/materialdesignicons.min.css">
@@ -49,7 +49,7 @@
                                         <div class="card-body">
                                             <div class="d-sm-flex justify-content-between align-items-start">
                                                 <div>
-                                                    <h4 class="card-title card-title-dash">History</h4>
+                                                    <h4 class="card-title card-title-dash"><%= lingua.history%></h4>
                                                 </div>
                                                 <!-- <div>
                                                             <a href="/create-user" class="btn btn-primary btn-icon-text" type="button"><i class="mdi mdi-map-marker-plus btn-icon-prepend"></i>Add User</a>
@@ -61,11 +61,11 @@
                                                     <thead>
                                                         <tr>
                                                             <!-- <th>ID</th> -->
-                                                            <th>Description</th>
-                                                            <td>Type</td>
-                                                            <th>Date</th>
-                                                            <th>User</th>
-                                                            <th>Location</th>
+                                                            <th><%= lingua.description%></th>
+                                                            <td><%= lingua.type%></td>
+                                                            <th><%= lingua.date%></th>
+                                                            <th><%= lingua.user.name%></th>
+                                                            <th><%= lingua.location.name%></th>
                                                             <!-- <th>Action</th> -->
                                                         </tr>
                                                     </thead>
@@ -89,7 +89,7 @@
                                                                 <%- history.type%>
                                                             </td>
                                                             <td>
-                                                                <%= moment(history.date).isValid() ? moment(history.date).format(completeDateFormat) : 'N/A' %>
+                                                                <%= moment(history?.created_date).isValid() ? moment(history?.created_date).format(completeDateFormat) : 'N/A' %>
 
                                                             </td>
                                                             <td>
@@ -118,6 +118,8 @@
                 </div>
             </div>
         </div>
+        <!-- partial:partials/_footer.html -->
+        <%- include('../partials/footer.ejs'); %>
     </div>
     <!-- page-body-wrapper ends -->
     </div>

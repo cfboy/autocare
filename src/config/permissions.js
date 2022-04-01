@@ -18,15 +18,29 @@ function canDeleteUser(user) {
     )
 }
 
-function canDeleteCar(user, carID) {
+function canDeleteCar(user, carID, services) {
     return (
-        user.role === ROLES.ADMIN || user?.cars?.includes(carID)
+        user.role === ROLES.ADMIN || (carID && services.length == 0)
     )
 }
 
-function canEditCar(user, carID) {
+function canAddCar(user) {
     return (
-        [ROLES.ADMIN, ROLES.MANAGER].includes(user.role) || user?.cars?.includes(carID)
+        user.subscriptions.some(sub => sub.items.some(item => item?.cars?.length < item.data.quantity))
+    )
+}
+
+function canEditCar(user, carID, services) {
+
+    return (
+        [ROLES.ADMIN, ROLES.MANAGER].includes(user.role) || (carID && services.length == 0)
+    )
+}
+
+function canManageCars(user) {
+    return (
+        [ROLES.ADMIN].includes(user.role)
+        // || user?.services.length < 1
     )
 }
 
@@ -36,11 +50,20 @@ function canValidateMemberships(user) {
     )
 }
 
+function canChangePassword(user, userID) {
+    return (
+        user.role === ROLES.ADMIN || user.id === userID
+    )
+}
+
 module.exports = {
+    canManageCars,
+    canAddCar,
     canDeleteCar,
     canEditCar,
     canDeleteLocation,
     canEditLocation,
     canDeleteUser,
-    canValidateMemberships
+    canValidateMemberships,
+    canChangePassword
 }

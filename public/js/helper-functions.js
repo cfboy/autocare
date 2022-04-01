@@ -57,3 +57,8 @@ function manageLangDropdown() {
         $('.dropdown-menu #es-lang').removeClass('active').attr('hidden', false);
     }
 }
+
+function clearForm(form) {
+    form.find('input').val('');
+    form.find('select').val("").trigger("change");
+}

@@ -1,9 +1,63 @@
+//Use node-fetch to call externals API. 
+//Use v2.0 to use the module in code (for versions prior to version):
+const fetch = require('node-fetch');
+const SubscriptionService = require('../subscription')
+
 /**
- * This function get all cars on db.
+ * This function get all cars from the db.
+ * 
  * @param {} Car 
  * @returns Car list
  */
-const getCars = (Car) => (cars) => {
+const getCars = (Car) => async () => {
+    return Car.find({}, function (err, docs) {
+        if (err) {
+            console.error(err)
+        } else {
+            console.debug("CAR-SERVICE: Found Cars: ", docs.length);
+        }
+    })
+}
+
+const getCarsWithUserNull = (Car) => async () => {
+    return Car.find({ user_id: { $eq: null } }, function (err, docs) {
+        if (err) {
+            console.error(err)
+        } else {
+            console.debug("CAR-SERVICE: Found Cars with user null: ", docs.length);
+        }
+    })
+}
+
+/**
+ * This function get all cars from the db.
+ * 
+ * @param {} Car 
+ * @returns Car list
+ */
+async function handleCarsWithUserNull(carsWithNull) {
+    if (carsWithNull) {
+        for (carObj of carsWithNull) {
+            let subscription = await SubscriptionService.getSubscriptionByCar(carObj)
+            // if (!carObj.user_id || carObj.user_id !== subscription.user.id) {
+            if (subscription) {
+                let updatedCar = await this.updateCar(carObj.id, { user_id: subscription.user.id })
+                console.debug('Updated Car: ' + updatedCar.brand)
+            }else{
+                console.debug('This Car not have subscription.')
+            }
+            // }
+        }
+    }
+}
+
+/**
+ * This function get all cars from db.
+ * This function receive a list off cars (user cars) because the car schema don't have user reference.
+ * @param {} Car 
+ * @returns Car list
+ */
+const getCarsByList = (Car) => async (cars) => {
     return Car.find({ _id: { $in: cars } }, function (err, docs) {
         if (err) {
             console.error(err)
@@ -23,31 +77,38 @@ const getCarByID = (Car) => async (carID) => {
         if (err) {
             console.error(err)
         } else {
-            console.debug("CAR-SERVICE: Found car: ", docs.name);
+            console.debug("CAR-SERVICE: Found car: ", docs.brand);
         }
     })
 }
 
 /**
  * This function add new car to DB
- * @param {name, brand, model, plate} Car 
+ * @param {brand, model, plate} Car 
  * @returns car object
  */
-const addCar = (Car) => async (name, brand, model, plate) => {
-    if (!name) {
-        throw new Error(`Missing Data. Please provide the name of the car.`)
+const addCar = (Car) => async (brand, model, plate, user_id) => {
+    // TODO: change this to find first then create new car.
+    try {
+        if (!brand || !model || !plate) {
+            throw new Error(`Missing Data. Please provide all data for car.`)
+        }
+
+        console.log(`CAR-SERVICE: addCar(${brand})`)
+
+        const car = new Car({
+            brand,
+            model,
+            plate,
+            user_id
+        })
+
+        return await car.save()
+    } catch (error) {
+        console.debug(error)
+        console.log(`ERROR: CAR-SERVICE: addCar()`)
+        return null
     }
-
-    console.log(`CAR-SERVICE: addCar(${name})`)
-
-    const car = new Car({
-        name,
-        brand,
-        model,
-        plate
-    })
-
-    return await car.save()
 }
 
 /**
@@ -57,11 +118,11 @@ const addCar = (Car) => async (name, brand, model, plate) => {
  */
 const updateCar = (Car) => async (id, updates) => {
     console.log(`updateCar() ID: ${id}`)
-    return await Car.findByIdAndUpdate({ _id: id }, updates, function (err, doc) {
+    return await Car.findByIdAndUpdate({ _id: id }, updates, { new: true }, function (err, doc) {
         if (err) {
             console.error(err.message)
         } else {
-            console.debug("Updated : ", doc.name);
+            console.debug("Updated : ", doc.brand);
         }
     })
 }
@@ -72,6 +133,8 @@ const updateCar = (Car) => async (id, updates) => {
  * @returns promise
  */
 const deleteCar = (Car) => async (id) => {
+    // TODO: implement not forever delete.
+
     console.log(`deleteCar() by ID: ${id}`)
 
     return Car.deleteOne({ _id: id }, function (err, docs) {
@@ -94,20 +157,73 @@ const getCarByPlate = (Car) => async (plate) => {
             console.error(err)
         } else {
             if (doc)
-                console.debug(`CAR-SERVICE: Found car: ${doc?.name} - ${doc?.model} - ${doc?.plate}`);
+                console.debug(`CAR-SERVICE: Found car: ${doc?.brand} - ${doc?.model} - ${doc?.plate}`);
             else
                 console.debug(`CAR-SERVICE: Not Found car with plate: ${plate}`);
         }
     })
 }
 
+/**
+ * This function return all cars by user object.
+ * @param {*} user 
+ * @returns car list
+ */
+// TODO: to optimize this method need to add a userID on car schema.
+const getAllCarsByUser = (Car) => async (user) => {
+    console.debug("getAllCarsByUser()...")
+    return Car.find({ user_id: user.id }, function (err, docs) {
+        if (err) {
+            console.error(err)
+        } else {
+            console.debug(`CAR-SERVICE: Found Cars ${docs.length} By user: ${user.email}`);
+        }
+    })
+}
+
+
+/**
+ * This function get all makes from external API.
+ * @returns 
+ */
+async function getAllMakes() {
+
+    let allMakes = [], allModels = []
+
+    if (JSON.parse(process.env.USE_CAR_API)) {
+        console.debug("getAllMakes from API")
+        const apiRoute = 'GetAllMakes?format=json'
+        const apiResponse = await fetch(
+            'https://vpic.nhtsa.dot.gov/api/vehicles/' + apiRoute
+        )
+        let apiResponseJSON
+
+        if (apiResponse.ok) {
+            apiResponseJSON = await apiResponse.json()
+            allMakes = apiResponseJSON?.Results
+        }
+    } else {
+        console.debug("getAllMakes from local list")
+        allMakes = require('../../helpers/carMakes').carMakes
+    }
+
+    allMakes = allMakes.sort((a, b) => a.Make_Name.localeCompare(b.Make_Name))
+
+    return { allMakes, allModels }
+}
+
 module.exports = (Car) => {
     return {
         getCars: getCars(Car),
+        getCarsWithUserNull: getCarsWithUserNull(Car),
+        getCarsByList: getCarsByList(Car),
         getCarByID: getCarByID(Car),
         addCar: addCar(Car),
         updateCar: updateCar(Car),
         deleteCar: deleteCar(Car),
-        getCarByPlate: getCarByPlate(Car)
+        getCarByPlate: getCarByPlate(Car),
+        getAllMakes: getAllMakes,
+        getAllCarsByUser: getAllCarsByUser(Car),
+        handleCarsWithUserNull: handleCarsWithUserNull
     }
 }

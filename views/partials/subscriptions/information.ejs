@@ -1,49 +1,202 @@
-<div class="table-responsive  mt-1">
-    <% if(showManageBtn) { %>
-    <div class="d-sm-flex justify-content-between align-items-start float-end">
-        <a id="manage-billing-button" class="btn btn-primary btn-icon-text manage-billing-button" style="margin: 0;"
-            type="submit" value="<%- customer.billingID%>" email="<%- customer.email%>">
-            <i class="fab fa-stripe-s"></i> Manage Billing</a>
+<div class="d-flex justify-content-between align-items-start">
+    <div>
+        <h4 class="card-title card-title-dash">
+            <% if(invalid) { %>
+            <%= lingua.membership.invalidMemberships%>
+            <% } else { %>
+            <%= lingua.membership.memberships%>
+            <% } %>
+        </h4>
     </div>
-    <% } %>
-    <table class="table table-hover">
+    <div class="d-sm-flex justify-content-between align-items-start">
+        <% if(showManageBtn) { %>
+        <a id="manage-billing-button" class="btn btn-primary btn-icon-text text-white manage-billing-button m-1"
+            style="margin: 0;" type="submit" value="<%- customer.billingID%>" email="<%- customer.email%>">
+            <i class="fab fa-stripe-s"></i> <%= lingua.membership.manageBilling%>
+        </a>
+        <% } %>
+        <% if(showCreateBtn) { %>
+        <a href="/create-subscriptions" class="btn btn-primary btn-icon-text text-white m-1 p-3" type="button">
+            <i class="fas fa-plus btn-icon-prepend"></i> <%= lingua.membership.createSubscriptions%>
+        </a>
+        <% } %>
+
+    </div>
+
+</div>
+<div class="table-responsive mt-1">
+    <table class="table">
         <thead>
             <tr>
-                <th>Membership Information</th>
                 <th>
+                    <%= lingua.membership.info%>
+                </th>
+                <th>
+                    <%= lingua.membership.period%>
+                    <br>
+                    <small>( <%= lingua.membership.startDate%>) / <%= lingua.membership.endDate%></small>
+
+                </th>
+                <th class="text-center">
+                    <%= lingua.membership.status%>
                 </th>
             </tr>
         </thead>
         <tbody>
+            <% for(stripeSubscription of subscriptions) { %>
             <tr>
-                <td>Plan</td>
                 <td>
-                    <%- stripeSubscription?.product?.name%>
+                    <% for(item of stripeSubscription.items) { %>
+                    <p>
+                        <b><%- item.data.price.product.name %></b> (<%= item.cars.length %>/<%= item.data.quantity%>
+                        <small> <%= lingua.car.carsQty%></small>)
+                    </p>
+                    <ul class="mb-0">
+                        <% if(item.isValid) { %>
+                        <% for(car of item.cars) { %>
+                        <li class="mt-1 mb-1 m-3">
+                            <a href="/car/<%= car.id%>">
+
+                                <%- car.brand%> - <%- car.model%> - <%- car.plate%>
+                            </a>
+                            <% if(car?.cancel_date) { %>
+                            <b>
+                                (<%= lingua.membership.validUntil%>:
+                                <%= moment(car?.cancel_date).isValid() ? moment(car?.cancel_date).format(shortDateFormat) : 'N/A' %>
+                                )
+                            </b>
+                            <% } %>
+                        </li>
+                        <% } %>
+
+                        <% } else { %>
+                        <!-- If the length of cars is less than item quantity, then show add car btn. -->
+                        <% if(item.cars.length < item.data.quantity) { %>
+                        <% for(car of item.cars) { %>
+                        <li class="mt-1 mb-1 m-3">
+                            <a href="/car/<%= car.id%>">
+                                <%- car.brand%> - <%- car.model%> - <%- car.plate%>
+                            </a>
+                            <% if(car?.cancel_date) { %>
+                            <b>
+                                (<%= lingua.membership.validUntil%>:
+                                <%= moment(car?.cancel_date * 1000).isValid() ? moment(car?.cancel_date * 1000).format(shortDateFormat) : 'N/A' %>
+                                )
+                            </b>
+                            <% } %>
+                        </li>
+                        <% } %>
+                        <% for(let i=0; i < (item.data.quantity-item.cars.length); i++) { %>
+                        <li class="mt-1 mb-1 m-3">
+                            <a href="/cars/create?itemID=<%- item.id%>&userID=<%- customer.id%>" id="add-car-button"
+                                class="btn btn-warning p-2" style="margin: 0;" type="submit">
+                                <%= lingua.car.addMissingCar%></a>
+                        </li>
+                        <% } %>
+                        <% } else if(item.cars.length > item.data.quantity) { %>
+
+                        <form id="handle-valid-cars-form-<%= item.id%>" action="/confirmValidCars" method="post">
+                            <input id="subscriptionID" name="subscriptionID" value="<%=  stripeSubscription.id%>"
+                                hidden>
+
+                            <!-- <input id="itemID" name="itemID" value="<%=  item.id%>" hidden> -->
+                            <input id="requiredQty-<%=  item.id%>" name="requiredQty" value="<%=  item.data.quantity %>"
+                                hidden>
+                            <input type="text" name="selectedCars" id="selectedCars-<%=  item.id%>" value="" hidden>
+                            <input type="text" name="carsToRemove" id="carsToRemove-<%=  item.id%>" value="" hidden>
+                            <p class="alert badge-outline-warning text-center"><%= lingua.select%> <b>
+                                    <%=  item.data.quantity %>
+                                </b> <%= lingua.car.toUseOnNextPeriod%>.</p>
+                            <div class="form-group">
+                                <% for(car of item.cars) { %>
+
+                                <div class="form-check form-check-primary">
+
+                                    <label class="form-check-label">
+
+                                        <input type="checkbox" class="form-check-input" name="cars"
+                                            onclick="validateCheckboxes(`<%= item.id%>`)" value="<%= car._id%>">
+                                        <%- car.brand %> - <%- car.model %> - <%- car.plate %>
+
+                                    </label>
+
+                                </div>
+                                <% } %>
+
+                            </div>
+                            <div id="validationTxt-<%= item.id%>"></div>
+                            <button id="confirm-valid-cars-button-<%= item.id%>" class="btn btn-secondary"
+                                style="margin: 0;" type="submit" itemid="<%= item.id%>" disabled>
+                                <%= lingua.car.confirmCarsForNextPeriod%> <span
+                                    id="selectedDisplay-<%= item.id%>">(0/<%=  item.data.quantity %>)</span>
+                            </button>
+                        </form>
+                        <% } %>
+                        <% } %>
+                    </ul>
+                    <br>
+                    <% } %>
+                </td>
+                <td>
+                    (<%= moment(stripeSubscription?.data?.current_period_start * 1000).isValid() ? moment(stripeSubscription?.data?.current_period_start * 1000).format(shortDateFormat) : 'N/A' %>)
+                    /
+                    (<%= moment(stripeSubscription?.data?.current_period_end * 1000).isValid() ? moment(stripeSubscription?.data?.current_period_end * 1000).format(shortDateFormat) : 'N/A' %>)
 
                 </td>
-            </tr>
-            <tr>
-                <td>Status</td>
-                <td> <span style="text-transform: uppercase;">
-                        <%- membershipStatus%>
-                    </span></td>
-            </tr>
-            <tr>
-                <td>
-                    Current Period Start
-                </td>
-                <td>
-                    <%= moment(stripeSubscription?.current_period_start * 1000).isValid() ? moment(stripeSubscription?.current_period_start * 1000).format(completeDateFormat) : 'N/A' %>
+                <td class="text-center">
+                    <span style="text-transform: uppercase;">
+                        <%- stripeSubscription?.data.status%>
+                    </span>
                 </td>
             </tr>
-            <tr>
-                <td>
-                    Current Period End
-                </td>
-                <td>
-                    <%= moment(stripeSubscription?.current_period_end * 1000).isValid() ? moment(stripeSubscription?.current_period_end * 1000).format(completeDateFormat) : 'N/A' %>
-                </td>
-            </tr>
+            <% } %>
         </tbody>
     </table>
 </div>
+
+<script>
+
+    function validateCheckboxes(itemid) {
+        var selected = [];
+        var toRemove = [];
+        var confirmValidCarsButton = $(`#confirm-valid-cars-button-${itemid}`);
+        var validationTxt = $(`#validationTxt-${itemid}`);
+        var selectedCars = document.getElementById(`selectedCars-${itemid}`);
+        var carsToRemove = document.getElementById(`carsToRemove-${itemid}`);
+        var requiredQty = $(`#requiredQty-${itemid}`).val();
+        var selectedDisplay = $(`#selectedDisplay-${itemid}`)
+
+        $(`#handle-valid-cars-form-${itemid} input:checkbox[type=checkbox]`).each(function () {
+            toRemove.push($(this).val());
+        });
+
+
+        $(`#handle-valid-cars-form-${itemid} input:checkbox[type=checkbox]:checked`).each(function () {
+            selected.push($(this).val());
+            toRemove.splice($.inArray($(this).val(), toRemove), 1);
+        });
+        console.debug('Selected: ' + selected);
+
+        console.debug('toRemove: ' + toRemove);
+
+        selectedDisplay.html(`(${selected.length?.toString()}/${requiredQty?.toString()})`);
+
+        if (selected.length == requiredQty) {
+            $(`#handle-valid-cars-form-${itemid} input:checkbox[type=checkbox]:not(:checked)`).each(function () {
+                $(this).attr('disabled', 'disabled');
+            });
+            validationTxt.html(`<p class="valid"> Maximum car selected. Press confirm button to continue.<p>`)
+            confirmValidCarsButton.removeClass('btn-secondary').addClass('btn-primary').removeAttr('disabled');
+
+        } else if (selected.length < requiredQty) {
+            $(`#handle-valid-cars-form-${itemid} input:checkbox[type=checkbox]`).each(function () {
+                $(this).removeAttr('disabled');
+            });
+            validationTxt.html(``)
+            confirmValidCarsButton.removeClass('btn-primary').addClass('btn-secondary').attr('disabled', 'disabled');
+        }
+
+        selectedCars.value = selected;
+        carsToRemove.value = toRemove;
+    }
+</script>

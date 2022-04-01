@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title><%= lingua.termsAndConditions%></title>
+    <!-- plugins:css -->
+    <link rel="stylesheet" href="./vendors/feather/feather.css">
+    <link rel="stylesheet" href="./vendors/mdi/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="./vendors/ti-icons/css/themify-icons.css">
+    <link rel="stylesheet" href="./vendors/typicons/typicons.css">
+    <link rel="stylesheet" href="./vendors/simple-line-icons/css/simple-line-icons.css">
+    <link rel="stylesheet" href="../../vendors/flag-icon-css/css/flag-icon.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+        integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="./vendors/css/vendor.bundle.base.css">
+    <link rel="stylesheet" href="./js/select.dataTables.min.css">
+    <!-- End plugin css for this page -->
+    <!-- inject:css -->
+    <link rel="stylesheet" href="./css/vertical-layout-light/style.css">
+    <!-- endinject -->
+    <link rel="shortcut icon" href="./images/favicon.png" />
+</head>
+
+<body>
+    <div class="container-scroller">
+        <nav class="navbar default-layout col-lg-12 col-12 p-0 d-flex align-items-top flex-row">
+            <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-start">
+                <div>
+                    <a class="navbar-brand brand-logo" href="/account">
+                        <img src="../images/mrquicks/mrQuicksLogo.png" alt="logo" style="height: auto!important;" />
+                    </a>
+                    <a class="navbar-brand brand-logo-mini" href="/account">
+                        <img src="../images/favicon.png" alt="logo" />
+                    </a>
+                </div>
+            </div>
+            <div class="navbar-menu-wrapper d-flex align-items-top">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link count-indicator" id="languageDropdown" href="#" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            <!-- <i class="icon-globe"></i> -->
+                            <!-- <i class="fas fa-globe-americas"></i> -->
+                            <div id="showLang" style="display: contents;">
+                                <span id="es-lang" hidden>
+                                    <span class="flag-icon flag-icon-pr "></span> ESPAÑOL
+                                </span>
+                                <span id="en-lang" hidden>
+                                    <span class="flag-icon flag-icon-um "></span> ENGLISH
+                                </span>
+                            </div>
+                        </a>
+                        <div id="languageDropdown"
+                            class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list pb-0"
+                            aria-labelledby="languageDropdown">
+                            <a id="es-lang" href="?lang=es" class="dropdown-item py-3">
+                                ES <span class="flag-icon flag-icon-pr" style="margin-left: 5px;"></span>
+                            </a>
+
+                            <a id="en-lang" href="?lang=en" class="dropdown-item py-3">
+                                EN <span class="flag-icon flag-icon-um" style="margin-left: 5px;"></span>
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <!-- partial -->
+        <div class="container-fluid content-wrapper p-0">
+            <div class="container p-4 pt-0">
+                <div class="row">
+
+                    <div class="col-lg-12 col-md-12 mb-12">
+                        <div class="card h-100 shadow-lg">
+                            <div class="card-body">
+                                <%if(lang == 'es') { %>
+                                <h2>Términos y Condiciones del Plan Ilimitado Mensual (30 días):</h1>
+                                    <br>
+                                    <p>
+                                        La Membresía Mensual (30 días calendarios) brinda lavados de auto automáticos
+                                        ilimitados durante cada mes que la membresía permanezca activa. Esta
+                                        membresía está limitada a cierto número de suscripciones de acuerdo a la
+                                        capacidad de servicio de nuestras instalaciones.
+                                        <br>
+                                        <br>
+                                        Como miembro, usted comprende que la tarjeta de crédito proporcionada se
+                                        facturará automáticamente cada mes hasta que la membresía se cancele
+                                        oportunamente o sea rescindida por Autocare LLC DBA Mr. Quick&#39;s. No se
+                                        proporcionará ninguna notificación previa de dichos cargos a menos que cambie
+                                        la fecha o el monto, en cuyo caso Autocare LLC DBA Mr. Quick&#39;s proporcionará
+                                        un
+                                        aviso con al menos 30 días de anticipación a que se cobre el pago. Dicho aviso
+                                        será publicado en el sitio web o a través del correo electrónico y/o número de
+                                        teléfono móvil que proporcionó al momento de registrarse para el programa. Al
+                                        convertirse en Miembro, acepta renunciar a todos y cada uno de los derechos de
+                                        retener y/o retrasar el pago de los cargos relacionados con la tarjeta de
+                                        crédito,
+                                        ya sea como se describe en su acuerdo con el emisor de la tarjeta de crédito o
+                                        de
+                                        otra manera.
+                                        <br><br>
+                                        <!-- La membresía puede ser cancelada en cualquier momento. Las cancelaciones
+                                        deben realizarse en línea al menos cinco (5) días antes de la finalización de la
+                                        membresía de 30 días vigente en ese momento. Si no cancela la membresía a
+                                        tiempo dentro de los primeros 25 días de la suscripción del servicio, el aviso
+                                        de
+                                        cancelación entrará en vigencia al final del mes siguiente y se le cobrará ese
+                                        mes.
+                                        Para cancelar su membresía, visite nuestro sitio web <a target="_blank"
+                                            href="https://www.mrquickspr.com/">www.mrquickspr.com</a> -->
+
+                                        La membresía puede ser cancelada en cualquier momento. Las cancelaciones deben
+                                        realizarse en línea al menos cinco (5) días antes de la finalización de la
+                                        membresía de 30 días vigente en ese momento. Si no cancela la membresía a tiempo
+                                        dentro de los primeros 25 días de la suscripción del servicio, el aviso de
+                                        cancelación entrará en vigencia al final del mes siguiente y se le cobrará ese
+                                        mes. Si un Miembro decide degradar una membresía antes de finalizar el período
+                                        de 30 días, dicho cambio entrará en vigencia de inmediato. No se proporcionarán
+                                        reembolsos en este evento. Si un Miembro decide ascender su membresía dentro del
+                                        período de 30 días, la actualización entrará en vigencia de inmediato. La
+                                        diferencia de precio será prorrateada y cobrada por el período restante de 30
+                                        días. Para cancelar o modificar su membresía, visite nuestro sitio web
+                                        <a target="_blank" href="https://www.mrquickspr.com/">www.mrquickspr.com</a>
+                                        <br><br>
+                                        Autocare LLC DBA Mr. Quick’s se reserva el derecho de cancelar, modificar o
+                                        cambiar el programa y/o los precios si lo considera necesario y puede cancelar
+                                        su plan de membresía mensual por cualquier motivo que considere pertinente. Si
+                                        el
+                                        cargo mensual es rechazado por el sistema de procesamiento de tarjetas y usted
+                                        no corrige la situación, la membresía terminará de inmediato. De vez en cuando,
+                                        circunstancias fuera de nuestro control, como el mantenimiento preventivo, las
+                                        inclemencias del tiempo, la ausencia de servicios públicos o la falla del
+                                        servicio de Internet pueden afectar la disponibilidad de los servicios. Autocare
+                                        LLC DBA Mr. Quick&#39;s no se hará responsable de los días perdidos durante el
+                                        período de membresía.
+
+                                        <br><br>
+                                        Los vehículos utilizados con fines comerciales de transportación, tales como
+                                        (pero no limitados a) UBER, Lift, taxis, transporte público, “Ride Hail and
+                                        Sharing
+                                        services” estarán excluidos del programa de membresía. Si identificamos dichos
+                                        usos, la membresía será cancelada inmediatamente sin reembolso alguno.
+                                        <br><br>
+                                        Solo los vehículos enumerados en la cuenta de usuario del cliente son elegibles
+                                        para el programa. Los miembros deben realizar cambios en línea para agregar o
+                                        eliminar vehículos de membresía según sea necesario.
+                                        <br><br>
+                                        Al ingresar su número de teléfono móvil y/o dirección de correo electrónico,
+                                        acepta recibir notificaciones móviles y/o comunicaciones por correo electrónico
+                                        de Autocare LLC DBA Mr. Quick&#39;s para ofertas promocionales y de mercadeo,
+                                        así
+                                        como comunicaciones sobre cualquier cambio en los términos y condiciones de
+                                        este programa.
+                                        <br><br>
+                                        En caso de que la tarjeta de crédito o la institución bancaria correspondiente
+                                        retire, contra cargue o rechace el pago de su membresía, usted será responsable
+                                        de los costos y gastos incurridos por Autocare LLC DBA Mr. Quick&#39;s,
+                                        incluyendo
+                                        todos los honorarios de abogados sostenidos en cualquier esfuerzo realizado para
+                                        cobrar cualquier dinero adeudado. En ningún caso dichos gastos serán menores
+                                        de $100.00.
+                                        <br><br>
+                                        Si Autocare LLC DBA Mr. Quick&#39;s opta por presentar una demanda en su contra
+                                        por cualquier motivo relacionado con el cumplimiento de sus obligaciones como
+                                        miembro, o si usted decide resolver cualquier problema relacionado con su
+                                        membresía, la acción estará sujeta exclusivamente a las leyes del Estado Libre
+                                        Asociado de Puerto Rico y se presentará ante el Tribunal de Primera Instancia de
+                                        Bayamón, Puerto Rico.
+                                    </p>
+                                    <% } else if(lang === 'en'){ %>
+                                    <h2>Monthly (30 day) Unlimited Plan Terms &amp; Conditions:</h2>
+                                    <br>
+                                    <p>
+                                        Monthly Membership (30 calendar days) provides unlimited automatic car
+                                        washes during each month your membership remains active. This membership is
+                                        limited to certain number of subscriptions according to service capacity of our
+                                        facilities.
+                                        <br>
+                                        <br>
+                                        As a Monthly Member, you understand that the credit card provided will be
+                                        automatically billed each month until the membership is timely cancelled or is
+                                        otherwise terminated by Autocare LLC DBA Mr. Quick’s. No prior notification of
+                                        such charges will be provided unless the date or amount changes, in which case
+                                        Autocare LLC DBA Mr. Quick’s will provide at least 30 days’ notice prior to
+                                        payment being collected through notice posted at the website or direct contact
+                                        through the email and/or mobile number you provide at time of registration for
+                                        the program. By becoming a Member, you agree to waive any and all rights to
+                                        withhold and/or delay payment of the related credit card charges, whether as
+                                        described in your agreement with the credit card issuer or otherwise.
+                                        <br>
+                                        <br>
+                                        <!-- Membership may be canceled at any time. Cancellations must be made online at
+                                        least five (5) days prior to the conclusion of the then running 30-day
+                                        membership.
+                                        If you fail to timely cancel the membership within the first 25 days of service
+                                        subscription, the cancellation notice will become effective at the end of the
+                                        following month, and you will be charged for that month.  To cancel your
+                                        membership, visit our website <a target="_blank"
+                                            href="https://www.mrquickspr.com/">www.mrquickspr.com</a> -->
+
+                                        Membership may be canceled at any time. Cancellations must be made online at
+                                        least five (5) days prior to the conclusion of the then running 30-day
+                                        membership. If you fail to timely cancel the membership within the first 25 days
+                                        of service subscription, the cancellation notice will become effective at the
+                                        end of the following month, and you will be charged for that month. If a Member
+                                        decides to downgrade a membership prior to the 30-day end period, such change
+                                        will become effective immediately. No refunds will be provided in this event. If
+                                        a Member decides to upgrade a membership within the 30-day period, the upgrade
+                                        will become effective immediately. The price difference will be prorated and
+                                        charged for the remainder 30-day period. To cancel or change your membership,
+                                        visit our website <a target="_blank"
+                                            href="https://www.mrquickspr.com/">www.mrquickspr.com</a>
+                                        <br>
+                                        <br>
+
+                                        Autocare LLC DBA Mr. Quick’s reserves the right to cancel, amend or change the
+                                        program and/or prices, from time to time as it feels necessary and can cancel
+                                        your monthly membership plan for any reason it deems pertinent. If the monthly
+                                        charge is declined by the card processing system and you fail to correct the
+                                        situation, the membership will terminate immediately.  From time-to-time
+                                        circumstances out of our control may affect the availability of services, such
+                                        as
+                                        preventive maintenance, inclement weather, absence of utility services, or
+                                        failure
+                                        of internet service. Autocare LLC DBA Mr. Quick’s will not be held responsible
+                                        for lost days during membership period.
+                                        <br>
+                                        <br>
+                                        Vehicles used for commercial purposes such as (But not limited to) UBER, Lift,
+                                        taxis, public transportation, Ride Hail &amp; Sharing services will be excluded
+                                        from the
+
+                                        membership program. If we identify such uses, the membership will terminate
+                                        immediately with no reimbursement provided.
+                                        <br>
+                                        <br>
+                                        Only the vehicle/s listed on the customer information account is/are eligible
+                                        for
+                                        the program. Members must make changes online to add / remove membership
+                                        vehicles as needed.
+                                        <br>
+                                        <br>
+
+                                        By entering your mobile number and/or email address, you consent to receive
+                                        mobile notifications and/or email communications from Autocare LLC DBA Mr.
+                                        Quick’s for promotional and marketing offers as well as communication in any
+                                        changes to terms and conditions of this program.
+                                        <br>
+                                        <br>
+
+                                        In the event your payment for the membership is withdrawn, charged-back or
+                                        otherwise refused by the corresponding credit card or banking institution, you
+                                        will
+                                        be responsible for costs and expenses incurred by Autocare LLC DBA Mr. Quick’s,
+                                        including all attorneys’ fees sustained in any efforts carried out to collect
+                                        any
+                                        monies due. In no event those costs, or expenses will be less than $100.00.
+                                        <br>
+                                        <br>
+
+                                        Should Autocare LLC DBA Mr. Quick’s opt to file suit against you for any reason
+                                        regarding the performance of you member obligations, or should you decide to
+                                        resolve any issues involving your membership, the action will be exclusively
+                                        subject to the laws of the Commonwealth of Puerto Rico and filed before the
+                                        Court of First Instance of Puerto Rico in Bayamon.
+                                    </p>
+
+
+                                    <% } %>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- page-body-wrapper ends -->
+    </div>
+    <!-- container-scroller -->
+    <%- include('./partials/footer.ejs'); %>
+
+    <!-- plugins:js -->
+    <script src="./vendors/js/vendor.bundle.base.js"></script>
+    <!-- endinject -->
+    <!-- Plugin js for this page -->
+
+    <script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+
+    <!-- End plugin js for this page -->
+    <!-- inject:js -->
+    <script src="./js/off-canvas.js"></script>
+    <script src="./js/hoverable-collapse.js"></script>
+    </script>
+    <script src="./js/jquery.cookie.js" type="text/javascript"></script>
+    <script src="./js/dashboard.js"></script>
+    <!-- End custom js for this page-->
+    <script src="./js/helper-functions.js"></script>
+
+    <script>
+        window.onload = function () {
+            manageLangDropdown();
+        };
+    </script>
+</body>
+
+</html>
