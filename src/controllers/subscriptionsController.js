@@ -124,6 +124,7 @@ exports.validate = async (req, res) => {
  * @param {*} res 
  */
 exports.carCheck = async (req, res) => {
+    console.debug('START carCheck...')
     try {
         if (req.body?.error) {
             console.log(`REKOR-SCOUT: ERROR on JSON ${req.body.error}`)
@@ -147,25 +148,20 @@ exports.carCheck = async (req, res) => {
                      * https://docs.rekor.ai/rekor-scout/application-integration/json-plate-results
                      */
 
-                    console.log("Processing Time (MS): " + bodyResult.processing_time_ms)
-                    for (result of bodyResult.results) {
-                        console.log("IDENTFIED PLATE: " + result?.plate)
-                        readingObjs = {
-                            "plate": result.plate,
-                            "color": '',
-                            "brand": '',
-                            "model": '',
-                            "year": ''
-                        }
-                        console.debug("alpr_results - CAR DETAILS: ")
-                        console.debug("-> PLATE: " + readingObjs.plate)
+                    // console.log("Processing Time (MS): " + bodyResult.processing_time_ms)
 
-                        if (!readingQueue.some(car => car.plate === readingObjs.plate))
-                            readingQueue.push(readingObjs)
+                    let plate = bodyResult.results[0].plate
+                    console.log(`IDENTFIED PLATE: ${plate} (${bodyResult.results[0].confidence})`)
+                    readingObjs = {
+                        "plate": plate
                     }
 
-                    req.io.emit('read-plates', readingQueue);
+                    if (!readingQueue.some(item => item.plate === readingObjs.plate)) {
+                        readingQueue.push(readingObjs)
+                        req.io.emit('read-plates', readingObjs);
+                    }
 
+                    req.io.emit('stop-reading-plates');
                     break;
 
                 case 'alpr_group':
@@ -179,17 +175,17 @@ exports.carCheck = async (req, res) => {
                      */
                     readingObjs = {
                         "plate": bodyResult.best_plate_number,
-                        "color": bodyResult.vehicle.color[0].name,
-                        "brand": bodyResult.vehicle.make[0].name,
-                        "model": bodyResult.vehicle.make_model[0].name,
-                        "year": bodyResult.vehicle.year[0].name
+                        // "color": bodyResult.vehicle.color[0].name,
+                        // "brand": bodyResult.vehicle.make[0].name,
+                        // "model": bodyResult.vehicle.make_model[0].name,
+                        // "year": bodyResult.vehicle.year[0].name
                     }
                     console.debug("alpr_group - CAR DETAILS: ")
                     console.debug("-> PLATE: " + readingObjs.plate)
-                    console.debug("-> COLOR: " + readingObjs.color)
-                    console.debug("-> BRAND: " + readingObjs.brand)
-                    console.debug("-> MODEL: " + readingObjs.model)
-                    console.debug("-> YEAR : " + readingObjs.year)
+                    // console.debug("-> COLOR: " + readingObjs.color)
+                    // console.debug("-> BRAND: " + readingObjs.brand)
+                    // console.debug("-> MODEL: " + readingObjs.model)
+                    // console.debug("-> YEAR : " + readingObjs.year)
 
                     // Load info to a global queue list.
                     if (!readingQueue.some(car => car.plate === readingObjs.plate))
@@ -213,9 +209,12 @@ exports.carCheck = async (req, res) => {
                     console.log('REKOR-SCOUT: No dataType detected.');
             }
         }
+
+        res.status(200).send('Ok')
     } catch (error) {
         console.error(error)
         console.error('REKOR-SCOUT: ERROR --> ' + error.message)
+        res.status(500).send("Error")
     }
 }
 
