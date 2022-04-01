@@ -182,10 +182,12 @@
         // Receive data
         socket.on('read-plates', (data) => {
             console.log('New Plate: ' + data.plate)
-            console.log(JSON.stringify(data));
-            document.querySelector('#resultOfCameraScanLoading').innerHTML = '';
-            document.querySelector('#resultOfCameraScan').innerHTML += (`
+            if (data.plate) {
+                console.log(JSON.stringify(data));
+                document.querySelector('#resultOfCameraScanLoading').innerHTML = '';
+                document.querySelector('#resultOfCameraScan').innerHTML += (`
                     <a id="plate-${data.plate}" class="btn btn-link" onclick="setPlateValue('${data.plate}')"><b>${data.plate}</b></a>` + '<br>')
+            }
         })
 
         function setInputType(value) {
