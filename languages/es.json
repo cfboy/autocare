@@ -112,7 +112,7 @@
         "recipe": "Recibo de Servicio",
         "id": "ID del Servicio",
         "notFound": "Service No Encontrado.",
-        "use": "Servicio de Usuario"
+        "use": "Confirmar uso de servicio"
     },
     "location": {
         "name": "Localidad",

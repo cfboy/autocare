@@ -112,7 +112,7 @@
         "recipe": "Service Recipe",
         "id": "Service ID",
         "notFound": "Service Not found.",
-        "use": "User Service"
+        "use": "Confirm use of Service"
     },
     "location": {
         "name": "Location",
@@ -200,5 +200,5 @@
         "resetSucessfully": "Auto Care Password Reset Successfully",
         "notSend": "Email Not Send."
     },
-    "clear" : "Clear"
+    "clear": "Clear"
 }

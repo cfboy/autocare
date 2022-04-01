@@ -2,6 +2,7 @@ const SubscriptionService = require('../collections/subscription')
 const { ROLES } = require('../collections/user/user.model')
 const alertTypes = require('../helpers/alertTypes')
 
+// TODO: Maybe invalid subs are wrong, because session is for all app and not for only the user.
 async function validateSubscriptions(req, res, next) {
     console.debug('validateSubscriptions')
     let user = await SubscriptionService.setStripeInfoToUser(req.user)

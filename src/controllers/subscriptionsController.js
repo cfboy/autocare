@@ -8,7 +8,7 @@ const { historyTypes } = require('../collections/history/history.model')
 const Stripe = require('../connect/stripe')
 
 let readingObjs = {}
-let readingQueue = []
+// let readingQueue = []
 
 /**
  * This function render the create subscriptions form.
@@ -60,16 +60,16 @@ exports.validateMembership = async (req, res) => {
     }
     let user = req.user
 
-    res.render('dashboards/validateMembership.ejs', { user, message, alertType, readingQueue })
+    res.render('dashboards/validateMembership.ejs', { user, message, alertType })
 
 }
 
-exports.clearQueue = async (req, res) => {
-    console.debug('Clearing Queue...')
-    readingQueue = []
-    res.send({ readingQueue })
+// exports.clearQueue = async (req, res) => {
+//     console.debug('Clearing Queue...')
+//     readingQueue = []
+//     res.send({ readingQueue })
 
-}
+// }
 
 /**
  * This function search the user by car plate number and return the membership status.
@@ -101,7 +101,7 @@ exports.validate = async (req, res) => {
         }
 
         // Remove readed plate to readingQueue list.
-        readingQueue = readingQueue.filter(item => carPlate !== item.plate)
+        // readingQueue = readingQueue.filter(item => carPlate !== item.plate)
 
         res.render('ajaxSnippets/validationResult.ejs', {
             user,
@@ -156,9 +156,7 @@ exports.carCheck = async (req, res) => {
                         "plate": plate
                     }
 
-                    if (!readingQueue.some(item => item.plate === readingObjs.plate
-                        && readingObjs.plate !== '' & readingObjs.plate?.length > 3)) {
-                        readingQueue.push(readingObjs)
+                    if (readingObjs.plate !== '' & readingObjs.plate?.length > 3) {
                         req.io.emit('read-plates', readingObjs);
                     }
 
@@ -189,11 +187,11 @@ exports.carCheck = async (req, res) => {
                     // console.debug("-> YEAR : " + readingObjs.year)
 
                     // Load info to a global queue list.
-                    if (!readingQueue.some(car => car.plate === readingObjs.plate))
-                        readingQueue.push(readingObjs)
+                    // if (!readingQueue.some(car => car.plate === readingObjs.plate))
+                    //     readingQueue.push(readingObjs)
 
 
-                    req.io.emit('read-plates', readingQueue);
+                    // req.io.emit('read-plates', readingQueue);
 
                     break;
 
