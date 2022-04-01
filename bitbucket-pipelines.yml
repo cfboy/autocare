@@ -4,4 +4,4 @@ pipelines:
   default:
     - step:
         script:
-          - git push --mirror git@github.com:E3-Consulting/autocare.git
+          - git push --mirror https://github.com/E3-Consulting/autocare.git
