@@ -1,4 +1,4 @@
-<div class="d-sm-flex justify-content-between align-items-start">
+<div class="d-flex justify-content-between align-items-start">
     <div>
         <h4 class="card-title card-title-dash">
             <% if(invalid) { %>
@@ -16,7 +16,7 @@
         </a>
         <% } %>
         <% if(showCreateBtn) { %>
-        <a href="/create-subscriptions" class="btn btn-primary btn-icon-text text-white m-1" type="button">
+        <a href="/create-subscriptions" class="btn btn-primary btn-icon-text text-white m-1 p-3" type="button">
             <i class="fas fa-plus btn-icon-prepend"></i> <%= lingua.membership.createSubscriptions%>
         </a>
         <% } %>
