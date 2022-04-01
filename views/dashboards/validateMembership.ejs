@@ -174,7 +174,7 @@
                 console.debug(JSON.stringify(data));
                 document.querySelector('#resultOfCameraScanLoading').innerHTML = '';
                 document.querySelector('#resultOfCameraScan').innerHTML = (`
-                    <a id="plate-${data.plate}" class="btn btn-link mb-1" onclick="setPlateValue('${data.plate}')"><b>${data.plate}</b></a>` + '<br>')
+                    <a id="plate-${data.plate}" class="btn btn-icon-md btn-outline-behance" onclick="setPlateValue('${data.plate}')"><b>${data.plate}</b></a>` + '<br>')
             }
         })
 
