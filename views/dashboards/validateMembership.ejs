@@ -70,7 +70,7 @@
 
                                                                 <form id="form-validate-membership" class="pt-3"
                                                                     method="post">
-                                                               
+
                                                                     <div class="form-group">
                                                                         <label class="required" for="name">
                                                                             <%= lingua.car.plateNumber%></label>
@@ -79,7 +79,7 @@
                                                                             id="plateNumber" name="plateNumber"
                                                                             class="form-control form-control-lg text-uppercase"
                                                                             required />
-                                                                       
+
                                                                         <div class="mt-3 mb-3">
                                                                             <input type="hidden" id="inputType"
                                                                                 name="inputType" value="User" />
@@ -169,9 +169,9 @@
 
         // Receive data
         socket.on('read-plates', (data) => {
-            console.log('New Plate: ' + data.plate)
+            console.debug('New Plate: ' + data.plate)
             if (data.plate) {
-                console.log(JSON.stringify(data));
+                console.debug(JSON.stringify(data));
                 document.querySelector('#resultOfCameraScanLoading').innerHTML = '';
                 document.querySelector('#resultOfCameraScan').innerHTML = (`
                     <a id="plate-${data.plate}" class="btn btn-link mb-1" onclick="setPlateValue('${data.plate}')"><b>${data.plate}</b></a>` + '<br>')
@@ -180,7 +180,7 @@
 
         function setInputType(value) {
             $("#inputType").val(value);
-            console.log($("#inputType").val())
+            console.debug($("#inputType").val())
         }
 
         function setPlateValue(plate) {
