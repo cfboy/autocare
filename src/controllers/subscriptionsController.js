@@ -156,7 +156,8 @@ exports.carCheck = async (req, res) => {
                         "plate": plate
                     }
 
-                    if (!readingQueue.some(item => item.plate === readingObjs.plate && readingObjs.plate !== '')) {
+                    if (!readingQueue.some(item => item.plate === readingObjs.plate
+                        && readingObjs.plate !== '' & readingObjs.plate?.length > 3)) {
                         readingQueue.push(readingObjs)
                         req.io.emit('read-plates', readingObjs);
                     }
