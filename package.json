@@ -70,7 +70,6 @@
         "mongoose": "^5.10.11",
         "morris.js06": "^0.6.6",
         "node-fetch": "2.0",
-        "node-openalpr": "^1.1.1",
         "node-pre-gyp": "github:mapbox/node-pre-gyp#8036d17",
         "nodemailer": "^6.7.2",
         "nodemon": "^2.0.15",
