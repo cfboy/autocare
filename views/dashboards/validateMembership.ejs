@@ -171,7 +171,7 @@
         socket.on('read-plates', (data) => {
             console.debug('New Plate: ' + data.plate)
             if (data.plate) {
-                console.debug(JSON.stringify(data));
+                // console.debug(JSON.stringify(data));
                 document.querySelector('#resultOfCameraScanLoading').innerHTML = '';
                 let exist = document.querySelector(`#plate-${data.plate}`) !== null;
                 if (!exist) {
