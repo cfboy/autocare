@@ -78,6 +78,7 @@ app.locals.stripeStatus = STATUS
 app.locals.version = pjson.version
 app.locals.domain = process.env.DOMAIN
 app.locals.financialReports = process.env.FINANCIAL_REPORTS_LINK
+app.locals.pkStripe = process.env.PK_STRIPE
 
 // Lingua configuration
 app.use(lingua(app, {
@@ -103,8 +104,7 @@ const port = process.env.PORT || 3000
 
 // app.listen(port, () => console.log(`Listening on port http://localhost:${port}/`))
 server.listen(port, () => {
-    console.log(`Listening on port ${port}`)
-    console.log(`http://localhost:${port}/`)
+    // console.log(`Listening on port ${port}`)
     console.log(`Server Running...`)
 });
 

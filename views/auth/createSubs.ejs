@@ -148,13 +148,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.8/js/select2.min.js" defer></script>
     <script src="../../vendors/select2/select2.min.js"></script>
     <script src="../../js/select2.js"></script>
-    <script type="text/javascript" src="https://js.stripe.com/v3/"></script>
-    <script type="text/javascript" src="../js/account.js"></script>
+    <!-- <script type="text/javascript" src="../js/account.js"></script> -->
     <script src="../js/helper-functions.js"></script>
 
     <!-- End custom js for this page-->
     <%- include('../partials/dataTable.ejs', {tableID : '#cart-table', ordering: false, searching: false , info: false, paging: false, footerCheckout: true}); %>
     <%- include('../partials/alerts.ejs', {message, alertType}); %>
+    <%- include('../partials/subscriptions/checkoutScript.ejs'); %>
     <script>
         var rowIdx = 0; //This field is used to filter the list when remove any from de list.
         let subscriptionList = [];
