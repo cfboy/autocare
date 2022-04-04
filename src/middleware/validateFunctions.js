@@ -12,7 +12,7 @@ async function validateSubscriptions(req, res, next) {
 }
 
 async function redirectBySubscriptionStatus(req, res, next) {
-    console.debug('redirectBySubscriptionStatus')
+    // console.debug('redirectBySubscriptionStatus')
     let user = req.user
     let invalidSubs = req.session.invalidSubs
 
