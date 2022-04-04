@@ -8,7 +8,7 @@ const { historyTypes } = require('../collections/history/history.model')
 const Stripe = require('../connect/stripe')
 
 let readingObjs = {}
-// let readingQueue = []
+let readingQueue = {}
 
 /**
  * This function render the create subscriptions form.
@@ -156,7 +156,8 @@ exports.carCheck = async (req, res) => {
                         "plate": plate
                     }
 
-                    if (readingObjs.plate !== '' & readingObjs.plate?.length > 3) {
+                    if (readingObjs.plate !== '' & readingObjs.plate?.length > 3 && readingObjs.plate !== readingQueue.plate) {
+                        readingQueue = { plate: readingObjs.plate }
                         console.debug(`IDENTFIED PLATE: ${plate} (${bodyResult.results[0].confidence})`)
                         req.io.emit('read-plates', readingObjs);
                     }
