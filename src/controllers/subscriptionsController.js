@@ -132,7 +132,7 @@ exports.carCheck = async (req, res) => {
         else {
             let dataType = req.body.data_type,
                 bodyResult = req.body
-            console.log(`REKOR-SCOUT: Data Type: ${dataType}`)
+            // console.log(`REKOR-SCOUT: Data Type: ${dataType}`)
             switch (dataType) {
                 case 'alpr_results':
                     req.io.emit('reading-plates');
@@ -201,7 +201,7 @@ exports.carCheck = async (req, res) => {
                      * Every minute, the Scout Agent adds one heartbeat message to the queue. 
                      * The heartbeat provides general health and status information.
                      */
-                    console.log('Video Streams: (' + bodyResult.video_streams.length + ')')
+                    // console.log('Video Streams: (' + bodyResult.video_streams.length + ')')
 
                     break;
 

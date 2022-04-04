@@ -172,7 +172,7 @@
                 console.debug('New Plate: ' + data.plate)
                 // console.debug(JSON.stringify(data));
                 document.querySelector('#resultOfCameraScanLoading').innerHTML = '';
-                let exist = document.querySelector(`#plate-${data.plate}`) !== null;
+                let exist = document.getElementById(`plate-${data.plate}`) !== null;
                 if (!exist) {
                     console.debug('New Plate to show')
                     document.querySelector('#resultOfCameraScan').innerHTML = (`
