@@ -149,7 +149,7 @@ const getUserById = (User) => (id) => {
         if (err) {
             console.error(err)
         } else {
-            console.debug("USER-SERVICE: Found user to edit: ", docs);
+            console.debug("USER-SERVICE: Found user: ", docs.email);
         }
     }).populate('locations').populate({ path: 'subscriptions.items.cars', model: 'car' })
 }

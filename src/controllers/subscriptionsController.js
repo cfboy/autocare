@@ -124,7 +124,7 @@ exports.validate = async (req, res) => {
  * @param {*} res 
  */
 exports.carCheck = async (req, res) => {
-    console.debug('START carCheck...')
+    // console.debug('START carCheck...')
     try {
         if (req.body?.error) {
             console.log(`REKOR-SCOUT: ERROR on JSON ${req.body.error}`)
@@ -151,12 +151,13 @@ exports.carCheck = async (req, res) => {
                     // console.log("Processing Time (MS): " + bodyResult.processing_time_ms)
 
                     let plate = bodyResult.results[0].plate
-                    console.log(`IDENTFIED PLATE: ${plate} (${bodyResult.results[0].confidence})`)
+                    // console.log(`IDENTFIED PLATE: ${plate} (${bodyResult.results[0].confidence})`)
                     readingObjs = {
                         "plate": plate
                     }
 
                     if (readingObjs.plate !== '' & readingObjs.plate?.length > 3) {
+                        console.log(`IDENTFIED PLATE: ${plate} (${bodyResult.results[0].confidence})`)
                         req.io.emit('read-plates', readingObjs);
                     }
 
