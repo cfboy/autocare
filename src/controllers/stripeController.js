@@ -39,7 +39,7 @@ exports.webhook = async (req, res) => {
     try {
         const data = event.data.object
         let customer, notification, subscription, items, subscriptionItems, alertInfo
-        console.log(event.type, data)
+        console.log(`WEBHOOK: Event: ${event.type}`)
         switch (event.type) {
             // case 'customer.created':
             //     console.log(JSON.stringify(data))
@@ -64,7 +64,8 @@ exports.webhook = async (req, res) => {
             // case 'invoice.paid':
             //     break
             case 'customer.subscription.created':
-                console.debug(`WEBHOOK: customer.subscription.created: ${data.id}`)
+                // console.debug(`WEBHOOK: customer.subscription.created: ${data.id}`)
+                console.log(`WEBHOOK: Subscription: ${data.id}`)
 
                 subscription = data
 
@@ -113,6 +114,7 @@ exports.webhook = async (req, res) => {
 
                 break;
             case 'customer.subscription.updated':
+                console.log(`WEBHOOK: Subscription: ${data.id}`)
                 subscription = data
                 customer = await UserService.getUserByBillingID(subscription.customer)
                 if (customer) {
@@ -126,10 +128,12 @@ exports.webhook = async (req, res) => {
 
                     items = []
                     for (subItem of subscriptionItems) {
-                        let itemToUpdate = mySubscription.items.find(item => item.id == subItem.id)
+                        let itemToUpdate = mySubscription?.items?.find(item => item.id == subItem.id)
                         // TODO: reset cancel_date of cars
-                        let newItem = { id: itemToUpdate.id, cars: itemToUpdate.cars, data: subItem }
-                        items.push(newItem)
+                        if (itemToUpdate) {
+                            let newItem = { id: itemToUpdate.id, cars: itemToUpdate.cars, data: subItem }
+                            items.push(newItem)
+                        }
                     }
 
                     updates = {
@@ -164,6 +168,7 @@ exports.webhook = async (req, res) => {
         }
         res.sendStatus(200)
     } catch (error) {
+        console.log(`ERROR-WEBHOOK-EVENT: ${data?.object?.id}`)
         console.log(`ERROR stripeController: ${error.message}`)
         console.log(error)
         res.sendStatus(500)

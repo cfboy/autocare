@@ -41,7 +41,7 @@ const updateSubscription = (Subscription) => async (id, updates) => {
         if (err) {
             console.error(err.message)
         } else {
-            console.debug("Updated : ", doc.id);
+            console.debug("Subscription-SERVICE Updated: ", doc.id);
         }
     })
 }
@@ -133,7 +133,7 @@ const getSubscriptionById = (Subscription) => (id) => {
         if (err) {
             console.error(err)
         } else {
-            console.debug("Subscription-SERVICE: Found subscription: ", docs);
+            console.debug("Subscription-SERVICE: Found subscription: ", docs?.id);
         }
     }).populate('user').populate({ path: 'items.cars', model: 'car' })
 }
