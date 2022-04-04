@@ -132,8 +132,8 @@
     <script src="./js/todolist.js"></script>
     <!-- endinject -->
     <!-- Custom js for this page-->
-    <script type="text/javascript" src="https://js.stripe.com/v3/"></script>
-    <script type="text/javascript" src="../js/account.js"></script>
+    <!-- <script type="text/javascript" src="https://js.stripe.com/v3/"></script> -->
+    <!-- <script type="text/javascript" src="../js/account.js"></script> -->
     <script src="./js/jquery.cookie.js" type="text/javascript"></script>
     <script src="./js/dashboard.js"></script>
     <!-- <script src="./js/Chart.roundedBarCharts.js"></script> -->
@@ -143,102 +143,7 @@
     <!-- Alerts Code -->
     <%- include('../partials/alerts.ejs', {message, alertType}); %>
     <%- include('../partials/dataTable.ejs', {tableID : '#membersTable'}); %>
-
-    <!-- <script src="./js/Chart.roundedBarCharts.js"></script> -->
-
-    <!-- <script src="https://unpkg.com/@mongodb-js/charts-embed-dom"></script> -->
-
-    <script>
-        // const ChartsEmbedSDK = window.ChartsEmbedSDK;
-
-        // const sdk = new ChartsEmbedSDK({
-        //     baseUrl: 'https://charts.mongodb.com/charts-autocare-development-kzztx',
-        //     autoRefresh: true,
-        //     maxDataAge: 60,
-        //     widthMode: 'scale',
-        //     heightMode: 'fixed',
-        //     showAttribution: false
-        // });
-        // const chart = sdk.createChart({ ... });
-
-        // embed a dashboard
-        // const dashboard = sdk.createDashboard({
-        //     dashboardId: '62280248-a354-4826-891f-fa5a1c9302ea',
-
-        // });
-
-        // function addEventListeners() {
-        /* Refresh button */
-            // document
-            //     .getElementById("refresh-button")
-            //     .addEventListener("click", async function () {
-            //         console.log('refresh')
-            //         await dashboard.refresh();
-            //     });
-
-        /* Theme toggle */
-            // document
-            //     .getElementById("theme")
-            //     .addEventListener("change", async function () {
-            //         await dashboard.setTheme(this.checked ? "dark" : "light");
-
-            //         const currentTheme = await dashboard.getTheme();
-            //         document.getElementById("currentTheme").innerText =
-            //             currentTheme === "light" ? "dark" : "light";
-            //     });
-
-        /* Max Data Age select */
-            // document
-            //     .getElementById("fromDate")
-            //     .addEventListener("change", async (e) => {
-            //         const dateValue = e.target.value;
-            //         // const defaultMaxDataAge = 3600;
-            //         var charts = await dashboard.getAllCharts();
-            //         console.log("length " + charts.length)
-            //         for (chart of charts) {
-            //             chart.getFilter()
-            //         }
-            //     });
-
-            // /* Height Mode select */
-            // document
-            //     .getElementById("height-mode")
-            //     .addEventListener("change", async (e) => {
-            //         const heightMode = e.target.value;
-            //         await dashboard.setHeightMode(heightMode);
-            //     });
-
-            // /* Width Mode select */
-            // document
-            //     .getElementById("width-mode")
-            //     .addEventListener("change", async (e) => {
-            //         const widthMode = e.target.value;
-            //         await dashboard.setWidthMode(widthMode);
-            //     });
-
-            // /* Charts Background select */
-            // document
-            //     .getElementById("charts-background")
-            //     .addEventListener("change", async (e) => {
-            //         const chartsBackground = e.target.value;
-            //         await dashboard.setChartsBackground(chartsBackground);
-            //     });
-        // }
-
-        // async function renderDashboard() {
-            // await dashboard.render(document.getElementById("dashboard"));
-            // addEventListeners();
-
-            // $("#dashboard div").css({ position: 'inherit' });
-
-            // $('#dashboard div').position('inherit')
-        // }
-
-        // renderDashboard().catch((e) => window.alert(e.message));
-
-        // console.log(JSON.stringify(dashoardCharts))
-
-    </script>
+    <%- include('../partials/subscriptions/checkoutScript.ejs'); %>  
 </body>
 
 </html>

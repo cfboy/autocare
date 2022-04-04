@@ -56,7 +56,7 @@ exports.account = async (req, res) => {
         let reportURL
         switch (role) {
             case ROLES.ADMIN:
-                reportURL = reports.find(report => report.name.indexOf('Dashboard') != -1).url
+                reportURL = reports.find(report => report.name.indexOf('Dashboard') != -1)?.url
                 // Get Customers
                 customers = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
                 params = { ...params, customers, reportURL }
@@ -66,7 +66,7 @@ exports.account = async (req, res) => {
                 res.render('dashboards/customer.ejs', params)
                 break;
             case ROLES.MANAGER:
-                reportURL = reports.find(report => report.name.indexOf('Service') != -1).url
+                reportURL = reports.find(report => report.name.indexOf('Service') != -1)?.url
                 // Get Customers
                 customers = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
                 params = { ...params, customers, reportURL }

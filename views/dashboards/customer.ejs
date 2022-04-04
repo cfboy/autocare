@@ -88,8 +88,8 @@
   <!-- endinject -->
   <!-- Custom js for this page-->
   </script>
-  <script type="text/javascript" src="https://js.stripe.com/v3/"></script>
-  <script type="text/javascript" src="./js/account.js"></script>
+  <!-- <script type="text/javascript" src="https://js.stripe.com/v3/"></script> -->
+  <!-- <script type="text/javascript" src="./js/account.js"></script> -->
   <script src="./js/jquery.cookie.js" type="text/javascript"></script>
   <script src="./js/dashboard.js"></script>
   <script src="./js/Chart.roundedBarCharts.js"></script>
@@ -97,6 +97,7 @@
 
   <!-- Alerts Code -->
   <%- include('../partials/alerts.ejs', {message, alertType}); %>
+  <%- include('../partials/subscriptions/checkoutScript.ejs'); %>
 </body>
 
 </html>

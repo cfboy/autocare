@@ -1,0 +1,33 @@
+<script type="text/javascript" src="https://js.stripe.com/v3/"></script>
+<script>
+    $(document).ready(function () {
+
+        const checkoutBtn = $('#checkout-btn'); //New checkout btn
+        const publishableKey = `<%= pkStripe%>`;
+        const stripe = Stripe(publishableKey)
+        // Checkout
+        checkoutBtn.click(function () {
+            const subscriptions = JSON.parse($('#subscription-list').val());
+            const billingID = $(this).attr("value");
+            const email = $(this).attr("email");
+
+            if (billingID) {
+                fetch('/checkout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'email': email
+                    },
+                    body: JSON.stringify({
+                        subscriptions,
+                        customerID: billingID
+                    })
+                })
+                    .then((result) => result.json())
+                    .then(({ sessionId }) => stripe.redirectToCheckout({ sessionId }))
+            } else {
+                alert("This user don't have billing id.")
+            }
+        })
+    })
+</script>
