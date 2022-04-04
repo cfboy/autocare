@@ -157,7 +157,7 @@ exports.carCheck = async (req, res) => {
                     }
 
                     if (readingObjs.plate !== '' & readingObjs.plate?.length > 3) {
-                        console.log(`IDENTFIED PLATE: ${plate} (${bodyResult.results[0].confidence})`)
+                        console.debug(`IDENTFIED PLATE: ${plate} (${bodyResult.results[0].confidence})`)
                         req.io.emit('read-plates', readingObjs);
                     }
 
