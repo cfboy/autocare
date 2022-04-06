@@ -118,36 +118,52 @@ exports.webhook = async (req, res) => {
                 subscription = data
                 customer = await UserService.getUserByBillingID(subscription.customer)
                 if (customer) {
-
                     subscription = await Stripe.getSubscriptionById(subscription.id)
-
-                    alertInfo = { message: "Subscription Updated", alertType: alertTypes.BasicAlert }
-
                     subscriptionItems = subscription.items.data
                     let mySubscription = await SubscriptionService.getSubscriptionById(subscription.id)
+                    if (mySubscription) {
+                        items = []
+                        for (subItem of subscriptionItems) {
+                            let itemToUpdate = mySubscription?.items?.find(item => item.id == subItem.id)
+                            // TODO: reset cancel_date of cars
+                            if (itemToUpdate) {
+                                let newItem = { id: itemToUpdate.id, cars: itemToUpdate.cars, data: subItem }
+                                items.push(newItem)
+                            }
+                        }
 
-                    items = []
-                    for (subItem of subscriptionItems) {
-                        let itemToUpdate = mySubscription?.items?.find(item => item.id == subItem.id)
-                        // TODO: reset cancel_date of cars
-                        if (itemToUpdate) {
-                            let newItem = { id: itemToUpdate.id, cars: itemToUpdate.cars, data: subItem }
+                        updates = {
+                            data: subscription,
+                            items: items
+                        }
+
+
+                        subscription = await SubscriptionService.updateSubscription(subscription.id, updates);
+
+                        if (!alertInfo) {
+                            alertInfo = { message: "Subscription Updated", alertType: alertTypes.BasicAlert }
+                        }
+                    } else {
+                        // Create Subs
+                        let cars = JSON.parse(subscription.metadata.cars)
+                        let subscriptionItems = subscription.items.data
+                        let items = []
+                        for (subItem of subscriptionItems) {
+                            let newItem = { id: subItem.id, cars: [], data: subItem }
+                            for (carObj of cars) {
+                                if (subItem.price.id === carObj.priceID) {
+                                    let newCar = await CarService.getCarByPlate(carObj.plate)
+                                    if (!newCar)
+                                        newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate, customer.id)
+
+                                    newItem.cars.push(newCar)
+                                }
+
+                            }
                             items.push(newItem)
                         }
-                    }
-
-                    updates = {
-                        data: subscription,
-                        items: items
-                    }
-
-
-                    subscription = await SubscriptionService.updateSubscription(subscription.id, updates)
-
-                    if (subscription.canceled_at) {
-                        // cancelled
-                        console.log(`You just canceled the subscription: ${subscription.id} at ${moment(subscription?.canceled_at * 1000).isValid() ? moment(subscription?.canceled_at * 1000).format(completeDateFormat) : 'N/A'}`)
-                        alertInfo = { message: "Subscription Cancelled", alertType: alertTypes.BasicAlert }
+                        newSubscription = await SubscriptionService.addSubscription({ id: subscription.id, data: subscription, items: items, user: customer })
+                        alertInfo = { message: "Subscription Created", alertType: alertTypes.BasicAlert }
                     }
 
                     // Add notification to user.
