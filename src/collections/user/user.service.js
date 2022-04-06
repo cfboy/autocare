@@ -244,7 +244,7 @@ const addNotification = (User) => async (id, message) => {
     let notification = {
         isRead: false,
         message: message,
-        created_date: new Date()
+        // created_date: new Date()
     }
 
     let customer = await User.findByIdAndUpdate({ _id: id },
