@@ -21,7 +21,7 @@ const addUser = (User) => async ({
     console.log(`USER: addUser(${email})`)
 
     const user = new User({
-        email,
+        email: email.toLowerCase(),
         password,
         billingID,
         role,
