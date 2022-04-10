@@ -41,7 +41,6 @@ exports.createAccount = async (req, res) => {
 exports.register = async (req, res) => {
     try {
         const {
-            email,
             firstName,
             lastName,
             phoneNumber,
@@ -51,7 +50,9 @@ exports.register = async (req, res) => {
 
         const lingua = req.res.lingua.content
 
-        var { password } = req.body
+        var { email, password } = req.body
+
+        email = email?.toLowerCase()
 
         console.debug('email', email)
 

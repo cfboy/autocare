@@ -47,6 +47,11 @@ exports.account = async (req, res) => {
             prices = await Stripe.getAllPrices(),
             params
 
+        // Show balance on dashboard.
+        if (user?.billingID) {
+            let { totalString } = await Stripe.getCustomerBalanceTransactions(user.billingID)
+            user.balance = totalString
+        }
         params = {
             user, prices, message, alertType,
             subscriptions: user?.subscriptions

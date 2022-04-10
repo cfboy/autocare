@@ -37,7 +37,7 @@ const resetPasswordRequest = async (lingua, email) => {
 
     var resultEmail = await sendEmail(
         user.email,
-        lingua.email.title,
+        lingua.email.passwordReset,
         {
             name: user?.personalInfo?.firstName + ' ' + user?.personalInfo?.lastName,
             link: link,

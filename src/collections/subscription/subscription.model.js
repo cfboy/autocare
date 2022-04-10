@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const subscriptionSchema = new Schema({
-    id: String, //Subscription ID
+    id: { type: String, unique: true }, //Subscription ID
     data: {},
     items: [{
         id: String, //Subscription Item ID,
