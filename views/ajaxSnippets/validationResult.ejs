@@ -86,7 +86,7 @@
 
                         <p class="alert alert-danger mt-2"><%= lingua.car.maxServiceQty%>.</p>
                         <% }
-                         else if (car.isValid) { %>
+                         else if (!car.isValid) { %>
                         <i class="far fa-8x fa-times-circle invalid"></i>
 
                         <p class="alert alert-danger mt-2">
