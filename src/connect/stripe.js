@@ -421,6 +421,46 @@ async function getSubscriptionItemById(id) {
     return subscriptionItem
 }
 
+/**
+ * This function get all customer transactions balance.
+ * @returns balance transactions list, amount, and string amount
+ */
+async function getCustomerBalanceTransactions(id) {
+    const balanceTransactions = await Stripe.customers.listBalanceTransactions(
+        id
+    );
+
+    console.debug("Balance Transactions: " + balanceTransactions.data.length)
+
+    let total = 0.00
+    for (balance of balanceTransactions.data) {
+        total += balance.amount
+    }
+    let totalString = null
+
+    // If the total is zero then totalString is null/undefined.
+    if (total * -1 > 0) {
+        totalString = Dinero({ amount: total * -1 }).toFormat('$0,0.00')
+        console.debug('Total Customer Balance: ' + totalString)
+    }
+
+    return { transactions: balanceTransactions.data, total: total, totalString: totalString }
+}
+
+
+//TODO: make this function more generic.
+async function updateSubscription(id, cancelAt) {
+    console.log('ID: ' + id)
+    console.log('cancelAt: ' + cancelAt)
+    const subscription = await Stripe.subscriptions.update(id,
+        {
+            cancel_at: cancelAt
+        }
+    );
+
+    return subscription
+}
+
 module.exports = {
     STATUS,
     getCustomerByID,
@@ -439,5 +479,7 @@ module.exports = {
     getCustomerInvoices,
     getAllSubscriptions,
     getSubscriptionById,
-    getSubscriptionItemById
+    getSubscriptionItemById,
+    getCustomerBalanceTransactions,
+    updateSubscription
 }

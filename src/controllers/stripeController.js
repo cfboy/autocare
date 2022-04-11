@@ -6,6 +6,7 @@ const SubscriptionService = require('../collections/subscription')
 const alertTypes = require('../helpers/alertTypes')
 const moment = require('moment');
 const { completeDateFormat } = require('../helpers/formats')
+const sendEmail = require("../utils/email/sendEmail");
 
 /**
  * This function is a helper for agroup a list per key.
@@ -29,6 +30,7 @@ const groupByKey = (list, key, { omitKey = false }) =>
 exports.webhook = async (req, res) => {
     // TODO: implement all necessary webhooks
     let event
+    const lingua = req.res.lingua.content
 
     try {
         event = Stripe.createWebhook(req.body, req.header('Stripe-Signature'))
@@ -68,50 +70,72 @@ exports.webhook = async (req, res) => {
                 console.log(`WEBHOOK: Subscription: ${data.id}`)
 
                 subscription = data
+                if (subscription.status == 'active') {
+                    customer = await UserService.getUserByBillingID(subscription.customer)
+                    if (customer) {
+                        subscription = await SubscriptionService.getSubscriptionById(subscription.id);
 
-                customer = await UserService.getUserByBillingID(subscription.customer)
-                if (customer) {
-                    subscription = await SubscriptionService.getSubscriptionById(subscription.id);
+                        if (!subscription) {
+                            // Find subcription again for expand product information
+                            subscription = await Stripe.getSubscriptionById(data.id)
+                            subscriptionItems = subscription.items.data
+                            let cars = []
+                            if (subscription?.metadata?.cars)
+                                cars = JSON.parse(subscription?.metadata?.cars)
 
-                    if (!subscription) {
-                        // Find subcription again for expand product information
-                        subscription = await Stripe.getSubscriptionById(data.id)
-                        subscriptionItems = subscription.items.data
-                        let cars = []
-                        if (subscription?.metadata?.cars)
-                            cars = JSON.parse(subscription?.metadata?.cars)
+                            let items = []
+                            for (subItem of subscriptionItems) {
+                                let newItem = { id: subItem.id, cars: [], data: subItem }
+                                if (cars.length > 0) {
+                                    for (carObj of cars) {
+                                        if (subItem.price.id === carObj.priceID) {
+                                            let newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate, customer.id)
+                                            newItem.cars.push(newCar)
+                                        }
 
-                        let items = []
-                        for (subItem of subscriptionItems) {
-                            let newItem = { id: subItem.id, cars: [], data: subItem }
-                            if (cars.length > 0) {
-                                for (carObj of cars) {
-                                    if (subItem.price.id === carObj.priceID) {
-                                        let newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate, customer.id)
-                                        newItem.cars.push(newCar)
                                     }
-
                                 }
-                            }
-                            items.push(newItem)
+                                items.push(newItem)
 
+                            }
+
+                            console.debug(`WEBHOOK: Items to add ${items.length}`)
+
+                            alertInfo = { message: `Your membership ${subscription.id} has been created successfully.`, alertType: alertTypes.BasicAlert }
+
+                            subscription = await SubscriptionService.addSubscription({ id: subscription.id, items: items, data: subscription, user: customer });
                         }
 
-                        console.debug(`WEBHOOK: Items to add ${items.length}`)
+                        [customer, notification] = await UserService.addNotification(customer.id, alertInfo.message);
 
-                        alertInfo = { message: "Subscription created", alertType: alertTypes.BasicAlert }
+                        req.io.emit('notifications', notification);
 
-                        subscription = await SubscriptionService.addSubscription({ id: subscription.id, items: items, data: subscription, user: customer });
+                        //Send Email
+                        var resultEmail = await sendEmail(
+                            customer.email,
+                            lingua.email.title,
+                            {
+                                name: customer?.personalInfo?.firstName + ' ' + customer?.personalInfo?.lastName,
+                                message: alertInfo.message
+                            },
+                            "../template/subscriptions.handlebars"
+                        )
+
+                        if (resultEmail) {
+                            console.debug('Email Sent: ' + resultEmail?.accepted[0])
+
+                        } else {
+
+                            console.debug('WARNING: Email Not Sent.')
+                        }
+
+
+                    } else {
+                        console.log('customer.subscription.created: Not Found Customer.')
                     }
-
-                    [customer, notification] = await UserService.addNotification(customer.id, alertInfo.message);
-
-                    req.io.emit('notifications', notification);
-
                 } else {
-                    console.log('customer.subscription.created: Not Found Customer.')
+                    console.debug('WEBHOOK: SUBSCRIPTION STATUS NOT ACTIVE. HANDLE ON UPDATE.')
                 }
-
                 break;
             case 'customer.subscription.updated':
                 console.log(`WEBHOOK: Subscription: ${data.id}`)
@@ -125,10 +149,21 @@ exports.webhook = async (req, res) => {
                         items = []
                         for (subItem of subscriptionItems) {
                             let itemToUpdate = mySubscription?.items?.find(item => item.id == subItem.id)
-                            // TODO: reset cancel_date of cars
                             if (itemToUpdate) {
                                 let newItem = { id: itemToUpdate.id, cars: itemToUpdate.cars, data: subItem }
                                 items.push(newItem)
+
+                                try {
+                                    if (newItem?.cars?.length == newItem.data.quantity) {
+                                        for (car of newItem.cars) {
+                                            if (car.cancel_date !== null)
+                                                await CarService.updateCar(car.id, { cancel_date: null })
+                                        }
+                                    }
+                                } catch (e) {
+                                    console.log(e)
+                                    console.log('Error trying to clear cancel_date of subscription: ' + mySubscription.id)
+                                }
                             }
                         }
 
@@ -140,9 +175,13 @@ exports.webhook = async (req, res) => {
 
                         subscription = await SubscriptionService.updateSubscription(subscription.id, updates);
 
-                        if (!alertInfo) {
-                            alertInfo = { message: "Subscription Updated", alertType: alertTypes.BasicAlert }
-                        }
+                        alertInfo = { message: `Your membership ${subscription.id} has been updated successfully. `, alertType: alertTypes.BasicAlert }
+
+                        // Send customer balance on email.
+                        let { totalString } = await Stripe.getCustomerBalanceTransactions(customer.billingID)
+                        if (totalString)
+                            alertInfo.message += `Your current balance on your account is ${totalString}.`
+
                     } else {
                         // Create Subs
                         let cars = JSON.parse(subscription.metadata.cars)
@@ -163,13 +202,32 @@ exports.webhook = async (req, res) => {
                             items.push(newItem)
                         }
                         newSubscription = await SubscriptionService.addSubscription({ id: subscription.id, data: subscription, items: items, user: customer })
-                        alertInfo = { message: "Subscription Created", alertType: alertTypes.BasicAlert }
+                        alertInfo = { message: `Your membership ${subscription.id} has been created successfully.`, alertType: alertTypes.BasicAlert }
                     }
 
                     // Add notification to user.
                     [customer, notification] = await UserService.addNotification(customer.id, alertInfo.message)
 
                     req.io.emit('notifications', notification);
+
+                    //Send Email
+                    var resultEmail = await sendEmail(
+                        customer.email,
+                        lingua.email.title,
+                        {
+                            name: customer?.personalInfo?.firstName + ' ' + customer?.personalInfo?.lastName,
+                            message: alertInfo.message
+                        },
+                        "../template/subscriptions.handlebars"
+                    )
+
+                    if (resultEmail) {
+                        console.debug('Email Sent: ' + resultEmail?.accepted[0])
+
+                    } else {
+
+                        console.debug('WARNING: Email Not Sent.')
+                    }
 
                 } else {
                     console.log('customer.subscription.updated: Not Found Customer.')
@@ -246,13 +304,14 @@ exports.completeCheckoutSuccess = async (req, res) => {
             console.log(session)
             subscriptionID = session.subscription
         }
-        if (subscription_id) {
+        if (!subscriptionID && subscription_id) {
             subscriptionID = subscription_id
         }
 
         let subscription = await SubscriptionService.getSubscriptionById(subscriptionID)
         let newSubscription
 
+        // This code is not nescessary.
         if (!subscription) {
             subscription = await Stripe.getSubscriptionById(subscriptionID)
             let customer = await UserService.getUserByBillingID(subscription.customer)

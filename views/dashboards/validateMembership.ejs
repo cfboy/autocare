@@ -75,7 +75,6 @@
                                                                         <label class="required" for="name">
                                                                             <%= lingua.car.plateNumber%></label>
                                                                         <input autocomplete="off" type="text"
-                                                                            onchange="setInputType('Manual')"
                                                                             id="plateNumber" name="plateNumber"
                                                                             class="form-control form-control-lg text-uppercase"
                                                                             required />
@@ -176,28 +175,40 @@
                 if (!exist) {
                     console.log('New Plate: ' + data.plate)
                     document.querySelector('#resultOfCameraScan').innerHTML = (`
-                    <a id="plate-${data.plate}" class="btn btn-icon-md btn-outline-behance m-4" onclick="setPlateValue('${data.plate}')"><b>${data.plate}</b></a>` + '<br>')
+                    <a id="plate-${data.plate}" class="btn btn-icon-md btn-outline-behance m-4" onclick="automaticValidation('${data.plate}')"><b>${data.plate}</b></a>` + '<br>')
+                    automaticValidation(data.plate);
                 }
             }
         })
 
-        function setInputType(value) {
-            $("#inputType").val(value);
-            console.debug($("#inputType").val())
-        }
+        function automaticValidation(plate) {
+            $.ajax({
+                url: "/validateMembership",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    plateNumber: plate,
+                    inputType: 'System'
+                }),
+                beforeSend: function () {
+                    showResult('#membershipDetails',
+                        `<div class="spinner text-center p-5">
+                                <div class="spinner-grow"></div>
+                            </div>`
+                    );
 
-        function setPlateValue(plate) {
-            $("#plateNumber").val(plate);
-            setInputType('System');
-            $("#validateMembershipBtn").click();
-            $(`#plate-${plate}`).remove();
+                }
+            }).done(function (result) {
+                showResult('#membershipDetails', result);
+            }).fail(function (err) {
+                console.log(err);
+            })
         }
 
         $("#validateMembershipBtn").on("click", function (event) {
             event.preventDefault();
             event.stopPropagation();
             var valueToValidate = $("#plateNumber");
-            var inputType = $('#inputType');
             // reportValidity and checkValidity validate inputs on form.
             valueToValidate[0].reportValidity();
             if (valueToValidate[0].checkValidity()) {
@@ -207,7 +218,7 @@
                     contentType: "application/json",
                     data: JSON.stringify({
                         plateNumber: valueToValidate.val(),
-                        inputType: inputType.val()
+                        inputType: "Manual"
                     }),
                     beforeSend: function () {
                         showResult('#membershipDetails',
@@ -231,24 +242,6 @@
             event.stopPropagation();
             showResult('#resultOfCameraScan', '');
         });
-
-        // Not used.
-        // $("#clearQueueBtn").on("click", function (event) {
-        //     event.preventDefault();
-        //     event.stopPropagation();
-
-        //     $.ajax({
-        //         url: "/clearQueue",
-        //         type: "POST",
-        //         contentType: "application/json",
-        //         data: {},
-        //     }).done(function (result) {
-        //         document.querySelector('#resultOfCameraScan').innerHTML = ('')
-        //     }).fail(function (err) {
-        //         console.log(err);
-        //     })
-
-        // });
 
         var showResult = function (updateDiv, result) {
             $(updateDiv).html(result);

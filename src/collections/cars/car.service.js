@@ -19,6 +19,22 @@ const getCars = (Car) => async () => {
     })
 }
 
+/**
+ * This function get all cars from the db.
+ * 
+ * @param {} Car 
+ * @returns Car list
+ */
+const getOldCars = (Car) => async (id) => {
+    return Car.find({ $and: [{ user_id: id }, { cancel_date: { $ne: null } }] }, function (err, docs) {
+        if (err) {
+            console.error(err)
+        } else {
+            console.debug("CAR-SERVICE: getOldCars: ", docs.length);
+        }
+    })
+}
+
 const getCarsWithUserNull = (Car) => async () => {
     return Car.find({ user_id: { $eq: null } }, function (err, docs) {
         if (err) {
@@ -43,7 +59,7 @@ async function handleCarsWithUserNull(carsWithNull) {
             if (subscription) {
                 let updatedCar = await this.updateCar(carObj.id, { user_id: subscription.user.id })
                 console.debug('Updated Car: ' + updatedCar.brand)
-            }else{
+            } else {
                 console.debug('This Car not have subscription.')
             }
             // }
@@ -99,7 +115,7 @@ const addCar = (Car) => async (brand, model, plate, user_id) => {
         const car = new Car({
             brand,
             model,
-            plate,
+            plate: plate.toUpperCase(),
             user_id
         })
 
@@ -215,6 +231,7 @@ async function getAllMakes() {
 module.exports = (Car) => {
     return {
         getCars: getCars(Car),
+        getOldCars: getOldCars(Car),
         getCarsWithUserNull: getCarsWithUserNull(Car),
         getCarsByList: getCarsByList(Car),
         getCarByID: getCarByID(Car),

@@ -86,14 +86,14 @@
 
                         <p class="alert alert-danger mt-2"><%= lingua.car.maxServiceQty%>.</p>
                         <% }
-                         else if (!car.isValid) { %>
+                         else if (car.isValid) { %>
                         <i class="far fa-8x fa-times-circle invalid"></i>
 
                         <p class="alert alert-danger mt-2">
-                            <%= lingua.car.carExpiredOn(moment(car?.cancel_date * 1000).isValid() ? moment(car?.cancel_date * 1000).format(shortDateFormat) : 'N/A')%>:
+                            <%= lingua.car.carExpiredOn(moment(car?.cancel_date).isValid() ? moment(car?.cancel_date).format(shortDateFormat) : 'N/A')%>:
 
-                            // <br>
-                            // Create another membership to use the service for this car.
+                            <br>
+                            Create another membership to use the service for this car.
                         </p>
 
                         <% } else { %>
