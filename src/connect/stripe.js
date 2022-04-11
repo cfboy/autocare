@@ -436,7 +436,7 @@ async function getCustomerBalanceTransactions(id) {
     for (balance of balanceTransactions.data) {
         total += balance.amount
     }
-    let totalString
+    let totalString = null
 
     // If the total is zero then totalString is null/undefined.
     if (total * -1 > 0) {

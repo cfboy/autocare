@@ -256,16 +256,16 @@ async function validateItemQty(item) {
         let isValid = false
 
         if (itemObj) {
-            console.log('Cars Qty: ' + itemObj?.cars?.length)
-            console.log('Item Qty: ' + itemObj?.data?.quantity)
+            console.debug('Cars Qty: ' + itemObj?.cars?.length)
+            console.debug('Item Qty: ' + itemObj?.data?.quantity)
 
             if (itemObj?.cars?.length == itemObj?.data?.quantity) {
-                console.log('Item has the same quantity. ')
+                console.debug('Item has the same quantity.')
                 isValid = true
             }
             else if (itemObj?.cars?.length > itemObj?.data?.quantity) {
                 // This case is when the item has more cars than it can have. 
-                console.log('Item has more cars than quantity. ')
+                console.debug('Item has more cars than quantity. ')
                 // Verify if any car dont have cancel_date set. 
                 let notNeedSetCancelDate = itemObj.cars.filter(car => car.cancel_date == null)?.length === itemObj?.data?.quantity
 
@@ -276,7 +276,7 @@ async function validateItemQty(item) {
             else if (itemObj?.cars?.length < itemObj?.data?.quantity) {
                 // Need add more cars.
 
-                console.log('Item has less cars than quantity. ')
+                console.debug('Item has less cars than quantity. ')
             }
 
         }

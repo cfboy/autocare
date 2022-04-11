@@ -149,10 +149,21 @@ exports.webhook = async (req, res) => {
                         items = []
                         for (subItem of subscriptionItems) {
                             let itemToUpdate = mySubscription?.items?.find(item => item.id == subItem.id)
-                            // TODO: reset cancel_date of cars
                             if (itemToUpdate) {
                                 let newItem = { id: itemToUpdate.id, cars: itemToUpdate.cars, data: subItem }
                                 items.push(newItem)
+
+                                try {
+                                    if (newItem?.cars?.length == newItem.data.quantity) {
+                                        for (car of newItem.cars) {
+                                            if (car.cancel_date !== null)
+                                                await CarService.updateCar(car.id, { cancel_date: null })
+                                        }
+                                    }
+                                } catch (e) {
+                                    console.log(e)
+                                    console.log('Error trying to clear cancel_date of subscription: ' + mySubscription.id)
+                                }
                             }
                         }
 
@@ -168,7 +179,8 @@ exports.webhook = async (req, res) => {
 
                         // Send customer balance on email.
                         let { totalString } = await Stripe.getCustomerBalanceTransactions(customer.billingID)
-                        alertInfo.message += `Your current balance on your account is ${totalString}.`
+                        if (totalString)
+                            alertInfo.message += `Your current balance on your account is ${totalString}.`
 
                     } else {
                         // Create Subs
