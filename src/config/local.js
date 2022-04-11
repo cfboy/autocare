@@ -10,7 +10,7 @@ passport.use(new LocalStrategy({ usernameField: 'email', passReqToCallback: true
         if (!email && !password) {
             return done(null, false, { message: lingua.validation.missingCredentials });
         }
-        const currentUser = await UserService.getUserByEmail(email)
+        const currentUser = await UserService.getUserByEmail(email?.toLowerCase())
 
         if (!currentUser) {
             return done(null, false, { message: lingua.validation.userNotExist(email) });
