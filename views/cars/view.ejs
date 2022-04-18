@@ -95,7 +95,13 @@
                                                         <tr>
                                                             <td><%= lingua.service.qty%></td>
                                                             <td>
-                                                                <%- car.services.length%>
+                                                                <%- car.utilization.services%>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Utilization</td>
+                                                            <td>
+                                                                <%- (car.utilization.percentage * 100).toFixed(1)%>%
                                                             </td>
                                                         </tr>
                                                     </tbody>

@@ -97,7 +97,7 @@
 
                                                             <td><%- car.model%></td>
                                                             <td><%- car.plate%></td>
-                                                            <td><%- car?.services?.length%></td>
+                                                            <td><%- car?.utilization?.services%></td>
                                                             <td>
                                                                 <%= moment(car?.created_date).isValid() ? moment(car?.created_date).format(completeDateFormat) : 'N/A' %>
 

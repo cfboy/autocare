@@ -212,21 +212,7 @@ exports.viewUser = async (req, res) => {
                 customer = await SubscriptionService.setStripeInfoToUser(customer)
             }
 
-            let customerCars = []
-            if (customer?.subscriptions) {
-                for (customerSub of customer.subscriptions) {
-                    // Iterates the items on DB subscription.
-                    for (customerItem of customerSub.items) {
-                        // then iterates cars in DB item.
-                        for (car of customerItem.cars) {
-                            customerCars.push(car)
-                        }
-                    }
-                }
-
-
-                cars = await ServiceService.setServicesToCars(customerCars)
-            }
+            cars = await CarService.getAllCarsByUser(customer)
 
             res.status(200).render('user/view.ejs', {
                 user: req.user,

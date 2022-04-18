@@ -47,7 +47,16 @@ exports.cars = async (req, res) => {
             } else {
                 cars = await CarService.getAllCarsByUser(user)
             }
-            cars = await ServiceService.setServicesToCars(cars)
+
+            for (car of cars) {
+                // TODO: get services in the current period to calculate the correct percentage
+                let services = await ServiceService.getServicesByCar(car),
+                    percentage = (services.length / 30)
+
+                if (car?.utilization?.services != services.length || car?.utilization?.percentage != percentage)
+                    car = await CarService.updateCar(car.id, { 'utilization.services': services.length, 'utilization.percentage': percentage })
+
+            }
 
             res.render('cars/index.ejs', {
                 user, cars, message, alertType,
@@ -82,7 +91,11 @@ exports.view = async (req, res) => {
         let id = req.params.id,
             car = await CarService.getCarByID(id)
 
-        car.services = await ServiceService.getServicesByCar(car)
+        // let services = await ServiceService.getServicesByCar(car),
+        //     percentage = (services.length / 30)
+
+        // if (car.utilization.services != services.length || car.utilization.percentage != percentage)
+        //     car = await CarService.updateCar(id, { 'utilization.services': services.length, 'utilization.percentage': percentage })
 
         if (car) {
             res.status(200).render('cars/view.ejs', {

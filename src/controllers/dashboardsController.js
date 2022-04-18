@@ -93,7 +93,7 @@ exports.account = async (req, res) => {
         }
 
     } catch (error) {
-        console.error("ERROR: dashboardController -> Tyring to find stripeInfo.")
+        console.error("ERROR: dashboardController -> Tyring generate user dashboard.")
         console.error(error.message)
     }
 }

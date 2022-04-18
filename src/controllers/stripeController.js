@@ -236,6 +236,18 @@ exports.webhook = async (req, res) => {
                 break
             case 'customer.subscription.deleted':
                 break;
+
+            case 'invoice.payment_succeeded':
+                if (data.blling_reason == 'subscription_cycle') {
+                    for (line of data.lines.data) {
+                        let cars = await SubscriptionService.getSubscriptionCarsById(line.subscription)
+                        if (cars) {
+                            await CarService.updateCars(cars?.map(({ id }) => (id)), { 'utilization.services': 0, 'utilization.percentage': 0 })
+                        }
+                    }
+
+                }
+                break;
             default:
                 console.log(`Unhandled event type ${event.type}`);
 

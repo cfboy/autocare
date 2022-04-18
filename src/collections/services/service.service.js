@@ -191,33 +191,6 @@ const getServicesByCars = (Service) => async (cars) => {
  * @param {*} Service 
  * @returns 
  */
-const setServicesToCars = (Service) => async (cars) => {
-    let services = await Service.find({ car: { $in: cars } })
-        .populate({ path: 'location', model: 'location' })
-        .populate({ path: 'authorizedBy', model: 'user' })
-        .populate({ path: 'user', model: 'user' })
-        .populate({ path: 'car', model: 'car' })
-        .then(result => {
-            if (result.length > 0) {
-                console.debug(`SERVICE-SERVICE: getServicesByCars(): Successfully found ${result.length} services.`);
-                return result
-            } else {
-                console.debug("SERVICE-SERVICE: getServicesByCars(): No services found for this cars.");
-            }
-        })
-        .catch(err => console.error(`Failed to find document: ${err}`));
-
-    for (carObj of cars) {
-        carObj.services = []
-        if (services) {
-            let carServices = services.find(service => service.car.id == carObj.id)
-            if (carServices)
-                carObj.services.push(carServices)
-        }
-    }
-    return cars
-}
-
 
 module.exports = (Service) => {
     return {
@@ -228,7 +201,6 @@ module.exports = (Service) => {
         deleteService: deleteService(Service),
         getServicesByCar: getServicesByCar(Service),
         getServicesByUser: getServicesByUser(Service),
-        getServicesByCars: getServicesByCars(Service),
-        setServicesToCars: setServicesToCars(Service)
+        getServicesByCars: getServicesByCars(Service)
     }
 }
