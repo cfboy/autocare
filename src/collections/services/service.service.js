@@ -185,13 +185,6 @@ const getServicesByCars = (Service) => async (cars) => {
         .catch(err => console.error(`Failed to find document: ${err}`));
 }
 
-/**
- * This function find all services by a list of cars.
- * Assign this services in the car.services properties.
- * @param {*} Service 
- * @returns 
- */
-
 module.exports = (Service) => {
     return {
         getServices: getServices(Service),
