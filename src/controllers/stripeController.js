@@ -144,10 +144,41 @@ exports.webhook = async (req, res) => {
                 subscription = data
                 customer = await UserService.getUserByBillingID(subscription.customer)
                 if (customer) {
-                    subscription = await Stripe.getSubscriptionById(subscription.id)
+                    subscription = await Stripe.getSubscriptionById(subscription.id) //TODO: maybe not nescessary
                     subscriptionItems = subscription.items.data
                     let mySubscription = await SubscriptionService.getSubscriptionById(subscription.id)
                     if (mySubscription) {
+                        // ------------------- Handle utilization ------------------------------------------------------
+                        // Verify if the period is changed.
+                        if (subscription.current_period_start !== mySubscription.data.current_period_start || subscription.current_period_end !== mySubscription.data.current_period_end) {
+                            console.debug('stripeController --> The period is different.')
+                            let cars = await SubscriptionService.getSubscriptionCarsById(subscription.id)
+
+                            if (cars) {
+                                for (car of cars) {
+                                    // Add old utilization / History
+                                    await UtilizationService.addUtilization(car,
+                                        car.utilization.start_date,
+                                        car.utilization.end_date,
+                                        car.utilization.services,
+                                        car.utilization.percentage)
+                                }
+                                // Calculate the new dates.
+                                // Get the dates from new invoice. 
+                                let newStartDate = new Date(subscription.current_period_start * 1000)
+                                let newEndDate = new Date(subscription.current_period_end * 1000)
+
+                                // Reset current utilization on car model.
+                                await CarService.updateCars(cars?.map(({ id }) => (id)), {
+                                    'utilization.start_date': newStartDate,
+                                    'utilization.end_date': newEndDate,
+                                    'utilization.services': 0,
+                                    'utilization.percentage': 0
+                                })
+                            }
+                        }
+                        // -------------------------------------------------------------------------------------
+
                         items = []
                         for (subItem of subscriptionItems) {
                             let itemToUpdate = mySubscription?.items?.find(item => item.id == subItem.id)
@@ -237,38 +268,6 @@ exports.webhook = async (req, res) => {
 
                 break
             case 'customer.subscription.deleted':
-                break;
-
-            case 'invoice.payment_succeeded':
-                if (data.blling_reason == 'subscription_cycle') {
-                    for (line of data.lines.data) {
-                        let cars = await SubscriptionService.getSubscriptionCarsById(line.subscription)
-
-                        if (cars) {
-                            for (car of cars) {
-                                // Add old utilization / History
-                                await UtilizationService.addUtilization(car,
-                                    car.utilization.start_date,
-                                    car.utilization.end_date,
-                                    car.utilization.services,
-                                    car.utilization.percentage)
-                            }
-                            // Calculate the new dates.
-                            // Get the dates from new invoice. 
-                            let newStartDate = new Date(line.period_start * 1000)
-                            let newEndDate = new Date(line.period_end * 1000)
-
-                            // Reset current utilization on car model.
-                            await CarService.updateCars(cars?.map(({ id }) => (id)), {
-                                'utilization.start_date': newStartDate,
-                                'utilization.end_date': newEndDate,
-                                'utilization.services': 0,
-                                'utilization.percentage': 0
-                            })
-                        }
-                    }
-
-                }
                 break;
             default:
                 console.log(`Unhandled event type ${event.type}`);

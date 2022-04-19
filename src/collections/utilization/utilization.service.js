@@ -60,6 +60,7 @@ const addUtilization = (Utilization) => async (car, startDate, endDate, services
             car, start_date: startDate, end_date: endDate, services, percentage
         })
 
+        console.debug('addUtilization to car: ' + car.plate)
         return await utilization.save()
     } catch (error) {
         console.debug(error)
