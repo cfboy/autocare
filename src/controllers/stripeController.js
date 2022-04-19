@@ -2,6 +2,8 @@ const Stripe = require('../connect/stripe')
 const CarService = require('../collections/cars')
 const UserService = require('../collections/user')
 const SubscriptionService = require('../collections/subscription')
+const UtilizationService = require('../collections/utilization')
+
 // const { ROLES } = require('../collections/user/user.model')
 const alertTypes = require('../helpers/alertTypes')
 const moment = require('moment');
@@ -241,8 +243,28 @@ exports.webhook = async (req, res) => {
                 if (data.blling_reason == 'subscription_cycle') {
                     for (line of data.lines.data) {
                         let cars = await SubscriptionService.getSubscriptionCarsById(line.subscription)
+
                         if (cars) {
-                            await CarService.updateCars(cars?.map(({ id }) => (id)), { 'utilization.services': 0, 'utilization.percentage': 0 })
+                            for (car of cars) {
+                                // Add old utilization / History
+                                await UtilizationService.addUtilization(car,
+                                    car.utilization.start_date,
+                                    car.utilization.end_date,
+                                    car.utilization.services,
+                                    car.utilization.percentage)
+                            }
+                            // Calculate the new dates.
+                            // Get the dates from new invoice. 
+                            let newStartDate = new Date(line.period_start * 1000)
+                            let newEndDate = new Date(line.period_end * 1000)
+
+                            // Reset current utilization on car model.
+                            await CarService.updateCars(cars?.map(({ id }) => (id)), {
+                                'utilization.start_date': newStartDate,
+                                'utilization.end_date': newEndDate,
+                                'utilization.services': 0,
+                                'utilization.percentage': 0
+                            })
                         }
                     }
 

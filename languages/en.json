@@ -201,5 +201,6 @@
         "notSend": "Email Not Send.",
         "passwordReset" : "Auto Care Password Reset Request"
     },
-    "clear": "Clear"
+    "clear": "Clear",
+    "utilizationHistory" : "Utilization History"
 }

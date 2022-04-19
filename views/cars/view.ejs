@@ -102,11 +102,39 @@
                                                             <td>Utilization</td>
                                                             <td>
                                                                 <%- (car.utilization.percentage * 100).toFixed(1)%>%
+                                                                (Period:
+                                                                <%= moment(car?.utilization?.start_date).isValid() ? moment(car?.utilization?.start_date).format(shortDateFormat) : 'N/A'%>
+                                                                /
+                                                                <%= moment(car?.utilization?.end_date).isValid() ? moment(car?.utilization?.end_date).format(shortDateFormat) : 'N/A'%>)
                                                             </td>
                                                         </tr>
+                                                        <% if(utilization.length > 0) { %>
+                                                        <tr>
+                                                            <td> <%= lingua.utilizationHistory%></td>
+                                                            <td>
+                                                                <% for(item of utilization) { %>
+
+                                                                <ul style="padding-left: 0;">
+                                                                    Period:
+                                                                    <%= moment(item?.start_date).isValid() ? moment(item?.start_date).format(shortDateFormat) : 'N/A'%>
+                                                                    /
+                                                                    <%= moment(item?.end_date).isValid() ? moment(item?.end_date).format(shortDateFormat) : 'N/A'%>
+
+                                                                    <li style="margin-left: 20px;">
+                                                                        <%= lingua.service.qty%>:
+                                                                        <%- item.services%>
+                                                                        (<%- (item.percentage * 100).toFixed(1)%>%)
+                                                                    </li>
+                                                                </ul>
+                                                                <% } %>
+
+                                                            </td>
+                                                        </tr>
+                                                        <% } %>
                                                     </tbody>
                                                 </table>
                                             </div>
+
                                         </div>
                                     </div>
                                 </div>
@@ -139,10 +167,7 @@
     <script src="../js/off-canvas.js"></script>
     <script src="../js/hoverable-collapse.js"></script>
     <script src="../js/template.js"></script>
-    <script src="../js/settings.js"></script>
-    <script src="../js/todolist.js"></script>
     <!-- endinject -->
-    <script type="text/javascript" src="https://js.stripe.com/v3/"></script>
     <script src="../js/jquery.cookie.js" type="text/javascript"></script>
     <script src="../js/Chart.roundedBarCharts.js"></script>
 

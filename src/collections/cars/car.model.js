@@ -7,10 +7,12 @@ const carSchema = new Schema({
     plate: { type: String, unique: true },
     created_date: { type: Date, default: Date.now },
     cancel_date: { type: Date, default: null },
-    user_id : String,
+    user_id: String,
     utilization: {
-        services : Number,
-        percentage : Number
+        start_date: { type: Date, default: null },
+        end_date: { type: Date, default: null },
+        services: Number,
+        percentage: Number
     }
 })
 

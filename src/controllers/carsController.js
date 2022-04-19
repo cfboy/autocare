@@ -7,6 +7,7 @@ const HistoryService = require('../collections/history')
 const { historyTypes } = require('../collections/history/history.model')
 const alertTypes = require('../helpers/alertTypes')
 const Stripe = require('../connect/stripe')
+const UtilizationService = require('../collections/utilization')
 const { canDeleteCar,
     canManageCars,
     canEditCar,
@@ -50,12 +51,21 @@ exports.cars = async (req, res) => {
 
             for (car of cars) {
                 // TODO: get services in the current period to calculate the correct percentage
-                let services = await ServiceService.getServicesByCar(car),
-                    percentage = (services.length / 30)
+                let subscription = await SubscriptionService.getSubscriptionByCar(car)
+                let startDate = new Date(subscription.data.current_period_start * 1000),
+                    endDate = new Date(subscription.data.current_period_end * 1000),
+                    daysBetweenTwoDates = (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24)
 
-                if (car?.utilization?.services != services.length || car?.utilization?.percentage != percentage)
-                    car = await CarService.updateCar(car.id, { 'utilization.services': services.length, 'utilization.percentage': percentage })
+                let services = await ServiceService.getServicesByCarBetweenDates(car, startDate, endDate),
+                    percentage = (services.length / daysBetweenTwoDates)
 
+                if (car.utilization?.start_date == null || car.utilization?.end_date == null || car?.utilization?.services != services.length || car?.utilization?.percentage != percentage)
+                    car = await CarService.updateCar(car.id, {
+                        'utilization.start_date': startDate,
+                        'utilization.end_date': endDate,
+                        'utilization.services': services.length,
+                        'utilization.percentage': percentage
+                    })
             }
 
             res.render('cars/index.ejs', {
@@ -91,16 +101,12 @@ exports.view = async (req, res) => {
         let id = req.params.id,
             car = await CarService.getCarByID(id)
 
-        // let services = await ServiceService.getServicesByCar(car),
-        //     percentage = (services.length / 30)
-
-        // if (car.utilization.services != services.length || car.utilization.percentage != percentage)
-        //     car = await CarService.updateCar(id, { 'utilization.services': services.length, 'utilization.percentage': percentage })
-
         if (car) {
+            let utilization = await UtilizationService.getUtilizationByCar(car)
             res.status(200).render('cars/view.ejs', {
                 user,
                 car,
+                utilization,
                 message,
                 alertType,
                 canEditCar: canEditCar(user, car.id, car.services),

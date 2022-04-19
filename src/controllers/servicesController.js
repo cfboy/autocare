@@ -102,17 +102,26 @@ exports.useService = async (req, res) => {
         if (userID) {
             let authorizedBy = req.user
             let car = await CarService.getCarByID(carID)
-            let {item, subscription} = await SubscriptionService.getSubscriptionItemByCar(car)
+            let { item, subscription } = await SubscriptionService.getSubscriptionItemByCar(car)
             let customer = await UserService.getUserById(car.user_id)
 
             // TODO: Change location 
             let service = await ServiceService.addService(car, authorizedBy, authorizedBy.locations[0], customer, item?.data?.price?.product?.name, inputType)
 
             if (car && service) {
-                let services = await ServiceService.getServicesByCar(car),
-                    percentage = (services.length / 30)
+                let startDate = new Date(subscription.data.current_period_start * 1000),
+                    endDate = new Date(subscription.data.current_period_end * 1000),
+                    daysBetweenTwoDates = (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24)
 
-                car = await CarService.updateCar(car.id, { 'utilization.services': services.length, 'utilization.percentage': percentage })
+                let servicesInPeriod = await ServiceService.getServicesByCarBetweenDates(car, startDate, endDate),
+                    percentage = (servicesInPeriod?.length / daysBetweenTwoDates)
+
+                car = await CarService.updateCar(car.id, {
+                    'utilization.start_date': startDate,
+                    'utilization.end_date': endDate,
+                    'utilization.services': servicesInPeriod.length,
+                    'utilization.percentage': percentage
+                })
 
                 //Log this action.
                 HistoryService.addHistory(`Use Service: ${service.id}`, historyTypes.SERVICE, customer, service.location)
