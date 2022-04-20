@@ -93,21 +93,29 @@
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td><%= lingua.service.qty%></td>
+                                                            <td>Total <%= lingua.service.qty%></td>
                                                             <td>
-                                                                <%- car.utilization.services%>
+                                                                <%- car?.allServices?.length%>
                                                             </td>
                                                         </tr>
                                                         <tr>
                                                             <td>Utilization</td>
                                                             <td>
-                                                                <%- (car.utilization.percentage * 100).toFixed(1)%>%
-                                                                (Period:
-                                                                <%= moment(car?.utilization?.start_date).isValid() ? moment(car?.utilization?.start_date).format(shortDateFormat) : 'N/A'%>
-                                                                /
-                                                                <%= moment(car?.utilization?.end_date).isValid() ? moment(car?.utilization?.end_date).format(shortDateFormat) : 'N/A'%>)
+                                                                <ul style="padding-left: 0;">
+                                                                    Curent Period:
+                                                                    <%= moment(car?.utilization?.start_date).isValid() ? moment(car?.utilization?.start_date).format(shortDateFormat) : 'N/A'%>
+                                                                    /
+                                                                    <%= moment(car?.utilization?.end_date).isValid() ? moment(car?.utilization?.end_date).format(shortDateFormat) : 'N/A'%>
+
+                                                                    <li style="margin-left: 20px;">
+                                                                        <%= lingua.service.qty%>:
+                                                                        <%- car.utilization.services%>
+                                                                        (<%- (car.utilization.percentage * 100).toFixed(1)%>%)
+                                                                    </li>
+                                                                </ul>
                                                             </td>
                                                         </tr>
+                                                        
                                                         <% if(utilization.length > 0) { %>
                                                         <tr>
                                                             <td> <%= lingua.utilizationHistory%></td>
