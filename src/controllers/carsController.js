@@ -57,7 +57,7 @@ exports.cars = async (req, res) => {
                         percentage = (services.length / daysBetweenTwoDates)
 
                     if (carObj.utilization?.start_date == null || carObj.utilization?.end_date == null || carObj?.utilization?.services != services.length || carObj?.utilization?.percentage != percentage)
-                        await CarService.updateCar(car.id, {
+                        await CarService.updateCar(carObj.id, {
                             'utilization.start_date': startDate,
                             'utilization.end_date': endDate,
                             'utilization.services': services.length,
