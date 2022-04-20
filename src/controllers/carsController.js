@@ -116,7 +116,7 @@ exports.view = async (req, res) => {
                 utilization,
                 message,
                 alertType,
-                canEditCar: canEditCar(user, car.id, car.services),
+                canEditCar: canEditCar(user, car.id, car.allServices),
                 canManageCars: canManageCars(user)
             })
         } else {

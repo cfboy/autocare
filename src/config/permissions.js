@@ -33,7 +33,7 @@ function canAddCar(user) {
 function canEditCar(user, carID, services) {
 
     return (
-        [ROLES.ADMIN, ROLES.MANAGER].includes(user.role) || (carID && services.length == 0)
+        [ROLES.ADMIN, ROLES.MANAGER].includes(user.role) || (carID && services?.length == 0)
     )
 }
 
