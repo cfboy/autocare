@@ -7,6 +7,7 @@ const HistoryService = require('../collections/history')
 const { historyTypes } = require('../collections/history/history.model')
 const alertTypes = require('../helpers/alertTypes')
 const Stripe = require('../connect/stripe')
+const UtilizationService = require('../collections/utilization')
 const { canDeleteCar,
     canManageCars,
     canEditCar,
@@ -44,10 +45,34 @@ exports.cars = async (req, res) => {
 
             if ([ROLES.ADMIN, ROLES.MANAGER].includes(user.role)) {
                 cars = await CarService.getCars()
+
+                // Execute this logic for Admins and Managers to calculate utilization on old cars.
+                for (carObj of cars) {
+                    let subscription = await SubscriptionService.getSubscriptionByCar(carObj)
+                    let startDate = new Date(subscription.data.current_period_start * 1000),
+                        endDate = new Date(subscription.data.current_period_end * 1000),
+                        daysBetweenTwoDates = (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24)
+
+                    let services = await ServiceService.getServicesByCarBetweenDates(carObj, startDate, endDate),
+                        percentage = (services.length / daysBetweenTwoDates)
+
+                    if (carObj.utilization?.start_date == null || carObj.utilization?.end_date == null || carObj?.utilization?.services != services.length || carObj?.utilization?.percentage != percentage)
+                        await CarService.updateCar(car.id, {
+                            'utilization.start_date': startDate,
+                            'utilization.end_date': endDate,
+                            'utilization.services': services.length,
+                            'utilization.percentage': percentage
+                        })
+                }
+
             } else {
                 cars = await CarService.getAllCarsByUser(user)
             }
-            cars = await ServiceService.setServicesToCars(cars)
+
+            // Get allServices for car. 
+            for (carObj of cars) {
+                carObj.allServices = await ServiceService.getServicesByCar(carObj)
+            }
 
             res.render('cars/index.ejs', {
                 user, cars, message, alertType,
@@ -82,12 +107,13 @@ exports.view = async (req, res) => {
         let id = req.params.id,
             car = await CarService.getCarByID(id)
 
-        car.services = await ServiceService.getServicesByCar(car)
-
         if (car) {
+            car.allServices = await ServiceService.getServicesByCar(car)
+            let utilization = await UtilizationService.getUtilizationByCar(car)
             res.status(200).render('cars/view.ejs', {
                 user,
                 car,
+                utilization,
                 message,
                 alertType,
                 canEditCar: canEditCar(user, car.id, car.services),

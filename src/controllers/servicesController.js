@@ -5,6 +5,7 @@ const HistoryService = require('../collections/history')
 const { historyTypes } = require('../collections/history/history.model')
 const { ROLES } = require('../collections/user/user.model')
 const Stripe = require('../connect/stripe')
+const UserService = require('../collections/user')
 
 exports.services = async (req, res) => {
     try {
@@ -101,14 +102,30 @@ exports.useService = async (req, res) => {
         if (userID) {
             let authorizedBy = req.user
             let car = await CarService.getCarByID(carID)
-            let item = await SubscriptionService.getSubscriptionItemByCar(car)
-            let customer = await SubscriptionService.getUserByCar(car)
+            let { item, subscription } = await SubscriptionService.getSubscriptionItemByCar(car)
+            let customer = await UserService.getUserById(car.user_id)
+
             // TODO: Change location 
             let service = await ServiceService.addService(car, authorizedBy, authorizedBy.locations[0], customer, item?.data?.price?.product?.name, inputType)
 
-            if (car && service)
+            if (car && service) {
+                let startDate = new Date(subscription.data.current_period_start * 1000),
+                    endDate = new Date(subscription.data.current_period_end * 1000),
+                    daysBetweenTwoDates = (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24)
+
+                let servicesInPeriod = await ServiceService.getServicesByCarBetweenDates(car, startDate, endDate),
+                    percentage = (servicesInPeriod?.length / daysBetweenTwoDates)
+
+                car = await CarService.updateCar(car.id, {
+                    'utilization.start_date': startDate,
+                    'utilization.end_date': endDate,
+                    'utilization.services': servicesInPeriod.length,
+                    'utilization.percentage': percentage
+                })
+
                 //Log this action.
                 HistoryService.addHistory(`Use Service: ${service.id}`, historyTypes.SERVICE, customer, service.location)
+            }
 
             res.render('ajaxSnippets/useServiceResult.ejs', { customer, service, car })
         } else {

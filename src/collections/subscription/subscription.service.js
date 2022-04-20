@@ -168,8 +168,8 @@ const getSubscriptionItemByCar = (Subscription) => async (car) => {
         .then(result => {
             if (result) {
                 console.debug(`getSubscriptionItemByCar(): Successfully found ${result?.id}.`);
-                let itemToReturn = result.items.find(item => item.cars.find(carObj => carObj.id == car.id))
-                return itemToReturn
+                let item = result.items.find(item => item.cars.find(carObj => carObj.id == car.id))
+                return {item, subscription: result}
             } else {
                 console.debug("getSubscriptionItemByCar(): No document matches the provided query.");
             }
@@ -177,28 +177,22 @@ const getSubscriptionItemByCar = (Subscription) => async (car) => {
         .catch(err => console.error(`Failed to find document: ${err}`));
 }
 
-
-const getUserByCar = (Subscription) => async (car) => {
-    console.debug(`getUserByCar() by ID: ${car.id}`)
-
-    let subscription = await Subscription.findOne({
-        "items.cars": { _id: car.id }
-    },
-        function (err, docs) {
-            if (err) {
-                console.error(err)
+const getSubscriptionCarsById = (Subscription) => async (id) => {
+    return await Subscription.findOne({ id: id }).populate('user').populate({ path: 'items.cars', model: 'car' })
+        .then(result => {
+            if (result) {
+                console.debug(`getSubscriptionCarsById(): Successfully found ${result?.id}.`);
+                let itemsToReturn = []
+                for (item of result.items) {
+                    itemsToReturn = itemsToReturn.concat(item.cars)
+                }
+                return itemsToReturn
             } else {
-                console.debug("Subscription-SERVICE: Found subscription: ", docs?.id);
+                console.debug("getSubscriptionCarsById(): No document matches the provided query.");
             }
-        }).populate('user').populate({ path: 'items.cars', model: 'car' })
-
-
-    let user = subscription?.user
-
-
-    return user
+        })
+        .catch(err => console.error(`Failed to find document: ${err}`));
 }
-
 
 /**
  * This function set the subscription information temporary on .subscriptons property in the user object.
@@ -307,7 +301,7 @@ module.exports = (Subscription) => {
         getSubscriptionById: getSubscriptionById(Subscription),
         getSubscriptionByCar: getSubscriptionByCar(Subscription),
         getSubscriptionItemByCar: getSubscriptionItemByCar(Subscription),
-        getUserByCar: getUserByCar(Subscription),
+        getSubscriptionCarsById : getSubscriptionCarsById(Subscription),
         setStripeInfoToUser: setStripeInfoToUser,
         validateItemQty: validateItemQty
     }

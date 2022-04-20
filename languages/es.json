@@ -201,5 +201,6 @@
         "notSend": "No se pudo enviar el correo electrónico.",
         "passwordReset": "Auto Care - Solicitud de restablecimiento de contraseña"
     },
-    "clear": "Limpiar"
+    "clear": "Limpiar",
+    "utilizationHistory": "Historial de Utilización"
 }

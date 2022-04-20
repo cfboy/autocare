@@ -151,7 +151,7 @@ const getUserById = (User) => (id) => {
         } else {
             console.debug("USER-SERVICE: Found user: ", docs.email);
         }
-    }).populate('locations').populate({ path: 'subscriptions.items.cars', model: 'car' })
+    }).populate('locations')
 }
 
 /**
@@ -162,7 +162,7 @@ const getUserById = (User) => (id) => {
 const getUserByEmail = (User) => async (email) => {
     console.log(`getUserByEmail(): ${email}`)
 
-    return await User.findOne({ email }).populate({ path: 'subscriptions.items.cars', model: 'car' })
+    return await User.findOne({ email })
 }
 
 /**
@@ -189,24 +189,6 @@ const updateBillingID = (User) => async (id, billingID) => {
             console.debug(`USER-SERVICE: Updated BillingID of ${doc.email} ->> ${doc.billingID}`);
         }
     })
-}
-
-/**
- * This function get user by plate number.
- * @param {*} User 
- * @returns user
- */
-const getUserByCar = (User) => async (car) => {
-    return User.findOne({
-        "subscriptions.items.cars": { _id: car.id }
-    },
-        function (err, docs) {
-            if (err) {
-                console.error(err)
-            } else {
-                console.debug("USER-SERVICE: Found user: ", docs?.email);
-            }
-        })
 }
 
 /**
@@ -406,7 +388,6 @@ module.exports = (User) => {
         getUserByEmail: getUserByEmail(User),
         getUserByBillingID: getUserByBillingID(User),
         updateBillingID: updateBillingID(User),
-        getUserByCar: getUserByCar(User),
         getUsersByLocationID: getUsersByLocationID(User),
         getUsersByList: getUsersByList(User),
         addNotification: addNotification(User),

@@ -119,28 +119,6 @@ const getServiceByID = (Service) => async (serviceID) => {
 }
 
 /**
- * This funtion returns a list of service by user,
- * @param {*} user 
- * @returns service list
- */
-const getServicesByUser = (Service) => async (user) => {
-    return Service.find({ user: user })
-        .populate({ path: 'location', model: 'location' })
-        .populate({ path: 'authorizedBy', model: 'user' })
-        .populate({ path: 'user', model: 'user' })
-        .populate({ path: 'car', model: 'car' })
-        .then(result => {
-            if (result) {
-                console.debug(`getServicesByCars(): Successfully found ${result.length} services.`);
-                return result
-            } else {
-                console.debug("getServicesByCars(): No document matches the provided query.");
-            }
-        })
-        .catch(err => console.error(`Failed to find document: ${err}`));
-}
-
-/**
  * This funtion returns a list of service by car,
  * @param {*} car 
  * @returns Service list
@@ -157,6 +135,33 @@ const getServicesByCar = (Service) => async (car) => {
                 return result
             } else {
                 console.debug("getServicesByCar(): No document matches the provided query.");
+            }
+        })
+        .catch(err => console.error(`Failed to find document: ${err}`));
+}
+
+/**
+ * This funtion returns a list of service by car between dates,
+ * @param {*} car 
+ * @returns Service list
+ */
+const getServicesByCarBetweenDates = (Service) => async (car, startDate, endDate) => {
+    return Service.find({
+        car: car, created_date: {
+            $gte: startDate,
+            $lte: endDate
+        }
+    })
+        .populate({ path: 'location', model: 'location' })
+        .populate({ path: 'authorizedBy', model: 'user' })
+        .populate({ path: 'user', model: 'user' })
+        .populate({ path: 'car', model: 'car' })
+        .then(result => {
+            if (result) {
+                console.debug(`getServicesByCarBetweenDates(): Successfully found ${result.length} services.`);
+                return result
+            } else {
+                console.debug("getServicesByCarBetweenDates(): No document matches the provided query.");
             }
         })
         .catch(err => console.error(`Failed to find document: ${err}`));
@@ -185,40 +190,6 @@ const getServicesByCars = (Service) => async (cars) => {
         .catch(err => console.error(`Failed to find document: ${err}`));
 }
 
-/**
- * This function find all services by a list of cars.
- * Assign this services in the car.services properties.
- * @param {*} Service 
- * @returns 
- */
-const setServicesToCars = (Service) => async (cars) => {
-    let services = await Service.find({ car: { $in: cars } })
-        .populate({ path: 'location', model: 'location' })
-        .populate({ path: 'authorizedBy', model: 'user' })
-        .populate({ path: 'user', model: 'user' })
-        .populate({ path: 'car', model: 'car' })
-        .then(result => {
-            if (result.length > 0) {
-                console.debug(`SERVICE-SERVICE: getServicesByCars(): Successfully found ${result.length} services.`);
-                return result
-            } else {
-                console.debug("SERVICE-SERVICE: getServicesByCars(): No services found for this cars.");
-            }
-        })
-        .catch(err => console.error(`Failed to find document: ${err}`));
-
-    for (carObj of cars) {
-        carObj.services = []
-        if (services) {
-            let carServices = services.find(service => service.car.id == carObj.id)
-            if (carServices)
-                carObj.services.push(carServices)
-        }
-    }
-    return cars
-}
-
-
 module.exports = (Service) => {
     return {
         getServices: getServices(Service),
@@ -227,8 +198,7 @@ module.exports = (Service) => {
         updateService: updateService(Service),
         deleteService: deleteService(Service),
         getServicesByCar: getServicesByCar(Service),
-        getServicesByUser: getServicesByUser(Service),
         getServicesByCars: getServicesByCars(Service),
-        setServicesToCars: setServicesToCars(Service)
+        getServicesByCarBetweenDates: getServicesByCarBetweenDates(Service)
     }
 }

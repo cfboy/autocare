@@ -144,6 +144,23 @@ const updateCar = (Car) => async (id, updates) => {
 }
 
 /**
+ * This function update cars properties by a list of id's.
+ * The ids list ussualy is: cars.map(({ id }) => (id))
+ * @param {ids, updates} Car 
+ * @returns 
+ */
+const updateCars = (Car) => async (ids, updates) => {
+    console.log(`updateCar() ID: ${ids}`)
+    return await Car.updateMany({ _id: { $in: ids } }, updates, { new: true }, function (err, docs) {
+        if (err) {
+            console.error(err.message)
+        } else {
+            console.debug("Updated : ", docs?.n);
+        }
+    })
+}
+
+/**
  * This function delete a car from DB.
  * @param {*} Car 
  * @returns promise
@@ -185,7 +202,6 @@ const getCarByPlate = (Car) => async (plate) => {
  * @param {*} user 
  * @returns car list
  */
-// TODO: to optimize this method need to add a userID on car schema.
 const getAllCarsByUser = (Car) => async (user) => {
     console.debug("getAllCarsByUser()...")
     return Car.find({ user_id: user.id }, function (err, docs) {
@@ -237,6 +253,7 @@ module.exports = (Car) => {
         getCarByID: getCarByID(Car),
         addCar: addCar(Car),
         updateCar: updateCar(Car),
+        updateCars: updateCars(Car),
         deleteCar: deleteCar(Car),
         getCarByPlate: getCarByPlate(Car),
         getAllMakes: getAllMakes,

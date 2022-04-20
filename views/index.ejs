@@ -172,18 +172,6 @@
         window.onload = function () {
             manageLangDropdown();
         };
-
-        // TODO: Maybe remove. This logic is unused.
-        $(document).ready(function () {
-            const selectProductBtn = $('.select-product-btn');
-            selectProductBtn.click(function () {
-                // const product = $("input[name='product']:checked").val()
-                const product = $(this).attr("value");
-                var params = new URLSearchParams();
-                params.append('product', product);
-                location.href = '/create-account?' + params.toString();
-            })
-        })
     </script>
 </body>
 

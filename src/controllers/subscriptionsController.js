@@ -288,6 +288,5 @@ exports.confirmValidCars = async (req, res) => {
         req.session.message = "Error trying to confirm valid cars."
         req.session.alertType = alertTypes.ErrorAlert
     }
-    // TODO: update invalid list
     res.redirect('/account')
 }
