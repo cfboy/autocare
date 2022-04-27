@@ -96,8 +96,8 @@ exports.validate = async (req, res) => {
             car.isValid = car?.cancel_date ? (car.cancel_date < new Date()) : true
             // TODO: use selected location 
             //Log this action.
-            let actionType = inputType == 'System' ? historyTypes.SYSTEM_ACTION : historyTypes.USER_ACTION
-            HistoryService.addHistory(`Validate Membership: ${carPlate}`, actionType, req.user, req?.user?.locations[0])
+            // let actionType = inputType == 'System' ? historyTypes.SYSTEM_ACTION : historyTypes.USER_ACTION
+            // HistoryService.addHistory(`Validate Membership: ${carPlate}`, actionType, req.user, req?.user?.locations[0])
         }
 
         // Remove readed plate to readingQueue list.
