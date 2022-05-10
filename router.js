@@ -111,6 +111,7 @@ router.post('/carcheck', subscriptionsController.carCheck)
 router.get('/create-subscriptions', checkAuthenticated, subscriptionsController.createSubscriptions)
 router.get('/handleInvalidSubscriptions', checkAuthenticated, validateSubscriptions, subscriptionsController.handleInvalidSubscriptions)
 router.post('/confirmValidCars', checkAuthenticated, subscriptionsController.confirmValidCars)
+router.post('/syncSubscription', checkAuthenticated, subscriptionsController.syncSubscription)
 
 router.post('/cars/create', checkAuthenticated, authAddCar, carsController.save)
 router.post('/edit-car', checkAuthenticated, authEditCar, carsController.update)
