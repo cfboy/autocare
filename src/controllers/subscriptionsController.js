@@ -290,3 +290,58 @@ exports.confirmValidCars = async (req, res) => {
     }
     res.redirect('/account')
 }
+
+/**
+ * This function sync the selected subscription with stripe to update all information of this subscription.
+ * The btn has the property value and this value is the subscription ID.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.syncSubscription = async (req, res) => {
+    try {
+
+        let subscriptionID = req.body.value
+
+        if (subscriptionID) {
+            let subscription = await Stripe.getSubscriptionById(subscriptionID)
+
+            if (subscription) {
+                let subscriptionItems = subscription.items.data
+                let mySubscription = await SubscriptionService.getSubscriptionById(subscription.id)
+
+                items = []
+                for (subItem of subscriptionItems) {
+                    let itemToUpdate = mySubscription?.items?.find(item => item.id == subItem.id)
+                    if (itemToUpdate) {
+                        let newItem = { id: itemToUpdate.id, cars: itemToUpdate.cars, data: subItem }
+                        items.push(newItem)
+                    }
+                }
+
+                updates = {
+                    data: subscription,
+                    items: items
+                }
+
+                subscription = await SubscriptionService.updateSubscription(subscription.id, updates);
+
+                alertInfo = { message: `Your membership ${subscription.id} has been updated successfully. `, alertType: alertTypes.BasicAlert }
+                console.debug(alertInfo.message)
+                res.send(`Sync Completed. The page is reloaded in a few seconds...`)
+
+            } else {
+                console.debug('Not found Membership.')
+
+                res.send('Not found Membership.')
+            }
+        } else {
+            console.log('Missing membership ID')
+            res.send('Missing Membership ID.')
+        }
+
+    } catch (error) {
+        console.error("ERROR: subscriptionsController -> Tyring to sync membership.")
+        console.error(error.message)
+        res.render('Error on sync membership.')
+    }
+}

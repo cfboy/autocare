@@ -4,11 +4,13 @@ const UserService = require('../collections/user')
 const SubscriptionService = require('../collections/subscription')
 const UtilizationService = require('../collections/utilization')
 
-// const { ROLES } = require('../collections/user/user.model')
+const { ROLES } = require('../collections/user/user.model')
 const alertTypes = require('../helpers/alertTypes')
 const moment = require('moment');
 const { completeDateFormat } = require('../helpers/formats')
 const sendEmail = require("../utils/email/sendEmail");
+
+const bcrypt = require('bcrypt');
 
 /**
  * This function is a helper for agroup a list per key.
@@ -45,22 +47,31 @@ exports.webhook = async (req, res) => {
         let customer, notification, subscription, items, subscriptionItems, alertInfo
         console.log(`WEBHOOK: Event: ${event.type}`)
         switch (event.type) {
-            // case 'customer.created':
-            //     console.log(JSON.stringify(data))
-            //     if (data) {
-            //         let user = await UserService.addUser({
-            //             email: data.email,
-            //             password: 'Test1234', //TODO: optimize
-            //             billingID: data.id,
-            //             role: Roles.CUSTOMER,
-            //             firstName: data.name.split(' ')[0],
-            //             lastName: data.name.split(' ')[1],
-            //             phoneNumber: data.phone,
-            //             dateOfBirth: null,
-            //             city: data.address ? data.address.city : null
-            //         })
-            //     }
-            //     break
+            case 'customer.created':
+                console.debug(JSON.stringify(data))
+
+                let hashPassword = await bcrypt.hash('Test1234', 10)
+                let firstName = data?.name?.split(' ')[0] ? data.name.split(' ')[0] : 'Test Name',
+                    lastName = data?.name?.split(' ')[1] ? data.name.split(' ')[1] : 'Test Last Name',
+                    phoneNumber = data?.phone ? data.phone : '787-777-7777',
+                    email = data?.email ? data.email : 'test@test.com'
+
+
+                let user = await UserService.addUser({
+                    email: email,
+                    password: hashPassword,
+                    billingID: data.id,
+                    role: ROLES.CUSTOMER,
+                    firstName: firstName,
+                    lastName: lastName,
+                    phoneNumber: phoneNumber,
+                    dateOfBirth: null,
+                    city: data?.address ? data?.address?.city : null
+                })
+
+                console.debug(`Customer created: ${user.email}`)
+
+                break
             // case 'customer.deleted':
             //     break
             // case 'customer.updated':
@@ -268,6 +279,83 @@ exports.webhook = async (req, res) => {
 
                 break
             case 'customer.subscription.deleted':
+                console.log(`WEBHOOK: Subscription Deleted: ${data.id}`)
+                subscription = data
+                customer = await UserService.getUserByBillingID(subscription.customer)
+                if (customer) {
+                    subscription = await Stripe.getSubscriptionById(subscription.id) // Find subscription to expand product information.
+                    subscriptionItems = subscription.items.data
+                    let mySubscription = await SubscriptionService.getSubscriptionById(subscription.id)
+                    if (mySubscription) {
+                        items = []
+                        for (subItem of subscriptionItems) {
+                            let itemToUpdate = mySubscription?.items?.find(item => item.id == subItem.id)
+                            if (itemToUpdate) {
+                                let newItem = { id: itemToUpdate.id, cars: itemToUpdate.cars, data: subItem }
+                                items.push(newItem)
+                            }
+                        }
+
+                        updates = {
+                            data: subscription,
+                            items: items
+                        }
+
+
+                        subscription = await SubscriptionService.updateSubscription(subscription.id, updates);
+
+                        alertInfo = { message: `Your membership ${subscription.id} has been cancelled successfully. `, alertType: alertTypes.BasicAlert }
+
+                    } else {
+                        // Create Subs
+                        let cars = JSON.parse(subscription?.metadata?.cars)
+                        let subscriptionItems = subscription.items.data
+                        let items = []
+                        for (subItem of subscriptionItems) {
+                            let newItem = { id: subItem.id, cars: [], data: subItem }
+                            for (carObj of cars) {
+                                if (subItem.price.id === carObj.priceID) {
+                                    let newCar = await CarService.getCarByPlate(carObj.plate)
+                                    if (!newCar)
+                                        newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate, customer.id)
+
+                                    newItem.cars.push(newCar)
+                                }
+
+                            }
+                            items.push(newItem)
+                        }
+                        newSubscription = await SubscriptionService.addSubscription({ id: subscription.id, data: subscription, items: items, user: customer })
+                        alertInfo = { message: `Your membership ${subscription.id} has been created successfully.`, alertType: alertTypes.BasicAlert }
+                    }
+                    // Add notification to user.
+                    [customer, notification] = await UserService.addNotification(customer.id, alertInfo.message)
+
+                    req.io.emit('notifications', notification);
+
+                    //Send Email
+                    var resultEmail = await sendEmail(
+                        customer.email,
+                        lingua.email.title,
+                        {
+                            name: customer?.personalInfo?.firstName + ' ' + customer?.personalInfo?.lastName,
+                            message: alertInfo.message
+                        },
+                        "../template/subscriptions.handlebars"
+                    )
+
+                    if (resultEmail) {
+                        console.debug('Email Sent: ' + resultEmail?.accepted[0])
+
+                    } else {
+
+                        console.debug('WARNING: Email Not Sent.')
+                    }
+
+                } else {
+                    console.log('customer.subscription.cancelled: Not Found Customer.')
+                }
+
                 break;
             default:
                 console.log(`Unhandled event type ${event.type}`);

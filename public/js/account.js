@@ -1,6 +1,7 @@
 $(document).ready(function () {
     const useServiceButton = $('#use-service-button')
     useServiceButton.click(function (event) {
+        useServiceButton.prop('disabled', true);
         event.preventDefault();
         event.stopPropagation();
 
