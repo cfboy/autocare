@@ -18,6 +18,12 @@ function canDeleteUser(user) {
     )
 }
 
+function canDeleteService(user) {
+    return (
+        user.role === ROLES.ADMIN
+    )
+}
+
 function canDeleteCar(user, carID, services) {
     return (
         user.role === ROLES.ADMIN || (carID && services.length == 0)
@@ -65,5 +71,6 @@ module.exports = {
     canEditLocation,
     canDeleteUser,
     canValidateMemberships,
-    canChangePassword
+    canChangePassword,
+    canDeleteService
 }
