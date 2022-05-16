@@ -110,7 +110,7 @@ const getServiceByID = (Service) => async (serviceID) => {
         if (err) {
             console.error(err)
         } else {
-            console.debug("SERVICE-SERVICE: Found Service: ", docs.brand);
+            console.debug("SERVICE-SERVICE: Found Service: ", docs.id);
         }
     }).populate({ path: 'location', model: 'location' })
         .populate({ path: 'authorizedBy', model: 'user' })

@@ -143,6 +143,66 @@
                                                 </table>
                                             </div>
 
+                                            <br>
+
+                                            <% if(car?.allServices?.length > 0) { %>
+                                            <div class="d-flex justify-content-between align-items-start">
+
+                                                <div>
+                                                    <h4 class="card-title card-title-dash"><%= lingua.service.services%>
+                                                    </h4>
+                                                </div>
+
+                                            </div>
+                                            <div class="table-responsive mt-1">
+                                                <table class="table table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>ID</th>
+                                                            <th><%= lingua.date%></th>
+
+                                                            <th><%= lingua.car.name%></th>
+                                                            <% if([roles.ADMIN].includes(user.role) && service.duplicated) { %>
+                                                            <th>Action</th>
+                                                            <% } %>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <% for(service of car.allServices) { %>
+                                                        <tr>
+
+                                                            <td>
+                                                                <%- service.id%> <% if(service.duplicated) { %>
+                                                                - DUPLICATED
+                                                                <% } %>
+                                                            </td>
+                                                            <td>
+                                                                <%= moment(service?.created_date).isValid() ? moment(service?.created_date).format(completeDateFormat) : 'N/A' %>
+                                                            </td>
+                                                            <td>
+                                                                <%= lingua.car.brand%>: <%- car?.brand%>
+                                                                <br>
+                                                                <%= lingua.car.model%>: <%- car?.model%>
+                                                                <br>
+                                                                <%= lingua.car.plate%>: <%- car?.plate%>
+                                                            </td>
+                                                            <% if([roles.ADMIN].includes(user.role) && service.duplicated) { %>
+
+                                                            <td>
+                                                                <a id="deleteBtn"
+                                                                    onclick="return confirmDelete('/delete-service', '<%- service._id%>')"
+                                                                    class="btn btn-icon btn-icon-no-border no-margin">
+                                                                    <i class="fas fa-trash-alt icon-sm text-danger"></i>
+                                                                </a>
+                                                            </td>
+                                                            <% } %>
+
+                                                        </tr>
+                                                        <% } %>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <% } %>
                                         </div>
                                     </div>
                                 </div>

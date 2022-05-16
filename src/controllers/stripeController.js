@@ -49,7 +49,7 @@ exports.webhook = async (req, res) => {
         switch (event.type) {
             case 'customer.created':
                 console.debug(JSON.stringify(data))
-
+                // TODO: verify if the customer exists, if not then create.
                 let hashPassword = await bcrypt.hash('Test1234', 10)
                 let firstName = data?.name?.split(' ')[0] ? data.name.split(' ')[0] : 'Test Name',
                     lastName = data?.name?.split(' ')[1] ? data.name.split(' ')[1] : 'Test Last Name',

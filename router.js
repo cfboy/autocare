@@ -23,6 +23,7 @@ const { checkAuthenticated,
     authEditCar,
     authDeleteUser,
     authDeleteCar,
+    authDeleteService,
     authValidateMembership,
     authChangePassword } = require('./src/middleware/authFunctions')
 
@@ -125,6 +126,7 @@ router.post('/removeFromCart', checkAuthenticated, userController.removeFromCart
 router.get('/services', checkAuthenticated, servicesController.services)
 router.get('/service/:id', checkAuthenticated, servicesController.view)
 router.post('/useService', checkAuthenticated, authValidateMembership, servicesController.useService)
+router.get('/delete-service/:id', checkAuthenticated, authDeleteService, servicesController.delete)
 
 //------ Location Routes ------
 router.get('/locations', checkAuthenticated, locationController.locations)

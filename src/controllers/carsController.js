@@ -110,6 +110,37 @@ exports.view = async (req, res) => {
         if (car) {
             car.allServices = await ServiceService.getServicesByCar(car)
             let utilization = await UtilizationService.getUtilizationByCar(car)
+
+            // this gives an object with dates as keys
+            // Create groups of services.
+            const groups = car.allServices.reduce((groups, service) => {
+                const serviceDate = service.created_date;
+                var date = new Date(serviceDate.getTime());
+                date.setHours(0, 0, 0, 0);
+                if (!groups[date]) {
+                    groups[date] = [];
+                }
+                groups[date].push(service);
+                return groups;
+            }, {});
+
+            // Edit: to add it in the array format instead
+            const groupArrays = Object.keys(groups).map((date) => {
+                return {
+                    date,
+                    services: groups[date]
+                };
+            });
+
+            // Set duplicated flag to service.
+            for (group of groupArrays) {
+                if (group.services.length > 1) {
+                    for (service of group.services) {
+                        service.duplicated = true
+                    }
+                }
+            }
+
             res.status(200).render('cars/view.ejs', {
                 user,
                 car,

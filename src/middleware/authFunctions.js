@@ -8,7 +8,8 @@ const { canDeleteCar,
     canEditLocation,
     canDeleteUser,
     canValidateMemberships,
-    canChangePassword } = require('../config/permissions'),
+    canChangePassword,
+    canDeleteService } = require('../config/permissions'),
     alertTypes = require('../helpers/alertTypes')
 
 
@@ -122,6 +123,15 @@ async function authChangePassword(req, res, next) {
     res.status(401).redirect('/account')
 }
 
+async function authDeleteService(req, res, next) {
+    if (canDeleteService(req.user)) {
+        return next()
+    }
+    req.session.message = `Not allowed to delete this service.`
+    req.session.alertType = alertTypes.WarningAlert
+    res.status(401).redirect('/services')
+}
+
 module.exports = {
     checkAuthenticated,
     checkNotAuthenticated,
@@ -132,5 +142,6 @@ module.exports = {
     authEditLocation,
     authDeleteUser,
     authValidateMembership,
-    authChangePassword
+    authChangePassword,
+    authDeleteService
 }

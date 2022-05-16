@@ -4,8 +4,8 @@ const CarService = require('../collections/cars')
 const HistoryService = require('../collections/history')
 const { historyTypes } = require('../collections/history/history.model')
 const { ROLES } = require('../collections/user/user.model')
-const Stripe = require('../connect/stripe')
 const UserService = require('../collections/user')
+const alertTypes = require('../helpers/alertTypes')
 
 exports.services = async (req, res) => {
     try {
@@ -150,4 +150,31 @@ exports.useService = async (req, res) => {
         req.session.alertType = alertTypes.ErrorAlert
         res.render(`Error trying to log service.`)
     }
+}
+
+/**
+ * This function deletes a service.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.delete = async (req, res) => {
+    console.log('Deleting services...')
+    const serviceID = req.params.id
+
+    try {
+        ServiceService.deleteService(serviceID)
+        // Set the message for alert. 
+        req.session.message = `Service Deleted.`
+        req.session.alertType = alertTypes.CompletedActionAlert
+
+    } catch (error) {
+        console.debug(error)
+        console.log(`ERROR-SERVICE-CONTROLLER : ${error.message}`)
+        req.session.message = "Can't delete service."
+        req.session.alertType = alertTypes.ErrorAlert
+    }
+
+    // Redirect to cars for update the utilization percentage.
+    res.redirect('/cars')
+
 }
