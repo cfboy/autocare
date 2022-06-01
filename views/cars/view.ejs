@@ -51,13 +51,22 @@
                                                 <div>
                                                     <h4 class="card-title card-title-dash"><%= lingua.car.info%></h4>
                                                 </div>
-                                                <% if(canEditCar) { %>
-                                                <a href="/edit-car/<%- car.id%>?url=/car" type="button"
-                                                    class="btn btn-primary btn-icon-text">
-                                                    <i class=" mdi mdi-square-edit-outline"></i> <%= lingua.car.edit%>
-                                                </a>
-                                                <% } %>
+                                                <div class="d-flex justify-content-between align-items-start">
 
+                                                    <a class="btn btn-primary btn-icon-text m-1" type="button"
+                                                        href="/customers/<%- car?.user_id%>">
+                                                        <i class="fa-solid fa-eye"></i>
+                                                        <!-- <i class="mdi mdi-view-headline"></i> -->
+                                                        <%= lingua.user.view%>
+                                                    </a>
+                                                    <% if(canEditCar) { %>
+                                                    <a href="/edit-car/<%- car.id%>?url=/car" type="button"
+                                                        class="btn btn-primary btn-icon-text m-1">
+                                                        <i class="far fa-edit"></i>
+                                                        <%= lingua.car.edit%>
+                                                    </a>
+                                                    <% } %>
+                                                </div>
                                             </div>
                                             <div class="table-responsive mt-1">
                                                 <table class="table table-hover">
@@ -162,7 +171,7 @@
                                                             <th><%= lingua.date%></th>
 
                                                             <th><%= lingua.car.name%></th>
-                                                            <% if([roles.ADMIN].includes(user.role) && service.duplicated) { %>
+                                                            <% if([roles.ADMIN].includes(user.role) && hasDuplicatedServices) { %>
                                                             <th>Action</th>
                                                             <% } %>
                                                         </tr>
@@ -186,14 +195,18 @@
                                                                 <br>
                                                                 <%= lingua.car.plate%>: <%- car?.plate%>
                                                             </td>
-                                                            <% if([roles.ADMIN].includes(user.role) && service.duplicated) { %>
+                                                            <% if([roles.ADMIN].includes(user.role) && hasDuplicatedServices) { %>
 
                                                             <td>
+                                                                <% if([roles.ADMIN].includes(user.role) && service.duplicated) { %>
+
                                                                 <a id="deleteBtn"
                                                                     onclick="return confirmDelete('/delete-service', '<%- service._id%>')"
                                                                     class="btn btn-icon btn-icon-no-border no-margin">
                                                                     <i class="fas fa-trash-alt icon-sm text-danger"></i>
                                                                 </a>
+                                                                <% } %>
+
                                                             </td>
                                                             <% } %>
 

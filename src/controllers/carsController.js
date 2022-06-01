@@ -100,6 +100,8 @@ exports.view = async (req, res) => {
         let { message, alertType } = req.session,
             user = req.user;
 
+        let hasDuplicatedServices = false
+
         if (message) {
             req.session.message = ''
             req.session.alertType = ''
@@ -137,6 +139,7 @@ exports.view = async (req, res) => {
                 if (group.services.length > 1) {
                     for (service of group.services) {
                         service.duplicated = true
+                        hasDuplicatedServices = true
                     }
                 }
             }
@@ -148,7 +151,8 @@ exports.view = async (req, res) => {
                 message,
                 alertType,
                 canEditCar: canEditCar(user, car.id, car.allServices),
-                canManageCars: canManageCars(user)
+                canManageCars: canManageCars(user),
+                hasDuplicatedServices
             })
         } else {
             message = 'Car not found.'
