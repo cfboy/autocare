@@ -138,6 +138,15 @@ const getUsersPerRoles = (User) => (roles) => {
 }
 
 /**
+ * This function get users excluding a role.
+ * @param {*} User 
+ * @returns user
+ */
+const getUsersExcludeRole = (User) => (role) => {
+    return User.find({ role: { $ne: role } }).populate('locations')
+}
+
+/**
  * This function get user by id.
  * @param {*} User 
  * @returns user
@@ -384,6 +393,7 @@ module.exports = (User) => {
         getUsers: getUsers(User),
         getUsersPerRole: getUsersPerRole(User),
         getUsersPerRoles: getUsersPerRoles(User),
+        getUsersExcludeRole: getUsersExcludeRole(User),
         getUserById: getUserById(User),
         getUserByEmail: getUserByEmail(User),
         getUserByBillingID: getUserByBillingID(User),

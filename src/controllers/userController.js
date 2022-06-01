@@ -39,7 +39,8 @@ exports.users = async (req, res) => {
             let users = []
 
             if ([ROLES.ADMIN, ROLES.MANAGER].includes(user.role))
-                users = await UserService.getUsers(user.id)
+                // users = await UserService.getUsers(user.id)
+                users = await UserService.getUsersExcludeRole(ROLES.CUSTOMER)
 
             res.render('user/index.ejs', { user, users, message, alertType })
 
