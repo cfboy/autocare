@@ -46,7 +46,7 @@ const addService = (Service) => async (car, authorizedBy, location, user, produc
         const service = await Service.findOneAndUpdate(query, update, options,
             (error, result) => {
                 if (error) {
-                    console.error(err.message)
+                    console.error(error.message)
                 } else {
                     console.debug("Service Added: ", result.id);
                 }
