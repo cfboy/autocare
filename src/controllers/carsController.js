@@ -385,18 +385,18 @@ exports.validatePlate = async (req, res) => {
             car = await CarService.getCarByPlate(plateNumber),
             subscriptionList = req.body.subscriptionList,
             existingCar = false
-
+        let customer, item = null
 
         if (car || subscriptionList?.some(car => car.plate === plateNumber)) {
             existingCar = true
         } else if (addToCart) {
-            let [customer, item] = await UserService.addItemToCart(req.user.id, newItem)
+            [customer, item] = await UserService.addItemToCart(req.user.id, newItem)
 
             if (customer && item)
                 console.debug('Item Added successfully')
         }
 
-        res.send({ existingCar: existingCar })
+        res.send({ existingCar: existingCar, item })
 
     } catch (error) {
         console.error("ERROR: carController -> Tyring to validate car plate.")

@@ -9,7 +9,7 @@ const serviceSchema = new Schema({
     car: { type: Schema.Types.ObjectId, ref: 'car', default: null },
     user: { type: Schema.Types.ObjectId, ref: 'user', default: null },
     product: String,
-    inputType: { type: String, enum: ['System', 'Manual'], default: 'Manual' },
+    inputType: { type: String, enum: ['System', 'Manual'], default: 'Manual' }
 })
 
 

@@ -20,10 +20,12 @@ const addService = (Service) => async (car, authorizedBy, location, user, produc
         // if (serviceID === '')
         // serviceID = Math.random().toString(36).toUpperCase().substring(2, 6)
 
-        let properties = {
-            // id is a random ID genetated with letters and numbers. 
+        let date = new Date()
+        date.setSeconds(0, 0)
+
+        const query = {
             id: serviceID,
-            // date: Date.now(),
+            created_date: date,
             location: location,
             authorizedBy: authorizedBy,
             user: user,
@@ -32,13 +34,29 @@ const addService = (Service) => async (car, authorizedBy, location, user, produc
             inputType: inputType
         }
 
-        const service = new Service(properties)
-            .populate({ path: 'location', model: 'location' })
+        const update = {
+        }
+
+        const options = {
+            upsert: true,
+            new: true,
+            setDefaultsOnInsert: true
+        }
+
+        const service = await Service.findOneAndUpdate(query, update, options,
+            (error, result) => {
+                if (error) {
+                    console.error(err.message)
+                } else {
+                    console.debug("Service Added: ", result.id);
+                }
+
+            }).populate({ path: 'location', model: 'location' })
             .populate({ path: 'authorizedBy', model: 'user' })
             .populate({ path: 'user', model: 'user' })
             .populate({ path: 'car', model: 'car' })
 
-        return await service.save()
+        return service
     } catch (error) {
         console.log(`ERROR: SERVICE-SERVICE: addService()`)
         console.log(error)

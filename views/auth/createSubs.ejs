@@ -148,7 +148,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.8/js/select2.min.js" defer></script>
     <script src="../../vendors/select2/select2.min.js"></script>
     <script src="../../js/select2.js"></script>
-    <!-- <script type="text/javascript" src="../js/account.js"></script> -->
     <script src="../js/helper-functions.js"></script>
 
     <!-- End custom js for this page-->
@@ -217,11 +216,11 @@
                         showResult('#plateValidationResult', reportMessage);
 
                     } else {
-                        console.log("newItem: " + newItem);
+                        // console.log("newItem: " + result.item);
                         showResult('#plateValidationResult',
                             `<p class="success"><%= lingua.car.validCar%></p>`);
 
-                        addDataToTable(newItem);
+                        addDataToTable(result.item);
                         // Clear all elements on form for next submit.
                         clearForm(form);
                         showResult('#plateValidationResult', ``);
@@ -235,8 +234,8 @@
         // Remove subscription
         $('#cart-table tbody').on('click', '.remove', function () {
             var t = $('#cart-table').DataTable();
-            var id = $(this).attr('id');
-            let itemToRemove = subscriptionList.find(item => item.id == id);
+            var id = $(this).attr('value');
+            let itemToRemove = subscriptionList.find(item => item._id == id);
 
             // Remove from the table.
             t.row($(this).parents('tr')).remove().draw();
@@ -286,7 +285,7 @@
                 newItem.product,
                 newItem.price,
                 `<td class="text-center">
-                                <button  id="${rowIdx}" class="btn btn-icon btn-icon-no-border no-margin remove">
+                                <button  id="${rowIdx}" value="${newItem._id}" class="btn btn-icon btn-icon-no-border no-margin remove">
                                     <i class="fas fa-trash-alt icon-sm text-danger"></i>
                                 </button>
                             </td>`
