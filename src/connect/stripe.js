@@ -52,6 +52,7 @@ const createCheckoutSession = async (customerID, subscriptions, subscriptionsEnt
             default_tax_rates: defaultTaxes,
 
         },
+        allow_promotion_codes: true,
         success_url: `${process.env.DOMAIN}/completeCheckoutSuccess?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${process.env.DOMAIN}`
     })
