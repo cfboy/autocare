@@ -123,23 +123,25 @@ exports.webhook = async (req, res) => {
 
                         req.io.emit('notifications', notification);
 
-                        //Send Email
-                        var resultEmail = await sendEmail(
-                            customer.email,
-                            lingua.email.title,
-                            {
-                                name: customer?.personalInfo?.firstName + ' ' + customer?.personalInfo?.lastName,
-                                message: alertInfo.message
-                            },
-                            "../template/subscriptions.handlebars"
-                        )
+                        if (process.env.NODE_ENV === "production") {
+                            //Send Email
+                            var resultEmail = await sendEmail(
+                                customer.email,
+                                lingua.email.title,
+                                {
+                                    name: customer?.personalInfo?.firstName + ' ' + customer?.personalInfo?.lastName,
+                                    message: alertInfo.message
+                                },
+                                "../template/subscriptions.handlebars"
+                            )
 
-                        if (resultEmail) {
-                            console.debug('Email Sent: ' + resultEmail?.accepted[0])
+                            if (resultEmail) {
+                                console.debug('Email Sent: ' + resultEmail?.accepted[0])
 
-                        } else {
+                            } else {
 
-                            console.debug('WARNING: Email Not Sent.')
+                                console.debug('WARNING: Email Not Sent.')
+                            }
                         }
 
 
@@ -254,23 +256,25 @@ exports.webhook = async (req, res) => {
 
                     req.io.emit('notifications', notification);
 
-                    //Send Email
-                    var resultEmail = await sendEmail(
-                        customer.email,
-                        lingua.email.title,
-                        {
-                            name: customer?.personalInfo?.firstName + ' ' + customer?.personalInfo?.lastName,
-                            message: alertInfo.message
-                        },
-                        "../template/subscriptions.handlebars"
-                    )
+                    if (process.env.NODE_ENV === "production") {
+                        //Send Email
+                        var resultEmail = await sendEmail(
+                            customer.email,
+                            lingua.email.title,
+                            {
+                                name: customer?.personalInfo?.firstName + ' ' + customer?.personalInfo?.lastName,
+                                message: alertInfo.message
+                            },
+                            "../template/subscriptions.handlebars"
+                        )
 
-                    if (resultEmail) {
-                        console.debug('Email Sent: ' + resultEmail?.accepted[0])
+                        if (resultEmail) {
+                            console.debug('Email Sent: ' + resultEmail?.accepted[0])
 
-                    } else {
+                        } else {
 
-                        console.debug('WARNING: Email Not Sent.')
+                            console.debug('WARNING: Email Not Sent.')
+                        }
                     }
 
                 } else {
