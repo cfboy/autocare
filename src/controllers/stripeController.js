@@ -48,7 +48,7 @@ exports.webhook = async (req, res) => {
         console.log(`WEBHOOK: Event: ${event.type}`)
         switch (event.type) {
             case 'customer.created':
-                console.debug(JSON.stringify(data))
+                // console.debug(JSON.stringify(data))
                 // TODO: verify if the customer exists, if not then create.
                 let hashPassword = await bcrypt.hash('Test1234', 10)
                 let firstName = data?.name?.split(' ')[0] ? data.name.split(' ')[0] : 'Test Name',
@@ -69,7 +69,7 @@ exports.webhook = async (req, res) => {
                     city: data?.address ? data?.address?.city : null
                 })
 
-                console.debug(`Customer created: ${user.email}`)
+                // console.debug(`Customer created: ${user.email}`)
 
                 break
             // case 'customer.deleted':
@@ -112,7 +112,7 @@ exports.webhook = async (req, res) => {
 
                             }
 
-                            console.debug(`WEBHOOK: Items to add ${items.length}`)
+                            // console.debug(`WEBHOOK: Items to add ${items.length}`)
 
                             alertInfo = { message: `Your membership ${subscription.id} has been created successfully.`, alertType: alertTypes.BasicAlert }
 
@@ -164,7 +164,7 @@ exports.webhook = async (req, res) => {
                         // ------------------- Handle utilization ------------------------------------------------------
                         // Verify if the period is changed.
                         if (subscription.current_period_start !== mySubscription.data.current_period_start || subscription.current_period_end !== mySubscription.data.current_period_end) {
-                            console.debug('stripeController --> The period is different.')
+                            // console.debug('stripeController --> The period is different.')
                             let cars = await SubscriptionService.getSubscriptionCarsById(subscription.id)
 
                             if (cars) {
@@ -419,8 +419,8 @@ exports.completeCheckoutSuccess = async (req, res) => {
 
         // clean cart items.
         let user = await UserService.emptyCart(req.user.id)
-        if (user.cart.items?.lenght == 0)
-            console.debug("The Cart is empty.")
+        // if (user.cart.items?.lenght == 0)
+        // console.debug("The Cart is empty.")
 
 
         if (session_id) {

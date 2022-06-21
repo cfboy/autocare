@@ -248,7 +248,7 @@ exports.save = async (req, res) => {
         let car = await CarService.addCar(fields.brand, fields.model, fields.plate, fields.userID)
 
         if (car) {
-            console.debug(`A new car added to DB. ID: ${car.id}.`)
+            // console.debug(`A new car added to DB. ID: ${car.id}.`)
 
             // Add car to subscription
             // fields.subItem.split('/')[0] has the subscription ID

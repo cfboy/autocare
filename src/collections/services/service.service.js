@@ -38,8 +38,9 @@ const addService = (Service) => async (car, authorizedBy, location, user, produc
 
         const options = {
             upsert: true,
-            new: true,
-            setDefaultsOnInsert: true
+            new: true
+            // ,
+            // setDefaultsOnInsert: true
         }
 
         const service = await Service.findOneAndUpdate(query, update, options,
@@ -108,9 +109,10 @@ const getServices = (Service) => async () => {
     return Service.find({}, function (err, docs) {
         if (err) {
             console.error(err)
-        } else {
-            console.debug("SERVICE-SERVICE: Found Services: ", docs.length);
         }
+        // else {
+        //     console.debug("SERVICE-SERVICE: Found Services: ", docs.length);
+        // }
     }).populate({ path: 'location', model: 'location' })
         .populate({ path: 'authorizedBy', model: 'user' })
         .populate({ path: 'user', model: 'user' })
@@ -126,9 +128,10 @@ const getServiceByID = (Service) => async (serviceID) => {
     return Service.findOne({ _id: serviceID }, function (err, docs) {
         if (err) {
             console.error(err)
-        } else {
-            console.debug("SERVICE-SERVICE: Found Service: ", docs.id);
         }
+        // else {
+        //     console.debug("SERVICE-SERVICE: Found Service: ", docs.id);
+        // }
     }).populate({ path: 'location', model: 'location' })
         .populate({ path: 'authorizedBy', model: 'user' })
         .populate({ path: 'user', model: 'user' })
@@ -148,11 +151,12 @@ const getServicesByCar = (Service) => async (car) => {
         .populate({ path: 'car', model: 'car' })
         .then(result => {
             if (result) {
-                console.debug(`getServicesByCar(): Successfully found ${result.length} services.`);
+                // console.debug(`getServicesByCar(): Successfully found ${result.length} services.`);
                 return result
-            } else {
-                console.debug("getServicesByCar(): No document matches the provided query.");
             }
+            //  else {
+            // console.debug("getServicesByCar(): No document matches the provided query.");
+            // }
         })
         .catch(err => console.error(`Failed to find document: ${err}`));
 }
@@ -175,11 +179,12 @@ const getServicesByCarBetweenDates = (Service) => async (car, startDate, endDate
         .populate({ path: 'car', model: 'car' })
         .then(result => {
             if (result) {
-                console.debug(`getServicesByCarBetweenDates(): Successfully found ${result.length} services.`);
+                // console.debug(`getServicesByCarBetweenDates(): Successfully found ${result.length} services.`);
                 return result
-            } else {
-                console.debug("getServicesByCarBetweenDates(): No document matches the provided query.");
             }
+            // else {
+            //     console.debug("getServicesByCarBetweenDates(): No document matches the provided query.");
+            // }
         })
         .catch(err => console.error(`Failed to find document: ${err}`));
 }
@@ -198,11 +203,12 @@ const getServicesByCars = (Service) => async (cars) => {
         .populate({ path: 'car', model: 'car' })
         .then(result => {
             if (result.length > 0) {
-                console.debug(`getServicesByCars(): Successfully found ${result.length} documents.`);
+                // console.debug(`getServicesByCars(): Successfully found ${result.length} documents.`);
                 return result
-            } else {
-                console.debug("getServicesByCars(): No document matches the provided query.");
             }
+            // else {
+            //     console.debug("getServicesByCars(): No document matches the provided query.");
+            // }
         })
         .catch(err => console.error(`Failed to find document: ${err}`));
 }

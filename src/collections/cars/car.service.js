@@ -13,9 +13,10 @@ const getCars = (Car) => async () => {
     return Car.find({}, function (err, docs) {
         if (err) {
             console.error(err)
-        } else {
-            console.debug("CAR-SERVICE: Found Cars: ", docs.length);
         }
+        // else {
+        //     console.debug("CAR-SERVICE: Found Cars: ", docs.length);
+        // }
     })
 }
 
@@ -29,9 +30,10 @@ const getOldCars = (Car) => async (id) => {
     return Car.find({ $and: [{ user_id: id }, { cancel_date: { $ne: null } }] }, function (err, docs) {
         if (err) {
             console.error(err)
-        } else {
-            console.debug("CAR-SERVICE: getOldCars: ", docs.length);
         }
+        // else {
+        //     console.debug("CAR-SERVICE: getOldCars: ", docs.length);
+        // }
     })
 }
 
@@ -39,9 +41,10 @@ const getCarsWithUserNull = (Car) => async () => {
     return Car.find({ user_id: { $eq: null } }, function (err, docs) {
         if (err) {
             console.error(err)
-        } else {
-            console.debug("CAR-SERVICE: Found Cars with user null: ", docs.length);
         }
+        // else {
+        //     console.debug("CAR-SERVICE: Found Cars with user null: ", docs.length);
+        // }
     })
 }
 
@@ -59,9 +62,10 @@ async function handleCarsWithUserNull(carsWithNull) {
             if (subscription) {
                 let updatedCar = await this.updateCar(carObj.id, { user_id: subscription.user.id })
                 console.debug('Updated Car: ' + updatedCar.brand)
-            } else {
-                console.debug('This Car not have subscription.')
             }
+            // else {
+            //     console.debug('This Car not have subscription.')
+            // }
             // }
         }
     }
@@ -77,9 +81,10 @@ const getCarsByList = (Car) => async (cars) => {
     return Car.find({ _id: { $in: cars } }, function (err, docs) {
         if (err) {
             console.error(err)
-        } else {
-            console.debug("CAR-SERVICE: Found Cars: ", docs.length);
         }
+        // else {
+        //     console.debug("CAR-SERVICE: Found Cars: ", docs.length);
+        // }
     })
 }
 
@@ -92,9 +97,10 @@ const getCarByID = (Car) => async (carID) => {
     return Car.findOne({ _id: carID }, function (err, docs) {
         if (err) {
             console.error(err)
-        } else {
-            console.debug("CAR-SERVICE: Found car: ", docs.brand);
         }
+        // else {
+        //     console.debug("CAR-SERVICE: Found car: ", docs.brand);
+        // }
     })
 }
 
@@ -154,9 +160,10 @@ const updateCars = (Car) => async (ids, updates) => {
     return await Car.updateMany({ _id: { $in: ids } }, updates, { new: true }, function (err, docs) {
         if (err) {
             console.error(err.message)
-        } else {
-            console.debug("Updated : ", docs?.n);
         }
+        // else {
+        //     console.debug("Updated : ", docs?.n);
+        // }
     })
 }
 
@@ -191,8 +198,8 @@ const getCarByPlate = (Car) => async (plate) => {
         } else {
             if (doc)
                 console.debug(`CAR-SERVICE: Found car: ${doc?.brand} - ${doc?.model} - ${doc?.plate}`);
-            else
-                console.debug(`CAR-SERVICE: Not Found car with plate: ${plate}`);
+            // else
+            //     console.debug(`CAR-SERVICE: Not Found car with plate: ${plate}`);
         }
     })
 }
@@ -207,9 +214,10 @@ const getAllCarsByUser = (Car) => async (user) => {
     return Car.find({ user_id: user.id }, function (err, docs) {
         if (err) {
             console.error(err)
-        } else {
-            console.debug(`CAR-SERVICE: Found Cars ${docs.length} By user: ${user.email}`);
-        }
+        } 
+        // else {
+        //     console.debug(`CAR-SERVICE: Found Cars ${docs.length} By user: ${user.email}`);
+        // }
     })
 }
 
@@ -223,7 +231,7 @@ async function getAllMakes() {
     let allMakes = [], allModels = []
 
     if (JSON.parse(process.env.USE_CAR_API)) {
-        console.debug("getAllMakes from API")
+        // console.debug("getAllMakes from API")
         const apiRoute = 'GetAllMakes?format=json'
         const apiResponse = await fetch(
             'https://vpic.nhtsa.dot.gov/api/vehicles/' + apiRoute
@@ -235,7 +243,7 @@ async function getAllMakes() {
             allMakes = apiResponseJSON?.Results
         }
     } else {
-        console.debug("getAllMakes from local list")
+        // console.debug("getAllMakes from local list")
         allMakes = require('../../helpers/carMakes').carMakes
     }
 

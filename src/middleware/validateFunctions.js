@@ -4,7 +4,7 @@ const alertTypes = require('../helpers/alertTypes')
 
 // TODO: Maybe invalid subs are wrong, because session is for all app and not for only the user.
 async function validateSubscriptions(req, res, next) {
-    console.debug('validateSubscriptions')
+    // console.debug('validateSubscriptions')
     let user = await SubscriptionService.setStripeInfoToUser(req.user)
     let invalidSubs = user?.subscriptions.filter(subs => subs.items.some(item => !item.isValid))
     req.session.invalidSubs = invalidSubs

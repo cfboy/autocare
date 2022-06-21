@@ -58,9 +58,10 @@ const getHistoryById = (History) => (id) => {
     return History.findOne({ _id: id }, function (err, docs) {
         if (err) {
             console.error(err)
-        } else {
-            console.debug("Founded History: ", docs);
         }
+        // else {
+        //     console.debug("Founded History: ", docs);
+        // }
     }).populate('user').populate('location')
 }
 
@@ -75,9 +76,10 @@ const getMyHistory = (History) => (userId) => {
     return History.find({ user: userId }, function (err, docs) {
         if (err) {
             console.error(err)
-        } else {
-            console.debug("Founded History: ", docs);
         }
+        // else {
+        //     console.debug("Founded History: ", docs);
+        // }
     }).populate('user').populate('location')
 }
 

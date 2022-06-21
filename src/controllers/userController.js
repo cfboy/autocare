@@ -436,7 +436,7 @@ exports.changeNotificationState = async (req, res) => {
         if (notificationId) {
             customer = await UserService.changeNotificationState(userId, notificationId, newStatus)
         } else if (allNotifications) {
-            console.debug("readAllNotifications")
+            // console.debug("readAllNotifications")
             customer = await UserService.readAllNotifications(userId)
         }
 

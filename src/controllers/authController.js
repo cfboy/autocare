@@ -54,7 +54,7 @@ exports.register = async (req, res) => {
 
         email = email?.toLowerCase()
 
-        console.debug('email', email)
+        // console.debug('email', email)
 
         let customer = await UserService.getUserByEmail(email)
         let customerInfo = {}
@@ -128,7 +128,7 @@ exports.register = async (req, res) => {
  * @param {*} res 
  */
 exports.logout = async (req, res) => {
-    console.debug('Log out...')
+    // console.debug('Log out...')
     req.logOut()
     res.redirect("/");
 }
