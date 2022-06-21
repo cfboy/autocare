@@ -92,7 +92,7 @@ const getCustomerByID = async (id) => {
         const customer = await Stripe.customers.retrieve(id, {
             expand: ['subscriptions'] //Expand the Customer Obj to get subscriptions info.
         })
-        console.debug(`STRIPE: Customer Found: ${customer.email}`);
+        // console.debug(`STRIPE: Customer Found: ${customer.email}`);
         return customer
 
     } catch (error) {
@@ -109,13 +109,13 @@ const getCustomerByID = async (id) => {
  */
 const getCustomerByEmail = async (email) => {
     try {
-        console.debug(`STRIPE: getCustomerByEmail(${email})`);
+        // console.debug(`STRIPE: getCustomerByEmail(${email})`);
 
         const customer = await Stripe.customers.list({
             limit: 1,
             email: email
         })
-        console.debug(`STRIPE: Customer Found`);
+        // console.debug(`STRIPE: Customer Found`);
         // Return the first and only object in the customer list.
         return customer.data[0]
 
@@ -139,7 +139,7 @@ const addNewCustomer = async (email,
     phoneNumber,
     city) => {
     try {
-        console.debug(`STRIPE: addNewCustomer()`);
+        // console.debug(`STRIPE: addNewCustomer()`);
 
         const customer = await Stripe.customers.create({
             email,
@@ -249,7 +249,7 @@ const getProductPrice = async (productID) => {
 const getProductInfoById = async (id) => {
     try {
         const product = await Stripe.products.retrieve(id)
-        console.debug(`STRIPE: Product ${id} Found`);
+        // console.debug(`STRIPE: Product ${id} Found`);
 
         return product
 
@@ -291,12 +291,12 @@ const getProductInfoById = async (id) => {
  */
 const getCustomerEvents = async (customerID) => {
     try {
-        console.debug(`STRIPE: getCustomerEvents(${customerID})`);
+        // console.debug(`STRIPE: getCustomerEvents(${customerID})`);
         let eventsToReturn = []
         let events = await Stripe.events.list({ limit: 50 });
 
         eventsToReturn = events.data.filter((event) => event.data.object.id === customerID)
-        console.debug(`STRIPE: Events Found ${eventsToReturn}`);
+        // console.debug(`STRIPE: Events Found ${eventsToReturn}`);
 
         return eventsToReturn
     } catch (error) {
@@ -317,7 +317,7 @@ const getCustomerCharges = async (user) => {
         let customerID = user.billingID,
             role = user.role
 
-        console.debug(`STRIPE: getCustomerCharges(${customerID})`);
+        // console.debug(`STRIPE: getCustomerCharges(${customerID})`);
         let chargesToReturn = []
         let charges = await Stripe.charges.list({
             // customer: customerID,
@@ -330,7 +330,7 @@ const getCustomerCharges = async (user) => {
             chargesToReturn = charges.data.filter(charge => charge?.customer === customerID)
 
 
-        console.debug(`STRIPE: Charges Found ${chargesToReturn.length}`);
+        // console.debug(`STRIPE: Charges Found ${chargesToReturn.length}`);
         if (chargesToReturn.length > 0) {
             for (charge of chargesToReturn) {
                 charge.amount = Dinero({ amount: charge.amount }).toFormat('$0,0.00')
@@ -355,7 +355,7 @@ const getCustomerInvoices = async (user) => {
         let customerID = user.billingID,
             role = user.role
 
-        console.debug(`STRIPE: getCustomerInvoices(${customerID})`);
+        // console.debug(`STRIPE: getCustomerInvoices(${customerID})`);
         let invoicesToReturn = []
         let invoices = await Stripe.invoices.list({
             // customer: customerID,
@@ -368,7 +368,7 @@ const getCustomerInvoices = async (user) => {
             invoicesToReturn = invoices.data.filter(invoice => invoice?.customer === customerID)
 
 
-        console.debug(`STRIPE: Invoices Found ${invoicesToReturn.length}`);
+        // console.debug(`STRIPE: Invoices Found ${invoicesToReturn.length}`);
         if (invoicesToReturn.length > 0) {
             for (invoice of invoicesToReturn) {
                 invoice.total = Dinero({ amount: invoice.total }).toFormat('$0,0.00')
@@ -404,7 +404,7 @@ async function getSubscriptionById(id) {
             expand: ['items.data.price.product']
         })
 
-    console.debug("Subscription: " + subscription.id)
+    // console.debug("Subscription: " + subscription.id)
 
     return subscription
 }
@@ -431,7 +431,7 @@ async function getCustomerBalanceTransactions(id) {
         id
     );
 
-    console.debug("Balance Transactions: " + balanceTransactions.data.length)
+    // console.debug("Balance Transactions: " + balanceTransactions.data.length)
 
     let total = 0.00
     for (balance of balanceTransactions.data) {

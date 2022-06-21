@@ -226,7 +226,7 @@ exports.carCheck = async (req, res) => {
  */
 exports.handleInvalidSubscriptions = async (req, res) => {
     try {
-        console.debug('handleInvalidSubscriptions')
+        // console.debug('handleInvalidSubscriptions')
         const user = req.user
         let { invalidSubs, message, alertType } = req.session
 
@@ -249,7 +249,7 @@ exports.handleInvalidSubscriptions = async (req, res) => {
 
 exports.confirmValidCars = async (req, res) => {
     try {
-        console.debug('confirmValidCars')
+        // console.debug('confirmValidCars')
 
         let { subscriptionID, selectedCars, carsToRemove } = req.body
 

@@ -229,9 +229,9 @@
             selected.push($(this).val());
             toRemove.splice($.inArray($(this).val(), toRemove), 1);
         });
-        console.debug('Selected: ' + selected);
+        // console.debug('Selected: ' + selected);
 
-        console.debug('toRemove: ' + toRemove);
+        // console.debug('toRemove: ' + toRemove);
 
         selectedDisplay.html(`(${selected.length?.toString()}/${requiredQty?.toString()})`);
 

@@ -132,9 +132,10 @@ const getSubscriptionById = (Subscription) => (id) => {
     return Subscription.findOne({ id: id }, function (err, docs) {
         if (err) {
             console.error(err)
-        } else {
-            console.debug("Subscription-SERVICE: Found subscription: ", docs?.id);
         }
+        // else {
+        // console.debug("Subscription-SERVICE: Found subscription: ", docs?.id);
+        // }
     }).populate('user').populate({ path: 'items.cars', model: 'car' })
 }
 
@@ -150,9 +151,10 @@ const getSubscriptionByCar = (Subscription) => async (car) => {
         function (err, docs) {
             if (err) {
                 console.error(err)
-            } else {
-                console.debug("Subscription-SERVICE: Found subscription: ", docs?.id);
             }
+            // else {
+            // console.debug("Subscription-SERVICE: Found subscription: ", docs?.id);
+            // }
         }).populate('user').populate({ path: 'items.cars', model: 'car' })
 }
 
@@ -169,10 +171,11 @@ const getSubscriptionItemByCar = (Subscription) => async (car) => {
             if (result) {
                 console.debug(`getSubscriptionItemByCar(): Successfully found ${result?.id}.`);
                 let item = result.items.find(item => item.cars.find(carObj => carObj.id == car.id))
-                return {item, subscription: result}
-            } else {
-                console.debug("getSubscriptionItemByCar(): No document matches the provided query.");
+                return { item, subscription: result }
             }
+            // else {
+            //     console.debug("getSubscriptionItemByCar(): No document matches the provided query.");
+            // }
         })
         .catch(err => console.error(`Failed to find document: ${err}`));
 }
@@ -187,9 +190,10 @@ const getSubscriptionCarsById = (Subscription) => async (id) => {
                     itemsToReturn = itemsToReturn.concat(item.cars)
                 }
                 return itemsToReturn
-            } else {
-                console.debug("getSubscriptionCarsById(): No document matches the provided query.");
             }
+            // else {
+            //     console.debug("getSubscriptionCarsById(): No document matches the provided query.");
+            // }
         })
         .catch(err => console.error(`Failed to find document: ${err}`));
 }
@@ -207,7 +211,7 @@ async function setStripeInfoToUser(customerObj) {
         let customer = customerObj
 
         if (customer?.subscriptions) {
-            console.debug(`STRIPE: The customer is already has the subscriptions set.`);
+            console.debug(`STRIPE: The customer ${customer.email} is already has the subscriptions set.`);
         }
         else {
             customer.subscriptions = await this.getSubscriptionsByUser(customer)
@@ -222,7 +226,7 @@ async function setStripeInfoToUser(customerObj) {
                 }
             }
 
-            console.debug(`STRIPE: Set Stripe Info to User done.`);
+            // console.debug(`STRIPE: Set Stripe Info to User done.`);
         }
 
         return customer
@@ -250,16 +254,16 @@ async function validateItemQty(item) {
         let isValid = false
 
         if (itemObj) {
-            console.debug('Cars Qty: ' + itemObj?.cars?.length)
-            console.debug('Item Qty: ' + itemObj?.data?.quantity)
+            // console.debug('Cars Qty: ' + itemObj?.cars?.length)
+            // console.debug('Item Qty: ' + itemObj?.data?.quantity)
 
             if (itemObj?.cars?.length == itemObj?.data?.quantity) {
-                console.debug('Item has the same quantity.')
+                // console.debug('Item has the same quantity.')
                 isValid = true
             }
             else if (itemObj?.cars?.length > itemObj?.data?.quantity) {
                 // This case is when the item has more cars than it can have. 
-                console.debug('Item has more cars than quantity. ')
+                // console.debug('Item has more cars than quantity. ')
                 // Verify if any car dont have cancel_date set. 
                 let notNeedSetCancelDate = itemObj.cars.filter(car => car.cancel_date == null)?.length === itemObj?.data?.quantity
 
@@ -270,13 +274,13 @@ async function validateItemQty(item) {
             else if (itemObj?.cars?.length < itemObj?.data?.quantity) {
                 // Need add more cars.
 
-                console.debug('Item has less cars than quantity. ')
+                // console.debug('Item has less cars than quantity. ')
             }
 
         }
 
 
-        console.debug(`STRIPE: validateSubscriptionItems() done.`);
+        // console.debug(`STRIPE: validateSubscriptionItems() done.`);
         return isValid
 
     } catch (error) {
@@ -301,7 +305,7 @@ module.exports = (Subscription) => {
         getSubscriptionById: getSubscriptionById(Subscription),
         getSubscriptionByCar: getSubscriptionByCar(Subscription),
         getSubscriptionItemByCar: getSubscriptionItemByCar(Subscription),
-        getSubscriptionCarsById : getSubscriptionCarsById(Subscription),
+        getSubscriptionCarsById: getSubscriptionCarsById(Subscription),
         setStripeInfoToUser: setStripeInfoToUser,
         validateItemQty: validateItemQty
     }
