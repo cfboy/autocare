@@ -121,8 +121,8 @@ const addCar = (Car) => async (brand, model, plate, user_id) => {
 
         return await car.save()
     } catch (error) {
-        console.debug(error)
         console.log(`ERROR: CAR-SERVICE: addCar()`)
+        console.error(error)
         return null
     }
 }

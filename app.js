@@ -109,6 +109,6 @@ server.listen(port, () => {
 });
 
 io.on('connect', (socket) => {
-    console.log("Socket connected: " + socket.connected)
-    console.log("Socket ID: " + socket.id)
+    console.debug("Socket connected: " + socket.connected)
+    console.debug("Socket ID: " + socket.id)
 });

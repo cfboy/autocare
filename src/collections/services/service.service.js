@@ -4,7 +4,6 @@
  * @returns Service object
  */
 const addService = (Service) => async (car, authorizedBy, location, user, product, inputType) => {
-    // TODO: change this to find first then create new car.
     try {
         if (!car || !authorizedBy || !location || !user || !product) {
             throw new Error(`Missing Data. Please provide all data=>
@@ -25,16 +24,16 @@ const addService = (Service) => async (car, authorizedBy, location, user, produc
 
         const query = {
             id: serviceID,
-            created_date: date,
+            created_date: date
+        }
+
+        const update = {
             location: location,
             authorizedBy: authorizedBy,
             user: user,
             car: car,
             product: product,
             inputType: inputType
-        }
-
-        const update = {
         }
 
         const options = {
@@ -59,7 +58,7 @@ const addService = (Service) => async (car, authorizedBy, location, user, produc
         return service
     } catch (error) {
         console.log(`ERROR: SERVICE-SERVICE: addService()`)
-        console.log(error)
+        console.error(error)
         return null
     }
 }
