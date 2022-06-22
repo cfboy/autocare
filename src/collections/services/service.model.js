@@ -12,6 +12,8 @@ const serviceSchema = new Schema({
     inputType: { type: String, enum: ['System', 'Manual'], default: 'Manual' }
 })
 
+serviceSchema.indexes({created_date: 1, car: 1 }, { unique: true })
+
 
 const Service = mongoose.model('service', serviceSchema, 'service')
 

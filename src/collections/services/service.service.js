@@ -24,10 +24,7 @@ const addService = (Service) => async (car, authorizedBy, location, user, produc
 
         const query = {
             id: serviceID,
-            created_date: date
-        }
-
-        const update = {
+            created_date: date,
             location: location,
             authorizedBy: authorizedBy,
             user: user,
@@ -36,11 +33,14 @@ const addService = (Service) => async (car, authorizedBy, location, user, produc
             inputType: inputType
         }
 
+        const update = {
+
+        }
+
         const options = {
             upsert: true,
-            new: true
-            // ,
-            // setDefaultsOnInsert: true
+            new: true,
+            setDefaultsOnInsert: true
         }
 
         const service = await Service.findOneAndUpdate(query, update, options,
