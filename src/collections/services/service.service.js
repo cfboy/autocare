@@ -24,10 +24,7 @@ const addService = (Service) => async (car, authorizedBy, location, user, produc
 
         const query = {
             id: serviceID,
-            created_date: date
-        }
-
-        const update = {
+            created_date: date,
             location: location,
             authorizedBy: authorizedBy,
             user: user,
@@ -36,24 +33,23 @@ const addService = (Service) => async (car, authorizedBy, location, user, produc
             inputType: inputType
         }
 
+        const update = {
+
+        }
+
         const options = {
             upsert: true,
             new: true,
             setDefaultsOnInsert: true
         }
 
-        const service = await Service.findOneAndUpdate(query, update, options,
-            (error, result) => {
-                if (error) {
-                    console.error(error.message)
-                } else {
-                    console.debug("Service Added: ", result.id);
-                }
-
-            }).populate({ path: 'location', model: 'location' })
+        const service = await Service.findOneAndUpdate(query, update, options)
+            .populate({ path: 'location', model: 'location' })
             .populate({ path: 'authorizedBy', model: 'user' })
             .populate({ path: 'user', model: 'user' })
             .populate({ path: 'car', model: 'car' })
+
+        console.log(`SERVICE-SERVICE: New Service ID: ${service.id}`)
 
         return service
     } catch (error) {
