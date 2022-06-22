@@ -126,7 +126,7 @@
                             <% } %>
                             <% if(!car?.hasService) { %>
                             <button id="use-service-button" user-id="<%= customer?.id%>" car-id="<%= car?.id%>"
-                                inputType="<%= inputType%>"
+                                inputType="<%= inputType%>" onclick="confirmValidation(this)"
                                 class="btn btn-block btn-success btn-lg font-weight-medium btn-icon-text m-1"
                                 type="submit">
                                 <%= lingua.service.use%>
@@ -157,5 +157,39 @@
         </div>
     </div>
 </div>
-<!-- Included account.js for manage billing actions. -->
-<script type="text/javascript" src="./js/account.js"></script>
+<script>
+
+    function confirmValidation(element) {
+
+        const userID = element.getAttribute("user-id");
+        const carID = element.getAttribute("car-id");
+        const inputType = element.getAttribute("inputType");
+
+        console.log(`confirmValidation: userID: ${userID} - carID: ${carID} - inputType: ${inputType}`)
+
+        $.ajax({
+            url: "/useService",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({
+                userID: userID,
+                carID: carID,
+                inputType: inputType
+            }),
+            beforeSend: function () {
+                showResult('#useServiceUpdate',
+                    `<div class="spinner text-center p-5">
+                            <div class="spinner-grow"></div>
+                    </div>`
+                );
+
+            }
+        }).done(function (result) {
+            showResult('#useServiceUpdate', result);
+            // cleanInput("tagNumber");
+        }).fail(function (err) {
+            console.log(err);
+        })
+
+    }
+</script>
