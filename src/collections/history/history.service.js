@@ -8,7 +8,7 @@ const addHistory = (History) => async (description, type, user, location) => {
         throw new Error(`Missing Data. Please provide the description of the history.`)
     }
 
-    console.log(`historyService: addHistory()`)
+    // console.log(`historyService: addHistory()`)
 
     const history = new History({
         description,
