@@ -24,17 +24,16 @@ const addService = (Service) => async (car, authorizedBy, location, user, produc
 
         const query = {
             id: serviceID,
-            created_date: date,
+            created_date: date
+        }
+
+        const update = {
             location: location,
             authorizedBy: authorizedBy,
             user: user,
             car: car,
             product: product,
             inputType: inputType
-        }
-
-        const update = {
-
         }
 
         const options = {
