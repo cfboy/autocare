@@ -202,6 +202,7 @@ async function getAllProducts() {
 async function getAllPrices() {
     const prices = await Stripe.prices.list({
         active: true,
+        limit: 100,
         expand: ['data.product']
     })
 

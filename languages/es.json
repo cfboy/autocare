@@ -1,6 +1,7 @@
 {
     "home": "Inicio",
-    "month": "Mes",
+    "month": "mes",
+    "months" : "meses",
     "termsAndConditions": "Términos y Condiciones",
     "title": "Portal de Membresías",
     "welcome": "Bienvenido",

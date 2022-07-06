@@ -459,7 +459,7 @@ exports.removeFromCart = async (req, res) => {
 
     let user = await UserService.removeItemFromCart(req.user.id, itemToRemove)
     if (user)
-        returnValues = { itemRemoved: true, subscriptionList: user.cart }
+        returnValues = { itemRemoved: true, subscriptionList: user.cart?.items }
     else
         returnValues = { itemRemoved: false, subscriptionList: [] }
 

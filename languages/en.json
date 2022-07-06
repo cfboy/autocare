@@ -1,6 +1,7 @@
 {
     "home": "Home",
-    "month": "Month",
+    "month": "month",
+    "months" : "months",
     "termsAndConditions": "Terms and Conditions",
     "title": "Membership Portal",
     "welcome": "Welcome",
