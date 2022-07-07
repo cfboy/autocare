@@ -2,6 +2,7 @@
 //Use v2.0 to use the module in code (for versions prior to version):
 const fetch = require('node-fetch');
 const SubscriptionService = require('../subscription')
+const { STATUS } = require('../../connect/stripe')
 
 /**
  * This function get all cars from the db.
@@ -37,6 +38,11 @@ const getOldCars = (Car) => async (id) => {
     })
 }
 
+/**
+ * This function get all cars with the user_id field null.
+ * @param {*} Car 
+ * @returns Car List
+ */
 const getCarsWithUserNull = (Car) => async () => {
     return Car.find({ user_id: { $eq: null } }, function (err, docs) {
         if (err) {
@@ -49,7 +55,7 @@ const getCarsWithUserNull = (Car) => async () => {
 }
 
 /**
- * This function get all cars from the db.
+ * This function assing the user id to the cars with user_id field null.
  * 
  * @param {} Car 
  * @returns Car list
@@ -214,13 +220,41 @@ const getAllCarsByUser = (Car) => async (user) => {
     return Car.find({ user_id: user.id }, function (err, docs) {
         if (err) {
             console.error(err)
-        } 
+        }
         // else {
         //     console.debug(`CAR-SERVICE: Found Cars ${docs.length} By user: ${user.email}`);
         // }
     })
 }
 
+
+/**
+ * This function return all cars by user object without.
+ * @param {*} user 
+ * @returns car list
+ */
+const getAllCarsByUserWithoutSubs = (Car) => async (user) => {
+    console.debug("getAllCarsByUserWithoutSubs()...")
+    let carsToReturn = []
+
+    let cars = await Car.find({ user_id: user.id }, function (err, docs) {
+        if (err) {
+            console.error(err)
+        }
+    })
+
+    if (cars) {
+        for (carObj of cars) {
+            let subscription = await SubscriptionService.getSubscriptionByCar(carObj)
+
+            if (!subscription || subscription.data.state == STATUS.CANCELED)
+                carsToReturn.push(carObj)
+
+        }
+    }
+
+    return carsToReturn
+}
 
 /**
  * This function get all makes from external API.
@@ -266,6 +300,7 @@ module.exports = (Car) => {
         getCarByPlate: getCarByPlate(Car),
         getAllMakes: getAllMakes,
         getAllCarsByUser: getAllCarsByUser(Car),
+        getAllCarsByUserWithoutSubs: getAllCarsByUserWithoutSubs(Car),
         handleCarsWithUserNull: handleCarsWithUserNull
     }
 }

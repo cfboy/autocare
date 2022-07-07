@@ -137,6 +137,7 @@
                                                             <th><%= lingua.car.brand%></th>
                                                             <th><%= lingua.car.model%></th>
                                                             <th><%= lingua.car.plate%></th>
+                                                            <th><%= lingua.membership.name%></th>
                                                             <th><%= lingua.action%></th>
                                                         </tr>
                                                     </thead>
@@ -153,8 +154,13 @@
 
                                                             <td><%- car.model%></td>
                                                             <td><%- car.plate%></td>
-
-                                                            <td class="text-center">
+                                                            <td>
+                                                                <%# car.subscription.data%>
+                                                                <span style="text-transform: uppercase;">
+                                                                    <%- car.subscription.data.status%>
+                                                                </span>
+                                                            </td>
+                                                            <td>
                                                                 <% if(enableActions) { %>
                                                                 <a href="/edit-car/<%- car.id%>?url=/cars" type="button"
                                                                     class="btn btn-icon btn-icon-no-border no-margin pt-0 pb-0">

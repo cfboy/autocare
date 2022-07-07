@@ -28,7 +28,9 @@ exports.createSubscriptions = async (req, res) => {
 
             const prices = await Stripe.getAllPrices()
 
-            res.render('auth/createSubs.ejs', { cart, message, alertType, user, allMakes, allModels, prices })
+            let userCars = await CarService.getAllCarsByUserWithoutSubs(user)
+
+            res.render('auth/createSubs.ejs', { cart, message, alertType, user, allMakes, allModels, prices, userCars })
         } else {
             req.session.message = "This user don't have stripe account."
             req.session.alertType = alertTypes.WarningAlert

@@ -144,7 +144,15 @@
                     (<%= moment(stripeSubscription?.data?.current_period_start * 1000).isValid() ? moment(stripeSubscription?.data?.current_period_start * 1000).format(shortDateFormat) : 'N/A' %>)
                     /
                     (<%= moment(stripeSubscription?.data?.current_period_end * 1000).isValid() ? moment(stripeSubscription?.data?.current_period_end * 1000).format(shortDateFormat) : 'N/A' %>)
-
+                    <br>
+                    <br>
+                    <% if(stripeSubscription?.data.cancel_at) { %>
+                    <b>
+                        Cancel At:
+                        <br>
+                        <%= moment(stripeSubscription?.data?.cancel_at * 1000).isValid() ? moment(stripeSubscription?.data?.cancel_at * 1000).format(shortDateFormat) : 'N/A' %>
+                    </b>
+                    <% } %>
                 </td>
                 <td class="text-center">
                     <span style="text-transform: uppercase;">
