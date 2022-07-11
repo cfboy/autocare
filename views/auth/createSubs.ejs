@@ -53,7 +53,41 @@
                                     <form id="form-subscriptions" class="pt-3" method="post">
                                         <div class="row">
                                             <input id="userID" name="userID" value="<%= user.id%>" hidden />
+                                            <h5><i class="fa-solid fa-1 list-number"></i>
+                                                <%= lingua.car.selectOrCreate%>
+                                            </h5>
+                                            <hr>
+                                            <% if(userCars.length > 0) { %>
+                                            <div class="col-lg-12">
+                                                <div class="form-group">
+                                                    <label for="myCar"><%= lingua.car.myCars%>
+                                                        <i class="fa-solid fa-circle-info warning" data-toggle="tooltip"
+                                                            title="Select a car to autofill the form fields."></i>
+                                                    </label>
+
+                                                    <select id="myCar" name="myCar" onchange="autofillCarInfo(this)"
+                                                        class="form-control mb-3 form-control-lg js-example-basic-single w-100">
+                                                        <option value=""><%= lingua.selectOne%></option>
+                                                        <% for(const car of userCars) { %>
+                                                        <!-- All properties are necessary to autofill the other fields. -->
+                                                        <option value="<%= car.id%>" name="<%= car.id%>"
+                                                            brand="<%= car.brand%>" model="<%= car.model%>"
+                                                            plate="<%= car.plate%>">
+                                                            <%= car.brand%> - <%= car.model%> - <%= car.plate%>
+                                                        </option>
+                                                        <% } %>
+                                                    </select>
+                                                    <br>
+                                                    <div id="autofillLoading"></div>
+                                                </div>
+                                            </div>
+                                            <% } %>
                                             <%- include('../cars/formFields.ejs', {allMakes, car: null}); %>
+
+                                            <h5><i class="fa-solid fa-2 list-number"></i>
+                                                <%= lingua.membership.selectMembership%>
+                                            </h5>
+                                            <hr>
                                             <div class="col-lg-12">
                                                 <div class="form-group">
                                                     <label for="product"
@@ -210,9 +244,9 @@
                     }),
                 }).done(function (result) {
                     if (result.existingCar) {
-                        document.getElementById("carPlate").setCustomValidity("<%= lingua.car.existingCar%>");
+                        document.getElementById("carPlate").setCustomValidity(result.invalidMsj);
                         document.getElementById("carPlate").reportValidity();
-                        let reportMessage = `<p class="error"><%= lingua.car.existingCar%>.</p>`
+                        let reportMessage = `<p class="error">` + result.invalidMsj + `</p>`
                         showResult('#plateValidationResult', reportMessage);
 
                     } else {
@@ -300,9 +334,40 @@
             if (subscriptionList.length > 0)
                 checkoutBtn.removeAttr('hidden');
         }
+
+        function autofillCarInfo(selectedCar) {
+            if (selectedCar) {
+
+                let id = selectedCar.selectedOptions[0].getAttribute('value');
+                let brand = selectedCar.selectedOptions[0].getAttribute('brand');
+                let model = selectedCar.selectedOptions[0].getAttribute('model');
+                let plate = selectedCar.selectedOptions[0].getAttribute('plate');
+                let carBrand = $('#brand');
+                let carModel = $('#carModel');
+                let carPlate = $('#carPlate');
+
+                carBrand.attr('disabled', true);
+                carModel.attr('disabled', true);
+                carPlate.attr('disabled', true);
+
+                showResult('#autofillLoading', `<span class="d-block alert-fill-info rounded-1 p-2"><%= lingua.loading%>...</span>`)
+
+                // Set the values to the form fields.
+                carBrand.select2().val(brand).trigger('change'); //This trigger the function findModel on cars.js
+                carBrand.attr('disabled', false);
+                // Set timeout in which the models loads.
+                setTimeout(function () {
+                    carModel.attr('disabled', true);
+                    carModel.select2().val(model).trigger('change');
+                    carModel.attr('disabled', false);
+                    carPlate.attr('disabled', false);
+                    carPlate.val(plate);
+                    showResult('#autofillLoading', "")
+                }, 1500);
+
+            }
+
+        }
     </script>
-
 </body>
-
-
 </html>

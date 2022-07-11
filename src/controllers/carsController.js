@@ -381,14 +381,25 @@ exports.delete = async (req, res) => {
  */
 exports.validatePlate = async (req, res) => {
     try {
+        const lingua = req.res.lingua.content
+
         let { plateNumber, newItem, addToCart } = req.body,
             car = await CarService.getCarByPlate(plateNumber),
             subscriptionList = req.body.subscriptionList,
-            existingCar = false
+            invalidCar = false,
+            invalidMsj = ''
+        canUseThisCar = car ? await CarService.canUseThisCarForNewSubs(car) : false
         let customer, item = null
 
-        if (car || subscriptionList?.some(car => car.plate === plateNumber)) {
-            existingCar = true
+        // if the canUseThisCar is true, it means that this car is an existing and valid car to assign to a new membership.
+        if ((car && !canUseThisCar)) {
+            invalidCar = true
+            invalidMsj = lingua.car.existingCar
+
+        } else if (subscriptionList?.some(car => car.plate === plateNumber)) {
+            invalidCar = true
+            invalidMsj = lingua.car.alreadyAddedToCart
+
         } else if (addToCart) {
             [customer, item] = await UserService.addItemToCart(req.user.id, newItem)
 
@@ -396,7 +407,7 @@ exports.validatePlate = async (req, res) => {
                 console.debug('Item Added successfully')
         }
 
-        res.send({ existingCar: existingCar, item })
+        res.send({ existingCar: invalidCar, invalidMsj: invalidMsj, item })
 
     } catch (error) {
         console.error("ERROR: carController -> Tyring to validate car plate.")

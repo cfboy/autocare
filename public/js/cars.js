@@ -16,6 +16,7 @@ function findModel(makeName, carModel = null, select) {
         // }
         // });
     } else {
+        // TODO: add backup if the API its not working.
         $.ajax({
             url: "https://vpic.nhtsa.dot.gov/api/vehicles/GetModelsForMake/" + makeName,
             type: "GET",

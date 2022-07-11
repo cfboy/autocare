@@ -100,13 +100,13 @@ const getCarsByList = (Car) => async (cars) => {
  * @returns Car
  */
 const getCarByID = (Car) => async (carID) => {
-    return Car.findOne({ _id: carID }, function (err, docs) {
+    return Car.findOne({ _id: carID }, function (err, doc) {
         if (err) {
             console.error(err)
         }
-        // else {
-        //     console.debug("CAR-SERVICE: Found car: ", docs.brand);
-        // }
+        else if (!doc) {
+            console.debug("CAR-SERVICE: Not found car");
+        }
     })
 }
 
@@ -247,14 +247,33 @@ const getAllCarsByUserWithoutSubs = (Car) => async (user) => {
         for (carObj of cars) {
             let subscription = await SubscriptionService.getSubscriptionByCar(carObj)
 
-            if (!subscription || subscription.data.state == STATUS.CANCELED)
+            if (!subscription || subscription.data.status == STATUS.CANCELED)
                 carsToReturn.push(carObj)
 
         }
     }
 
+    console.debug('Existing cars available to use for other membership. - ' + carsToReturn?.length)
     return carsToReturn
 }
+
+/**
+ * This function return a flag if the car can be used or not for a new subscription.
+ * @param {*} user 
+ * @returns car list
+ */
+async function canUseThisCarForNewSubs(car) {
+    console.debug("canUseThisCarForNewSubs()...")
+    let canUse = false
+    if (car) {
+        let subscription = await SubscriptionService.getSubscriptionByCar(car)
+        if (!subscription || subscription.data.status == STATUS.CANCELED)
+            canUse = true
+    }
+
+    return canUse
+}
+
 
 /**
  * This function get all makes from external API.
@@ -301,6 +320,7 @@ module.exports = (Car) => {
         getAllMakes: getAllMakes,
         getAllCarsByUser: getAllCarsByUser(Car),
         getAllCarsByUserWithoutSubs: getAllCarsByUserWithoutSubs(Car),
+        canUseThisCarForNewSubs: canUseThisCarForNewSubs,
         handleCarsWithUserNull: handleCarsWithUserNull
     }
 }
