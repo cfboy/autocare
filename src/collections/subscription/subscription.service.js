@@ -146,7 +146,7 @@ const getSubscriptionById = (Subscription) => (id) => {
  */
 const getSubscriptionByCar = (Subscription) => async (car) => {
     return Subscription.findOne({
-        "items.cars": { _id: car.id }
+        "items.cars": { _id: (car.id ? car.id : car._id) } //Added the conditional statemet if the car.id is undefined.
     },
         function (err, docs) {
             if (err) {

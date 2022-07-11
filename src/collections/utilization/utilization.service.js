@@ -1,3 +1,7 @@
+const SubscriptionService = require('../subscription')
+const ServiceService = require('../services')
+const CarService = require('../cars')
+
 /**
  * This function get all utilization from the db.
  * 
@@ -69,11 +73,52 @@ const addUtilization = (Utilization) => async (car, startDate, endDate, services
     }
 }
 
+/**
+ * This function synchronize or update the utilization percentage per car if its necessary. 
+ * @param {*} cars 
+ * @returns updatedCars qty
+ */
+async function syncCarsUtilization(cars) {
+    try {
+        let updatedCars = 0;
+        console.debug("Start syncCarsUtilization() for " + cars?.length + " cars...")
+        // Execute this logic for Admins and Managers to calculate utilization on old cars.
+        for (carObj of cars) {
+            let subscription = await SubscriptionService.getSubscriptionByCar(carObj)
+            let startDate = new Date(subscription.data.current_period_start * 1000),
+                endDate = new Date(subscription.data.current_period_end * 1000),
+                daysBetweenTwoDates = (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24)
+
+            let services = await ServiceService.getServicesByCarBetweenDates(carObj, startDate, endDate),
+                percentage = (services.length / daysBetweenTwoDates)
+
+            if (carObj.utilization?.start_date == null || carObj.utilization?.end_date == null || carObj?.utilization?.services != services.length || carObj?.utilization?.percentage != percentage) {
+                await CarService.updateCar(carObj.id, {
+                    'utilization.start_date': startDate,
+                    'utilization.end_date': endDate,
+                    'utilization.services': services.length,
+                    'utilization.percentage': percentage
+                })
+                updatedCars++
+            }
+        }
+
+        return updatedCars
+    }
+    catch (error) {
+        console.log(`ERROR: UTILIZATION-SERVICE: syncCarsUtilization()`)
+        console.error(error)
+    }
+}
+
+
+
 module.exports = (Utilization) => {
     return {
         getUtilization: getUtilization(Utilization),
         getUtilizationByCar: getUtilizationByCar(Utilization),
         getUtilizationByCarsList: getUtilizationByCarsList(Utilization),
-        addUtilization: addUtilization(Utilization)
+        addUtilization: addUtilization(Utilization),
+        syncCarsUtilization: syncCarsUtilization
     }
 }

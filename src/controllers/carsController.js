@@ -6,7 +6,6 @@ const CarService = require('../collections/cars')
 const HistoryService = require('../collections/history')
 const { historyTypes } = require('../collections/history/history.model')
 const alertTypes = require('../helpers/alertTypes')
-const Stripe = require('../connect/stripe')
 const UtilizationService = require('../collections/utilization')
 const { canDeleteCar,
     canManageCars,
@@ -38,32 +37,13 @@ exports.cars = async (req, res) => {
         if (!user) {
             res.redirect('/')
         } else {
-            // Handle invalid Cars
-            let nullUserCars = await CarService.getCarsWithUserNull()
-            if (nullUserCars.length > 0)
-                await CarService.handleCarsWithUserNull(nullUserCars)
-
             if ([ROLES.ADMIN, ROLES.MANAGER].includes(user.role)) {
+                // Handle invalid Cars
+                let nullUserCars = await CarService.getCarsWithUserNull()
+                if (nullUserCars.length > 0)
+                    await CarService.handleCarsWithUserNull(nullUserCars)
+
                 cars = await CarService.getCars()
-
-                // Execute this logic for Admins and Managers to calculate utilization on old cars.
-                for (carObj of cars) {
-                    let subscription = await SubscriptionService.getSubscriptionByCar(carObj)
-                    let startDate = new Date(subscription.data.current_period_start * 1000),
-                        endDate = new Date(subscription.data.current_period_end * 1000),
-                        daysBetweenTwoDates = (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24)
-
-                    let services = await ServiceService.getServicesByCarBetweenDates(carObj, startDate, endDate),
-                        percentage = (services.length / daysBetweenTwoDates)
-
-                    if (carObj.utilization?.start_date == null || carObj.utilization?.end_date == null || carObj?.utilization?.services != services.length || carObj?.utilization?.percentage != percentage)
-                        await CarService.updateCar(carObj.id, {
-                            'utilization.start_date': startDate,
-                            'utilization.end_date': endDate,
-                            'utilization.services': services.length,
-                            'utilization.percentage': percentage
-                        })
-                }
 
             } else {
                 cars = await CarService.getAllCarsByUser(user)
@@ -415,4 +395,24 @@ exports.validatePlate = async (req, res) => {
         res.render('Error validating car plate.')
     }
 
+}
+
+exports.syncUtilization = async (req, res) => {
+    try {
+        let cars = JSON.parse(req.body.cars)
+
+        if (cars) {
+            let updatedQty = await UtilizationService.syncCarsUtilization(cars)
+            res.send({ updatedQty: updatedQty, message: `Syncronization Completed. (Updated Cars: ${updatedQty})` })
+
+        } else {
+            res.send({ updatedQty: 0, message: `Not cars to synchronize.` })
+        }
+
+
+    } catch (error) {
+        console.error("ERROR: carsController -> Tyring to syncUtilization.")
+        console.error(error.message)
+        res.render({ message: 'Error on sync % utilization.' })
+    }
 }

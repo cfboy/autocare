@@ -105,6 +105,8 @@ router.get('/car/:id', checkAuthenticated, carsController.view)
 router.get('/cars/create', checkAuthenticated, authAddCar, carsController.create)
 router.get('/edit-car/:id', checkAuthenticated, authEditCar, carsController.edit)
 
+router.post('/syncUtilization', checkAuthenticated, carsController.syncUtilization)
+
 //------ Subscriptions/Memberships Routes ------
 router.get('/validateMembership', checkAuthenticated, authValidateMembership, subscriptionsController.validateMembership)
 router.post('/validateMembership', checkAuthenticated, authValidateMembership, subscriptionsController.validate)

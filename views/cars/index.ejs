@@ -46,11 +46,24 @@
                             <div class="row flex-grow">
                                 <div class="col-12 grid-margin stretch-card">
                                     <div class="card card-rounded">
+                                        <div id="loadingActions" class="text-center"></div>
                                         <div class="card-body">
                                             <div class="d-flex justify-content-between align-items-start">
                                                 <div>
                                                     <h4 class="card-title card-title-dash"><%= lingua.car.cars%></h4>
                                                 </div>
+                                                <% if([roles.ADMIN].includes(user.role)) { %>
+                                                <div>
+                                                    <a onclick="syncUtilization()" class="btn btn-primary btn-icon-text"
+                                                        data-toggle="tooltip" data-placement="bottom"
+                                                        title="This btn re-calculate de % of utilization of all cars."
+                                                        type="button">
+                                                        <i class="fas fa-sync btn-icon-prepend"></i>SYNC %
+                                                        Utilization</a>
+                                                    <br>
+
+                                                </div>
+                                                <% } %>
                                                 <% if(canAddCar) { %>
                                                 <div>
                                                     <a href="/cars/create" class="btn btn-primary btn-icon-text"
@@ -169,6 +182,34 @@
     <!-- Alerts Code -->
     <%- include('../partials/alerts.ejs', {message, alertType}); %>
     <%- include('../partials/dataTable.ejs', {tableID : '#users', dateColumn: 4 }); %>
+
+    <script>
+        function syncUtilization() {
+
+            showResult('#loadingActions', '<p class="d-block badge-opacity-warning rounded-1 p-2">Start Utilization % Syncronization...</p>')
+
+            $.ajax({
+                url: "/syncUtilization",
+                type: "POST",
+                data:
+                    JSON.stringify({
+                        cars: '<%- JSON.stringify(cars) %>'
+                    }),
+                contentType: "application/json",
+            }).done(function (result) {
+
+                showResult('#loadingActions', '<p class="d-block badge-opacity-success rounded-1 p-2">' + result.message + '</p>')
+
+                setTimeout(function () {
+                    showResult('#loadingActions', "");
+                }, 2000);
+            }).fail(function (err) {
+                console.log(err);
+            })
+
+
+        }
+    </script>
 </body>
 
 </html>

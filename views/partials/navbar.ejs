@@ -180,7 +180,11 @@
 
 <script>
     window.onload = function () {
-        $('[data-toggle="tooltip"]').tooltip();   
+        $('[data-toggle="tooltip"]').tooltip({
+            placement: function (t_el, el) {
+                return (typeof $(el).data('placement') === 'undefined') ? 'bottom' : $(el).data('placement');
+            }, trigger: 'hover'
+        });
         //YOUR JQUERY CODE
         manageLangDropdown();
 
