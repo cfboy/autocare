@@ -216,7 +216,7 @@ exports.viewUser = async (req, res) => {
             cars = await CarService.getAllCarsByUser(customer)
 
             for (car of cars) {
-                car.subscription = await SubscriptionService.getSubscriptionByCar(car)
+                car.subscription = await SubscriptionService.getLastSubscriptionByCar(car)
             }
 
             res.status(200).render('user/view.ejs', {

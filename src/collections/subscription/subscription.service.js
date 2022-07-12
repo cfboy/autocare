@@ -1,3 +1,4 @@
+const { STATUS } = require('../../connect/stripe');
 /**
  * IMPORTANT: All the subscription obj has the ID of Stripe Subscription Obj on id property.
  * So when need to find a subscription by id should use findOne instead findByID.
@@ -118,7 +119,7 @@ const getSubscriptions = (Subscription) => () => {
  */
 const getSubscriptionsByUser = (Subscription) => async (user) => {
     return Subscription.find({ user: user }).populate('user')
-        .populate({ path: 'items.cars', model: 'car' })
+        .populate({ path: 'items.cars', model: 'car' }).sort({ _id: -1 })
 }
 
 /**
@@ -156,6 +157,46 @@ const getSubscriptionByCar = (Subscription) => async (car) => {
             // console.debug("Subscription-SERVICE: Found subscription: ", docs?.id);
             // }
         }).populate('user').populate({ path: 'items.cars', model: 'car' })
+}
+
+/**
+ * This function get the last subscription by car.
+ * @param {*} Subscription 
+ * @returns Subscription
+ */
+const getLastSubscriptionByCar = (Subscription) => async (car) => {
+     return await Subscription.findOne(
+        { "items.cars": { _id: (car.id ? car.id : car._id) } },
+        function (err, doc) {
+            if (err) {
+                console.error(err)
+            } else if (doc) {
+                console.debug("Found the last subscription by car: " + doc.id)
+            }
+        }).sort({ _id: -1 }).populate('user').populate({ path: 'items.cars', model: 'car' })
+}
+
+
+/**
+ *  This function get the last active subscription by car.
+ * @param {*} Subscription 
+ * @returns Subscription
+ */
+const getLastActiveSubscriptionByCar = (Subscription) => async (car) => {
+
+    return await Subscription.findOne({
+        $and: [
+            { "items.cars": { _id: (car.id ? car.id : car._id) } },
+            { "data.status": STATUS.ACTIVE }
+        ]
+    },
+        function (err, doc) {
+            if (err) {
+                console.error(err)
+            } else if (doc) {
+                console.debug("Found the last active subscription by car: " + doc.id)
+            }
+        }).sort({ _id: -1 }).populate('user').populate({ path: 'items.cars', model: 'car' })
 }
 
 /**
@@ -306,6 +347,8 @@ module.exports = (Subscription) => {
         getSubscriptionByCar: getSubscriptionByCar(Subscription),
         getSubscriptionItemByCar: getSubscriptionItemByCar(Subscription),
         getSubscriptionCarsById: getSubscriptionCarsById(Subscription),
+        getLastSubscriptionByCar: getLastSubscriptionByCar(Subscription),
+        getLastActiveSubscriptionByCar: getLastActiveSubscriptionByCar(Subscription),
         setStripeInfoToUser: setStripeInfoToUser,
         validateItemQty: validateItemQty
     }

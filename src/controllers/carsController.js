@@ -309,6 +309,8 @@ exports.delete = async (req, res) => {
 
     try {
         let car = await CarService.getCarByID(carID),
+            // TODO: implement remove the car from all subscriptions. (new and olds)
+            // Maybe getSubscriptions and loop.
             subscription = await SubscriptionService.getSubscriptionByCar(car)
 
         let item = subscription.items.find(item =>

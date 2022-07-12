@@ -56,20 +56,79 @@ const getUtilizationByCarsList = (Utilization) => async (cars) => {
  */
 const addUtilization = (Utilization) => async (car, startDate, endDate, services, percentage) => {
     try {
-        if (!car || !startDate || !endDate || !services || !percentage) {
+        if (!car || !startDate || !endDate || services == null || percentage == null) {
             throw new Error(`Missing Data. Please provide all data for utilization.`)
+            console.debug("car -> " + car?.id)
+            console.debug("startDate -> " + startDate)
+            console.debug("endDate -> " + endDate)
+            console.debug("services -> " + services)
+            console.debug("percentage -> " + percentage)
         }
 
-        const utilization = new Utilization({
-            car, start_date: startDate, end_date: endDate, services, percentage
-        })
+        let date = new Date()
+        date.setSeconds(0, 0)
 
+        const query = {
+            car: car,
+            created_date: date,
+            start_date: startDate,
+            end_date: endDate,
+            services, percentage
+        }
+
+        const update = {
+
+        }
+
+        const options = {
+            upsert: true,
+            new: true,
+            setDefaultsOnInsert: true
+        }
+
+        const utilization = await Utilization.findOneAndUpdate(query, update, options)
+        console.debug(`Utilization-SERVICE: New utilization ID: ${utilization.id}`)
         console.debug('addUtilization to car: ' + car.plate)
-        return await utilization.save()
+
+        return utilization
+
     } catch (error) {
         console.debug(error)
         console.log(`ERROR: Utilization-SERVICE: addUtilization()`)
         return null
+    }
+}
+
+async function calculateUtilizationPercent(car, isLogService) {
+
+    try {
+        let carUpdated = false;
+        let subscription = await SubscriptionService.getLastSubscriptionByCar(car)
+        let startDate = new Date(subscription.data.current_period_start * 1000),
+            endDate = new Date(subscription.data.current_period_end * 1000),
+            daysBetweenTwoDates = (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24)
+
+        let services = await ServiceService.getServicesByCarBetweenDates(car, startDate, endDate),
+            percentage = (services.length / daysBetweenTwoDates)
+
+        if (isLogService || (car?.utilization?.start_date == null || car?.utilization?.end_date == null || car?.utilization?.services != services.length || car?.utilization?.percentage != percentage)) {
+            await CarService.updateCar(car.id ? car.id : car._id, {
+                'utilization.start_date': startDate,
+                'utilization.end_date': endDate,
+                'utilization.services': services.length,
+                'utilization.percentage': percentage
+            })
+
+            carUpdated = true
+
+        }
+
+        return percentage, carUpdated
+
+    }
+    catch (error) {
+        console.log(`ERROR: UTILIZATION-SERVICE: calculateUtilizationPercent()`)
+        console.error(error)
     }
 }
 
@@ -84,29 +143,50 @@ async function syncCarsUtilization(cars) {
         console.debug("Start syncCarsUtilization() for " + cars?.length + " cars...")
         // Execute this logic for Admins and Managers to calculate utilization on old cars.
         for (carObj of cars) {
-            let subscription = await SubscriptionService.getSubscriptionByCar(carObj)
-            let startDate = new Date(subscription.data.current_period_start * 1000),
-                endDate = new Date(subscription.data.current_period_end * 1000),
-                daysBetweenTwoDates = (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24)
 
-            let services = await ServiceService.getServicesByCarBetweenDates(carObj, startDate, endDate),
-                percentage = (services.length / daysBetweenTwoDates)
+            let percentage, carUpdated = await this.calculateUtilizationPercent(carObj, false)
 
-            if (carObj.utilization?.start_date == null || carObj.utilization?.end_date == null || carObj?.utilization?.services != services.length || carObj?.utilization?.percentage != percentage) {
-                await CarService.updateCar(carObj.id, {
-                    'utilization.start_date': startDate,
-                    'utilization.end_date': endDate,
-                    'utilization.services': services.length,
-                    'utilization.percentage': percentage
-                })
-                updatedCars++
-            }
+            carUpdated ? updatedCars++ : updatedCars
+
         }
 
         return updatedCars
     }
     catch (error) {
         console.log(`ERROR: UTILIZATION-SERVICE: syncCarsUtilization()`)
+        console.error(error)
+    }
+}
+
+/**
+ * This function add new Utilization History to a car, then update the car to prepare the new period utilization values.
+ * @param {*} car 
+ * @param {*} periodStart 
+ * @param {*} periodEnd 
+ */
+async function handleUtilization(car, periodStart, periodEnd) {
+    try {
+        await this.addUtilization(car,
+            car.utilization.start_date,
+            car.utilization.end_date,
+            car.utilization.services,
+            car.utilization.percentage)
+
+        // Calculate the new dates.
+        // Get the dates from new invoice. 
+        let newStartDate = new Date(periodStart * 1000)
+        let newEndDate = new Date(periodEnd * 1000)
+
+        // Reset current utilization on car model.
+        await CarService.updateCar(car.id, {
+            'utilization.start_date': newStartDate,
+            'utilization.end_date': newEndDate,
+            'utilization.services': 0,
+            'utilization.percentage': 0
+        })
+    }
+    catch (error) {
+        console.log(`ERROR: UTILIZATION-SERVICE: handleUtilization()`)
         console.error(error)
     }
 }
@@ -119,6 +199,8 @@ module.exports = (Utilization) => {
         getUtilizationByCar: getUtilizationByCar(Utilization),
         getUtilizationByCarsList: getUtilizationByCarsList(Utilization),
         addUtilization: addUtilization(Utilization),
-        syncCarsUtilization: syncCarsUtilization
+        syncCarsUtilization: syncCarsUtilization,
+        calculateUtilizationPercent: calculateUtilizationPercent,
+        handleUtilization: handleUtilization
     }
 }

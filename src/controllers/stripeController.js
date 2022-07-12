@@ -72,14 +72,7 @@ exports.webhook = async (req, res) => {
                 // console.debug(`Customer created: ${user.email}`)
 
                 break
-            // case 'customer.deleted':
-            //     break
-            // case 'customer.updated':
-            //     break
-            // case 'invoice.paid':
-            //     break
             case 'customer.subscription.created':
-                // console.debug(`WEBHOOK: customer.subscription.created: ${data.id}`)
                 console.log(`WEBHOOK: Subscription: ${data.id}`)
 
                 subscription = data
@@ -102,7 +95,14 @@ exports.webhook = async (req, res) => {
                                 if (cars.length > 0) {
                                     for (carObj of cars) {
                                         if (subItem.price.id === carObj.priceID) {
-                                            let newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate, customer.id)
+                                            let newCar = await CarService.getCarByPlate(carObj.plate)
+                                            if (newCar) {
+                                                // Add old utilization / History
+                                                await UtilizationService.handleUtilization(newCar, subscription.current_period_start, subscription.current_period_end)
+                                            }
+                                            else
+                                                newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate, customer.id)
+
                                             newItem.cars.push(newCar)
                                         }
 
@@ -170,24 +170,8 @@ exports.webhook = async (req, res) => {
                             if (cars) {
                                 for (car of cars) {
                                     // Add old utilization / History
-                                    await UtilizationService.addUtilization(car,
-                                        car.utilization.start_date,
-                                        car.utilization.end_date,
-                                        car.utilization.services,
-                                        car.utilization.percentage)
+                                    await UtilizationService.handleUtilization(car, subscription.current_period_start, subscription.current_period_end)
                                 }
-                                // Calculate the new dates.
-                                // Get the dates from new invoice. 
-                                let newStartDate = new Date(subscription.current_period_start * 1000)
-                                let newEndDate = new Date(subscription.current_period_end * 1000)
-
-                                // Reset current utilization on car model.
-                                await CarService.updateCars(cars?.map(({ id }) => (id)), {
-                                    'utilization.start_date': newStartDate,
-                                    'utilization.end_date': newEndDate,
-                                    'utilization.services': 0,
-                                    'utilization.percentage': 0
-                                })
                             }
                         }
                         // -------------------------------------------------------------------------------------
@@ -238,7 +222,12 @@ exports.webhook = async (req, res) => {
                             for (carObj of cars) {
                                 if (subItem.price.id === carObj.priceID) {
                                     let newCar = await CarService.getCarByPlate(carObj.plate)
-                                    if (!newCar)
+                                    if (newCar) {
+                                        // TODO: handle old utilization
+                                        // Add old utilization / History
+                                        await UtilizationService.handleUtilization(newCar, subscription.current_period_start, subscription.current_period_end)
+                                    }
+                                    else
                                         newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate, customer.id)
 
                                     newItem.cars.push(newCar)
@@ -310,50 +299,31 @@ exports.webhook = async (req, res) => {
 
                         alertInfo = { message: `Your membership ${subscription.id} has been cancelled successfully. `, alertType: alertTypes.BasicAlert }
 
-                    } else {
-                        // Create Subs
-                        let cars = JSON.parse(subscription?.metadata?.cars)
-                        let subscriptionItems = subscription.items.data
-                        let items = []
-                        for (subItem of subscriptionItems) {
-                            let newItem = { id: subItem.id, cars: [], data: subItem }
-                            for (carObj of cars) {
-                                if (subItem.price.id === carObj.priceID) {
-                                    let newCar = await CarService.getCarByPlate(carObj.plate)
-                                    if (!newCar)
-                                        newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate, customer.id)
-
-                                    newItem.cars.push(newCar)
-                                }
-
-                            }
-                            items.push(newItem)
-                        }
-                        newSubscription = await SubscriptionService.addSubscription({ id: subscription.id, data: subscription, items: items, user: customer })
-                        alertInfo = { message: `Your membership ${subscription.id} has been created successfully.`, alertType: alertTypes.BasicAlert }
                     }
+
                     // Add notification to user.
                     [customer, notification] = await UserService.addNotification(customer.id, alertInfo.message)
 
                     req.io.emit('notifications', notification);
+                    if (process.env.NODE_ENV === "production") {
+                        //Send Email
+                        var resultEmail = await sendEmail(
+                            customer.email,
+                            lingua.email.title,
+                            {
+                                name: customer?.personalInfo?.firstName + ' ' + customer?.personalInfo?.lastName,
+                                message: alertInfo.message
+                            },
+                            "../template/subscriptions.handlebars"
+                        )
 
-                    //Send Email
-                    var resultEmail = await sendEmail(
-                        customer.email,
-                        lingua.email.title,
-                        {
-                            name: customer?.personalInfo?.firstName + ' ' + customer?.personalInfo?.lastName,
-                            message: alertInfo.message
-                        },
-                        "../template/subscriptions.handlebars"
-                    )
+                        if (resultEmail) {
+                            console.debug('Email Sent: ' + resultEmail?.accepted[0])
 
-                    if (resultEmail) {
-                        console.debug('Email Sent: ' + resultEmail?.accepted[0])
+                        } else {
 
-                    } else {
-
-                        console.debug('WARNING: Email Not Sent.')
+                            console.debug('WARNING: Email Not Sent.')
+                        }
                     }
 
                 } else {
@@ -449,7 +419,14 @@ exports.completeCheckoutSuccess = async (req, res) => {
                 let newItem = { id: subItem.id, cars: [], data: subItem }
                 for (carObj of cars) {
                     if (subItem.price.id === carObj.priceID) {
-                        let newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate, customer.id)
+                        let newCar = await CarService.getCarByPlate(carObj.plate)
+                        if (newCar) {
+                            // Add old utilization / History
+                            await UtilizationService.handleUtilization(newCar, subscription.current_period_start, subscription.current_period_end)
+                        }
+                        else
+                            newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate, customer.id)
+
                         newItem.cars.push(newCar)
                     }
 

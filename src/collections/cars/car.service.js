@@ -63,7 +63,7 @@ const getCarsWithUserNull = (Car) => async () => {
 async function handleCarsWithUserNull(carsWithNull) {
     if (carsWithNull) {
         for (carObj of carsWithNull) {
-            let subscription = await SubscriptionService.getSubscriptionByCar(carObj)
+            let subscription = await SubscriptionService.getLastSubscriptionByCar(carObj)
             // if (!carObj.user_id || carObj.user_id !== subscription.user.id) {
             if (subscription) {
                 let updatedCar = await this.updateCar(carObj.id, { user_id: subscription.user.id })
@@ -245,7 +245,7 @@ const getAllCarsByUserWithoutSubs = (Car) => async (user) => {
 
     if (cars) {
         for (carObj of cars) {
-            let subscription = await SubscriptionService.getSubscriptionByCar(carObj)
+            let subscription = await SubscriptionService.getLastSubscriptionByCar(carObj)
 
             if (!subscription || subscription.data.status == STATUS.CANCELED)
                 carsToReturn.push(carObj)
@@ -266,7 +266,7 @@ async function canUseThisCarForNewSubs(car) {
     console.debug("canUseThisCarForNewSubs()...")
     let canUse = false
     if (car) {
-        let subscription = await SubscriptionService.getSubscriptionByCar(car)
+        let subscription = await SubscriptionService.getLastSubscriptionByCar(car)
         if (!subscription || subscription.data.status == STATUS.CANCELED)
             canUse = true
     }
