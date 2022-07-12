@@ -206,13 +206,27 @@ async function getAllPrices() {
         expand: ['data.product']
     })
 
+    const inactivePrices = await Stripe.prices.list({
+        active: false,
+        limit: 100,
+        expand: ['data.product']
+    })
+    let oldPrices = inactivePrices.data.filter(price => price.metadata.type != null)
+
     // format currency
     for (const price of prices.data) {
         price.unit_amount = Dinero({ amount: price.unit_amount }).toFormat('$0,0.00')
 
         if (price?.product) {
-            // Get price of all products.
+            // Get perks of all products.
             price.product.perks = price?.product?.metadata?.perks?.split(',')
+            if (price.product.metadata.productKey == "basic") {
+                price.oldPrice = Dinero({ amount: oldPrices.find(price => price.metadata.type === 'OLD_BASIC').unit_amount }).toFormat('$0,0.00')
+            } else if (price.product.metadata.productKey == "pro") {
+                price.oldPrice = Dinero({ amount: oldPrices.find(price => price.metadata.type === 'OLD_PREMIUM').unit_amount }).toFormat('$0,0.00')
+            }
+
+
         }
 
     }
