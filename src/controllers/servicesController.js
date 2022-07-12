@@ -1,6 +1,7 @@
 const ServiceService = require('../collections/services')
 const SubscriptionService = require('../collections/subscription')
 const CarService = require('../collections/cars')
+const UtilizationService = require('../collections/utilization')
 const HistoryService = require('../collections/history')
 const { historyTypes } = require('../collections/history/history.model')
 const { ROLES } = require('../collections/user/user.model')

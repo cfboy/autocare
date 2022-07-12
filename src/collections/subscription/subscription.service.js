@@ -165,14 +165,15 @@ const getSubscriptionByCar = (Subscription) => async (car) => {
  * @returns Subscription
  */
 const getLastSubscriptionByCar = (Subscription) => async (car) => {
-     return await Subscription.findOne(
+    return await Subscription.findOne(
         { "items.cars": { _id: (car.id ? car.id : car._id) } },
         function (err, doc) {
             if (err) {
                 console.error(err)
-            } else if (doc) {
-                console.debug("Found the last subscription by car: " + doc.id)
             }
+            // else if (doc) {
+            // console.debug("Found the last subscription by car: " + doc.id)
+            // }
         }).sort({ _id: -1 }).populate('user').populate({ path: 'items.cars', model: 'car' })
 }
 

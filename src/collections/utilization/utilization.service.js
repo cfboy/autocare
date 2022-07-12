@@ -99,7 +99,7 @@ const addUtilization = (Utilization) => async (car, startDate, endDate, services
     }
 }
 
-async function calculateUtilizationPercent(car, isLogService) {
+async function calculateUtilizationPercent(car, isUseService) {
 
     try {
         let carUpdated = false;
@@ -111,7 +111,7 @@ async function calculateUtilizationPercent(car, isLogService) {
         let services = await ServiceService.getServicesByCarBetweenDates(car, startDate, endDate),
             percentage = (services.length / daysBetweenTwoDates)
 
-        if (isLogService || (car?.utilization?.start_date == null || car?.utilization?.end_date == null || car?.utilization?.services != services.length || car?.utilization?.percentage != percentage)) {
+        if (isUseService || (car?.utilization?.start_date == null || car?.utilization?.end_date == null || car?.utilization?.services != services.length || car?.utilization?.percentage != percentage)) {
             await CarService.updateCar(car.id ? car.id : car._id, {
                 'utilization.start_date': startDate,
                 'utilization.end_date': endDate,
