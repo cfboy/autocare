@@ -11,23 +11,33 @@ const { STATUS } = require('../../connect/stripe');
  * @param {*} Subscription 
  * @returns Subscription
  */
-const addSubscription = (Subscription) => async ({
-    id, items, data, user
-}) => {
+const addSubscription = (Subscription) => async ({ id, items, data, user }) => {
     if (!id || !items || !data || !user) {
         throw new Error(`Subscription: Missing Data.`)
     }
 
     console.log(`Subscription: addSubscription()`)
 
-    const subscription = new Subscription({
+    const query = {
         id,
         items,
         data,
         user
-    })
+    }
 
-    return await subscription.save()
+    const update = {
+    }
+
+    const options = {
+        upsert: true,
+        new: true,
+        setDefaultsOnInsert: true
+    }
+
+    const subscription = await Subscription.findOneAndUpdate(query, update, options)
+        .populate({ path: 'user', model: 'user' })
+
+    return subscription
 }
 
 /**
@@ -160,6 +170,21 @@ const getSubscriptionByCar = (Subscription) => async (car) => {
 }
 
 /**
+ * This function get all Subscriptions by car.
+ * @param {*} Subscription 
+ * @returns Subscription list
+ */
+const getSubscriptionsByCar = (Subscription) => async (car) => {
+    return Subscription.find({
+        "items.cars": { _id: (car.id ? car.id : car._id) }
+    }, function (err, docs) {
+        if (err) {
+            console.error(err)
+        }
+    }).populate('user').populate({ path: 'items.cars', model: 'car' }).sort({ _id: -1 })
+}
+
+/**
  * This function get the last subscription by car.
  * @param {*} Subscription 
  * @returns Subscription
@@ -261,9 +286,10 @@ async function setStripeInfoToUser(customerObj) {
 
             if (customer.subscriptions.length > 0) {
                 customer.hasSubscription = true
-                for (subscription of customer.subscriptions) {
-                    for (item of subscription.items) {
-                        item.isValid = await validateItemQty(item)
+                for (sub of customer.subscriptions) {
+                    for (item of sub.items) {
+                        // If the status of subscriptions is CANCELED, then is not necessary to validateItemQty.
+                        item.isValid = (sub.data.status == STATUS.CANCELED) ? true : await validateItemQty(item)
                     }
                 }
             }
@@ -276,7 +302,7 @@ async function setStripeInfoToUser(customerObj) {
 
     } catch (error) {
         console.debug(`ERROR-STRIPE: setStripeInfoToUser()`);
-        console.debug(`ERROR-STRIPE: ${error.message}`);
+        console.debug(`ERROR-STRIPE: ${error}`);
 
         return null
     }
@@ -346,6 +372,7 @@ module.exports = (Subscription) => {
         getSubscriptionsByUser: getSubscriptionsByUser(Subscription),
         getSubscriptionById: getSubscriptionById(Subscription),
         getSubscriptionByCar: getSubscriptionByCar(Subscription),
+        getSubscriptionsByCar: getSubscriptionsByCar(Subscription),
         getSubscriptionItemByCar: getSubscriptionItemByCar(Subscription),
         getSubscriptionCarsById: getSubscriptionCarsById(Subscription),
         getLastSubscriptionByCar: getLastSubscriptionByCar(Subscription),

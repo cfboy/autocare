@@ -230,7 +230,7 @@ const getUsersByList = (User) => async (users) => {
  * @returns user object
  */
 const addNotification = (User) => async (id, message) => {
-    console.log(`addNotification() ID: ${id}`)
+    // console.log(`addNotification() ID: ${id}`)
     // let date = Date.now();
     let notification = {
         isRead: false,
@@ -243,7 +243,7 @@ const addNotification = (User) => async (id, message) => {
         { new: true })
         .then(result => {
             if (result) {
-                console.debug(`addNotification(): Successfully Added notification ${result.id}.`);
+                // console.debug(`addNotification(): Successfully Added notification ${result.id}.`);
                 return result
             } else {
                 console.debug("addNotification(): No document returned.");

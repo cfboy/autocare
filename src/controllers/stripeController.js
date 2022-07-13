@@ -99,6 +99,8 @@ exports.webhook = async (req, res) => {
                                             if (newCar) {
                                                 // Add old utilization / History
                                                 await UtilizationService.handleUtilization(newCar, subscription.current_period_start, subscription.current_period_end)
+                                                if (newCar.cancel_date != null)
+                                                    await CarService.removeCarFromAllSubscriptions(newCar)
                                             }
                                             else
                                                 newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate, customer.id)
@@ -226,6 +228,8 @@ exports.webhook = async (req, res) => {
                                         // TODO: handle old utilization
                                         // Add old utilization / History
                                         await UtilizationService.handleUtilization(newCar, subscription.current_period_start, subscription.current_period_end)
+                                        if (newCar.cancel_date != null)
+                                            await CarService.removeCarFromAllSubscriptions(newCar)
                                     }
                                     else
                                         newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate, customer.id)
@@ -423,6 +427,8 @@ exports.completeCheckoutSuccess = async (req, res) => {
                         if (newCar) {
                             // Add old utilization / History
                             await UtilizationService.handleUtilization(newCar, subscription.current_period_start, subscription.current_period_end)
+                            if (newCar.cancel_date != null)
+                                await CarService.removeCarFromAllSubscriptions(newCar)
                         }
                         else
                             newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate, customer.id)

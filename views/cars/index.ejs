@@ -52,26 +52,24 @@
                                                 <div>
                                                     <h4 class="card-title card-title-dash"><%= lingua.car.cars%></h4>
                                                 </div>
-                                                <% if([roles.ADMIN].includes(user.role)) { %>
-                                                <div>
-                                                    <a onclick="syncUtilization()" class="btn btn-primary btn-icon-text"
+                                                <div class="d-flex">
+                                                    <% if([roles.ADMIN].includes(user.role)) { %>
+                                                    <a onclick="syncUtilization()" class="btn btn-primary btn-icon-text m-1"
                                                         data-toggle="tooltip" data-placement="bottom"
                                                         title="This btn re-calculate de % of utilization of all cars."
                                                         type="button">
-                                                        <i class="fas fa-sync btn-icon-prepend"></i>SYNC %
-                                                        Utilization</a>
+                                                        <i class="fas fa-sync btn-icon-prepend"></i>SYNC
+                                                        Utilization %</a>
                                                     <br>
 
-                                                </div>
-                                                <% } %>
-                                                <% if(canAddCar) { %>
-                                                <div>
-                                                    <a href="/cars/create" class="btn btn-primary btn-icon-text"
+                                                    <% } %>
+                                                    <% if(canAddCar) { %>
+                                                    <a href="/cars/create" class="btn btn-primary btn-icon-text m-1"
                                                         type="button">
                                                         <i
                                                             class="fas fa-plus btn-icon-prepend"></i><%= lingua.car.add%></a>
+                                                    <% } %>
                                                 </div>
-                                                <% } %>
                                             </div>
                                             <br>
                                             <div class="table-responsive  mt-1">

@@ -137,10 +137,13 @@
                         <% } %>
                         <% } %>
                     </ul>
+
                     <br>
-                    
-                    <small><b>ID: <%= stripeSubscription.id%></b></small>
                     <% } %>
+
+                    <p class="mt-2">
+                        <small><b>ID: <%= stripeSubscription.id%></b></small>
+                    </p>
                 </td>
                 <td>
                     (<%= moment(stripeSubscription?.data?.current_period_start * 1000).isValid() ? moment(stripeSubscription?.data?.current_period_start * 1000).format(shortDateFormat) : 'N/A' %>)
@@ -163,7 +166,7 @@
                     <% if([roles.ADMIN].includes(user.role)) { %>
                     <br>
                     <button id="sync-btn-<%- stripeSubscription.id%>" value="<%- stripeSubscription.id%>"
-                        class="sync-btn btn btn-primary btn-icon-text text-white p-1 m-1">
+                        class="sync-btn btn btn-primary btn-icon-text text-white p-1 m-1" style="line-height: 17px!important">
                         <i class="fa-solid fa-rotate"></i> Sync with Stripe
                     </button>
                     <div id="sync-update-<%- stripeSubscription.id%>"></div>

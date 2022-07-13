@@ -2,7 +2,8 @@
 //Use v2.0 to use the module in code (for versions prior to version):
 const fetch = require('node-fetch');
 const SubscriptionService = require('../subscription')
-const { STATUS } = require('../../connect/stripe')
+const { STATUS } = require('../../connect/stripe');
+const subscription = require('../subscription');
 
 /**
  * This function get all cars from the db.
@@ -116,7 +117,6 @@ const getCarByID = (Car) => async (carID) => {
  * @returns car object
  */
 const addCar = (Car) => async (brand, model, plate, user_id) => {
-    // TODO: change this to find first then create new car.
     try {
         if (!brand || !model || !plate) {
             throw new Error(`Missing Data. Please provide all data for car.`)
@@ -124,14 +124,26 @@ const addCar = (Car) => async (brand, model, plate, user_id) => {
 
         console.log(`CAR-SERVICE: addCar(${brand})`)
 
-        const car = new Car({
+        const query = {
             brand,
             model,
             plate: plate.toUpperCase(),
             user_id
-        })
+        }
 
-        return await car.save()
+        const update = {
+
+        }
+
+        const options = {
+            upsert: true,
+            new: true,
+            setDefaultsOnInsert: true
+        }
+
+        const car = await Car.findOneAndUpdate(query, update, options)
+
+        return car
     } catch (error) {
         console.log(`ERROR: CAR-SERVICE: addCar()`)
         console.error(error)
@@ -245,9 +257,7 @@ const getAllCarsByUserWithoutSubs = (Car) => async (user) => {
 
     if (cars) {
         for (carObj of cars) {
-            let subscription = await SubscriptionService.getLastSubscriptionByCar(carObj)
-
-            if (!subscription || subscription.data.status == STATUS.CANCELED)
+            if (await canUseThisCarForNewSubs(carObj))
                 carsToReturn.push(carObj)
 
         }
@@ -263,17 +273,63 @@ const getAllCarsByUserWithoutSubs = (Car) => async (user) => {
  * @returns car list
  */
 async function canUseThisCarForNewSubs(car) {
-    console.debug("canUseThisCarForNewSubs()...")
+    // console.debug("canUseThisCarForNewSubs()...")
     let canUse = false
     if (car) {
         let subscription = await SubscriptionService.getLastSubscriptionByCar(car)
-        if (!subscription || subscription.data.status == STATUS.CANCELED)
+        if (!subscription || subscription.data.status == STATUS.CANCELED || car.cancel_date != null)
             canUse = true
     }
 
     return canUse
 }
 
+/**
+ * This function get all subscriptions by car and then remove this car from all of these subscription.
+ * @param {*} car 
+ * @returns completed boolean flag
+ */
+async function removeCarFromAllSubscriptions(car) {
+    let completed = true
+    try {
+        console.debug('Start removeCarFromAllSubscriptions()')
+        // First get all car subscriptions to remove this car from subscriptions.
+        let carSubscriptions = await SubscriptionService.getSubscriptionsByCar(car)
+
+        for (carSubscription of carSubscriptions) {
+
+            let item = carSubscription.items.find(item =>
+                item.cars.find(itemCar =>
+                    itemCar.id = car.id))
+
+            let updatedSubscription = await SubscriptionService.removeSubscriptionCar(carSubscription.id, item.id, car)
+
+            // Validate if the car is removed from subscription.
+            let notDeletedCar = updatedSubscription.items.some(item =>
+                item.cars.some(itemCar =>
+                    itemCar.id == car.id))
+
+            if (!updatedSubscription || notDeletedCar) {
+                completed = false
+                console.debug(`Can't delete the car (${car.id}) from subscription (${carSubscription.id}).`)
+            }
+            else {
+                console.debug(`Car (${car.id}) removed from subscription (${carSubscription.id}).`)
+
+                await this.updateCar(car.id, { cancel_date: null })
+            }
+        }
+        return completed
+    }
+    catch (error) {
+        completed = false
+        console.log('ERROR: removeCarFromAllSubscriptions(): ' + car.id)
+        console.log(error)
+        return completed
+
+    }
+
+}
 
 /**
  * This function get all makes from external API.
@@ -321,6 +377,7 @@ module.exports = (Car) => {
         getAllCarsByUser: getAllCarsByUser(Car),
         getAllCarsByUserWithoutSubs: getAllCarsByUserWithoutSubs(Car),
         canUseThisCarForNewSubs: canUseThisCarForNewSubs,
-        handleCarsWithUserNull: handleCarsWithUserNull
+        handleCarsWithUserNull: handleCarsWithUserNull,
+        removeCarFromAllSubscriptions: removeCarFromAllSubscriptions
     }
 }

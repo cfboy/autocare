@@ -65,13 +65,6 @@ exports.validateMembership = async (req, res) => {
 
 }
 
-// exports.clearQueue = async (req, res) => {
-//     console.debug('Clearing Queue...')
-//     readingQueue = []
-//     res.send({ readingQueue })
-
-// }
-
 /**
  * This function search the user by car plate number and return the membership status.
  * This function is called by ajax function.

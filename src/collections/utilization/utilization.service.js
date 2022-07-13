@@ -57,12 +57,12 @@ const getUtilizationByCarsList = (Utilization) => async (cars) => {
 const addUtilization = (Utilization) => async (car, startDate, endDate, services, percentage) => {
     try {
         if (!car || !startDate || !endDate || services == null || percentage == null) {
-            throw new Error(`Missing Data. Please provide all data for utilization.`)
             console.debug("car -> " + car?.id)
             console.debug("startDate -> " + startDate)
             console.debug("endDate -> " + endDate)
             console.debug("services -> " + services)
             console.debug("percentage -> " + percentage)
+            throw new Error(`Missing Data. Please provide all data for utilization.`)
         }
 
         let date = new Date()
@@ -166,12 +166,16 @@ async function syncCarsUtilization(cars) {
  */
 async function handleUtilization(car, periodStart, periodEnd) {
     try {
-        await this.addUtilization(car,
-            car.utilization.start_date,
-            car.utilization.end_date,
-            car.utilization.services,
-            car.utilization.percentage)
-
+        if (car && car.utilization.start_date &&
+            car.utilization.end_date &&
+            car.utilization.services &&
+            car.utilization.percentage) {
+            await this.addUtilization(car,
+                car.utilization.start_date,
+                car.utilization.end_date,
+                car.utilization.services,
+                car.utilization.percentage)
+        }
         // Calculate the new dates.
         // Get the dates from new invoice. 
         let newStartDate = new Date(periodStart * 1000)

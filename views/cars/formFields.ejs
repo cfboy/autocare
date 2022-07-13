@@ -1,3 +1,27 @@
+<% if(userCars.length > 0) { %>
+<div class="col-lg-12">
+    <div class="form-group">
+        <label for="myCar"><%= lingua.car.myCars%>
+            <i class="fa-solid fa-circle-info warning" data-toggle="tooltip"
+                title="Select a car to autofill the form fields."></i>
+        </label>
+        <select id="myCar" name="myCar" onchange="autofillCarInfo(this, '<%= lingua.loading%>')"
+            class="form-control mb-3 form-control-lg js-example-basic-single w-100">
+            <option value=""><%= lingua.selectOne%></option>
+            <% for(const car of userCars) { %>
+            <!-- All properties are necessary to autofill the other fields. -->
+            <option value="<%= car.id%>" name="<%= car.id%>" brand="<%= car.brand%>" model="<%= car.model%>"
+                plate="<%= car.plate%>">
+                <%= car.brand%> - <%= car.model%> - <%= car.plate%>
+            </option>
+            <% } %>
+        </select>
+        <br>
+        <div id="autofillLoading"></div>
+    </div>
+</div>
+<% } %>
+
 <div class="col-lg-12">
     <div class="form-group">
         <label for="carBrand" class="required">
