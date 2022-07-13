@@ -201,11 +201,14 @@ exports.edit = async (req, res) => {
     try {
         const carID = req.params.id,
             url = req.query.url ? req.query.url : '/account',
-            car = await CarService.getCarByID(carID)
+            car = await CarService.getCarByID(carID),
+            user = req.user
 
         if (car) {
-            let { allMakes, allModels } = await CarService.getAllMakes()
-            res.status(200).render('cars/edit.ejs', { user: req.user, car, allMakes, allModels, url: (url == '/cars' || url == '/account') ? url : `${url}/${carID}` })
+            let { allMakes, allModels } = await CarService.getAllMakes(),
+                userCars = await CarService.getAllCarsByUserWithoutSubs(user)
+
+            res.status(200).render('cars/edit.ejs', { user, userCars, car, allMakes, allModels, url: (url == '/cars' || url == '/account') ? url : `${url}/${carID}` })
         }
 
     } catch (error) {
@@ -313,11 +316,11 @@ exports.delete = async (req, res) => {
     const carID = req.params.id
 
     try {
-        let car = await CarService.getCarByID(carID),
-            removeCarFromAllSubscriptions = await CarService.removeCarFromAllSubscriptions(car)
+        let car = await CarService.getCarByID(carID)
+            // removeCarFromAllSubscriptions = await CarService.removeCarFromAllSubscriptions(car)
 
-        if (removeCarFromAllSubscriptions) {
-            CarService.deleteCar(carID) //TODO: verify if is need to delete the car forever.
+        if (car) {
+            CarService.deleteCar(car.id) //TODO: verify if is need to delete the car forever.
             // Set the message for alert. 
             req.session.message = `Car Deleted.`
             req.session.alertType = alertTypes.CompletedActionAlert

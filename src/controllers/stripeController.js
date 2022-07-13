@@ -49,26 +49,29 @@ exports.webhook = async (req, res) => {
         switch (event.type) {
             case 'customer.created':
                 // console.debug(JSON.stringify(data))
-                // TODO: verify if the customer exists, if not then create.
-                let hashPassword = await bcrypt.hash('Test1234', 10)
-                let firstName = data?.name?.split(' ')[0] ? data.name.split(' ')[0] : 'Test Name',
-                    lastName = data?.name?.split(' ')[1] ? data.name.split(' ')[1] : 'Test Last Name',
-                    phoneNumber = data?.phone ? data.phone : '787-777-7777',
-                    email = data?.email ? data.email : 'test@test.com'
+                customer = await UserService.getUserByEmail(data?.email)
+                
+                if (!customer) {
+                    // TODO: verify if the customer exists, if not then create.
+                    let hashPassword = await bcrypt.hash('Test1234', 10)
+                    let firstName = data?.name?.split(' ')[0] ? data.name.split(' ')[0] : 'Test Name',
+                        lastName = data?.name?.split(' ')[1] ? data.name.split(' ')[1] : 'Test Last Name',
+                        phoneNumber = data?.phone ? data.phone : '787-777-7777',
+                        email = data?.email ? data.email : 'test@test.com'
 
 
-                let user = await UserService.addUser({
-                    email: email,
-                    password: hashPassword,
-                    billingID: data.id,
-                    role: ROLES.CUSTOMER,
-                    firstName: firstName,
-                    lastName: lastName,
-                    phoneNumber: phoneNumber,
-                    dateOfBirth: null,
-                    city: data?.address ? data?.address?.city : null
-                })
-
+                    let user = await UserService.addUser({
+                        email: email,
+                        password: hashPassword,
+                        billingID: data.id,
+                        role: ROLES.CUSTOMER,
+                        firstName: firstName,
+                        lastName: lastName,
+                        phoneNumber: phoneNumber,
+                        dateOfBirth: null,
+                        city: data?.address ? data?.address?.city : null
+                    })
+                }
                 // console.debug(`Customer created: ${user.email}`)
 
                 break

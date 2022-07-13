@@ -20,7 +20,7 @@ const addUser = (User) => async ({
 
     console.log(`USER: addUser(${email})`)
 
-    const user = new User({
+    const query = {
         email: email,
         password,
         billingID,
@@ -32,10 +32,21 @@ const addUser = (User) => async ({
             dateOfBirth,
             city
         }
-    })
+    }
 
-    // TODO: handle errors and return the doc.
-    return await user.save()
+    const update = {
+
+    }
+
+    const options = {
+        upsert: true,
+        new: true,
+        setDefaultsOnInsert: true
+    }
+
+    const user = await User.findOneAndUpdate(query, update, options)
+
+    return user
 }
 
 /**
