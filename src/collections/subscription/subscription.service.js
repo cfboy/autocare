@@ -133,6 +133,15 @@ const getSubscriptionsByUser = (Subscription) => async (user) => {
 }
 
 /**
+ * This function get the subscriptions by price id.
+ * @param {*} Subscription 
+ * @returns 
+ */
+const getSubscriptionsByPrice = (Subscription) => async (price) => {
+    return Subscription.find({ "items.data.price.id": price }).sort({ _id: -1 })
+}
+
+/**
  * This function get Subscription by id.
  * @param {*} Subscription 
  * @returns Subscription
@@ -370,6 +379,7 @@ module.exports = (Subscription) => {
         deleteSubscription: deleteSubscription(Subscription),
         getSubscriptions: getSubscriptions(Subscription),
         getSubscriptionsByUser: getSubscriptionsByUser(Subscription),
+        getSubscriptionsByPrice: getSubscriptionsByPrice(Subscription),
         getSubscriptionById: getSubscriptionById(Subscription),
         getSubscriptionByCar: getSubscriptionByCar(Subscription),
         getSubscriptionsByCar: getSubscriptionsByCar(Subscription),

@@ -184,9 +184,12 @@ exports.webhook = async (req, res) => {
                         items = []
                         for (subItem of subscriptionItems) {
                             let itemToUpdate = mySubscription?.items?.find(item => item.id == subItem.id)
+                            let cars = []
+                            let newItem
                             if (itemToUpdate) {
-                                let newItem = { id: itemToUpdate.id, cars: itemToUpdate.cars, data: subItem }
-                                items.push(newItem)
+                                console.log(`Found item tu update (ID: ${itemToUpdate?.id}).`)
+                                cars = itemToUpdate?.cars
+                                newItem = { id: itemToUpdate.id, cars: cars, data: subItem }
 
                                 try {
                                     if (newItem?.cars?.length == newItem.data.quantity) {
@@ -200,6 +203,35 @@ exports.webhook = async (req, res) => {
                                     console.log('Error trying to clear cancel_date of subscription: ' + mySubscription.id)
                                 }
                             }
+                            else {
+                                // TODO: validate this section.
+                                console.log(`ERROR: Not Found item tu update sub (ID: ${mySubscription?.id}).`)
+                                if (subscription?.metadata?.cars)
+                                    cars = JSON.parse(subscription?.metadata?.cars)
+
+                                newItem = { id: subItem.id, cars: [], data: subItem }
+
+                                for (carObj of cars) {
+                                    if (subItem.price.id === carObj.priceID) {
+                                        let newCar = await CarService.getCarByPlate(carObj.plate)
+                                        if (newCar) {
+                                            // Add old utilization / History
+                                            await UtilizationService.handleUtilization(newCar, subscription.current_period_start, subscription.current_period_end)
+                                            if (newCar.cancel_date != null)
+                                                await CarService.removeCarFromAllSubscriptions(newCar)
+                                        }
+                                        else
+                                            newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate, customer.id)
+
+                                        newItem.cars.push(newCar)
+                                    }
+
+                                }
+
+                            }
+
+                            items.push(newItem)
+
                         }
 
                         updates = {
@@ -584,6 +616,28 @@ exports.invoices = async (req, res) => {
         req.session.message = "Error trying to render the user invoices."
         req.session.alertType = alertTypes.ErrorAlert
         res.redirect('/account')
+
+    }
+
+}
+
+exports.changePrice = async (req, res) => {
+
+    try {
+        let oldPrice = ''
+        let newPrice = ''
+        let subscription = await SubscriptionService.getSubscriptionByPrice()
+        let subId = ''
+        let updates = {
+            items: [
+                { id: '', price: "" }
+            ]
+        }
+        let updated = await Stripe.updateStripeSubscription(subId, updates)
+
+    } catch (error) {
+        console.error("ERROR: changePrice()")
+        console.error(error)
 
     }
 

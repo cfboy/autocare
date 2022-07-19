@@ -93,7 +93,7 @@
                     <%# for(price of product.priceInfo) { %>
                     <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12 mb-4">
                         <div class="card h-100 shadow-lg">
-                            <% if(price.metadata.type) { %>
+                            <% if(price.metadata.type == "NEW OFFER") { %>
                             <div class="ribbon-wrapper">
                                 <div class="ribbon"><%= price.metadata.type%></div>
                             </div>

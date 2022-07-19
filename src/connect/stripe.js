@@ -103,6 +103,26 @@ const getCustomerByID = async (id) => {
 }
 
 /**
+ * This function update the stripe customer.
+ * @param {*} id 
+ * @param {*} updates 
+ * @returns 
+ */
+const updateCustomer = async (id, updates) => {
+    try {
+
+        const customer = await Stripe.customers.update(id, updates);
+
+        return customer
+    }
+    catch (error) {
+        console.log(`ERROR-STRIPE: updateCustomer()`);
+        console.log(`ERROR-STRIPE: ${error}`);
+    }
+
+}
+
+/**
  * This function get the customer on stripe by email.
  * @param {*} email 
  * @returns customer object
@@ -211,7 +231,7 @@ async function getAllPrices() {
         limit: 100,
         expand: ['data.product']
     })
-    let oldPrices = inactivePrices.data.filter(price => price.metadata.type != null)
+    let oldPrices = inactivePrices.data.filter(price => price.metadata.type != null && price.metadata.type.includes("OLD"))
 
     // format currency
     for (const price of prices.data) {
@@ -220,13 +240,18 @@ async function getAllPrices() {
         if (price?.product) {
             // Get perks of all products.
             price.product.perks = price?.product?.metadata?.perks?.split(',')
-            if (price.product.metadata.productKey == "basic") {
-                price.oldPrice = Dinero({ amount: oldPrices.find(price => price.metadata.type === 'OLD_BASIC').unit_amount }).toFormat('$0,0.00')
-            } else if (price.product.metadata.productKey == "pro") {
-                price.oldPrice = Dinero({ amount: oldPrices.find(price => price.metadata.type === 'OLD_PREMIUM').unit_amount }).toFormat('$0,0.00')
+            if (oldPrices.length > 0) {
+                if (price.product.metadata.productKey == "basic") {
+                    let oldBasic = oldPrices.find(price => price.metadata.type === 'OLD_BASIC')?.unit_amount
+
+                    price.oldPrice = oldBasic ? Dinero({ amount: oldBasic }).toFormat('$0,0.00') : null
+                }
+
+                else if (price.product.metadata.productKey == "pro") {
+                    let oldPremium = oldPrices.find(price => price.metadata.type === 'OLD_PREMIUM')?.unit_amount
+                    price.oldPrice = oldPremium ? Dinero({ amount: oldPremium }).toFormat('$0,0.00') : null
+                }
             }
-
-
         }
 
     }
@@ -465,13 +490,11 @@ async function getCustomerBalanceTransactions(id) {
 
 
 //TODO: make this function more generic.
-async function updateSubscription(id, cancelAt) {
+async function updateStripeSubscription(id, updates) {
     console.log('ID: ' + id)
-    console.log('cancelAt: ' + cancelAt)
+    // console.log('cancelAt: ' + cancelAt)
     const subscription = await Stripe.subscriptions.update(id,
-        {
-            cancel_at: cancelAt
-        }
+        updates
     );
 
     return subscription
@@ -482,6 +505,7 @@ module.exports = {
     getCustomerByID,
     getCustomerByEmail,
     addNewCustomer,
+    updateCustomer,
     getSessionByID,
     createCheckoutSession,
     createBillingSession,
@@ -497,5 +521,5 @@ module.exports = {
     getSubscriptionById,
     getSubscriptionItemById,
     getCustomerBalanceTransactions,
-    updateSubscription
+    updateStripeSubscription
 }
