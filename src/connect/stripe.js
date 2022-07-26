@@ -488,8 +488,12 @@ async function getCustomerBalanceTransactions(id) {
     return { transactions: balanceTransactions.data, total: total, totalString: totalString }
 }
 
-
-//TODO: make this function more generic.
+/**
+ * This function update the stripe subscription.
+ * @param {*} id 
+ * @param {*} updates 
+ * @returns subscription obj
+ */
 async function updateStripeSubscription(id, updates) {
     console.log('ID: ' + id)
     // console.log('cancelAt: ' + cancelAt)

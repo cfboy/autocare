@@ -138,7 +138,13 @@ const getSubscriptionsByUser = (Subscription) => async (user) => {
  * @returns 
  */
 const getSubscriptionsByPrice = (Subscription) => async (price) => {
-    return Subscription.find({ "items.data.price.id": price }).sort({ _id: -1 })
+    return Subscription.find(
+        {
+            $and: [
+                { "items.data.price.id": price },
+                { "data.status": STATUS.ACTIVE }
+            ]
+        }).sort({ _id: -1 })
 }
 
 /**

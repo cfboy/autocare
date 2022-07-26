@@ -9,7 +9,8 @@ const { canDeleteCar,
     canDeleteUser,
     canValidateMemberships,
     canChangePassword,
-    canDeleteService } = require('../config/permissions'),
+    canDeleteService,
+    isAdmin } = require('../config/permissions'),
     alertTypes = require('../helpers/alertTypes')
 
 
@@ -132,6 +133,15 @@ async function authDeleteService(req, res, next) {
     res.status(401).redirect('/services')
 }
 
+async function authChangePrices(req, res, next) {
+    if (isAdmin(req.user)) {
+        return next()
+    }
+    req.session.message = `Not allowed to change prices.`
+    req.session.alertType = alertTypes.WarningAlert
+    res.status(401).redirect('/account')
+}
+
 module.exports = {
     checkAuthenticated,
     checkNotAuthenticated,
@@ -143,5 +153,6 @@ module.exports = {
     authDeleteUser,
     authValidateMembership,
     authChangePassword,
-    authDeleteService
+    authDeleteService,
+    authChangePrices
 }

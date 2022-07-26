@@ -1,6 +1,12 @@
 const { ROLES } = require('../collections/user/user.model')
 const { STATUS } = require('../connect/stripe');
 
+function isAdmin(user) {
+    return (
+        user.role === ROLES.ADMIN
+    )
+}
+
 function canDeleteLocation(user) {
     return (
         user.role === ROLES.ADMIN
@@ -75,5 +81,6 @@ module.exports = {
     canDeleteUser,
     canValidateMemberships,
     canChangePassword,
-    canDeleteService
+    canDeleteService,
+    isAdmin
 }

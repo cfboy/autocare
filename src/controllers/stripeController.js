@@ -621,24 +621,64 @@ exports.invoices = async (req, res) => {
 
 }
 
+/**
+ * This function find all subscriptions with active status and oldPrice on any item, 
+ * then change this price for newPrice on the corresponding item.
+ * @param {*} req 
+ * @param {*} res 
+ */
 exports.changePrice = async (req, res) => {
 
     try {
-        let oldPrice = ''
-        let newPrice = ''
-        let subscription = await SubscriptionService.getSubscriptionByPrice()
-        let subId = ''
-        let updates = {
-            items: [
-                { id: '', price: "" }
-            ]
+        // Basic
+        // let oldPrice = 'price_1JvNZ5L5YqSpFl3KFGcW042e'
+        // let newPrice = 'price_1LIcmBL5YqSpFl3KlaCoJqeL'
+        // Premium
+        // let oldPrice = 'price_1JvNZuL5YqSpFl3Kg0Ct8yLB'
+        // let newPrice = 'price_1LIckEL5YqSpFl3KioTpVNsH'
+
+        let allPrices = await Stripe.getAllPrices()
+        let { oldPrice, newPrice } = req.body
+
+        let validNewPrice = allPrices.some(it => it.id == newPrice)
+
+        let subscriptions = await SubscriptionService.getSubscriptionsByPrice(oldPrice)
+
+        if (subscriptions.length > 0 && validNewPrice) {
+            let count = 0;
+            for (let subscription of subscriptions) {
+                let itemToUpdate = subscription.data.items.data.find(item => item.price.id === oldPrice)
+                let updates = {
+                    items: [
+                        { id: itemToUpdate.id, price: newPrice, quantity: itemToUpdate.quantity }
+                    ]
+                }
+                let updated = await Stripe.updateStripeSubscription(subscription.id, updates)
+
+                if (updated) {
+                    count++
+                    console.log(`Price (${newPrice}) updated for subscription (${updated?.id})`)
+                }
+            }
+
+            req.session.message = `Updated price for ${count} subscriptions: ${newPrice}`
+            req.session.alertType = alertTypes.CompletedActionAlert
+        } else {
+            if (!validNewPrice) {
+                req.session.message = `The new price is invalid.`
+                req.session.alertType = alertTypes.ErrorAlert
+            } else {
+                req.session.message = `No subscriptions to update the price.`
+                req.session.alertType = alertTypes.BasicAlert
+            }
         }
-        let updated = await Stripe.updateStripeSubscription(subId, updates)
 
     } catch (error) {
-        console.error("ERROR: changePrice()")
+        console.error("ERROR: stripeController.changePrice()")
         console.error(error)
+        req.session.message = "Error trying to change old price."
+        req.session.alertType = alertTypes.ErrorAlert
 
     }
-
+    res.redirect('/account')
 }

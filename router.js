@@ -25,7 +25,8 @@ const { checkAuthenticated,
     authDeleteCar,
     authDeleteService,
     authValidateMembership,
-    authChangePassword } = require('./src/middleware/authFunctions')
+    authChangePassword,
+    authChangePrices } = require('./src/middleware/authFunctions')
 
 const { validateSubscriptions, redirectBySubscriptionStatus } = require('./src/middleware/validateFunctions')
 
@@ -156,6 +157,8 @@ router.get('/delete-report/:id', checkAuthenticated, reportsController.delete)
 //------ Stripe and Payment Routes ------
 router.get('/charges', checkAuthenticated, stripeController.charges)
 router.get('/invoices', checkAuthenticated, stripeController.invoices)
+router.post('/changePrices', checkAuthenticated, authChangePrices, stripeController.changePrice)
+
 
 
 router.post('/webhook', stripeController.webhook)
