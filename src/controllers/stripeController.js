@@ -50,7 +50,7 @@ exports.webhook = async (req, res) => {
             case 'customer.created':
                 // console.debug(JSON.stringify(data))
                 customer = await UserService.getUserByEmail(data?.email)
-                
+
                 if (!customer) {
                     // TODO: verify if the customer exists, if not then create.
                     let hashPassword = await bcrypt.hash('Test1234', 10)
@@ -404,7 +404,7 @@ exports.checkout = async (req, res) => {
     } catch (e) {
         console.log(e)
         res.status(400)
-        return res.send({
+        res.send({
             error: {
                 message: e.message
             }
@@ -653,11 +653,16 @@ exports.changePrice = async (req, res) => {
                         { id: itemToUpdate.id, price: newPrice, quantity: itemToUpdate.quantity }
                     ]
                 }
-                let updated = await Stripe.updateStripeSubscription(subscription.id, updates)
+                try {
+                    let updated = await Stripe.updateStripeSubscription(subscription.id, updates)
 
-                if (updated) {
-                    count++
-                    console.log(`Price (${newPrice}) updated for subscription (${updated?.id})`)
+                    if (updated) {
+                        count++
+                        console.log(`Price (${newPrice}) updated for subscription (${updated?.id})`)
+                    }
+                } catch (error) {
+                    console.error(error)
+                    console.error("Error trying to change price to: " + subscription?.id)
                 }
             }
 
