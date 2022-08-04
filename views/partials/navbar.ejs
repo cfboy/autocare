@@ -70,6 +70,11 @@
                     </a>
                 </div>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/home" aria-expanded="false" title="Home">
+                    <i class="fa-solid fa-list text-primary"></i>
+                </a>
+            </li>
             <% if(user.billingID) { %>
             <li class="nav-item">
                 <a class="nav-link" href="/create-subscriptions" aria-expanded="false" title="Add Membership">
@@ -89,7 +94,7 @@
                     <% } %>
 
                 </a>
-                <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list pb-0 notifications-dropdown"
+                <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list pb-0 vh-50 overflow-auto notifications-dropdown"
                     aria-labelledby="notificationDropdown" onclick="">
                     <a class="dropdown-item py-3 border-bottom">
                         <p class="mb-0 font-weight-medium float-left">
@@ -180,6 +185,11 @@
 
 <script>
     window.onload = function () {
+        $('[data-toggle="tooltip"]').tooltip({
+            placement: function (t_el, el) {
+                return (typeof $(el).data('placement') === 'undefined') ? 'bottom' : $(el).data('placement');
+            }, trigger: 'hover'
+        });
         //YOUR JQUERY CODE
         manageLangDropdown();
 

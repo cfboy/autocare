@@ -54,13 +54,14 @@
                                                         <% } %></h4>
                                                 </div>
                                                 <div class="d-flex justify-content-between align-items-start">
-                                                    <a href="/changePassword/<%- customer.id%>?url=/customers"
+                                                    <a href="/changePassword/<%- customer.id%>?url=/editCustomers&userType=<%- userType%>"
                                                         type="button" class="btn btn-primary btn-icon-text m-1">
                                                         <i class="fa-solid fa-key"></i>
                                                         <%= lingua.user.password.changePassword%>
                                                     </a>
-                                                    <a href="/edit-user/<%- customer.id%>?url=/customers" data-id="user"
-                                                        type="button" class="btn btn-primary btn-icon-text m-1">
+                                                    <a href="/edit-user/<%- customer.id%>?url=/editCustomers&userType=<%- userType%>"
+                                                        data-id="user" type="button"
+                                                        class="btn btn-primary btn-icon-text m-1">
                                                         <i class="fa-solid fa-user-pen"></i>
                                                         <%= lingua.user.editPersonalInfo%>
                                                     </a>
@@ -137,6 +138,7 @@
                                                             <th><%= lingua.car.brand%></th>
                                                             <th><%= lingua.car.model%></th>
                                                             <th><%= lingua.car.plate%></th>
+                                                            <th><%= lingua.membership.name%></th>
                                                             <th><%= lingua.action%></th>
                                                         </tr>
                                                     </thead>
@@ -153,8 +155,13 @@
 
                                                             <td><%- car.model%></td>
                                                             <td><%- car.plate%></td>
-
-                                                            <td class="text-center">
+                                                            <td>
+                                                                <%# car.subscription.data%>
+                                                                <span style="text-transform: uppercase;">
+                                                                    <%- car.subscription.data.status%>
+                                                                </span>
+                                                            </td>
+                                                            <td>
                                                                 <% if(enableActions) { %>
                                                                 <a href="/edit-car/<%- car.id%>?url=/cars" type="button"
                                                                     class="btn btn-icon btn-icon-no-border no-margin pt-0 pb-0">
@@ -217,6 +224,7 @@
     <script src="../js/template.js"></script>
     <script src="../js/jquery.cookie.js" type="text/javascript"></script>
     <!-- End custom js for this page-->
+    <script src="../js/helper-functions.js"></script>
 
     <!-- Alerts Code -->
     <%- include('../partials/alerts.ejs', {message, alertType}); %>

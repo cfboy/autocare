@@ -87,24 +87,57 @@
         <!-- partial -->
         <div class="container-fluid content-wrapper p-0">
             <div class="container p-4 pt-0">
-                <div class="row">
+                <div class="row justify-content-center">
                     <% if(prices) { %>
                     <% for(price of prices) { %>
                     <%# for(price of product.priceInfo) { %>
-                    <div class="col-lg-6 col-md-6 mb-4">
+                    <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12 mb-4">
                         <div class="card h-100 shadow-lg">
+                            <% if(price.metadata.type == "NEW OFFER") { %>
+                            <div class="ribbon-wrapper">
+                                <div class="ribbon"><%= price.metadata.type%></div>
+                            </div>
+                            <% } %>
                             <div class="card-body">
                                 <div class="text-center p-3">
                                     <h1 class="h2"><%= price.product.name %></h2>
                                         <!-- <small>Individual</small> -->
-                                        <br><br>
-                                        <span class="h3"><%= price.unit_amount%></span>
-                                        <% if(price?.transform_quantity){ %>
-                                        <%= lingua.membership.perGroupOf%>**
-                                        <%=  price.transform_quantity?.divide_by%> / <%= price.recurring.interval%>
-                                        <% } else { %>
-                                        /<%= lingua.month%>**
-                                        <% } %>
+                                        <br>
+                                        <div>
+                                            <% if(price?.oldPrice) { %>
+                                            <span class="h4 text-danger"
+                                                style="text-decoration-line: line-through;"><%= price.oldPrice%></span>
+                                            <br>
+                                            <% } %>
+                                            <span class="h3"><%= price.unit_amount%></span>
+                                            <% if(price?.transform_quantity){ %>
+
+                                            <%= lingua.membership.perGroupOf%>**
+                                            <%=  price.transform_quantity?.divide_by%> / <%= price.recurring.interval%>
+
+                                            <% } else if(price.recurring) { %>
+                                            <b>
+                                                /
+                                                <% if(price.recurring.interval == 'month') { %>
+                                                <!-- If the recurring interval is a month then -->
+                                                <% if(price.recurring.interval_count > 1) { %>
+                                                <%= price.recurring.interval_count%>
+
+                                                <%= lingua.months%>
+                                                <% } else { %>
+                                                <%= lingua.month%>
+                                                <% } %>
+                                                <% } else { %>
+                                                <%= price.recurring.interval%>
+                                                <% } %>
+                                                **
+                                            </b>
+                                            <% } else { %>
+                                            <!-- This else maybe is not necessary -->
+                                            /<%= lingua.month%>**
+
+                                            <% } %>
+                                        </div>
                                         <br><br>
                                 </div>
                                 <p class="card-text"><%= price.product.description%></p>

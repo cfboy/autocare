@@ -28,7 +28,9 @@ exports.createSubscriptions = async (req, res) => {
 
             const prices = await Stripe.getAllPrices()
 
-            res.render('auth/createSubs.ejs', { cart, message, alertType, user, allMakes, allModels, prices })
+            let userCars = await CarService.getAllCarsByUserWithoutSubs(user)
+
+            res.render('auth/createSubs.ejs', { cart, message, alertType, user, allMakes, allModels, prices, userCars })
         } else {
             req.session.message = "This user don't have stripe account."
             req.session.alertType = alertTypes.WarningAlert
@@ -63,13 +65,6 @@ exports.validateMembership = async (req, res) => {
 
 }
 
-// exports.clearQueue = async (req, res) => {
-//     console.debug('Clearing Queue...')
-//     readingQueue = []
-//     res.send({ readingQueue })
-
-// }
-
 /**
  * This function search the user by car plate number and return the membership status.
  * This function is called by ajax function.
@@ -88,7 +83,11 @@ exports.validate = async (req, res) => {
         let customer, subscription, services, hasService
 
         if (car) {
-            subscription = await SubscriptionService.getSubscriptionByCar(car)
+            // TODO: Handle new/different subscriptions for old cars.
+            // subscription = await SubscriptionService.getSubscriptionByCar(car)
+            // subscription = await SubscriptionService.getLastActiveSubscriptionByCar(car)
+            subscription = await SubscriptionService.getLastSubscriptionByCar(car)
+
             customer = subscription?.user
             services = await ServiceService.getServicesByCar(car)
             hasService = services.some(service => service.created_date.setHours(0, 0, 0, 0) === new Date().setHours(0, 0, 0, 0))
@@ -99,9 +98,6 @@ exports.validate = async (req, res) => {
             // let actionType = inputType == 'System' ? historyTypes.SYSTEM_ACTION : historyTypes.USER_ACTION
             // HistoryService.addHistory(`Validate Membership: ${carPlate}`, actionType, req.user, req?.user?.locations[0])
         }
-
-        // Remove readed plate to readingQueue list.
-        // readingQueue = readingQueue.filter(item => carPlate !== item.plate)
 
         res.render('ajaxSnippets/validationResult.ejs', {
             user,

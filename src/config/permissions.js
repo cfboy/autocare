@@ -1,4 +1,11 @@
 const { ROLES } = require('../collections/user/user.model')
+const { STATUS } = require('../connect/stripe');
+
+function isAdmin(user) {
+    return (
+        user.role === ROLES.ADMIN
+    )
+}
 
 function canDeleteLocation(user) {
     return (
@@ -31,9 +38,11 @@ function canDeleteCar(user, carID, services) {
 }
 
 function canAddCar(user) {
-    return (
-        user.subscriptions.some(sub => sub.items.some(item => item?.cars?.length < item.data.quantity))
+    let canAdd = (
+        user.subscriptions.some(sub => sub.items.some(item => item?.cars?.length < item.data.quantity) && sub.data.status == STATUS.ACTIVE)
     )
+
+    return canAdd
 }
 
 function canEditCar(user, carID, services) {
@@ -72,5 +81,6 @@ module.exports = {
     canDeleteUser,
     canValidateMemberships,
     canChangePassword,
-    canDeleteService
+    canDeleteService,
+    isAdmin
 }

@@ -24,7 +24,7 @@ exports.users = async (req, res) => {
     try {
         // Message for alerts
         let { message, alertType } = req.session
-
+        let userType = 'users' //This variable is used to compose the url to redirect on edit.
         // clear message y alertType
         if (message) {
             req.session.message = ''
@@ -42,7 +42,7 @@ exports.users = async (req, res) => {
                 // users = await UserService.getUsers(user.id)
                 users = await UserService.getUsersExcludeRole(ROLES.CUSTOMER)
 
-            res.render('user/index.ejs', { user, users, message, alertType })
+            res.render('user/index.ejs', { user, users, message, alertType, userType })
 
         }
     } catch (error) {
@@ -64,6 +64,7 @@ exports.customers = async (req, res) => {
     try {
         // Message for alerts
         let { message, alertType } = req.session
+        let userType = 'customers' //This variable is used to compose the url to redirect on edit.
 
         // clear message y alertType
         if (message) {
@@ -78,7 +79,7 @@ exports.customers = async (req, res) => {
         } else {
             let users = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
 
-            res.render('user/index.ejs', { user, users, message, alertType })
+            res.render('user/index.ejs', { user, users, message, alertType, userType })
 
         }
     } catch (error) {
@@ -193,7 +194,8 @@ exports.viewUser = async (req, res) => {
     try {
         let { message, alertType } = req.session,
             findByBillingID = req?.query?.billingID ? true : false,
-            cars
+            cars,
+            userType = req?.query?.userType
 
         if (message) {
             req.session.message = ''
@@ -215,6 +217,10 @@ exports.viewUser = async (req, res) => {
 
             cars = await CarService.getAllCarsByUser(customer)
 
+            for (car of cars) {
+                car.subscription = await SubscriptionService.getLastSubscriptionByCar(car)
+            }
+
             res.status(200).render('user/view.ejs', {
                 user: req.user,
                 isMyProfile,
@@ -222,7 +228,8 @@ exports.viewUser = async (req, res) => {
                 subscriptions: customer?.subscriptions,
                 cars,
                 message,
-                alertType
+                alertType,
+                userType
             })
         } else {
             message = 'Customer not found.'
@@ -251,12 +258,15 @@ exports.editUser = async (req, res) => {
         const id = req.params.id;
         const url = req.query.url ? req.query.url : '/account'
         const customer = await UserService.getUserById(id)
+        const userType = req.query.userType
 
         if (customer) {
             if (ROLES)
                 selectRoles = Object.entries(ROLES)
 
-            res.status(200).render('user/edit.ejs', { user: req.user, customer, municipalities, selectRoles, url: (url == '/users' || url == '/customers' || url == '/account' || url == '/validateMembership') ? url : `${url}/${id}` })
+            let composedUrl = (req.user.role == ROLES.CUSTOMER) ? `/customers/${req.user.id}` : ((url || userType) == '/users' || (url || userType) == '/customers' || url == '/account' || url == '/validateMembership') ? url : url == "/editCustomers" ? `/customers/${id}` : `${url}/${id}`
+
+            res.status(200).render('user/edit.ejs', { user: req.user, customer, municipalities, selectRoles, url: composedUrl })
         } else {
             console.log('User not found.')
             res.redirect(`${url}`)
@@ -282,7 +292,10 @@ exports.changePassword = async (req, res) => {
         const customer = await UserService.getUserById(id)
 
         if (customer) {
-            res.status(200).render('user/changePassword.ejs', { user: req.user, customer, url: (url == '/users' || url == '/account' || url == '/validateMembership') ? url : `${url}/${id}` })
+                                                                                            //  (url == '/users' || url == '/account' || url == '/validateMembership') ? url : `${url}/${id}`
+            let composedUrl = (req.user.role == ROLES.CUSTOMER) ? `/customers/${req.user.id}` : ((url || userType) == '/users' || (url || userType) == '/customers' || url == '/account' || url == '/validateMembership') ? url : url == "/editCustomers" ? `/customers/${id}` : `${url}/${id}`
+
+            res.status(200).render('user/changePassword.ejs', { user: req.user, customer, url: composedUrl })
         } else {
             console.log('User not found.')
             res.redirect(`${url}`)
@@ -459,7 +472,7 @@ exports.removeFromCart = async (req, res) => {
 
     let user = await UserService.removeItemFromCart(req.user.id, itemToRemove)
     if (user)
-        returnValues = { itemRemoved: true, subscriptionList: user.cart }
+        returnValues = { itemRemoved: true, subscriptionList: user.cart?.items }
     else
         returnValues = { itemRemoved: false, subscriptionList: [] }
 

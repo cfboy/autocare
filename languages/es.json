@@ -1,6 +1,7 @@
 {
     "home": "Inicio",
-    "month": "Mes",
+    "month": "mes",
+    "months": "meses",
     "termsAndConditions": "Términos y Condiciones",
     "title": "Portal de Membresías",
     "welcome": "Bienvenido",
@@ -18,6 +19,7 @@
     "members": "Miembros",
     "add": "Añadir",
     "car": {
+        "myCars": "Mis Carros",
         "view": "Ver Carro",
         "info": "Información del Carro",
         "add": "Añadir Carro",
@@ -39,7 +41,9 @@
         "notFound": "Carro no encontrado en sistema",
         "existingCar": "La tablilla existe en nuestro sistema. Favor proveer otro número de tablilla",
         "validCar": "Número de Tablilla Valido",
-        "membershipToAddCar": "Membresía a la que va añadir el carro"
+        "membershipToAddCar": "Membresía a la que va añadir el carro",
+        "alreadyAddedToCart": "Este carro ya fué añadido a la lista.",
+        "selectOrCreate": "Seleccione o cree un nuevo carro"
     },
     "user": {
         "name": "Usuario",
@@ -99,7 +103,8 @@
         "currentPeriodEnd": "Periodo Corriente Culmina",
         "price": "Precio",
         "subTotal": "Sub Total",
-        "proceedToCheckout": "Proceder al Pago"
+        "proceedToCheckout": "Proceder al Pago",
+        "selectMembership": "Seleccione un plan"
     },
     "service": {
         "qty": "Cantidad de Servicios",
@@ -202,5 +207,6 @@
         "passwordReset": "Auto Care - Solicitud de restablecimiento de contraseña"
     },
     "clear": "Limpiar",
-    "utilizationHistory": "Historial de Utilización"
+    "utilizationHistory": "Historial de Utilización",
+    "loading": "Cargando"
 }

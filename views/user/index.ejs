@@ -76,7 +76,7 @@
                                                         <% for(const user of users) { %>
                                                         <tr>
                                                             <td>
-                                                                <a class="btn-link" href="/customers/<%- user.id%>">
+                                                                <a class="btn-link" href="/customers/<%- user.id%>?userType=/<%- userType%>">
                                                                     <%- user.personalInfo.firstName + ' ' + user.personalInfo.lastName %>
                                                                     <!-- <%# if(!user.hasAllInformation) { %>
                                                                     <i class="mdi mdi-alert text-warning"
@@ -94,8 +94,7 @@
                                                                 <%- user.personalInfo.phoneNumber %>
                                                             </td>
                                                             <td>
-                                                                <% var url = [roles.ADMIN].includes(user.role) ? 'users' : 'customers' %>
-                                                                <a href="/edit-user/<%- user.id%>?url=/<%- url%>"
+                                                                <a href="/edit-user/<%- user.id%>?url=/<%- userType%>"
                                                                     type="button"
                                                                     class="btn btn-icon btn-icon-no-border no-margin">
                                                                     <i class="far fa-edit icon-sm"></i>

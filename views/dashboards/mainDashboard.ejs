@@ -59,6 +59,11 @@
                                                 role="tab" aria-selected="false"><%= lingua.myPlans%></a>
                                         </li>
                                         <% } %>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="adminActions-tab" data-bs-toggle="tab"
+                                                href="#adminActions" role="tab" aria-controls="adminActions"
+                                                aria-selected="true">Admin Actions</a>
+                                        </li>
                                     </ul>
                                     <!-- <div>
                                         <div class="btn-wrapper">
@@ -96,6 +101,57 @@
                                             prices, subscriptions}); %>
                                     </div>
                                     <% } %>
+                                    <div class="tab-pane show vh-100" id="adminActions" role="tabpanel">
+                                        <div class="row flex-grow">
+                                            <div class="col-12 grid-margin stretch-card">
+                                                <div class="card card-rounded">
+                                                    <div class="card-body">
+                                                        <h4>Change Price</h4>
+                                                        <small>This tool find all subscriptions with the old price and
+                                                            change their price to the new price.</small>
+                                                        <form id="form-change-price" class="pt-3" action="/changePrices"
+                                                            method="post">
+
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label for="oldPrice" class="required">Old
+                                                                            Price ID</label>
+
+                                                                        <input type="text" id="oldPrice" name="oldPrice"
+                                                                            class="form-control mb-3 form-control-lg"
+                                                                            placeholder="Ej: price_1JvNZ5L5YqSpFl3KFGcW042e"
+                                                                            required />
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+
+                                                                    <div class="form-group">
+                                                                        <label for="newPrice" class="required">New
+                                                                            Price ID</label>
+
+                                                                        <input type="text" id="newPrice" name="newPrice"
+                                                                            class="form-control mb-3 form-control-lg"
+                                                                            required />
+                                                                    </div>
+                                                                </div>
+
+                                                            </div>
+
+                                                            <div class="row">
+                                                                <div class="mt-3">
+                                                                    <button id="add-btn"
+                                                                        class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn float-end"
+                                                                        type="submit"
+                                                                        style="color: white!important;">Change</button>
+                                                                </div>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <!-- content-wrapper ends -->
@@ -142,7 +198,7 @@
     <!-- Alerts Code -->
     <%- include('../partials/alerts.ejs', {message, alertType}); %>
     <%- include('../partials/dataTable.ejs', {tableID : '#membersTable'}); %>
-    <%- include('../partials/subscriptions/checkoutScript.ejs'); %>  
+    <%- include('../partials/subscriptions/checkoutScript.ejs'); %>
 </body>
 
 </html>

@@ -25,6 +25,7 @@
                 })
                     .then((result) => result.json())
                     .then(({ sessionId }) => stripe.redirectToCheckout({ sessionId }))
+                    .catch((error) => alert(error))
             } else {
                 alert("This user don't have billing id.")
             }
