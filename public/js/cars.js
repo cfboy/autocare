@@ -16,6 +16,7 @@ function findModel(makeName, carModel = null, select) {
         // }
         // });
     } else {
+        // TODO: add backup if the API its not working.
         $.ajax({
             url: "https://vpic.nhtsa.dot.gov/api/vehicles/GetModelsForMake/" + makeName,
             type: "GET",
@@ -49,6 +50,40 @@ function findModel(makeName, carModel = null, select) {
             }
         });
     }
+}
+
+function autofillCarInfo(selectedCar, linguaString) {
+    if (selectedCar) {
+        let id = selectedCar.selectedOptions[0].getAttribute('value');
+        let brand = selectedCar.selectedOptions[0].getAttribute('brand');
+        let model = selectedCar.selectedOptions[0].getAttribute('model');
+        let plate = selectedCar.selectedOptions[0].getAttribute('plate');
+        let carBrand = $('#brand');
+        let carModel = $('#carModel');
+        let carPlate = $('#carPlate');
+
+        carBrand.attr('disabled', true);
+        carModel.attr('disabled', true);
+        carPlate.attr('disabled', true);
+
+        // showResult function is in the helper-functions.js
+        showResult('#autofillLoading', `<span class="d-block alert-fill-info rounded-1 p-2">${linguaString}...</span>`)
+
+        // Set the values to the form fields.
+        carBrand.select2().val(brand).trigger('change'); //This trigger the function findModel on cars.js
+        carBrand.attr('disabled', false);
+        // Set timeout in which the models loads.
+        setTimeout(function () {
+            carModel.attr('disabled', true);
+            carModel.select2().val(model).trigger('change');
+            carModel.attr('disabled', false);
+            carPlate.attr('disabled', false);
+            carPlate.val(plate);
+            showResult('#autofillLoading', "")
+        }, 1500);
+
+    }
+
 }
 
 $('#carPlate').on('input', function () {

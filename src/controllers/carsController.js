@@ -1,19 +1,18 @@
 const SubscriptionService = require('../collections/subscription')
 const { ROLES } = require('../collections/user/user.model')
+const { STATUS } = require('../connect/stripe');
 const ServiceService = require('../collections/services')
 const UserService = require('../collections/user')
 const CarService = require('../collections/cars')
 const HistoryService = require('../collections/history')
 const { historyTypes } = require('../collections/history/history.model')
 const alertTypes = require('../helpers/alertTypes')
-const Stripe = require('../connect/stripe')
 const UtilizationService = require('../collections/utilization')
 const { canDeleteCar,
     canManageCars,
     canEditCar,
     canAddCar
 } = require('../config/permissions')
-const userService = require('../collections/user/user.service')
 
 /**
  * This function render all cars of current user.
@@ -38,32 +37,13 @@ exports.cars = async (req, res) => {
         if (!user) {
             res.redirect('/')
         } else {
-            // Handle invalid Cars
-            let nullUserCars = await CarService.getCarsWithUserNull()
-            if (nullUserCars.length > 0)
-                await CarService.handleCarsWithUserNull(nullUserCars)
-
             if ([ROLES.ADMIN, ROLES.MANAGER].includes(user.role)) {
+                // Handle invalid Cars
+                let nullUserCars = await CarService.getCarsWithUserNull()
+                if (nullUserCars.length > 0)
+                    await CarService.handleCarsWithUserNull(nullUserCars)
+
                 cars = await CarService.getCars()
-
-                // Execute this logic for Admins and Managers to calculate utilization on old cars.
-                for (carObj of cars) {
-                    let subscription = await SubscriptionService.getSubscriptionByCar(carObj)
-                    let startDate = new Date(subscription.data.current_period_start * 1000),
-                        endDate = new Date(subscription.data.current_period_end * 1000),
-                        daysBetweenTwoDates = (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24)
-
-                    let services = await ServiceService.getServicesByCarBetweenDates(carObj, startDate, endDate),
-                        percentage = (services.length / daysBetweenTwoDates)
-
-                    if (carObj.utilization?.start_date == null || carObj.utilization?.end_date == null || carObj?.utilization?.services != services.length || carObj?.utilization?.percentage != percentage)
-                        await CarService.updateCar(carObj.id, {
-                            'utilization.start_date': startDate,
-                            'utilization.end_date': endDate,
-                            'utilization.services': services.length,
-                            'utilization.percentage': percentage
-                        })
-                }
 
             } else {
                 cars = await CarService.getAllCarsByUser(user)
@@ -194,16 +174,17 @@ exports.create = async (req, res) => {
         let siToAddCar = []
         // let stripeItem
         user = await SubscriptionService.setStripeInfoToUser(user)
-        for (subscription of user.subscriptions) {
-            for (item of subscription.items) {
-                // stripeItem = await Stripe.getSubscriptionItemById(item.id)
-                if (item.cars.length < item.data.quantity) {
+        for (sub of user.subscriptions) {
+            for (item of sub.items) {
+                if (item.cars.length < item.data.quantity && sub.data.status == STATUS.ACTIVE) {
                     siToAddCar.push(item)
                 }
             }
         }
 
-        res.render('cars/create.ejs', { user, allMakes, allModels, siToAddCar, itemID, message, alertType })
+        let userCars = await CarService.getAllCarsByUserWithoutSubs(user)
+
+        res.render('cars/create.ejs', { user, allMakes, allModels, siToAddCar, itemID, userCars, message, alertType })
 
     } catch (error) {
         console.log(error)
@@ -220,11 +201,14 @@ exports.edit = async (req, res) => {
     try {
         const carID = req.params.id,
             url = req.query.url ? req.query.url : '/account',
-            car = await CarService.getCarByID(carID)
+            car = await CarService.getCarByID(carID),
+            user = req.user
 
         if (car) {
-            let { allMakes, allModels } = await CarService.getAllMakes()
-            res.status(200).render('cars/edit.ejs', { user: req.user, car, allMakes, allModels, url: (url == '/cars' || url == '/account') ? url : `${url}/${carID}` })
+            let { allMakes, allModels } = await CarService.getAllMakes(),
+                userCars = await CarService.getAllCarsByUserWithoutSubs(user)
+
+            res.status(200).render('cars/edit.ejs', { user, userCars, car, allMakes, allModels, url: (url == '/cars' || url == '/account') ? url : `${url}/${carID}` })
         }
 
     } catch (error) {
@@ -248,28 +232,31 @@ exports.save = async (req, res) => {
         let car = await CarService.addCar(fields.brand, fields.model, fields.plate, fields.userID)
 
         if (car) {
-            // console.debug(`A new car added to DB. ID: ${car.id}.`)
+            if (await CarService.canUseThisCarForNewSubs(car)) {
+                //Remove old car of old subscriptions. 
+                if (car.cancel_date != null)
+                    await CarsService.removeCarFromAllSubscriptions(car)
+                // Add car to subscription
+                // fields.subItem.split('/')[0] has the subscription ID
+                // fields.subItem.split('/')[1] has the subItem ID 
+                let subscription = await SubscriptionService.addSubscriptionCar(fields.subItem.split('/')[0], car, fields.subItem.split('/')[1])
 
-            // Add car to subscription
-            // fields.subItem.split('/')[0] has the subscription ID
-            // fields.subItem.split('/')[1] has the subItem ID 
-            let subscription = await SubscriptionService.addSubscriptionCar(fields.subItem.split('/')[0], car, fields.subItem.split('/')[1])
+                if (subscription) {
+                    req.session.message = `Added Car to subscription: ${subscription.id}. New Car:  ${car.brand} - ${car.model} - ${car.plate}`
+                }
 
-            if (subscription) {
-                req.session.message = `
-            Added Car to subscription: ${subscription.id}
-
-            New Car:  ${car.brand} - ${car.model} - ${car.plate}`
+                req.session.message = `New Car:  ${car.brand} - ${car.model} - ${car.plate}.`
+                req.session.alertType = alertTypes.CompletedActionAlert
+                req.flash('info', 'Car created.')
+            } else {
+                req.session.message = `This Car:  ${car.brand} - ${car.model} - ${car.plate} can not be added to this subscription..`
+                req.session.alertType = alertTypes.WarningAlert
             }
-
-            req.session.message = `New Car:  ${car.brand} - ${car.model} - ${car.plate}.`
-            req.session.alertType = alertTypes.CompletedActionAlert
-            req.flash('info', 'Car created.')
         } else {
-            req.session.message = `Car not created..`
+            req.session.message = `Car not found or created.`
             req.session.alertType = alertTypes.ErrorAlert
-            // req.flash('er', 'Car created.')
         }
+
         res.redirect('/cars')
 
     } catch (error) {
@@ -319,38 +306,27 @@ exports.update = async (req, res) => {
 
 /**
  * This function deletes existing car.
- * First remove the reference on User obj, then delete the Car obj.
+ * First remove the reference on subscription obj, then delete the Car obj.
  * @param {*} req 
  * @param {*} res 
  */
+// TODO: TEST THIS FUNCTION
 exports.delete = async (req, res) => {
     console.log('Deleting Car...')
     const carID = req.params.id
 
     try {
-        let car = await CarService.getCarByID(carID),
-            subscription = await SubscriptionService.getSubscriptionByCar(car)
+        let car = await CarService.getCarByID(carID)
+            // removeCarFromAllSubscriptions = await CarService.removeCarFromAllSubscriptions(car)
 
-        let item = subscription.items.find(item =>
-            item.cars.find(itemCar =>
-                itemCar.id = car.id))
-
-        let updatedSubscription = await SubscriptionService.removeSubscriptionCar(subscription.id, item.id, car)
-
-
-        // Validate if the car is removed from user.
-        let notDeletedCar = updatedSubscription.items.some(item =>
-            item.cars.some(itemCar =>
-                itemCar.id = car.id))
-
-        if (!updatedSubscription || notDeletedCar) {
-            req.session.message = `Can't delete the car from subscription.`
-            req.session.alertType = alertTypes.WarningAlert
-        } else {
-            CarService.deleteCar(carID) //TODO: verify if is need to delete the car forever.
+        if (car) {
+            CarService.deleteCar(car.id) //TODO: verify if is need to delete the car forever.
             // Set the message for alert. 
             req.session.message = `Car Deleted.`
             req.session.alertType = alertTypes.CompletedActionAlert
+        } else {
+            req.session.message = "Can't delete car."
+            req.session.alertType = alertTypes.ErrorAlert
         }
 
     } catch (error) {
@@ -359,15 +335,6 @@ exports.delete = async (req, res) => {
         req.session.message = "Can't delete car."
         req.session.alertType = alertTypes.ErrorAlert
     }
-
-    // //Log this action.
-    // try {
-    //     HistoryService.addHistory("Location deleted", historyTypes.USER_ACTION, req.user, null)
-    // } catch (error) {
-    //     console.debug(`ERROR-LOCATION-CONTROLLER : ${error.message}`)
-    //     req.session.message = "Can't add to History Log."
-    //     req.session.alertType = alertTypes.ErrorAlert
-    // }
 
     res.redirect('/cars')
 
@@ -381,14 +348,25 @@ exports.delete = async (req, res) => {
  */
 exports.validatePlate = async (req, res) => {
     try {
+        const lingua = req.res.lingua.content
+
         let { plateNumber, newItem, addToCart } = req.body,
             car = await CarService.getCarByPlate(plateNumber),
             subscriptionList = req.body.subscriptionList,
-            existingCar = false
+            invalidCar = false,
+            invalidMsj = ''
+        canUseThisCar = car ? await CarService.canUseThisCarForNewSubs(car) : false
         let customer, item = null
 
-        if (car || subscriptionList?.some(car => car.plate === plateNumber)) {
-            existingCar = true
+        // if the canUseThisCar is true, it means that this car is an existing and valid car to assign to a new membership.
+        if ((car && !canUseThisCar)) {
+            invalidCar = true
+            invalidMsj = lingua.car.existingCar
+
+        } else if (subscriptionList?.some(car => car.plate === plateNumber)) {
+            invalidCar = true
+            invalidMsj = lingua.car.alreadyAddedToCart
+
         } else if (addToCart) {
             [customer, item] = await UserService.addItemToCart(req.user.id, newItem)
 
@@ -396,7 +374,7 @@ exports.validatePlate = async (req, res) => {
                 console.debug('Item Added successfully')
         }
 
-        res.send({ existingCar: existingCar, item })
+        res.send({ existingCar: invalidCar, invalidMsj: invalidMsj, item })
 
     } catch (error) {
         console.error("ERROR: carController -> Tyring to validate car plate.")
@@ -404,4 +382,24 @@ exports.validatePlate = async (req, res) => {
         res.render('Error validating car plate.')
     }
 
+}
+
+exports.syncUtilization = async (req, res) => {
+    try {
+        let cars = JSON.parse(req.body.cars)
+
+        if (cars) {
+            let updatedQty = await UtilizationService.syncCarsUtilization(cars)
+            res.send({ updatedQty: updatedQty, message: `Syncronization Completed. (Updated Cars: ${updatedQty})` })
+
+        } else {
+            res.send({ updatedQty: 0, message: `Not cars to synchronize.` })
+        }
+
+
+    } catch (error) {
+        console.error("ERROR: carsController -> Tyring to syncUtilization.")
+        console.error(error.message)
+        res.render({ message: 'Error on sync % utilization.' })
+    }
 }

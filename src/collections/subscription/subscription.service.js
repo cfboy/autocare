@@ -1,3 +1,4 @@
+const { STATUS } = require('../../connect/stripe');
 /**
  * IMPORTANT: All the subscription obj has the ID of Stripe Subscription Obj on id property.
  * So when need to find a subscription by id should use findOne instead findByID.
@@ -10,23 +11,33 @@
  * @param {*} Subscription 
  * @returns Subscription
  */
-const addSubscription = (Subscription) => async ({
-    id, items, data, user
-}) => {
+const addSubscription = (Subscription) => async ({ id, items, data, user }) => {
     if (!id || !items || !data || !user) {
         throw new Error(`Subscription: Missing Data.`)
     }
 
     console.log(`Subscription: addSubscription()`)
 
-    const subscription = new Subscription({
+    const query = {
         id,
         items,
         data,
         user
-    })
+    }
 
-    return await subscription.save()
+    const update = {
+    }
+
+    const options = {
+        upsert: true,
+        new: true,
+        setDefaultsOnInsert: true
+    }
+
+    const subscription = await Subscription.findOneAndUpdate(query, update, options)
+        .populate({ path: 'user', model: 'user' })
+
+    return subscription
 }
 
 /**
@@ -118,7 +129,22 @@ const getSubscriptions = (Subscription) => () => {
  */
 const getSubscriptionsByUser = (Subscription) => async (user) => {
     return Subscription.find({ user: user }).populate('user')
-        .populate({ path: 'items.cars', model: 'car' })
+        .populate({ path: 'items.cars', model: 'car' }).sort({ _id: -1 })
+}
+
+/**
+ * This function get the subscriptions by price id.
+ * @param {*} Subscription 
+ * @returns 
+ */
+const getSubscriptionsByPrice = (Subscription) => async (price) => {
+    return Subscription.find(
+        {
+            $and: [
+                { "items.data.price.id": price },
+                { "data.status": STATUS.ACTIVE }
+            ]
+        }).sort({ _id: -1 })
 }
 
 /**
@@ -146,7 +172,7 @@ const getSubscriptionById = (Subscription) => (id) => {
  */
 const getSubscriptionByCar = (Subscription) => async (car) => {
     return Subscription.findOne({
-        "items.cars": { _id: car.id }
+        "items.cars": { _id: (car.id ? car.id : car._id) } //Added the conditional statemet if the car.id is undefined.
     },
         function (err, docs) {
             if (err) {
@@ -156,6 +182,62 @@ const getSubscriptionByCar = (Subscription) => async (car) => {
             // console.debug("Subscription-SERVICE: Found subscription: ", docs?.id);
             // }
         }).populate('user').populate({ path: 'items.cars', model: 'car' })
+}
+
+/**
+ * This function get all Subscriptions by car.
+ * @param {*} Subscription 
+ * @returns Subscription list
+ */
+const getSubscriptionsByCar = (Subscription) => async (car) => {
+    return Subscription.find({
+        "items.cars": { _id: (car.id ? car.id : car._id) }
+    }, function (err, docs) {
+        if (err) {
+            console.error(err)
+        }
+    }).populate('user').populate({ path: 'items.cars', model: 'car' }).sort({ _id: -1 })
+}
+
+/**
+ * This function get the last subscription by car.
+ * @param {*} Subscription 
+ * @returns Subscription
+ */
+const getLastSubscriptionByCar = (Subscription) => async (car) => {
+    return await Subscription.findOne(
+        { "items.cars": { _id: (car.id ? car.id : car._id) } },
+        function (err, doc) {
+            if (err) {
+                console.error(err)
+            }
+            // else if (doc) {
+            // console.debug("Found the last subscription by car: " + doc.id)
+            // }
+        }).sort({ _id: -1 }).populate('user').populate({ path: 'items.cars', model: 'car' })
+}
+
+
+/**
+ *  This function get the last active subscription by car.
+ * @param {*} Subscription 
+ * @returns Subscription
+ */
+const getLastActiveSubscriptionByCar = (Subscription) => async (car) => {
+
+    return await Subscription.findOne({
+        $and: [
+            { "items.cars": { _id: (car.id ? car.id : car._id) } },
+            { "data.status": STATUS.ACTIVE }
+        ]
+    },
+        function (err, doc) {
+            if (err) {
+                console.error(err)
+            } else if (doc) {
+                console.debug("Found the last active subscription by car: " + doc.id)
+            }
+        }).sort({ _id: -1 }).populate('user').populate({ path: 'items.cars', model: 'car' })
 }
 
 /**
@@ -219,9 +301,10 @@ async function setStripeInfoToUser(customerObj) {
 
             if (customer.subscriptions.length > 0) {
                 customer.hasSubscription = true
-                for (subscription of customer.subscriptions) {
-                    for (item of subscription.items) {
-                        item.isValid = await validateItemQty(item)
+                for (sub of customer.subscriptions) {
+                    for (item of sub.items) {
+                        // If the status of subscriptions is CANCELED, then is not necessary to validateItemQty.
+                        item.isValid = (sub.data.status == STATUS.CANCELED) ? true : await validateItemQty(item)
                     }
                 }
             }
@@ -234,7 +317,7 @@ async function setStripeInfoToUser(customerObj) {
 
     } catch (error) {
         console.debug(`ERROR-STRIPE: setStripeInfoToUser()`);
-        console.debug(`ERROR-STRIPE: ${error.message}`);
+        console.debug(`ERROR-STRIPE: ${error}`);
 
         return null
     }
@@ -302,10 +385,14 @@ module.exports = (Subscription) => {
         deleteSubscription: deleteSubscription(Subscription),
         getSubscriptions: getSubscriptions(Subscription),
         getSubscriptionsByUser: getSubscriptionsByUser(Subscription),
+        getSubscriptionsByPrice: getSubscriptionsByPrice(Subscription),
         getSubscriptionById: getSubscriptionById(Subscription),
         getSubscriptionByCar: getSubscriptionByCar(Subscription),
+        getSubscriptionsByCar: getSubscriptionsByCar(Subscription),
         getSubscriptionItemByCar: getSubscriptionItemByCar(Subscription),
         getSubscriptionCarsById: getSubscriptionCarsById(Subscription),
+        getLastSubscriptionByCar: getLastSubscriptionByCar(Subscription),
+        getLastActiveSubscriptionByCar: getLastActiveSubscriptionByCar(Subscription),
         setStripeInfoToUser: setStripeInfoToUser,
         validateItemQty: validateItemQty
     }

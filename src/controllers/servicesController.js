@@ -1,6 +1,7 @@
 const ServiceService = require('../collections/services')
 const SubscriptionService = require('../collections/subscription')
 const CarService = require('../collections/cars')
+const UtilizationService = require('../collections/utilization')
 const HistoryService = require('../collections/history')
 const { historyTypes } = require('../collections/history/history.model')
 const { ROLES } = require('../collections/user/user.model')
@@ -105,33 +106,11 @@ exports.useService = async (req, res) => {
             let { item, subscription } = await SubscriptionService.getSubscriptionItemByCar(car)
             let customer = await UserService.getUserById(car.user_id)
 
-            // This logic to validate duplicates don't works.
-            // Get services to verify if exist any service on the same day and avoid duplicated.
-            // let services = await ServiceService.getServicesByCar(car)
-            // let service = services.filter(service => service.created_date.setHours(0, 0, 0, 0) === new Date().setHours(0, 0, 0, 0))
-
-            // if (service?.length == 0) {
             // TODO: Change location 
             service = await ServiceService.addService(car, authorizedBy, authorizedBy.locations[0], customer, item?.data?.price?.product?.name, inputType)
-            // } else {
-            // Use existing service.
-            // service = service[0]
-            // }
 
             if (car && service) {
-                let startDate = new Date(subscription.data.current_period_start * 1000),
-                    endDate = new Date(subscription.data.current_period_end * 1000),
-                    daysBetweenTwoDates = (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24)
-
-                let servicesInPeriod = await ServiceService.getServicesByCarBetweenDates(car, startDate, endDate),
-                    percentage = (servicesInPeriod?.length / daysBetweenTwoDates)
-
-                car = await CarService.updateCar(car.id, {
-                    'utilization.start_date': startDate,
-                    'utilization.end_date': endDate,
-                    'utilization.services': servicesInPeriod.length,
-                    'utilization.percentage': percentage
-                })
+                await UtilizationService.calculateUtilizationPercent(car, true)
 
                 //Log this action.
                 HistoryService.addHistory(`Use Service: ${service.id}`, historyTypes.SERVICE, customer, service.location)

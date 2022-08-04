@@ -20,7 +20,7 @@ const addUser = (User) => async ({
 
     console.log(`USER: addUser(${email})`)
 
-    const user = new User({
+    const query = {
         email: email,
         password,
         billingID,
@@ -32,10 +32,21 @@ const addUser = (User) => async ({
             dateOfBirth,
             city
         }
-    })
+    }
 
-    // TODO: handle errors and return the doc.
-    return await user.save()
+    const update = {
+
+    }
+
+    const options = {
+        upsert: true,
+        new: true,
+        setDefaultsOnInsert: true
+    }
+
+    const user = await User.findOneAndUpdate(query, update, options)
+
+    return user
 }
 
 /**
@@ -230,7 +241,7 @@ const getUsersByList = (User) => async (users) => {
  * @returns user object
  */
 const addNotification = (User) => async (id, message) => {
-    console.log(`addNotification() ID: ${id}`)
+    // console.log(`addNotification() ID: ${id}`)
     // let date = Date.now();
     let notification = {
         isRead: false,
@@ -243,7 +254,7 @@ const addNotification = (User) => async (id, message) => {
         { new: true })
         .then(result => {
             if (result) {
-                console.debug(`addNotification(): Successfully Added notification ${result.id}.`);
+                // console.debug(`addNotification(): Successfully Added notification ${result.id}.`);
                 return result
             } else {
                 console.debug("addNotification(): No document returned.");

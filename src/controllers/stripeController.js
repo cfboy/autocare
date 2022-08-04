@@ -49,37 +49,33 @@ exports.webhook = async (req, res) => {
         switch (event.type) {
             case 'customer.created':
                 // console.debug(JSON.stringify(data))
-                // TODO: verify if the customer exists, if not then create.
-                let hashPassword = await bcrypt.hash('Test1234', 10)
-                let firstName = data?.name?.split(' ')[0] ? data.name.split(' ')[0] : 'Test Name',
-                    lastName = data?.name?.split(' ')[1] ? data.name.split(' ')[1] : 'Test Last Name',
-                    phoneNumber = data?.phone ? data.phone : '787-777-7777',
-                    email = data?.email ? data.email : 'test@test.com'
+                customer = await UserService.getUserByEmail(data?.email)
+
+                if (!customer) {
+                    // TODO: verify if the customer exists, if not then create.
+                    let hashPassword = await bcrypt.hash('Test1234', 10)
+                    let firstName = data?.name?.split(' ')[0] ? data.name.split(' ')[0] : 'Test Name',
+                        lastName = data?.name?.split(' ')[1] ? data.name.split(' ')[1] : 'Test Last Name',
+                        phoneNumber = data?.phone ? data.phone : '787-777-7777',
+                        email = data?.email ? data.email : 'test@test.com'
 
 
-                let user = await UserService.addUser({
-                    email: email,
-                    password: hashPassword,
-                    billingID: data.id,
-                    role: ROLES.CUSTOMER,
-                    firstName: firstName,
-                    lastName: lastName,
-                    phoneNumber: phoneNumber,
-                    dateOfBirth: null,
-                    city: data?.address ? data?.address?.city : null
-                })
-
+                    let user = await UserService.addUser({
+                        email: email,
+                        password: hashPassword,
+                        billingID: data.id,
+                        role: ROLES.CUSTOMER,
+                        firstName: firstName,
+                        lastName: lastName,
+                        phoneNumber: phoneNumber,
+                        dateOfBirth: null,
+                        city: data?.address ? data?.address?.city : null
+                    })
+                }
                 // console.debug(`Customer created: ${user.email}`)
 
                 break
-            // case 'customer.deleted':
-            //     break
-            // case 'customer.updated':
-            //     break
-            // case 'invoice.paid':
-            //     break
             case 'customer.subscription.created':
-                // console.debug(`WEBHOOK: customer.subscription.created: ${data.id}`)
                 console.log(`WEBHOOK: Subscription: ${data.id}`)
 
                 subscription = data
@@ -102,7 +98,16 @@ exports.webhook = async (req, res) => {
                                 if (cars.length > 0) {
                                     for (carObj of cars) {
                                         if (subItem.price.id === carObj.priceID) {
-                                            let newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate, customer.id)
+                                            let newCar = await CarService.getCarByPlate(carObj.plate)
+                                            if (newCar) {
+                                                // Add old utilization / History
+                                                await UtilizationService.handleUtilization(newCar, subscription.current_period_start, subscription.current_period_end)
+                                                if (newCar.cancel_date != null)
+                                                    await CarService.removeCarFromAllSubscriptions(newCar)
+                                            }
+                                            else
+                                                newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate, customer.id)
+
                                             newItem.cars.push(newCar)
                                         }
 
@@ -170,24 +175,8 @@ exports.webhook = async (req, res) => {
                             if (cars) {
                                 for (car of cars) {
                                     // Add old utilization / History
-                                    await UtilizationService.addUtilization(car,
-                                        car.utilization.start_date,
-                                        car.utilization.end_date,
-                                        car.utilization.services,
-                                        car.utilization.percentage)
+                                    await UtilizationService.handleUtilization(car, subscription.current_period_start, subscription.current_period_end)
                                 }
-                                // Calculate the new dates.
-                                // Get the dates from new invoice. 
-                                let newStartDate = new Date(subscription.current_period_start * 1000)
-                                let newEndDate = new Date(subscription.current_period_end * 1000)
-
-                                // Reset current utilization on car model.
-                                await CarService.updateCars(cars?.map(({ id }) => (id)), {
-                                    'utilization.start_date': newStartDate,
-                                    'utilization.end_date': newEndDate,
-                                    'utilization.services': 0,
-                                    'utilization.percentage': 0
-                                })
                             }
                         }
                         // -------------------------------------------------------------------------------------
@@ -195,9 +184,12 @@ exports.webhook = async (req, res) => {
                         items = []
                         for (subItem of subscriptionItems) {
                             let itemToUpdate = mySubscription?.items?.find(item => item.id == subItem.id)
+                            let cars = []
+                            let newItem
                             if (itemToUpdate) {
-                                let newItem = { id: itemToUpdate.id, cars: itemToUpdate.cars, data: subItem }
-                                items.push(newItem)
+                                console.log(`Found item tu update (ID: ${itemToUpdate?.id}).`)
+                                cars = itemToUpdate?.cars
+                                newItem = { id: itemToUpdate.id, cars: cars, data: subItem }
 
                                 try {
                                     if (newItem?.cars?.length == newItem.data.quantity) {
@@ -211,6 +203,35 @@ exports.webhook = async (req, res) => {
                                     console.log('Error trying to clear cancel_date of subscription: ' + mySubscription.id)
                                 }
                             }
+                            else {
+                                // TODO: validate this section.
+                                console.log(`ERROR: Not Found item tu update sub (ID: ${mySubscription?.id}).`)
+                                if (subscription?.metadata?.cars)
+                                    cars = JSON.parse(subscription?.metadata?.cars)
+
+                                newItem = { id: subItem.id, cars: [], data: subItem }
+
+                                for (carObj of cars) {
+                                    if (subItem.price.id === carObj.priceID) {
+                                        let newCar = await CarService.getCarByPlate(carObj.plate)
+                                        if (newCar) {
+                                            // Add old utilization / History
+                                            await UtilizationService.handleUtilization(newCar, subscription.current_period_start, subscription.current_period_end)
+                                            if (newCar.cancel_date != null)
+                                                await CarService.removeCarFromAllSubscriptions(newCar)
+                                        }
+                                        else
+                                            newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate, customer.id)
+
+                                        newItem.cars.push(newCar)
+                                    }
+
+                                }
+
+                            }
+
+                            items.push(newItem)
+
                         }
 
                         updates = {
@@ -238,7 +259,14 @@ exports.webhook = async (req, res) => {
                             for (carObj of cars) {
                                 if (subItem.price.id === carObj.priceID) {
                                     let newCar = await CarService.getCarByPlate(carObj.plate)
-                                    if (!newCar)
+                                    if (newCar) {
+                                        // TODO: handle old utilization
+                                        // Add old utilization / History
+                                        await UtilizationService.handleUtilization(newCar, subscription.current_period_start, subscription.current_period_end)
+                                        if (newCar.cancel_date != null)
+                                            await CarService.removeCarFromAllSubscriptions(newCar)
+                                    }
+                                    else
                                         newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate, customer.id)
 
                                     newItem.cars.push(newCar)
@@ -310,50 +338,31 @@ exports.webhook = async (req, res) => {
 
                         alertInfo = { message: `Your membership ${subscription.id} has been cancelled successfully. `, alertType: alertTypes.BasicAlert }
 
-                    } else {
-                        // Create Subs
-                        let cars = JSON.parse(subscription?.metadata?.cars)
-                        let subscriptionItems = subscription.items.data
-                        let items = []
-                        for (subItem of subscriptionItems) {
-                            let newItem = { id: subItem.id, cars: [], data: subItem }
-                            for (carObj of cars) {
-                                if (subItem.price.id === carObj.priceID) {
-                                    let newCar = await CarService.getCarByPlate(carObj.plate)
-                                    if (!newCar)
-                                        newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate, customer.id)
-
-                                    newItem.cars.push(newCar)
-                                }
-
-                            }
-                            items.push(newItem)
-                        }
-                        newSubscription = await SubscriptionService.addSubscription({ id: subscription.id, data: subscription, items: items, user: customer })
-                        alertInfo = { message: `Your membership ${subscription.id} has been created successfully.`, alertType: alertTypes.BasicAlert }
                     }
+
                     // Add notification to user.
                     [customer, notification] = await UserService.addNotification(customer.id, alertInfo.message)
 
                     req.io.emit('notifications', notification);
+                    if (process.env.NODE_ENV === "production") {
+                        //Send Email
+                        var resultEmail = await sendEmail(
+                            customer.email,
+                            lingua.email.title,
+                            {
+                                name: customer?.personalInfo?.firstName + ' ' + customer?.personalInfo?.lastName,
+                                message: alertInfo.message
+                            },
+                            "../template/subscriptions.handlebars"
+                        )
 
-                    //Send Email
-                    var resultEmail = await sendEmail(
-                        customer.email,
-                        lingua.email.title,
-                        {
-                            name: customer?.personalInfo?.firstName + ' ' + customer?.personalInfo?.lastName,
-                            message: alertInfo.message
-                        },
-                        "../template/subscriptions.handlebars"
-                    )
+                        if (resultEmail) {
+                            console.debug('Email Sent: ' + resultEmail?.accepted[0])
 
-                    if (resultEmail) {
-                        console.debug('Email Sent: ' + resultEmail?.accepted[0])
+                        } else {
 
-                    } else {
-
-                        console.debug('WARNING: Email Not Sent.')
+                            console.debug('WARNING: Email Not Sent.')
+                        }
                     }
 
                 } else {
@@ -395,7 +404,7 @@ exports.checkout = async (req, res) => {
     } catch (e) {
         console.log(e)
         res.status(400)
-        return res.send({
+        res.send({
             error: {
                 message: e.message
             }
@@ -449,7 +458,16 @@ exports.completeCheckoutSuccess = async (req, res) => {
                 let newItem = { id: subItem.id, cars: [], data: subItem }
                 for (carObj of cars) {
                     if (subItem.price.id === carObj.priceID) {
-                        let newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate, customer.id)
+                        let newCar = await CarService.getCarByPlate(carObj.plate)
+                        if (newCar) {
+                            // Add old utilization / History
+                            await UtilizationService.handleUtilization(newCar, subscription.current_period_start, subscription.current_period_end)
+                            if (newCar.cancel_date != null)
+                                await CarService.removeCarFromAllSubscriptions(newCar)
+                        }
+                        else
+                            newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate, customer.id)
+
                         newItem.cars.push(newCar)
                     }
 
@@ -601,4 +619,71 @@ exports.invoices = async (req, res) => {
 
     }
 
+}
+
+/**
+ * This function find all subscriptions with active status and oldPrice on any item, 
+ * then change this price for newPrice on the corresponding item.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.changePrice = async (req, res) => {
+
+    try {
+        // Basic
+        // let oldPrice = 'price_1JvNZ5L5YqSpFl3KFGcW042e'
+        // let newPrice = 'price_1LIcmBL5YqSpFl3KlaCoJqeL'
+        // Premium
+        // let oldPrice = 'price_1JvNZuL5YqSpFl3Kg0Ct8yLB'
+        // let newPrice = 'price_1LIckEL5YqSpFl3KioTpVNsH'
+
+        let allPrices = await Stripe.getAllPrices()
+        let { oldPrice, newPrice } = req.body
+
+        let validNewPrice = allPrices.some(it => it.id == newPrice)
+
+        let subscriptions = await SubscriptionService.getSubscriptionsByPrice(oldPrice)
+
+        if (subscriptions.length > 0 && validNewPrice) {
+            let count = 0;
+            for (let subscription of subscriptions) {
+                let itemToUpdate = subscription.data.items.data.find(item => item.price.id === oldPrice)
+                let updates = {
+                    items: [
+                        { id: itemToUpdate.id, price: newPrice, quantity: itemToUpdate.quantity }
+                    ]
+                }
+                try {
+                    let updated = await Stripe.updateStripeSubscription(subscription.id, updates)
+
+                    if (updated) {
+                        count++
+                        console.log(`Price (${newPrice}) updated for subscription (${updated?.id})`)
+                    }
+                } catch (error) {
+                    console.error(error)
+                    console.error("Error trying to change price to: " + subscription?.id)
+                }
+            }
+
+            req.session.message = `Updated price for ${count} subscriptions: ${newPrice}`
+            req.session.alertType = alertTypes.CompletedActionAlert
+        } else {
+            if (!validNewPrice) {
+                req.session.message = `The new price is invalid.`
+                req.session.alertType = alertTypes.ErrorAlert
+            } else {
+                req.session.message = `No subscriptions to update the price.`
+                req.session.alertType = alertTypes.BasicAlert
+            }
+        }
+
+    } catch (error) {
+        console.error("ERROR: stripeController.changePrice()")
+        console.error(error)
+        req.session.message = "Error trying to change old price."
+        req.session.alertType = alertTypes.ErrorAlert
+
+    }
+    res.redirect('/account')
 }

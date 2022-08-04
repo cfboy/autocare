@@ -62,3 +62,7 @@ function clearForm(form) {
     form.find('input').val('');
     form.find('select').val("").trigger("change");
 }
+
+function showResult(updateDiv, result) {
+    $(updateDiv).html(result);
+}

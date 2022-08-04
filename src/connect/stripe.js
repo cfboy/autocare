@@ -103,6 +103,26 @@ const getCustomerByID = async (id) => {
 }
 
 /**
+ * This function update the stripe customer.
+ * @param {*} id 
+ * @param {*} updates 
+ * @returns 
+ */
+const updateCustomer = async (id, updates) => {
+    try {
+
+        const customer = await Stripe.customers.update(id, updates);
+
+        return customer
+    }
+    catch (error) {
+        console.log(`ERROR-STRIPE: updateCustomer()`);
+        console.log(`ERROR-STRIPE: ${error}`);
+    }
+
+}
+
+/**
  * This function get the customer on stripe by email.
  * @param {*} email 
  * @returns customer object
@@ -202,16 +222,36 @@ async function getAllProducts() {
 async function getAllPrices() {
     const prices = await Stripe.prices.list({
         active: true,
+        limit: 100,
         expand: ['data.product']
     })
+
+    const inactivePrices = await Stripe.prices.list({
+        active: false,
+        limit: 100,
+        expand: ['data.product']
+    })
+    let oldPrices = inactivePrices.data.filter(price => price.metadata.type != null && price.metadata.type.includes("OLD"))
 
     // format currency
     for (const price of prices.data) {
         price.unit_amount = Dinero({ amount: price.unit_amount }).toFormat('$0,0.00')
 
         if (price?.product) {
-            // Get price of all products.
+            // Get perks of all products.
             price.product.perks = price?.product?.metadata?.perks?.split(',')
+            if (oldPrices.length > 0) {
+                if (price.product.metadata.productKey == "basic") {
+                    let oldBasic = oldPrices.find(price => price.metadata.type === 'OLD_BASIC')?.unit_amount
+
+                    price.oldPrice = oldBasic ? Dinero({ amount: oldBasic }).toFormat('$0,0.00') : null
+                }
+
+                else if (price.product.metadata.productKey == "pro") {
+                    let oldPremium = oldPrices.find(price => price.metadata.type === 'OLD_PREMIUM')?.unit_amount
+                    price.oldPrice = oldPremium ? Dinero({ amount: oldPremium }).toFormat('$0,0.00') : null
+                }
+            }
         }
 
     }
@@ -448,15 +488,17 @@ async function getCustomerBalanceTransactions(id) {
     return { transactions: balanceTransactions.data, total: total, totalString: totalString }
 }
 
-
-//TODO: make this function more generic.
-async function updateSubscription(id, cancelAt) {
+/**
+ * This function update the stripe subscription.
+ * @param {*} id 
+ * @param {*} updates 
+ * @returns subscription obj
+ */
+async function updateStripeSubscription(id, updates) {
     console.log('ID: ' + id)
-    console.log('cancelAt: ' + cancelAt)
+    // console.log('cancelAt: ' + cancelAt)
     const subscription = await Stripe.subscriptions.update(id,
-        {
-            cancel_at: cancelAt
-        }
+        updates
     );
 
     return subscription
@@ -467,6 +509,7 @@ module.exports = {
     getCustomerByID,
     getCustomerByEmail,
     addNewCustomer,
+    updateCustomer,
     getSessionByID,
     createCheckoutSession,
     createBillingSession,
@@ -482,5 +525,5 @@ module.exports = {
     getSubscriptionById,
     getSubscriptionItemById,
     getCustomerBalanceTransactions,
-    updateSubscription
+    updateStripeSubscription
 }

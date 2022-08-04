@@ -1,6 +1,7 @@
 {
     "home": "Home",
-    "month": "Month",
+    "month": "month",
+    "months": "months",
     "termsAndConditions": "Terms and Conditions",
     "title": "Membership Portal",
     "welcome": "Welcome",
@@ -18,6 +19,7 @@
     "members": "Members",
     "add": "Add",
     "car": {
+        "myCars": "My Cars",
         "view": "View Car",
         "info": "Car Information",
         "add": "Add Car",
@@ -39,7 +41,9 @@
         "notFound": "Car not found",
         "existingCar": "This is an existing Car Plate in the system. Please provide another plate",
         "validCar": "Valid Car Plate",
-        "membershipToAddCar": "Membership to add a Car"
+        "membershipToAddCar": "Membership to add a Car",
+        "alreadyAddedToCart": "This car is already added to the cart.",
+        "selectOrCreate": "Select or create a new car"
     },
     "user": {
         "name": "User",
@@ -99,7 +103,8 @@
         "currentPeriodEnd": "Current Period End",
         "price": "Price",
         "subTotal": "Sub Total",
-        "proceedToCheckout": "Proceed to Checkout"
+        "proceedToCheckout": "Proceed to Checkout",
+        "selectMembership": "Select membership plan"
     },
     "service": {
         "qty": "Service (Qty.)",
@@ -199,8 +204,9 @@
         "verifyEmail": "Verify your email {email} to complete the reset password process.",
         "resetSucessfully": "Auto Care Password Reset Successfully",
         "notSend": "Email Not Send.",
-        "passwordReset" : "Auto Care Password Reset Request"
+        "passwordReset": "Auto Care Password Reset Request"
     },
     "clear": "Clear",
-    "utilizationHistory" : "Utilization History"
+    "utilizationHistory": "Utilization History",
+    "loading": "Loading"
 }
