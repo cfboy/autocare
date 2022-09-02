@@ -269,8 +269,8 @@ const getAllCarsByUserWithoutSubs = (Car) => async (user) => {
 
 /**
  * This function return a flag if the car can be used or not for a new subscription.
- * @param {*} user 
- * @returns car list
+ * @param {*} car 
+ * @returns flag boolean
  */
 async function canUseThisCarForNewSubs(car) {
     // console.debug("canUseThisCarForNewSubs()...")
