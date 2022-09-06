@@ -83,7 +83,9 @@
                                             </div>
                                         </div>
                                         <div class="row">
-                                            <div class="mt-3">
+                                            <div class="col-6 mt-4" id="formValidationResult"></div>
+
+                                            <div class="col-6 mt-3">
                                                 <button id="addSub" type="submit"
                                                     class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn float-end">
                                                     <%= lingua.car.add%></button>
@@ -189,6 +191,8 @@
             // Clean plate input validator.
             document.getElementById("carPlate").setCustomValidity("");
             showResult('#plateValidationResult', ``);
+            showResult('#formValidationResult', ``);
+
             // Validate form before submit.
             event.preventDefault();
             event.stopPropagation();
@@ -208,37 +212,43 @@
                         product: product, price: price, priceID: priceID
                     };
 
-                $.ajax({
-                    url: "/validatePlate",
-                    type: "POST",
-                    contentType: "application/json",
-                    data: JSON.stringify({
-                        plateNumber: plate,
-                        newItem: newItem,
-                        subscriptionList: subscriptionList ? subscriptionList : [],
-                        addToCart: true
-                    }),
-                }).done(function (result) {
-                    if (result.existingCar) {
-                        document.getElementById("carPlate").setCustomValidity(result.invalidMsj);
-                        document.getElementById("carPlate").reportValidity();
-                        let reportMessage = `<p class="error">` + result.invalidMsj + `</p>`
-                        showResult('#plateValidationResult', reportMessage);
+                if (newItem.brand == '' || newItem.model == '' || newItem.plate == '') {
+                    let showMessage = `<p class="error">Missing values</p>`
+                    showResult('#formValidationResult', showMessage);
 
-                    } else {
-                        // console.log("newItem: " + result.item);
-                        showResult('#plateValidationResult',
-                            `<p class="success"><%= lingua.car.validCar%></p>`);
+                } else {
+                    $.ajax({
+                        url: "/validatePlate",
+                        type: "POST",
+                        contentType: "application/json",
+                        data: JSON.stringify({
+                            plateNumber: plate,
+                            newItem: newItem,
+                            subscriptionList: subscriptionList ? subscriptionList : [],
+                            addToCart: true
+                        }),
+                    }).done(function (result) {
+                        if (result.existingCar) {
+                            document.getElementById("carPlate").setCustomValidity(result.invalidMsj);
+                            document.getElementById("carPlate").reportValidity();
+                            let reportMessage = `<p class="error">` + result.invalidMsj + `</p>`
+                            showResult('#plateValidationResult', reportMessage);
 
-                        addDataToTable(result.item);
-                        // Clear all elements on form for next submit.
-                        clearForm(form);
-                        showResult('#plateValidationResult', ``);
-                    }
+                        } else {
+                            // console.log("newItem: " + result.item);
+                            showResult('#plateValidationResult',
+                                `<p class="success"><%= lingua.car.validCar%></p>`);
 
-                }).fail(function (err) {
-                    console.log(err);
-                })
+                            addDataToTable(result.item);
+                            // Clear all elements on form for next submit.
+                            clearForm(form);
+                            showResult('#plateValidationResult', ``);
+                        }
+
+                    }).fail(function (err) {
+                        console.log(err);
+                    })
+                }
             }
         });
         // Remove subscription

@@ -53,7 +53,7 @@ function findModel(makeName, carModel = null, select) {
 }
 
 function autofillCarInfo(selectedCar, linguaString) {
-    if (selectedCar) {
+    if (selectedCar && selectedCar.value != '') {
         let id = selectedCar.selectedOptions[0].getAttribute('value');
         let brand = selectedCar.selectedOptions[0].getAttribute('brand');
         let model = selectedCar.selectedOptions[0].getAttribute('model');
@@ -70,12 +70,20 @@ function autofillCarInfo(selectedCar, linguaString) {
         showResult('#autofillLoading', `<span class="d-block alert-fill-info rounded-1 p-2">${linguaString}...</span>`)
 
         // Set the values to the form fields.
-        carBrand.select2().val(brand).trigger('change'); //This trigger the function findModel on cars.js
+        if (carBrand.data('select2'))
+            carBrand.select2().val(brand).trigger('change'); //This trigger the function findModel on cars.js
+        else { 
+            carBrand.val(brand);
+        }
         carBrand.attr('disabled', false);
         // Set timeout in which the models loads.
         setTimeout(function () {
             carModel.attr('disabled', true);
-            carModel.select2().val(model).trigger('change');
+            if (carModel.data('select2'))
+                carModel.select2().val(model).trigger('change');
+            else {
+                carModel.val(model);
+            }
             carModel.attr('disabled', false);
             carPlate.attr('disabled', false);
             carPlate.val(plate);

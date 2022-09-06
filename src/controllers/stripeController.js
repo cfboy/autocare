@@ -108,7 +108,12 @@ exports.webhook = async (req, res) => {
                                             else
                                                 newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate, customer.id)
 
-                                            newItem.cars.push(newCar)
+                                            if (newCar)
+                                                newItem.cars.push(newCar)
+                                            else {
+                                                // add alert to add car
+                                                console.log("ERROR: Car not created at 'customer.subscription.created'")
+                                            }
                                         }
 
                                     }
@@ -223,7 +228,12 @@ exports.webhook = async (req, res) => {
                                         else
                                             newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate, customer.id)
 
-                                        newItem.cars.push(newCar)
+                                        if (newCar)
+                                            newItem.cars.push(newCar)
+                                        else {
+                                            // add alert to add car
+                                            console.log("ERROR: Car not created at 'customer.subscription.updated'")
+                                        }
                                     }
 
                                 }
@@ -269,7 +279,12 @@ exports.webhook = async (req, res) => {
                                     else
                                         newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate, customer.id)
 
-                                    newItem.cars.push(newCar)
+                                    if (newCar)
+                                        newItem.cars.push(newCar)
+                                    else {
+                                        // add alert to add car
+                                        console.log("ERROR: Car not created at 'customer.subscription.updated'")
+                                    }
                                 }
 
                             }
