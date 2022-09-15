@@ -87,7 +87,7 @@
         "createSubscriptions": "Create Memberships",
         "notPlan": "You are currently not in any plan. Please purchase a subscription below.",
         "notHappy": "Not happy with your current plan? Cancel or Upgrade by clicking the button below.",
-        "disclaimer": "This is a subscription for 30 days upon purchase date.",
+        "disclaimer": "This is an auto-renewable subscription every 30 days upon purchase date.",
         "perGroupOf": "per group of",
         "manageBilling": "Manage Billing",
         "info": "Membership Information",
