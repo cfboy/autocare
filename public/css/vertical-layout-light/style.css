@@ -32506,7 +32506,9 @@ div.tagsinput span.tag a {
 
 .auth .brand-logo img {
     /* width: 90px; */
-    width: 100px !important;
+    /* width: 100px !important; */
+    width: 100% !important;
+
 }
 
 .auth form .form-group {
@@ -33044,7 +33046,7 @@ div.tagsinput span.tag a {
 }
 
 .navbar .navbar-brand-wrapper .brand-logo-mini img {
-    width: calc(70px - 30px);
+    /* width: calc(70px - 30px); */
     max-width: 100%;
     margin: auto;
 }
@@ -33109,7 +33111,8 @@ div.tagsinput span.tag a {
 
 @media (max-width: 991px) {
     .navbar .navbar-menu-wrapper {
-        width: calc(100% - 55px);
+        /* width: calc(100% - 55px); */
+        width: calc(100% - 70px);
         padding-top: 12px;
         padding-left: 15px;
         padding-right: 11px;
@@ -35059,7 +35062,8 @@ div.tagsinput span.tag a {
 
 @media (max-width: 480px) {
     .navbar .navbar-brand-wrapper {
-        width: 55px;
+        /* width: 55px; */
+        width: 70px;
     }
 
     .navbar .navbar-brand-wrapper .brand-logo-mini {
