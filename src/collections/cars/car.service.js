@@ -228,7 +228,7 @@ const getCarByPlate = (Car) => async (plate) => {
  * @returns car list
  */
 const getAllCarsByUser = (Car) => async (user) => {
-    console.debug("getAllCarsByUser()...")
+    // console.debug("getAllCarsByUser()...")
     return Car.find({ user_id: user.id }, function (err, docs) {
         if (err) {
             console.error(err)
@@ -246,7 +246,7 @@ const getAllCarsByUser = (Car) => async (user) => {
  * @returns car list
  */
 const getAllCarsByUserWithoutSubs = (Car) => async (user) => {
-    console.debug("getAllCarsByUserWithoutSubs()...")
+    // console.debug("getAllCarsByUserWithoutSubs()...")
     let carsToReturn = []
 
     let cars = await Car.find({ user_id: user.id }, function (err, docs) {
