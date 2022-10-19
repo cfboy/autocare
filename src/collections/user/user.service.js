@@ -163,14 +163,15 @@ const getUsersExcludeRole = (User) => (role) => {
  * @returns user
  */
 const getUserById = (User) => (id) => {
-    console.log(`getUserById() by ID: ${id}`)
+    // console.log(`getUserById() by ID: ${id}`)
 
     return User.findOne({ _id: id }, function (err, docs) {
         if (err) {
             console.error(err)
-        } else {
-            console.debug("USER-SERVICE: Found user: ", docs.email);
-        }
+        } 
+        // else {
+        //     console.debug("USER-SERVICE: Found user: ", docs.email);
+        // }
     }).populate('locations')
 }
 
@@ -336,7 +337,7 @@ const readAllNotifications = (User) => async (userID) => {
  * @returns user object
  */
 const addItemToCart = (User) => async (id, item) => {
-    console.log(`addItemToCart() ID: ${id}`)
+    // console.log(`addItemToCart() ID: ${id}`)
 
     let customer = await User.findByIdAndUpdate({ _id: id },
         { $addToSet: { 'cart.items': item } },

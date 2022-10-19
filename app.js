@@ -2,6 +2,7 @@
 require('dotenv').config() //Loads environment variables from .env file into the process
 // }
 require("express-async-errors");
+require('log-timestamp')(function() { return '[' + new Date().toLocaleString() + '] %s' });
 
 const bodyParser = require('body-parser'),
     express = require('express'),

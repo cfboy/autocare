@@ -27,7 +27,7 @@ function findModel(makeName, carModel = null, select) {
             },
             success: function (result) {
                 let models = result.Results
-
+                //TODO: verify if has models then show a select with models or show open input field.
                 models = models.sort((a, b) => a.Model_Name.localeCompare(b.Model_Name))
 
                 // console.log(result);
