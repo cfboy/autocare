@@ -129,8 +129,13 @@ exports.register = async (req, res) => {
  */
 exports.logout = async (req, res) => {
     // console.debug('Log out...')
-    req.logOut()
-    res.redirect("/");
+    // req.logOut()
+    // res.redirect("/");
+
+    req.logout(function(err) {
+    if (err) { return next(err); }
+    res.redirect('/');
+  });
 }
 
 /**
