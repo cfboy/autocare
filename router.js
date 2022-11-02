@@ -28,7 +28,7 @@ const { checkAuthenticated,
     authChangePassword,
     authChangePrices } = require('./src/middleware/authFunctions')
 
-const { validateSubscriptions, redirectBySubscriptionStatus } = require('./src/middleware/validateFunctions')
+const { validateSubscriptions, redirectBySubscriptionStatus, validateLocation } = require('./src/middleware/validateFunctions')
 
 // Main Route
 router.get('/', checkAuthenticated, (req, res) => {
@@ -41,7 +41,7 @@ router.get('/home', dashboardsController.home)
 
 router.get('/termsandconditions', dashboardsController.termsAndConditions)
 
-router.get('/account', checkAuthenticated, validateSubscriptions, redirectBySubscriptionStatus, dashboardsController.account)
+router.get('/account', checkAuthenticated, validateLocation, validateSubscriptions, redirectBySubscriptionStatus, dashboardsController.account)
 
 //------ Auth Routes ------
 
@@ -65,6 +65,10 @@ router.get('/create-account', checkNotAuthenticated, authController.createAccoun
 router.post('/register', checkNotAuthenticated, authController.register)
 
 router.delete('/logout', checkAuthenticated, authController.logout)
+
+router.get('/selectLocation', checkAuthenticated, authController.selectLocation)
+
+router.post('/changeLocation', checkAuthenticated, authController.changeLocation)
 
 //------ Forgot Password Routes ------
 router.get('/resetPasswordRequest', checkNotAuthenticated, authController.resetPasswordRequest)

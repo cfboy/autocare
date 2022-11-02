@@ -131,11 +131,11 @@ exports.logout = async (req, res) => {
     // console.debug('Log out...')
     // req.logOut()
     // res.redirect("/");
-
-    req.logout(function(err) {
-    if (err) { return next(err); }
-    res.redirect('/');
-  });
+    res.clearCookie('currentLocation');
+    req.logout(function (err) {
+        if (err) { return next(err); }
+        res.redirect('/');
+    });
 }
 
 /**
@@ -233,3 +233,39 @@ exports.resetPasswordController = async (req, res, next) => {
 
     res.redirect('/login')
 };
+
+/**
+ * This function is for redirect to a selectLocation view.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.selectLocation = async (req, res) => {
+    let user = req.user,
+        userLocations = req.user.locations
+
+    res.render('auth/selectLocation.ejs', { userLocations })
+}
+
+/**
+ * This function receive the id of the new location and then set this value on cookies. (currentLocation).
+ * Return a response message.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.changeLocation = async (req, res) => {
+    try {
+        let { locationID } = req.body
+
+        if (locationID) {
+            res.cookie('currentLocation', locationID)
+            req.flash('info', 'Welcome to this location.')
+            res.status(200).send(locationID);
+        }
+    } catch (error) {
+        console.debug("ERROR: changeLocation -> Tyring to change location.")
+        console.debug(error)
+        req.session.message = `ERROR: ${error.message}`
+        req.session.alertType = alertTypes.ErrorAlert
+        res.status(500).send(error);
+    }
+}

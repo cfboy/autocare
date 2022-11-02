@@ -16,6 +16,8 @@ const bodyParser = require('body-parser'),
     passport = require('passport'),
     { STATUS } = require('./src/connect/stripe');
 
+const cookieParser = require('cookie-parser'); //npm i cookie-parser
+
 var MemoryStore = require('memorystore')(session),
     router = require('./router'),
     moment = require('moment');
@@ -30,6 +32,8 @@ const app = express()
 
 const server = require('http').createServer(app)
 const io = require('socket.io')(server, { cors: { origin: "*" } })
+
+app.use(cookieParser());
 
 app.use(session({
     saveUninitialized: false,

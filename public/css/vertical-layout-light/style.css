@@ -35994,3 +35994,14 @@ label.required:after {
     border-radius: 50px;
     margin-right: 5px;
 }
+
+.nav-dropdown {
+    padding: 5px 30px;
+    background-color: transparent;
+    outline: none;
+    /* border: none; */
+    cursor: pointer;
+}
+.nav-dropdown:focus {
+    box-shadow: none;
+}

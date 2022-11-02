@@ -46,6 +46,17 @@
             </li>
         </ul>
         <ul class="navbar-nav ms-auto">
+            <li class="nav-item dropdown ms-0">
+                <select class="form-select nav-dropdown w-100" name="location" id="locationDropdown" onchange="changeLocation(this, true)">
+                    <!-- <option value="">Select Location</option> -->
+                    <% for(const location of user.locations) { %>
+                    <% var selected = (false) ? "selected" : "";   %>
+                    <option value="<%= location.id%>">
+                        <%= location.name %>
+                    </option>
+                    <% } %>
+                </select>
+            </li>
             <li class="nav-item dropdown">
                 <a class="nav-link" id="languageDropdown" href="#" data-bs-toggle="dropdown" aria-expanded="false">
                     <!-- <i class="icon-globe"></i> -->
@@ -95,7 +106,7 @@
 
                 </a>
                 <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list pb-0 vh-50 overflow-auto notifications-dropdown"
-                    aria-labelledby="notificationDropdown" onclick="">
+                    aria-labelledby="notificationDropdown" onclick="" style="max-height: 50vh;">
                     <a class="dropdown-item py-3 border-bottom">
                         <p class="mb-0 font-weight-medium float-left">
                             <%= lingua.newNotifications(user?.notifications?.filter(notification => notification.isRead == false).length)%>
@@ -183,7 +194,6 @@
         </button>
     </div>
 </nav>
-
 <script src="../js/helper-functions.js"></script>
 <script src="https://cdn.socket.io/socket.io-3.0.1.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -198,6 +208,8 @@
         //YOUR JQUERY CODE
         manageLangDropdown();
 
+
+        $('#locationDropdown').val(getCookie('currentLocation'));
         const manageBillingButton = $('.manage-billing-button');
         manageBillingButton.click(function () {
             const billingID = $(this).attr("value");

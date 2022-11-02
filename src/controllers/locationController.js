@@ -232,7 +232,7 @@ exports.update = async (req, res) => {
             }
             if (unselectedUsers.length > 0) {
                 for (user of unselectedUsers) {
-                    let updatedUser = await UserService.removeUserLocation(user, location)
+                    let updatedUser = await UserService.removeUserLocation(user, location._id)
                     if (!updatedUser)
                         console.debug(`ERROR: LOCATION-CONTROLLER: Can't remove User ${updatedUser?.email}.`)
                     else

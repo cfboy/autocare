@@ -25,7 +25,40 @@ async function redirectBySubscriptionStatus(req, res, next) {
         return next()
 }
 
+/**
+ * This function validate the currentLocation in cookies. 
+ * If the user not have locations then redirect to logout.
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ * @returns 
+ */
+async function validateLocation(req, res, next) {
+    let user = req.user
+    let currentLocation = req.cookies.currentLocation
+
+    if (user?.locations.length == 0 && ![ROLES.CUSTOMER].includes(user.role)) {
+        // TODO: test this path
+        req.flash('warning', 'This user not have permission.')
+        res.redirect('/logout')
+    }
+    if (!currentLocation) {
+        if (user?.locations.length > 1) {
+            res.redirect('/selectLocation')
+        } else {
+            req.session.currentLocation = user?.locations[0]?.id
+            res.cookie('currentLocation', req.session.currentLocation)
+            return next()
+
+        }
+    } else {
+        return next()
+    }
+
+}
+
 module.exports = {
     validateSubscriptions,
-    redirectBySubscriptionStatus
+    redirectBySubscriptionStatus,
+    validateLocation
 }
