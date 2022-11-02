@@ -67,6 +67,7 @@
                                                     <thead>
                                                         <tr>
                                                             <th><%= lingua.name%></th>
+                                                            <th><%= lingua.cameraID%></th>
                                                             <th><%= lingua.active%></th>
                                                             <th><%= lingua.action%></th>
                                                         </tr>
@@ -79,6 +80,9 @@
                                                                     href="/view-location/<%- location.id%>">
                                                                     <%- location.name %>
                                                                 </a>
+                                                            </td>
+                                                            <td>
+                                                                <%- location.camera_id%>
                                                             </td>
                                                             <td>
                                                                 <% if(location.isActive) { %>
