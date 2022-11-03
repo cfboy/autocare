@@ -19,7 +19,7 @@ async function checkAuthenticated(req, res, next) {
         return next()
     }
     
-    req.flash('error', 'You needed to be logged in to visit that page!');
+    // req.flash('error', 'You needed to be logged in to visit that page!');
 
     res.redirect('/login')
 }
