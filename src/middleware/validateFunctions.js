@@ -37,24 +37,27 @@ async function validateLocation(req, res, next) {
     let user = req.user
     let currentLocation = req.cookies.currentLocation
 
-    if (user?.locations.length == 0 && ![ROLES.CUSTOMER].includes(user.role)) {
-        // TODO: test this path
-        req.flash('warning', 'This user not have permission.')
-        res.redirect('/logout')
-    }
-    if (!currentLocation) {
-        if (user?.locations.length > 1) {
-            res.redirect('/selectLocation')
-        } else {
-            req.session.currentLocation = user?.locations[0]?.id
-            res.cookie('currentLocation', req.session.currentLocation)
-            return next()
-
-        }
+    if ([ROLES.CUSTOMER].includes(user.role)) {
+        res.next()
     } else {
-        return next()
-    }
+        if (user?.locations.length == 0) {
+            // TODO: Show flash after logout.
+            req.flash('error', 'This user not have any location assigned to work.')
 
+            res.redirect('/logout');
+        } else if (!currentLocation) {
+            if (user?.locations.length > 1) {
+                res.redirect('/selectLocation')
+            } else {
+                req.session.currentLocation = user?.locations[0]?.id
+                console.log(`DEFAULT CURRENT LOCATION: ${req.session.currentLocation}`)
+                res.cookie('currentLocation', req.session.currentLocation)
+                return next()
+            }
+        } else {
+            return next()
+        }
+    }
 }
 
 module.exports = {

@@ -8,11 +8,21 @@
                         <div>
                             <h4><%= lingua.user.info%></h4>
                         </div>
-                        <div>
-                            <a href="/edit-user/<%- customer?.id%>?url=/validateMembership" type="button"
+                        <div class="d-flex">
+                            <!-- <a href="/edit-user/<%# customer?.id%>?url=/validateMembership" type="button"
                                 data-toggle="tooltip" title="Edit user"
                                 class="btn btn-icon btn-icon-no-border no-margin">
                                 <span class="far fa-2x fa-edit icon-sm"></span>
+                            </a> -->
+                            <a href="/customers/<%- customer?.id%>" type="button"
+                                data-toggle="tooltip" title="View Customer"
+                                class="btn btn-icon btn-icon-no-border m-1 p-0">
+                                <span class="far fa-2x fa-eye icon-sm"></span>
+                            </a>
+                            <a href="/car/<%- car?.id%>" type="button"
+                                data-toggle="tooltip" title="View Car"
+                                class="btn btn-icon btn-icon-no-border m-1 p-0">
+                                <span class="fa-solid fa-car fa-2x icon-sm"></span>
                             </a>
                         </div>
                     </div>

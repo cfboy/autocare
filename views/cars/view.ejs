@@ -169,8 +169,8 @@
                                                         <tr>
                                                             <th>ID</th>
                                                             <th><%= lingua.date%></th>
-
                                                             <th><%= lingua.car.name%></th>
+                                                            <th><%= lingua.location.name%></th>
                                                             <% if([roles.ADMIN].includes(user.role) && hasDuplicatedServices) { %>
                                                             <th>Action</th>
                                                             <% } %>
@@ -194,6 +194,9 @@
                                                                 <%= lingua.car.model%>: <%- car?.model%>
                                                                 <br>
                                                                 <%= lingua.car.plate%>: <%- car?.plate%>
+                                                            </td>
+                                                            <td>
+                                                                <%= service?.location?.name%>
                                                             </td>
                                                             <% if([roles.ADMIN].includes(user.role) && hasDuplicatedServices) { %>
 

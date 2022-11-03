@@ -64,6 +64,8 @@ router.get('/create-account', checkNotAuthenticated, authController.createAccoun
 
 router.post('/register', checkNotAuthenticated, authController.register)
 
+router.get('/logout', checkAuthenticated, authController.logout)
+
 router.delete('/logout', checkAuthenticated, authController.logout)
 
 router.get('/selectLocation', checkAuthenticated, authController.selectLocation)
@@ -77,8 +79,8 @@ router.post("/resetPasswordRequest", checkNotAuthenticated, authController.reset
 router.post("/resetPassword", checkNotAuthenticated, authController.resetPasswordController);
 
 //------ History Routes ------
-router.get('/history', checkAuthenticated, historyController.history)
-router.get('/activity', checkAuthenticated, historyController.activity)
+router.get('/history', checkAuthenticated, validateLocation, historyController.history)
+router.get('/activity', checkAuthenticated, validateLocation, historyController.activity)
 
 router.get('/history/:id', checkAuthenticated, historyController.viewHistory)
 
@@ -105,7 +107,7 @@ router.get('/notifications', checkAuthenticated, userController.notifications)
 router.post('/changeNotificationState', checkAuthenticated, userController.changeNotificationState)
 
 //------ Cars Routes ------
-router.get('/cars', checkAuthenticated, carsController.cars)
+router.get('/cars', checkAuthenticated, validateLocation, carsController.cars)
 router.get('/car/:id', checkAuthenticated, carsController.view)
 router.get('/cars/create', checkAuthenticated, authAddCar, carsController.create)
 router.get('/edit-car/:id', checkAuthenticated, authEditCar, carsController.edit)

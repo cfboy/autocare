@@ -128,12 +128,20 @@ exports.register = async (req, res) => {
  * @param {*} res 
  */
 exports.logout = async (req, res) => {
-    // console.debug('Log out...')
-    // req.logOut()
-    // res.redirect("/");
+  
+    let flashTypes = Object.keys(req.session.flash),
+        flashValues = Object.values(req.session.flash)
+
     res.clearCookie('currentLocation');
     req.logout(function (err) {
         if (err) { return next(err); }
+
+        for (var type of flashTypes) {
+            for (var value of flashValues) {
+                req.flash(type, value)
+            }
+        }
+
         res.redirect('/');
     });
 }
@@ -258,7 +266,8 @@ exports.changeLocation = async (req, res) => {
 
         if (locationID) {
             res.cookie('currentLocation', locationID)
-            req.flash('info', 'Welcome to this location.')
+            req.flash('info', 'Location changed.')
+            console.log('CURRENT LOCATION: ' + locationID);
             res.status(200).send(locationID);
         }
     } catch (error) {
