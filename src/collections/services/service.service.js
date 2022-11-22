@@ -14,7 +14,7 @@ const addService = (Service) => async (car, authorizedBy, location, user, produc
              product: ${product}.`)
         }
 
-        console.log(`SERVICE-SERVICE: addService()`)
+        // console.log(`SERVICE-SERVICE: addService()`)
         let serviceID = (car.id.substr(car?.id?.length - 4, car?.id?.length)).toUpperCase()
         // if (serviceID === '')
         // serviceID = Math.random().toString(36).toUpperCase().substring(2, 6)

@@ -181,7 +181,7 @@ const getUserById = (User) => (id) => {
  * @returns user
  */
 const getUserByEmail = (User) => async (email) => {
-    console.log(`getUserByEmail(): ${email}`)
+    // console.log(`getUserByEmail(): ${email}`)
 
     return await User.findOne({ email })
 }
@@ -382,7 +382,7 @@ const removeItemFromCart = (User) => async (id, item) => {
  * @returns User
  */
 const emptyCart = (User) => async (id) => {
-    console.log(`emptyCart() ID: ${id}`)
+    // console.log(`emptyCart() ID: ${id}`)
 
     return await User.findByIdAndUpdate({ _id: id },
         { $set: { 'cart.items': [] } },

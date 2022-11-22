@@ -450,7 +450,7 @@ exports.completeCheckoutSuccess = async (req, res) => {
         if (session_id) {
             console.debug("sessionID: " + session_id)
             session = await Stripe.getSessionByID(session_id)
-            console.log(session)
+            // console.log(session)
             subscriptionID = session.subscription
         }
         if (!subscriptionID && subscription_id) {
