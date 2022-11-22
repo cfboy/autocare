@@ -105,7 +105,7 @@ exports.useService = async (req, res) => {
             let car = await CarService.getCarByID(carID)
             let { item, subscription } = await SubscriptionService.getSubscriptionItemByCar(car)
             let customer = await UserService.getUserById(car.user_id)
-            let currentLocation = req.cookies.currentLocation ? req.cookies.currentLocation : 'N/A'
+            let currentLocation = req.session.locationID ? req.session.locationID : 'N/A'
 
             // TODO: Change location 
             service = await ServiceService.addService(car, authorizedBy, currentLocation, customer, item?.data?.price?.product?.name, inputType)

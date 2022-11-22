@@ -118,6 +118,7 @@ router.post('/syncUtilization', checkAuthenticated, carsController.syncUtilizati
 router.get('/validateMembership', checkAuthenticated, authValidateMembership, subscriptionsController.validateMembership)
 router.post('/validateMembership', checkAuthenticated, authValidateMembership, subscriptionsController.validate)
 router.post('/carcheck', subscriptionsController.carCheck)
+router.post('/readingData', subscriptionsController.readingData)
 router.get('/create-subscriptions', checkAuthenticated, subscriptionsController.createSubscriptions)
 router.get('/handleInvalidSubscriptions', checkAuthenticated, validateSubscriptions, subscriptionsController.handleInvalidSubscriptions)
 router.post('/confirmValidCars', checkAuthenticated, subscriptionsController.confirmValidCars)
@@ -139,6 +140,7 @@ router.get('/delete-service/:id', checkAuthenticated, authDeleteService, service
 
 //------ Location Routes ------
 router.get('/locations', checkAuthenticated, locationController.locations)
+router.get('/getCurrentLocation', locationController.getCurrentLocation)
 router.get('/create-location', checkAuthenticated, locationController.createLocation)
 router.get('/view-location/:id', checkAuthenticated, locationController.viewLocation)
 router.get('/edit-location/:id', checkAuthenticated, authEditLocation, locationController.editLocation)

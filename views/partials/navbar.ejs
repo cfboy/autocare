@@ -47,7 +47,8 @@
         </ul>
         <ul class="navbar-nav ms-auto">
             <li class="nav-item dropdown ms-0" title="Locations">
-                <select class="form-select nav-dropdown w-100" name="location" id="locationDropdown" onchange="changeLocation(this, true)">
+                <select class="form-select nav-dropdown w-100" name="location" id="locationDropdown"
+                    onchange="changeLocation(this, true)">
                     <!-- <option value="">Select Location</option> -->
                     <% for(const location of user.locations) { %>
                     <% var selected = (false) ? "selected" : "";   %>
@@ -208,8 +209,17 @@
         //YOUR JQUERY CODE
         manageLangDropdown();
 
+        $.ajax({
+            url: "/getCurrentLocation",
+            type: "GET",
+            contentType: "application/json"
+        }).done(function (result) {
+            console.log('result: ' + result)
+            $('#locationDropdown').val(result);
+        }).fail(function (err) {
+            console.log(err);
+        })
 
-        $('#locationDropdown').val(getCookie('currentLocation'));
         const manageBillingButton = $('.manage-billing-button');
         manageBillingButton.click(function () {
             const billingID = $(this).attr("value");

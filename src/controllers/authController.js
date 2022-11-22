@@ -1,4 +1,5 @@
 const UserService = require('../collections/user')
+const LocationService = require('../collections/location')
 const { ROLES } = require('../collections/user/user.model')
 const Stripe = require('../connect/stripe')
 const alertTypes = require('../helpers/alertTypes')
@@ -132,7 +133,6 @@ exports.logout = async (req, res) => {
     let flashTypes = Object.keys(req.session.flash),
         flashValues = Object.values(req.session.flash)
 
-    res.clearCookie('currentLocation');
     req.logout(function (err) {
         if (err) { return next(err); }
 
@@ -265,9 +265,13 @@ exports.changeLocation = async (req, res) => {
         let { locationID } = req.body
 
         if (locationID) {
+            let location = await LocationService.getLocationById(locationID)
             res.cookie('currentLocation', locationID)
-            req.flash('info', 'Location changed.')
+            req.session.locationID = locationID
+            req.session.cameraID = location.camera_id
             console.log('CURRENT LOCATION: ' + locationID);
+            console.log('LOCATION CAMERA: ' + req.session.cameraID);
+            req.flash('info', 'Location changed.')
             res.status(200).send(locationID);
         }
     } catch (error) {

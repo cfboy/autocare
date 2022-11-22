@@ -290,3 +290,18 @@ exports.delete = async (req, res) => {
     res.redirect('/locations')
 
 }
+
+
+/**
+ * This function retutn the current locations.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.getCurrentLocation = async (req, res) => {
+    try {
+        res.status(200).send(req.session.locationID)
+    } catch (error) {
+        console.error("ERROR: locationController -> Tyring to send current location.")
+        res.status(500).send(error)
+    }
+}

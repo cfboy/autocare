@@ -119,7 +119,7 @@
     <!-- Plugin js for this page -->
     <script src="../vendors/chart.js/Chart.min.js"></script>
     <script src="../vendors/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
-    <script src="../vendors/progressbar.js/progressbar.min.js"></script>
+    <!-- <script src="../vendors/progressbar.js/progressbar.min.js"></script> -->
     <script type="text/javascript"
         src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 
@@ -163,6 +163,20 @@
 
         socket.on('stop-reading-plates', () => {
             showResult('#resultOfCameraScanLoading', '')
+        })
+
+        socket.on('carcheck-data', (data) => {
+            if (data) {
+                $.ajax({
+                    url: "/readingData",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(data)
+                }).fail(function (err) {
+                    console.log('Error on carcheck-data AJAX.');
+                    console.log(err);
+                })
+            }
         })
 
         // Receive data

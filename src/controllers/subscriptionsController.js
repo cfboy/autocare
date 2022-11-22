@@ -120,90 +120,12 @@ exports.validate = async (req, res) => {
  * @param {*} res 
  */
 exports.carCheck = async (req, res) => {
-    // console.debug('START carCheck...')
     try {
         if (req.body?.error) {
             console.log(`REKOR-SCOUT: ERROR on JSON ${req.body.error}`)
         }
         else {
-            let dataType = req.body.data_type,
-                bodyResult = req.body
-            // console.log(`REKOR-SCOUT: Data Type: ${dataType}`)
-            switch (dataType) {
-                case 'alpr_results':
-                    req.io.emit('reading-plates');
-
-                    // Timer to delay
-                    // await new Promise(resolve => setTimeout(resolve, 2000));
-
-                    /**
-                     * Scout generates an alpr_results JSON value for every
-                     * frame of video in which a license plate is recognized. 
-                     * 
-                     * This is for single plate reads.
-                     * https://docs.rekor.ai/rekor-scout/application-integration/json-plate-results
-                     */
-
-                    // console.log("Processing Time (MS): " + bodyResult.processing_time_ms)
-
-                    let plate = bodyResult.results[0].plate
-                    // console.log(`IDENTFIED PLATE: ${plate} (${bodyResult.results[0].confidence})`)
-                    readingObjs = {
-                        "plate": plate
-                    }
-
-                    if (readingObjs.plate !== '' & readingObjs.plate?.length > 3) {
-                        // console.debug(`IDENTFIED PLATE: ${plate} (${bodyResult.results[0].confidence})`)
-                        req.io.emit('read-plates', readingObjs);
-                    }
-
-                    req.io.emit('stop-reading-plates');
-                    break;
-
-                case 'alpr_group':
-                    /**
-                     * Scout generates an alpr_group JSON value for a collection of similar license plates,
-                     * generally delegating a single plate group per vehicle. 
-                     * If more real-time results are needed, 
-                     * it is recommended that you ignore the plate_group value and use only the individual plate results.
-                     * 
-                     * https://docs.rekor.ai/rekor-scout/application-integration/json-group-results
-                     */
-                    readingObjs = {
-                        "plate": bodyResult.best_plate_number,
-                        // "color": bodyResult.vehicle.color[0].name,
-                        // "brand": bodyResult.vehicle.make[0].name,
-                        // "model": bodyResult.vehicle.make_model[0].name,
-                        // "year": bodyResult.vehicle.year[0].name
-                    }
-                    console.debug("alpr_group - CAR DETAILS: ")
-                    console.debug("-> PLATE: " + readingObjs.plate)
-                    // console.debug("-> COLOR: " + readingObjs.color)
-                    // console.debug("-> BRAND: " + readingObjs.brand)
-                    // console.debug("-> MODEL: " + readingObjs.model)
-                    // console.debug("-> YEAR : " + readingObjs.year)
-
-                    // Load info to a global queue list.
-                    // if (!readingQueue.some(car => car.plate === readingObjs.plate))
-                    //     readingQueue.push(readingObjs)
-
-
-                    // req.io.emit('read-plates', readingQueue);
-
-                    break;
-
-                case 'heartbeat':
-                    /**
-                     * Every minute, the Scout Agent adds one heartbeat message to the queue. 
-                     * The heartbeat provides general health and status information.
-                     */
-                    // console.log('Video Streams: (' + bodyResult.video_streams.length + ')')
-
-                    break;
-
-                default:
-                    console.log('REKOR-SCOUT: No dataType detected.');
-            }
+            req.io.emit('carcheck-data', req.body);
         }
 
         res.status(200).send('Ok')
@@ -214,6 +136,98 @@ exports.carCheck = async (req, res) => {
     }
 }
 
+exports.readingData = async (req, res) => {
+    try {
+        let dataType = req.body.data_type,
+            bodyResult = req.body,
+            cameras = bodyResult?.video_streams
+            cameraID = req.session.cameraID
+
+        for (var camera of cameras) {
+            if (camera.camera_name == cameraID)
+                console.log(`REKOR-SCOUT: Camera: ${camera?.camera_name}`)
+        }
+
+        switch (dataType) {
+            case 'alpr_results':
+                req.io.emit('reading-plates');
+
+                /**
+                 * Scout generates an alpr_results JSON value for every
+                 * frame of video in which a license plate is recognized. 
+                 * 
+                 * This is for single plate reads.
+                 * https://docs.rekor.ai/rekor-scout/application-integration/json-plate-results
+                 */
+
+                // console.log("Processing Time (MS): " + bodyResult.processing_time_ms)
+
+                let plate = bodyResult.results[0].plate
+                // console.log(`IDENTFIED PLATE: ${plate} (${bodyResult.results[0].confidence})`)
+                readingObjs = {
+                    "plate": plate
+                }
+
+                if (readingObjs.plate !== '' & readingObjs.plate?.length > 3) {
+                    // console.debug(`IDENTFIED PLATE: ${plate} (${bodyResult.results[0].confidence})`)
+                    req.io.emit('read-plates', readingObjs);
+                }
+
+                req.io.emit('stop-reading-plates');
+                break;
+
+            case 'alpr_group':
+                /**
+                 * Scout generates an alpr_group JSON value for a collection of similar license plates,
+                 * generally delegating a single plate group per vehicle. 
+                 * If more real-time results are needed, 
+                 * it is recommended that you ignore the plate_group value and use only the individual plate results.
+                 * 
+                 * https://docs.rekor.ai/rekor-scout/application-integration/json-group-results
+                 */
+                readingObjs = {
+                    "plate": bodyResult.best_plate_number,
+                    // "color": bodyResult.vehicle.color[0].name,
+                    // "brand": bodyResult.vehicle.make[0].name,
+                    // "model": bodyResult.vehicle.make_model[0].name,
+                    // "year": bodyResult.vehicle.year[0].name
+                }
+                console.debug("alpr_group - CAR DETAILS: ")
+                console.debug("-> PLATE: " + readingObjs.plate)
+                // console.debug("-> COLOR: " + readingObjs.color)
+                // console.debug("-> BRAND: " + readingObjs.brand)
+                // console.debug("-> MODEL: " + readingObjs.model)
+                // console.debug("-> YEAR : " + readingObjs.year)
+
+                // Load info to a global queue list.
+                // if (!readingQueue.some(car => car.plate === readingObjs.plate))
+                //     readingQueue.push(readingObjs)
+
+
+                // req.io.emit('read-plates', readingQueue);
+
+                break;
+
+            case 'heartbeat':
+                /**
+                 * Every minute, the Scout Agent adds one heartbeat message to the queue. 
+                 * The heartbeat provides general health and status information.
+                 */
+                console.log('heartbeat: Video Streams: (' + bodyResult.video_streams.length + ')')
+
+                break;
+
+            default:
+                console.log('REKOR-SCOUT: No dataType detected.');
+        }
+
+        res.status(200).send('Ok')
+    } catch (error) {
+        console.error(error)
+        console.error('REKOR-SCOUT: ERROR --> ' + error.message)
+        res.status(500).send("Error")
+    }
+}
 
 /**
  * This function renders the handle invalid subscriptions template.

@@ -1,4 +1,5 @@
 const SubscriptionService = require('../collections/subscription')
+const LocationService = require('../collections/location')
 const { ROLES } = require('../collections/user/user.model')
 const alertTypes = require('../helpers/alertTypes')
 
@@ -35,26 +36,40 @@ async function redirectBySubscriptionStatus(req, res, next) {
  */
 async function validateLocation(req, res, next) {
     let user = req.user
-    let currentLocation = req.cookies.currentLocation
+
+    let currentLocation = req.session.locationID,
+        cameraID = req.session.cameraID
 
     if ([ROLES.CUSTOMER].includes(user.role)) {
         res.next()
     } else {
         if (user?.locations.length == 0) {
+            //If the user is not associated to any location, then redirect to logout.
             // TODO: Show flash after logout.
             req.flash('error', 'This user not have any location assigned to work.')
 
             res.redirect('/logout');
         } else if (!currentLocation) {
+            //If the location is not in the session storage.
             if (user?.locations.length > 1) {
+                //if the user has multiple locations then redirect to choose one locaiton.
                 res.redirect('/selectLocation')
             } else {
-                req.session.currentLocation = user?.locations[0]?.id
-                console.log(`DEFAULT CURRENT LOCATION: ${req.session.currentLocation}`)
-                res.cookie('currentLocation', req.session.currentLocation)
+                //If the user has only one location, then set the values.
+                //Default Assignment
+                req.session.locationID = user?.locations[0]?.id
+                req.session.cameraID = user?.locations[0]?.camera_id
+                console.log(`DEFAULT CURRENT LOCATION: ${req.session.locationID}`)
+                console.log('LOCATION CAMERA: ' + req.session.cameraID);
                 return next()
             }
         } else {
+            //Validate if the cameraID is stored in the session.
+            if (!cameraID) {
+                var location = await LocationService.getLocationById(currentLocation)
+                req.session.cameraID = location
+            }
+
             return next()
         }
     }
