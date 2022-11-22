@@ -268,9 +268,9 @@ exports.changeLocation = async (req, res) => {
             let location = await LocationService.getLocationById(locationID)
             res.cookie('currentLocation', locationID)
             req.session.locationID = locationID
-            req.session.cameraID = location.camera_id
+            req.session.agentID = location.agentID
             console.log('CURRENT LOCATION: ' + locationID);
-            console.log('LOCATION CAMERA: ' + req.session.cameraID);
+            console.log('LOCATION CAMERA: ' + req.session.agentID);
             req.flash('info', 'Location changed.')
             res.status(200).send(locationID);
         }

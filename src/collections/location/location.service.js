@@ -72,8 +72,8 @@ const getLocationById = (Location) => (id) => {
     return Location.findOne({ _id: id }, function (err, docs) {
         if (err) {
             console.error(err)
-        } else {
-            console.debug("Found location to edit: ", docs);
+            // } else {
+            //     console.debug("Found location to edit: ", docs);
         }
     })
 }

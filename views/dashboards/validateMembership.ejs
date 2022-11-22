@@ -58,7 +58,19 @@
                                                                     <h5><%= lingua.membership.readyByCamera%>:</h5>
 
                                                                     <button id="clearCameraResults"
-                                                                        class="btn btn-sm btn-outline-dark p-2 br-5"><%= lingua.clear%></button>
+                                                                        class="btn btn-sm btn-outline-dark p-2 br-5"><%= lingua.clear%>
+                                                                    </button>
+                                                                </div>
+                                                                <div>
+                                                                    <% if(agentID) { %>
+                                                                    <span class="badge badge-outline-success" style="cursor: pointer" title="<%- agentID%>">Active
+                                                                        Agent
+                                                                    </span>
+                                                                    <% } else { %>
+                                                                    <span class="badge badge-outline-danger">
+                                                                        Agent Not Active
+                                                                    </span>
+                                                                    <% } %>
                                                                 </div>
                                                                 <div id="resultOfCameraScan">
                                                                 </div>

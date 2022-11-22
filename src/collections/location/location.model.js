@@ -7,7 +7,7 @@ const locationSchema = new Schema({
     isActive: { type: Boolean, default: false },
     services: [],
     users: [],
-    camera_id: String
+    agentID: String
 })
 
 const locationModel = mongoose.model('location', locationSchema, 'location')

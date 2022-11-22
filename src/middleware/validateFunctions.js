@@ -38,7 +38,7 @@ async function validateLocation(req, res, next) {
     let user = req.user
 
     let currentLocation = req.session.locationID,
-        cameraID = req.session.cameraID
+        agentID = req.session.agentID
 
     if ([ROLES.CUSTOMER].includes(user.role)) {
         res.next()
@@ -58,16 +58,16 @@ async function validateLocation(req, res, next) {
                 //If the user has only one location, then set the values.
                 //Default Assignment
                 req.session.locationID = user?.locations[0]?.id
-                req.session.cameraID = user?.locations[0]?.camera_id
+                req.session.agentID = user?.locations[0]?.agentID
                 console.log(`DEFAULT CURRENT LOCATION: ${req.session.locationID}`)
-                console.log('LOCATION CAMERA: ' + req.session.cameraID);
+                console.log('LOCATION AGENT: ' + req.session.agentID);
                 return next()
             }
         } else {
-            //Validate if the cameraID is stored in the session.
-            if (!cameraID) {
+            //Validate if the agentID is stored in the session.
+            if (!agentID) {
                 var location = await LocationService.getLocationById(currentLocation)
-                req.session.cameraID = location
+                req.session.agentID = location.agentID
             }
 
             return next()

@@ -52,7 +52,7 @@ exports.createSubscriptions = async (req, res) => {
  */
 exports.validateMembership = async (req, res) => {
     // Message for alerts
-    let { message, alertType } = req.session
+    let { message, alertType, agentID } = req.session
 
     // clear message y alertType
     if (message) {
@@ -61,7 +61,7 @@ exports.validateMembership = async (req, res) => {
     }
     let user = req.user
 
-    res.render('dashboards/validateMembership.ejs', { user, message, alertType })
+    res.render('dashboards/validateMembership.ejs', { user, message, alertType, agentID })
 
 }
 
@@ -139,41 +139,41 @@ exports.carCheck = async (req, res) => {
 exports.readingData = async (req, res) => {
     try {
         let dataType = req.body.data_type,
-            bodyResult = req.body,
-            cameras = bodyResult?.video_streams
-            cameraID = req.session.cameraID
+            bodyResult = req.body
+            sessionAgentID = req.session.agentID
 
-        for (var camera of cameras) {
-            if (camera.camera_name == cameraID)
-                console.log(`REKOR-SCOUT: Camera: ${camera?.camera_name}`)
-        }
 
         switch (dataType) {
             case 'alpr_results':
-                req.io.emit('reading-plates');
 
-                /**
-                 * Scout generates an alpr_results JSON value for every
-                 * frame of video in which a license plate is recognized. 
-                 * 
-                 * This is for single plate reads.
-                 * https://docs.rekor.ai/rekor-scout/application-integration/json-plate-results
-                 */
+                if (bodyResult.agent_uid == sessionAgentID) {
+                    // console.log(`REKOR-SCOUT: Camera: ${bodyResult.agentID}`)
 
-                // console.log("Processing Time (MS): " + bodyResult.processing_time_ms)
+                    req.io.emit('reading-plates');
 
-                let plate = bodyResult.results[0].plate
-                // console.log(`IDENTFIED PLATE: ${plate} (${bodyResult.results[0].confidence})`)
-                readingObjs = {
-                    "plate": plate
+                    /**
+                     * Scout generates an alpr_results JSON value for every
+                     * frame of video in which a license plate is recognized. 
+                     * 
+                     * This is for single plate reads.
+                     * https://docs.rekor.ai/rekor-scout/application-integration/json-plate-results
+                     */
+
+                    // console.log("Processing Time (MS): " + bodyResult.processing_time_ms)
+
+                    let plate = bodyResult.results[0].plate
+
+                    readingObjs = {
+                        "plate": plate
+                    }
+
+                    if (readingObjs.plate !== '' & readingObjs.plate?.length > 3) {
+                        // console.debug(`IDENTFIED PLATE: ${plate} (${bodyResult.results[0].confidence})`)
+                        req.io.emit('read-plates', readingObjs);
+                    }
+
+                    req.io.emit('stop-reading-plates');
                 }
-
-                if (readingObjs.plate !== '' & readingObjs.plate?.length > 3) {
-                    // console.debug(`IDENTFIED PLATE: ${plate} (${bodyResult.results[0].confidence})`)
-                    req.io.emit('read-plates', readingObjs);
-                }
-
-                req.io.emit('stop-reading-plates');
                 break;
 
             case 'alpr_group':
@@ -185,27 +185,31 @@ exports.readingData = async (req, res) => {
                  * 
                  * https://docs.rekor.ai/rekor-scout/application-integration/json-group-results
                  */
-                readingObjs = {
-                    "plate": bodyResult.best_plate_number,
-                    // "color": bodyResult.vehicle.color[0].name,
-                    // "brand": bodyResult.vehicle.make[0].name,
-                    // "model": bodyResult.vehicle.make_model[0].name,
-                    // "year": bodyResult.vehicle.year[0].name
+                if (bodyResult.agentID == sessionCameraID) {
+                    // console.log(`REKOR-SCOUT: Camera: ${bodyResult.agentID}`)
+
+
+                    readingObjs = {
+                        "plate": bodyResult.best_plate_number,
+                        // "color": bodyResult.vehicle.color[0].name,
+                        // "brand": bodyResult.vehicle.make[0].name,
+                        // "model": bodyResult.vehicle.make_model[0].name,
+                        // "year": bodyResult.vehicle.year[0].name
+                    }
+                    console.debug("alpr_group - CAR DETAILS: ")
+                    console.debug("-> PLATE: " + readingObjs.plate)
+                    // console.debug("-> COLOR: " + readingObjs.color)
+                    // console.debug("-> BRAND: " + readingObjs.brand)
+                    // console.debug("-> MODEL: " + readingObjs.model)
+                    // console.debug("-> YEAR : " + readingObjs.year)
+
+                    // Load info to a global queue list.
+                    // if (!readingQueue.some(car => car.plate === readingObjs.plate))
+                    //     readingQueue.push(readingObjs)
+
+
+                    // req.io.emit('read-plates', readingQueue);
                 }
-                console.debug("alpr_group - CAR DETAILS: ")
-                console.debug("-> PLATE: " + readingObjs.plate)
-                // console.debug("-> COLOR: " + readingObjs.color)
-                // console.debug("-> BRAND: " + readingObjs.brand)
-                // console.debug("-> MODEL: " + readingObjs.model)
-                // console.debug("-> YEAR : " + readingObjs.year)
-
-                // Load info to a global queue list.
-                // if (!readingQueue.some(car => car.plate === readingObjs.plate))
-                //     readingQueue.push(readingObjs)
-
-
-                // req.io.emit('read-plates', readingQueue);
-
                 break;
 
             case 'heartbeat':
@@ -220,6 +224,7 @@ exports.readingData = async (req, res) => {
             default:
                 console.log('REKOR-SCOUT: No dataType detected.');
         }
+
 
         res.status(200).send('Ok')
     } catch (error) {
