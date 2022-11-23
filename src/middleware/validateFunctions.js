@@ -35,10 +35,9 @@ async function redirectBySubscriptionStatus(req, res, next) {
  * @returns 
  */
 async function validateLocation(req, res, next) {
-    let user = req.user
-
-    let currentLocation = req.session.location,
-        agentID = req.session.agentID
+    let user = req.user,
+        currentLocation = req.session.location,
+        userHasThisLocation = req.user.locations.some(location => location.id === currentLocation?._id)
 
     if ([ROLES.CUSTOMER].includes(user.role)) {
         res.next()
@@ -49,26 +48,20 @@ async function validateLocation(req, res, next) {
             req.flash('error', 'This user not have any location assigned to work.')
 
             res.redirect('/logout');
-        } else if (!currentLocation) {
-            //If the location is not in the session storage.
+        } else if (!currentLocation || !userHasThisLocation) {
+            //If the location is not in the session storage or if the user is removed from de currentLocation.
             if (user?.locations.length > 1) {
                 //if the user has multiple locations then redirect to choose one locaiton.
                 res.redirect('/selectLocation')
             } else {
                 //If the user has only one location, then set the values.
                 //Default Assignment
-                req.session.locationID = user?.locations[0]?.id
-                req.session.agentID = user?.locations[0]?.agentID
-                console.log(`DEFAULT CURRENT LOCATION: ${req.session.locationID}`)
-                console.log('LOCATION AGENT: ' + req.session.agentID);
+                req.session.location = user?.locations[0]
+                console.log(`DEFAULT CURRENT LOCATION: ${req.session.location?.name}`)
+                console.log(`LOCATION AGENT: ${req.session.location?.agentID}`);
                 return next()
             }
         } else {
-            //Validate if the agentID is stored in the session.
-            if (!agentID || agentID != currentLocation.agentID) {
-                req.session.agentID = currentLocation.agentID
-            }
-
             return next()
         }
     }

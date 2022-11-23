@@ -30,7 +30,7 @@ const updateLocation = (Location) => async (id, updates) => {
         if (err) {
             console.error(err.message)
         } else {
-            console.debug("Updated : ", doc.name);
+            console.debug("Location Updated : ", doc.name);
         }
     })
 }

@@ -73,14 +73,14 @@ const updateUser = (User) => async (id, updates) => {
  * @returns User
  */
 const addUserLocation = (User) => async (id, location) => {
-    console.log(`addUserLocation() ID: ${id}`)
+    // console.log(`addUserLocation() ID: ${id}`)
     // findByIdAndUpdate returns the user
     // updateOne is more quickly but not return the user.
     return await User.findByIdAndUpdate({ _id: id }, { $addToSet: { locations: location } }, function (err, doc) {
         if (err) {
             console.error(err.message)
-        } else {
-            console.debug("Location Added : ", doc.email);
+            // } else {
+            //     console.debug("Location Added : ", doc.email);
         }
     })
 }
@@ -91,14 +91,14 @@ const addUserLocation = (User) => async (id, location) => {
  * @returns User
  */
 const removeUserLocation = (User) => async (id, location) => {
-    console.log(`removeUserLocation() ID: ${id}`)
+    // console.log(`removeUserLocation() ID: ${id}`)
     // findByIdAndUpdate returns the user
     // updateOne is more quickly but not return the user.
     return await User.findByIdAndUpdate({ _id: id }, { $pull: { locations: location } }, function (err, doc) {
         if (err) {
             console.error(err.message)
-        } else {
-            console.debug("Location Removed : ", doc.email);
+            // } else {
+            //     console.debug("Location Removed : ", doc.email);
         }
     })
 }
@@ -168,7 +168,7 @@ const getUserById = (User) => (id) => {
     return User.findOne({ _id: id }, function (err, docs) {
         if (err) {
             console.error(err)
-        } 
+        }
         // else {
         //     console.debug("USER-SERVICE: Found user: ", docs.email);
         // }

@@ -52,7 +52,7 @@ exports.createSubscriptions = async (req, res) => {
  */
 exports.validateMembership = async (req, res) => {
     // Message for alerts
-    let { message, alertType, agentID } = req.session
+    let { message, alertType, location } = req.session
 
     // clear message y alertType
     if (message) {
@@ -61,7 +61,7 @@ exports.validateMembership = async (req, res) => {
     }
     let user = req.user
 
-    res.render('dashboards/validateMembership.ejs', { user, message, alertType, agentID })
+    res.render('dashboards/validateMembership.ejs', { user, message, alertType, agentID: location?.agentID })
 
 }
 
@@ -140,7 +140,7 @@ exports.readingData = async (req, res) => {
     try {
         let dataType = req.body.data_type,
             bodyResult = req.body
-            sessionAgentID = req.session.agentID
+            sessionAgentID = req.session.location?.agentID
 
 
         switch (dataType) {

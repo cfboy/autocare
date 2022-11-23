@@ -225,8 +225,8 @@ exports.update = async (req, res) => {
                     let updatedUser = await UserService.addUserLocation(user, location)
                     if (!updatedUser)
                         console.debug(`ERROR: LOCATION-CONTROLLER: Can't update User ${updatedUser?.email}.`)
-                    else
-                        console.debug(`LOCATION-CONTROLLER: Updated User ${updatedUser?.email}.`)
+                    // else
+                    //     console.debug(`LOCATION-CONTROLLER: Updated User ${updatedUser?.email}.`)
 
                 }
             }
@@ -235,8 +235,8 @@ exports.update = async (req, res) => {
                     let updatedUser = await UserService.removeUserLocation(user, location._id)
                     if (!updatedUser)
                         console.debug(`ERROR: LOCATION-CONTROLLER: Can't remove User ${updatedUser?.email}.`)
-                    else
-                        console.debug(`LOCATION-CONTROLLER: Removed user ${updatedUser?.email}.`)
+                    // else
+                    //     console.debug(`LOCATION-CONTROLLER: Removed user ${updatedUser?.email}.`)
 
                 }
             }
@@ -304,7 +304,11 @@ exports.delete = async (req, res) => {
  */
 exports.getCurrentLocation = async (req, res) => {
     try {
-        res.status(200).send(req.session.location._id)
+        var currentLocation = req.session.location
+        var userHasThisLocation = req.user.locations.some(location => location.id === currentLocation?._id)
+
+        res.status(200).send(currentLocation && userHasThisLocation ? currentLocation?._id : null)
+
     } catch (error) {
         console.error("ERROR: locationController -> Tyring to send current location.")
         res.status(500).send(error)
