@@ -35999,7 +35999,7 @@ label.required:after {
     padding: 5px 30px;
     background-color: transparent;
     outline: none;
-    /* border: none; */
+    border: none;
     cursor: pointer;
 }
 .nav-dropdown:focus {

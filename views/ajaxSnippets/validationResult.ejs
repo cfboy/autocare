@@ -14,13 +14,13 @@
                                 class="btn btn-icon btn-icon-no-border no-margin">
                                 <span class="far fa-2x fa-edit icon-sm"></span>
                             </a> -->
-                            <a href="/customers/<%- customer?.id%>" type="button"
-                                data-toggle="tooltip" title="View Customer"
+                            <a href="/customers/<%- customer?.id%>" type="button" data-toggle="tooltip"
+                                title="View Customer" data-toggle="tooltip" data-placement="bottom"
                                 class="btn btn-icon btn-icon-no-border m-1 p-0">
                                 <span class="far fa-2x fa-eye icon-sm"></span>
                             </a>
-                            <a href="/car/<%- car?.id%>" type="button"
-                                data-toggle="tooltip" title="View Car"
+                            <a href="/car/<%- car?.id%>" type="button" data-toggle="tooltip" title="View Car"
+                                data-toggle="tooltip" data-placement="bottom"
                                 class="btn btn-icon btn-icon-no-border m-1 p-0">
                                 <span class="fa-solid fa-car fa-2x icon-sm"></span>
                             </a>
@@ -108,32 +108,26 @@
 
                         <% } else { %>
 
-                        <h4 class="text-center"> <%= lingua.membership.status%>:</h4>
 
                         <% if([stripeStatus.ACTIVE, stripeStatus.TRIALING].includes(subscription?.data?.status)) { %>
                         <i class="fas fa-8x fa-check-circle valid"></i>
-                        <p style="text-transform: uppercase">
+                        <p style="text-transform: uppercase" title="Membership Status" data-toggle="tooltip"
+                            data-placement="bottom">
                             <%= subscription?.data?.status %>
                         </p>
 
                         <% } else if([stripeStatus.CANCELED, stripeStatus.UNPAID, stripeStatus.NONE].includes(subscription?.data?.status)) { %>
                         <i class="far fa-8x fa-times-circle invalid"></i>
-                        <p style="text-transform: uppercase">
+                        <p style="text-transform: uppercase" title="Membership Status" data-toggle="tooltip"
+                            data-placement="bottom">
                             <%= subscription?.data?.status %>
                         </p>
                         <% } %>
-                        <br>
+
                         <div class="mt-3 mb-3">
-                            <% var subscriptionOnValidPeriod = moment(new Date()).isBefore(subscription?.data?.current_period_end * 1000)%>
+                            <% var subscriptionOnValidPeriod = moment(new Date()).isBefore(subscription?.data?.current_period_end * 1000) %>
                             <% if(subscriptionOnValidPeriod) { %>
-                            <% if([roles.ADMIN].includes(user.role)) { %>
-                            <button
-                                class="btn btn-block btn-primary btn-lg font-weight-medium btn-icon-text manage-billing-button m-1"
-                                type="submit" value="<%- customer.billingID%>" email="<%- customer.email%>">
-                                <%= lingua.membership.manageBilling%>
-                                <i class="fab fa-stripe-s btn-icon-apepend"></i>
-                            </button>
-                            <% } %>
+
                             <% if(!car?.hasService) { %>
                             <button id="use-service-button" user-id="<%= customer?.id%>" car-id="<%= car?.id%>"
                                 inputType="<%= inputType%>" onclick="confirmValidation(this)"
@@ -169,6 +163,11 @@
 </div>
 <script>
 
+    $('[data-toggle="tooltip"]').tooltip({
+        placement: function (t_el, el) {
+            return (typeof $(el).data('placement') === 'undefined') ? 'bottom' : $(el).data('placement');
+        }, trigger: 'hover'
+    });
     function confirmValidation(element) {
 
         const userID = element.getAttribute("user-id");

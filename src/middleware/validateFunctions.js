@@ -44,8 +44,7 @@ async function validateLocation(req, res, next) {
     } else {
         if (user?.locations.length == 0) {
             //If the user is not associated to any location, then redirect to logout.
-            // TODO: Show flash after logout.
-            req.flash('error', 'This user not have any location assigned to work.')
+            req.flash('error', 'This user not have any location assigned to work. Please contact the administrator.')
 
             res.redirect('/logout');
         } else if (!currentLocation || !userHasThisLocation) {

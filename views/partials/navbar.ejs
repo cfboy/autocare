@@ -47,7 +47,7 @@
         </ul>
         <ul class="navbar-nav ms-auto">
             <li class="nav-item dropdown ms-0" title="Locations">
-                <select class="form-select nav-dropdown w-100" name="location" id="locationDropdown"
+                <select class="form-select nav-dropdown w-100 d-none" name="location" id="locationDropdown"
                     onchange="changeLocation(this, true)">
                     <!-- <option value="">Select Location</option> -->
                     <% for(const location of user.locations) { %>
@@ -214,9 +214,9 @@
             type: "GET",
             contentType: "application/json"
         }).done(function (result) {
-            console.log('result: ' + result)
+            console.log('Current Location: ' + result)
             if (result)
-                $('#locationDropdown').val(result);
+                $('#locationDropdown').removeClass('d-none').val(result);
             else
                 window.location.href = '/';
 
