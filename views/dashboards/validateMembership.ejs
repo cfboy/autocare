@@ -55,23 +55,29 @@
                                                             <div class="card p-3">
                                                                 <div
                                                                     class="d-flex d-sm-flex justify-content-between align-items-start">
-                                                                    <h5><%= lingua.membership.readyByCamera%>:</h5>
+                                                                    <div class="d-flex">
+                                                                        <% if(agentID) { %>
+                                                                        <i class="fa-solid fa-circle text-success me-2"
+                                                                            style="cursor: pointer"
+                                                                            data-toggle="tooltip"
+                                                                            data-placement="bottom"
+                                                                            title="Active agent in session: <%- agentID%>"></i>
 
+                                                                        <% } else { %>
+                                                                        <i class="fa-solid fa-circle text-danger me-2"
+                                                                            style="cursor: pointer"
+                                                                            data-toggle="tooltip"
+                                                                            data-placement="bottom"
+                                                                            title="The agent is not in the session. Please refresh the page or log in again."></i>
+                                                                        <% } %>
+                                                                        <h5><%= lingua.membership.readyByCamera%>:</h5>
+
+                                                                    </div>
                                                                     <button id="clearCameraResults"
                                                                         class="btn btn-sm btn-outline-dark p-2 br-5"><%= lingua.clear%>
                                                                     </button>
                                                                 </div>
-                                                                <div>
-                                                                    <% if(agentID) { %>
-                                                                    <span class="badge badge-outline-success" style="cursor: pointer" title="<%- agentID%>">Active
-                                                                        Agent
-                                                                    </span>
-                                                                    <% } else { %>
-                                                                    <span class="badge badge-outline-danger">
-                                                                        Agent Not Active
-                                                                    </span>
-                                                                    <% } %>
-                                                                </div>
+
                                                                 <div id="resultOfCameraScan">
                                                                 </div>
                                                                 <div style="height: 10px !important"

@@ -255,7 +255,7 @@ exports.selectLocation = async (req, res) => {
 }
 
 /**
- * This function receive the id of the new location and then set this value on cookies. (currentLocation).
+ * This function receive the id of the new location and then set this value on session. (locationID).
  * Return a response message.
  * @param {*} req 
  * @param {*} res 
@@ -266,12 +266,12 @@ exports.changeLocation = async (req, res) => {
 
         if (locationID) {
             let location = await LocationService.getLocationById(locationID)
-            res.cookie('currentLocation', locationID)
-            req.session.locationID = locationID
-            req.session.agentID = location.agentID
-            console.log('CURRENT LOCATION: ' + locationID);
-            console.log('LOCATION CAMERA: ' + req.session.agentID);
-            req.flash('info', 'Location changed.')
+            // res.cookie('currentLocation', locationID)
+            console.log('CURRENT LOCATION: ' + location?.id);
+            console.log('LOCATION CAMERA: ' + location?.agentID);
+            req.session.location = location
+            req.session.agentID = location?.agentID
+            req.flash('info', 'Location ' + location?.name)
             res.status(200).send(locationID);
         }
     } catch (error) {

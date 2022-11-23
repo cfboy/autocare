@@ -27,7 +27,7 @@ async function redirectBySubscriptionStatus(req, res, next) {
 }
 
 /**
- * This function validate the currentLocation in cookies. 
+ * This function validate the currentLocation in session. 
  * If the user not have locations then redirect to logout.
  * @param {*} req 
  * @param {*} res 
@@ -37,7 +37,7 @@ async function redirectBySubscriptionStatus(req, res, next) {
 async function validateLocation(req, res, next) {
     let user = req.user
 
-    let currentLocation = req.session.locationID,
+    let currentLocation = req.session.location,
         agentID = req.session.agentID
 
     if ([ROLES.CUSTOMER].includes(user.role)) {
@@ -65,9 +65,8 @@ async function validateLocation(req, res, next) {
             }
         } else {
             //Validate if the agentID is stored in the session.
-            if (!agentID) {
-                var location = await LocationService.getLocationById(currentLocation)
-                req.session.agentID = location.agentID
+            if (!agentID || agentID != currentLocation.agentID) {
+                req.session.agentID = currentLocation.agentID
             }
 
             return next()

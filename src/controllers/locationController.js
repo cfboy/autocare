@@ -241,6 +241,11 @@ exports.update = async (req, res) => {
                 }
             }
 
+            //Update the location in session if is the same location.
+            if (location.id == req.session.location._id) {
+                req.session.location = location
+            }
+
             req.flash('info', 'Location Updated.')
             req.session.message = `Location updated ${location.name}`
             req.session.alertType = alertTypes.CompletedActionAlert
@@ -299,7 +304,7 @@ exports.delete = async (req, res) => {
  */
 exports.getCurrentLocation = async (req, res) => {
     try {
-        res.status(200).send(req.session.locationID)
+        res.status(200).send(req.session.location._id)
     } catch (error) {
         console.error("ERROR: locationController -> Tyring to send current location.")
         res.status(500).send(error)
