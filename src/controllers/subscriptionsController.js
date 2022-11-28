@@ -140,13 +140,16 @@ exports.readingData = async (req, res) => {
     try {
         let dataType = req.body.data_type,
             bodyResult = req.body
-            sessionAgentID = req.session.location?.agentID
+        sessionAgentID = req.session.location?.agentID,
+            agentID = bodyResult.agent_uid
+
+        let authorizedAgent = (agentID == sessionAgentID)
+
+        if (authorizedAgent) {
+            switch (dataType) {
+                case 'alpr_results':
 
 
-        switch (dataType) {
-            case 'alpr_results':
-
-                if (bodyResult.agent_uid == sessionAgentID) {
                     // console.log(`REKOR-SCOUT: Camera: ${bodyResult.agentID}`)
 
                     req.io.emit('reading-plates');
@@ -173,19 +176,19 @@ exports.readingData = async (req, res) => {
                     }
 
                     req.io.emit('stop-reading-plates');
-                }
-                break;
 
-            case 'alpr_group':
-                /**
-                 * Scout generates an alpr_group JSON value for a collection of similar license plates,
-                 * generally delegating a single plate group per vehicle. 
-                 * If more real-time results are needed, 
-                 * it is recommended that you ignore the plate_group value and use only the individual plate results.
-                 * 
-                 * https://docs.rekor.ai/rekor-scout/application-integration/json-group-results
-                 */
-                if (bodyResult.agentID == sessionCameraID) {
+                    break;
+
+                case 'alpr_group':
+                    /**
+                     * Scout generates an alpr_group JSON value for a collection of similar license plates,
+                     * generally delegating a single plate group per vehicle. 
+                     * If more real-time results are needed, 
+                     * it is recommended that you ignore the plate_group value and use only the individual plate results.
+                     * 
+                     * https://docs.rekor.ai/rekor-scout/application-integration/json-group-results
+                     */
+                    // if (authorizedAgent) {
                     // console.log(`REKOR-SCOUT: Camera: ${bodyResult.agentID}`)
 
 
@@ -209,20 +212,21 @@ exports.readingData = async (req, res) => {
 
 
                     // req.io.emit('read-plates', readingQueue);
-                }
-                break;
+                    // }
+                    break;
 
-            case 'heartbeat':
-                /**
-                 * Every minute, the Scout Agent adds one heartbeat message to the queue. 
-                 * The heartbeat provides general health and status information.
-                 */
-                console.log('heartbeat: Video Streams: (' + bodyResult.video_streams.length + ')')
+                case 'heartbeat':
+                    /**
+                     * Every minute, the Scout Agent adds one heartbeat message to the queue. 
+                     * The heartbeat provides general health and status information.
+                     */
+                    console.log(`HEARTBEAT -> Agent: ${bodyResult.agent_hostname} (${bodyResult.video_streams.length} Streams)`)
 
-                break;
+                    break;
 
-            default:
-                console.log('REKOR-SCOUT: No dataType detected.');
+                default:
+                    console.log('REKOR-SCOUT: No dataType detected.');
+            }
         }
 
 
