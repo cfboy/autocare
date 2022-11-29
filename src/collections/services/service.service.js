@@ -142,8 +142,8 @@ const getServicesByCar = (Service) => async (car) => {
     return Service.find({ car: car })
         .populate({ path: 'location', model: 'location' })
         .populate({ path: 'authorizedBy', model: 'user' })
-        .populate({ path: 'user', model: 'user' })
-        .populate({ path: 'car', model: 'car' })
+        // .populate({ path: 'user', model: 'user' })
+        // .populate({ path: 'car', model: 'car' })
         .then(result => {
             if (result) {
                 // console.debug(`getServicesByCar(): Successfully found ${result.length} services.`);
@@ -168,10 +168,10 @@ const getServicesByCarBetweenDates = (Service) => async (car, startDate, endDate
             $lte: endDate
         }
     })
-        .populate({ path: 'location', model: 'location' })
-        .populate({ path: 'authorizedBy', model: 'user' })
-        .populate({ path: 'user', model: 'user' })
-        .populate({ path: 'car', model: 'car' })
+        // .populate({ path: 'location', model: 'location' })
+        // .populate({ path: 'authorizedBy', model: 'user' })
+        // .populate({ path: 'user', model: 'user' })
+        // .populate({ path: 'car', model: 'car' })
         .then(result => {
             if (result) {
                 // console.debug(`getServicesByCarBetweenDates(): Successfully found ${result.length} services.`);

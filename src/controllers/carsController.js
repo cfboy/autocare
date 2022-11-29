@@ -95,35 +95,36 @@ exports.view = async (req, res) => {
 
             // this gives an object with dates as keys
             // Create groups of services.
-            const groups = car.allServices.reduce((groups, service) => {
-                const serviceDate = service.created_date;
-                var date = new Date(serviceDate.getTime());
-                date.setHours(0, 0, 0, 0);
-                if (!groups[date]) {
-                    groups[date] = [];
-                }
-                groups[date].push(service);
-                return groups;
-            }, {});
+            if ([ROLES.ADMIN].includes(user.role)) {
+                const groups = car.allServices.reduce((groups, service) => {
+                    const serviceDate = service.created_date;
+                    var date = new Date(serviceDate.getTime());
+                    date.setHours(0, 0, 0, 0);
+                    if (!groups[date]) {
+                        groups[date] = [];
+                    }
+                    groups[date].push(service);
+                    return groups;
+                }, {});
 
-            // Edit: to add it in the array format instead
-            const groupArrays = Object.keys(groups).map((date) => {
-                return {
-                    date,
-                    services: groups[date]
-                };
-            });
+                // Edit: to add it in the array format instead
+                const groupArrays = Object.keys(groups).map((date) => {
+                    return {
+                        date,
+                        services: groups[date]
+                    };
+                });
 
-            // Set duplicated flag to service.
-            for (group of groupArrays) {
-                if (group.services.length > 1) {
-                    for (service of group.services) {
-                        service.duplicated = true
-                        hasDuplicatedServices = true
+                // Set duplicated flag to service.
+                for (group of groupArrays) {
+                    if (group.services.length > 1) {
+                        for (service of group.services) {
+                            service.duplicated = true
+                            hasDuplicatedServices = true
+                        }
                     }
                 }
             }
-
             res.status(200).render('cars/view.ejs', {
                 user,
                 car,
@@ -317,7 +318,7 @@ exports.delete = async (req, res) => {
 
     try {
         let car = await CarService.getCarByID(carID)
-            // removeCarFromAllSubscriptions = await CarService.removeCarFromAllSubscriptions(car)
+        // removeCarFromAllSubscriptions = await CarService.removeCarFromAllSubscriptions(car)
 
         if (car) {
             CarService.deleteCar(car.id) //TODO: verify if is need to delete the car forever.

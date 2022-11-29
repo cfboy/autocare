@@ -89,8 +89,12 @@ exports.validate = async (req, res) => {
             subscription = await SubscriptionService.getLastSubscriptionByCar(car)
 
             customer = subscription?.user
-            services = await ServiceService.getServicesByCar(car)
-            hasService = services.some(service => service.created_date.setHours(0, 0, 0, 0) === new Date().setHours(0, 0, 0, 0))
+            // services = await ServiceService.getServicesByCar(car)
+            // hasService = services.some(service => service.created_date.setHours(0, 0, 0, 0) === new Date().setHours(0, 0, 0, 0))
+            let today = new Date(), tomorrow = new Date()
+            tomorrow = new Date(tomorrow.setDate(today.getDate() + 1))
+            services = await ServiceService.getServicesByCarBetweenDates(car, today.setHours(0, 0, 0, 0), tomorrow.setHours(0, 0, 0, 0))
+            hasService = services.length > 0
             car.hasService = hasService
             car.isValid = car?.cancel_date ? (car.cancel_date < new Date()) : true
             // TODO: use selected location 
