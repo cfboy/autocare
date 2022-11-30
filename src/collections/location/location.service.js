@@ -67,7 +67,7 @@ const getLocations = (Location) => () => {
  * @returns location object
  */
 const getLocationById = (Location) => (id) => {
-    console.log(`getLocationById() by ID: ${id}`)
+    // console.log(`getLocationById() by ID: ${id}`)
 
     return Location.findOne({ _id: id }, function (err, docs) {
         if (err) {

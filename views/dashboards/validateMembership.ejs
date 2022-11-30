@@ -162,6 +162,8 @@
             }
         });
 
+        // The socket is already defined on navbar.
+
         // const usernameSpan = document.getElementById("username");
         const agentSpan = $("#agent");
 
@@ -173,15 +175,15 @@
                                                                             data-placement="bottom"
                                                                             title="Active agent in session: ${agent}"></i>`);
             } else {
-                agentSpan.append(` <i class="fa-solid fa-circle text-danger me-2"
+                agentSpan.append(`<i class="fa-solid fa-circle text-danger me-2"
                                                                             style="cursor: pointer"
                                                                             data-toggle="tooltip"
                                                                             data-placement="bottom"
-                                                                            title="The agent is not in the session. Please refresh the page or log in again."></i>`);
+                                                                            title="The agent is not in the session. 
+                                                                            Please refresh the page or log in again."></i>`);
             }
         });
 
-        // The socket is already define on navbar.
         socket.on('reading-plates', () => {
             showResult('#resultOfCameraScanLoading', '<p>Reading...</p>')
         })

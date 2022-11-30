@@ -111,7 +111,7 @@ io.use(wrap(passport.session()));
 
 // Use socket only when the user is logged in.
 io.use((socket, next) => {
-    if (socket.request.user) {
+    if (socket.request.user && socket.request.session.location) {
         next();
     } else {
         next(new Error('unauthorized'))
@@ -133,12 +133,12 @@ server.listen(port, () => {
 });
 
 io.on('connect', (socket) => {
-    console.log(`New connection ${socket.id}`);
+    // console.log(`New connection ${socket.id}`);
 
     let agentRoom = socket.request.session?.location?.agentID
     //Create a room based on a location agentID
     if (agentRoom) {
-        console.log(`Agent Room: ${agentRoom}`);
+        // console.log(`Agent Room: ${agentRoom}`);
         socket.join(agentRoom)
     }
 
@@ -157,9 +157,8 @@ io.on('connect', (socket) => {
     //     cb(actives);
     // });
 
-    //Maybe implement persisten socket.
     const session = socket.request.session;
-    console.log(`Saving sid ${socket.id} in session ${session.id}`);
+    // console.log(`Saving sid ${socket.id} in session ${session.id}`);
     session.socketId = socket.id;
     session.save();
 });

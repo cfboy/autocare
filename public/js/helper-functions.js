@@ -75,7 +75,7 @@ function changeLocation(element, fromSelect) {
     else {
         locationID = element.getAttribute('id');
     }
-    console.log(`changeLocation to ID: ${locationID}`)
+    // console.log(`changeLocation to ID: ${locationID}`)
 
     $.ajax({
         url: "/changeLocation",
