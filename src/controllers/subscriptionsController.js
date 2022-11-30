@@ -129,7 +129,11 @@ exports.carCheck = async (req, res) => {
             console.log(`REKOR-SCOUT: ERROR on JSON ${req.body.error}`)
         }
         else {
-            req.io.emit('carcheck-data', req.body);
+            let agentRoom = req.body.agent_uid;
+            if (agentRoom) {
+                // req.io.socket.join(agentRoom);
+                req.io.in(agentRoom).emit('carcheck-data', req.body);
+            }
         }
 
         res.status(200).send('Ok')
@@ -155,8 +159,8 @@ exports.readingData = async (req, res) => {
 
 
                     // console.log(`REKOR-SCOUT: Camera: ${bodyResult.agentID}`)
-
-                    req.io.emit('reading-plates');
+                    // Emmit the results to all clients/sockets in the Agent ROOM.
+                    req.io.in(agentID).emit('reading-plates');
 
                     /**
                      * Scout generates an alpr_results JSON value for every
@@ -176,10 +180,10 @@ exports.readingData = async (req, res) => {
 
                     if (readingObjs.plate !== '' & readingObjs.plate?.length > 3) {
                         // console.debug(`IDENTFIED PLATE: ${plate} (${bodyResult.results[0].confidence})`)
-                        req.io.emit('read-plates', readingObjs);
+                        req.io.in(agentID).emit('read-plates', readingObjs);
                     }
 
-                    req.io.emit('stop-reading-plates');
+                    req.io.in(agentID).emit('stop-reading-plates');
 
                     break;
 

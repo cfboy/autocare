@@ -2,7 +2,7 @@
 require('dotenv').config() //Loads environment variables from .env file into the process
 // }
 require("express-async-errors");
-require('log-timestamp')(function() { return '[' + new Date().toLocaleString() + '] %s' });
+require('log-timestamp')(function () { return '[' + new Date().toLocaleString() + '] %s' });
 
 const bodyParser = require('body-parser'),
     express = require('express'),
@@ -33,9 +33,12 @@ const app = express()
 const server = require('http').createServer(app)
 const io = require('socket.io')(server, { cors: { origin: "*" } })
 
+// convert a connect middleware to a Socket.IO middleware
+const wrap = middleware => (socket, next) => middleware(socket.request, {}, next);
+
 app.use(cookieParser());
 
-app.use(session({
+const sessionMiddleware = session({
     saveUninitialized: false,
     cookie: { maxAge: 86400000 },
     store: new MemoryStore({
@@ -43,7 +46,9 @@ app.use(session({
     }),
     resave: false,
     secret: process.env.SESSION_SECRET
-}))
+})
+
+app.use(sessionMiddleware)
 
 // place this middleware before any other route definitions
 // makes io available as req.io in all request handlers
@@ -99,6 +104,20 @@ app.use(lingua(app, {
     }
 }));
 
+//Pass the passport to io
+io.use(wrap(sessionMiddleware));
+io.use(wrap(passport.initialize()));
+io.use(wrap(passport.session()));
+
+// Use socket only when the user is logged in.
+io.use((socket, next) => {
+    if (socket.request.user) {
+        next();
+    } else {
+        next(new Error('unauthorized'))
+    }
+});
+
 app.use('/', router);
 
 app.use((error, req, res, next) => {
@@ -114,6 +133,33 @@ server.listen(port, () => {
 });
 
 io.on('connect', (socket) => {
-    console.debug("Socket connected: " + socket.connected)
-    // console.debug("Socket ID: " + socket.id)
+    console.log(`New connection ${socket.id}`);
+
+    let agentRoom = socket.request.session?.location?.agentID
+    //Create a room based on a location agentID
+    if (agentRoom) {
+        console.log(`Agent Room: ${agentRoom}`);
+        socket.join(agentRoom)
+    }
+
+    // socket.on('whoami', (cb) => {
+    //     cb(socket.request.user ? socket.request.user.email : '');
+    // });
+
+    socket.on('agent', (cb) => {
+        cb(agentRoom ? agentRoom : '');
+    });
+
+    // socket.on('getRooms', (cb) => {
+    //     const rooms = Array.from(io.sockets.adapter.rooms)
+    //     const filtered = rooms.filter(room => !room[1].has(room[0]))
+    //     const actives = filtered.map(i => i[0])
+    //     cb(actives);
+    // });
+
+    //Maybe implement persisten socket.
+    const session = socket.request.session;
+    console.log(`Saving sid ${socket.id} in session ${session.id}`);
+    session.socketId = socket.id;
+    session.save();
 });

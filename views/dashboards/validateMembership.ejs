@@ -56,20 +56,7 @@
                                                                 <div
                                                                     class="d-flex d-sm-flex justify-content-between align-items-start">
                                                                     <div class="d-flex">
-                                                                        <% if(agentID) { %>
-                                                                        <i class="fa-solid fa-circle text-success me-2"
-                                                                            style="cursor: pointer"
-                                                                            data-toggle="tooltip"
-                                                                            data-placement="bottom"
-                                                                            title="Active agent in session: <%- agentID%>"></i>
-
-                                                                        <% } else { %>
-                                                                        <i class="fa-solid fa-circle text-danger me-2"
-                                                                            style="cursor: pointer"
-                                                                            data-toggle="tooltip"
-                                                                            data-placement="bottom"
-                                                                            title="The agent is not in the session. Please refresh the page or log in again."></i>
-                                                                        <% } %>
+                                                                        <div id="agent" class="text-small"></div>
                                                                         <h5><%= lingua.membership.readyByCamera%>:</h5>
 
                                                                     </div>
@@ -174,6 +161,26 @@
                 this.value = this.value.replace(/\s/g, "");
             }
         });
+
+        // const usernameSpan = document.getElementById("username");
+        const agentSpan = $("#agent");
+
+        socket.emit('agent', (agent) => {
+            if (agent) {
+                agentSpan.append(`<i class="fa-solid fa-circle text-success me-2"
+                                                                            style="cursor: pointer"
+                                                                            data-toggle="tooltip"
+                                                                            data-placement="bottom"
+                                                                            title="Active agent in session: ${agent}"></i>`);
+            } else {
+                agentSpan.append(` <i class="fa-solid fa-circle text-danger me-2"
+                                                                            style="cursor: pointer"
+                                                                            data-toggle="tooltip"
+                                                                            data-placement="bottom"
+                                                                            title="The agent is not in the session. Please refresh the page or log in again."></i>`);
+            }
+        });
+
         // The socket is already define on navbar.
         socket.on('reading-plates', () => {
             showResult('#resultOfCameraScanLoading', '<p>Reading...</p>')

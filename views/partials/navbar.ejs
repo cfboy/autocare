@@ -248,8 +248,23 @@
 
     var readFlag = false;
 
-    const socket = io('<%= domain%>');
+    const socket = io();
 
+    // const socketIdSpan = document.getElementById("socketId");
+    // const usernameSpan = document.getElementById("username");
+    // const locationSpan = document.getElementById("location");
+
+    // socket.on('connect', () => {
+    //     socketIdSpan.innerText = socket.id;
+
+    //     socket.emit('whoami', (username) => {
+    //         usernameSpan.innerText = username;
+    //     });
+
+    //     socket.emit('location', (location) => {
+    //         locationSpan.innerText = location;
+    //     });
+    // });
     // Receive data
     socket.on('notifications', (data) => {
         console.log(JSON.stringify(data));
