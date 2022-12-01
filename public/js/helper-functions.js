@@ -86,10 +86,7 @@ function changeLocation(element, fromSelect) {
         }),
 
     }).done(function (result) {
-        // if (fromSelect) {
-        //     location.reload();
-        // }else
-            window.location.href = "/account";
+        window.location.href = "/account";
     }).fail(function (err) {
         console.log(err);
     })
