@@ -131,7 +131,7 @@ exports.webhook = async (req, res) => {
 
                         [customer, notification] = await UserService.addNotification(customer.id, alertInfo.message);
 
-                        req.io.emit('notifications', notification);
+                        req.io.in(customer?.id).emit('notifications', notification);
 
                         if (process.env.NODE_ENV === "production") {
                             //Send Email
@@ -297,7 +297,7 @@ exports.webhook = async (req, res) => {
                     // Add notification to user.
                     [customer, notification] = await UserService.addNotification(customer.id, alertInfo.message)
 
-                    req.io.emit('notifications', notification);
+                    req.io.in(customer?.id).emit('notifications', notification);
 
                     if (process.env.NODE_ENV === "production") {
                         //Send Email
@@ -358,7 +358,7 @@ exports.webhook = async (req, res) => {
                     // Add notification to user.
                     [customer, notification] = await UserService.addNotification(customer.id, alertInfo.message)
 
-                    req.io.emit('notifications', notification);
+                    req.io.in(customer?.id).emit('notifications', notification);
                     if (process.env.NODE_ENV === "production") {
                         //Send Email
                         var resultEmail = await sendEmail(

@@ -163,24 +163,24 @@
         });
 
         // The socket is already defined on navbar.
+        // socket.emit('join-to-agent-room');
 
         // const usernameSpan = document.getElementById("username");
         const agentSpan = $("#agent");
 
         socket.emit('agent', (agent) => {
             if (agent) {
-                agentSpan.append(`<i class="fa-solid fa-circle text-success me-2"
+                agentSpan.html(`<i class="fa-solid fa-circle text-success me-2"
                                                                             style="cursor: pointer"
                                                                             data-toggle="tooltip"
                                                                             data-placement="bottom"
                                                                             title="Active agent in session: ${agent}"></i>`);
             } else {
-                agentSpan.append(`<i class="fa-solid fa-circle text-danger me-2"
+                agentSpan.html(`<i class="fa-solid fa-circle text-danger me-2"
                                                                             style="cursor: pointer"
                                                                             data-toggle="tooltip"
                                                                             data-placement="bottom"
-                                                                            title="The agent is not in the session. 
-                                                                            Please refresh the page or log in again."></i>`);
+                                                                            title="The agent is not in the session. Please refresh the page or log in again."></i>`);
             }
         });
 

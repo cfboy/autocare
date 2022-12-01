@@ -135,28 +135,40 @@ server.listen(port, () => {
 io.on('connect', (socket) => {
     // console.log(`New connection ${socket.id}`);
 
-    let agentRoom = socket.request.session?.location?.agentID
-    //Create a room based on a location agentID
-    if (agentRoom) {
-        // console.log(`Agent Room: ${agentRoom}`);
-        socket.join(agentRoom)
-    }
+
+    //Create a room based on the userID for notifications.
+    const userID = socket.request.user.id
+    socket.join(userID)
 
     // socket.on('whoami', (cb) => {
     //     cb(socket.request.user ? socket.request.user.email : '');
     // });
+    const agentRoom = socket.request.session?.location?.agentID
 
-    socket.on('agent', (cb) => {
-        cb(agentRoom ? agentRoom : '');
+    // socket.on('join-to-agent-room', () => {
+    // console.log('Join room')
+    //Create a room based on a location agentID for cameras data.
+    if (agentRoom) {
+        // console.log(`Agent Room: ${agentRoom}`);
+        socket.join(agentRoom)
+    }
+    // socket.emit('agent', agentRoom ? agentRoom : '');
+    // })
+
+    socket.on('agent', (cb) => { cb(agentRoom ? agentRoom : '') });
+
+    socket.on('getRooms', (cb) => {
+        const rooms = Array.from(io.sockets.adapter.rooms)
+        const filtered = rooms.filter(room => !room[1].has(room[0]))
+        const actives = filtered.map(i => i[0])
+        cb(actives);
     });
 
-    // socket.on('getRooms', (cb) => {
-    //     const rooms = Array.from(io.sockets.adapter.rooms)
-    //     const filtered = rooms.filter(room => !room[1].has(room[0]))
-    //     const actives = filtered.map(i => i[0])
-    //     cb(actives);
-    // });
-
+    socket.on('getConnectedSockets', (agentID, cb) => {
+        const clients = io.sockets.adapter.rooms.get(agentID)
+        const actives = clients?.size
+        cb(actives ? actives : 0);
+    });
     const session = socket.request.session;
     // console.log(`Saving sid ${socket.id} in session ${session.id}`);
     session.socketId = socket.id;
