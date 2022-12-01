@@ -25,8 +25,9 @@
             <li class="nav-item font-weight-semibold d-none d-lg-block ms-0">
                 <h1 class="welcome-text">
                     <%# lingua.welcome%>
-                     <span class="text-black fw-bold"><%- user.personalInfo.firstName%> <%- user.personalInfo.lastName%></span>
-                     <small class="text-small text-uppercase"><%- user.role%></small>
+                    <span class="text-black fw-bold"><%- user.personalInfo.firstName%>
+                        <%- user.personalInfo.lastName%></span>
+                    <small class="text-small text-uppercase"><%- user.role%></small>
                 </h1>
 
                 <% if (messages.error) { %>
@@ -197,9 +198,11 @@
         </button>
     </div>
 </nav>
+<!-- <div id="notifications-target"></div> -->
 <script src="../js/helper-functions.js"></script>
 <script src="https://cdn.socket.io/socket.io-3.0.1.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script type="text/javascript" src="../js/sweet-alerts.js"></script>
 
 <script>
     window.onload = function () {
@@ -283,6 +286,9 @@
 
         $('#notificationDropdownBtn').append(`
         <span class="count"></span>`)
+
+        // TODO: TEST
+        toastAlert(data?.message);
 
     })
 
