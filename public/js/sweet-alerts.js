@@ -80,15 +80,22 @@ function confirmAlert(message, lingua) {
 
 function toastAlert(message) {
     Swal.fire({
+        icon: 'info',
+        title: 'Notification',
         text: message,
-        target: '#notifications-target',
-        customClass: {
-            container: 'position-absolute'
-        },
+        // target: '#notifications-target',
+        // customClass: {
+        //     container: 'position-absolute'
+        // },
         toast: true,
-        position: 'bottom-right',
-        timer: 1500,
-        showConfirmButton: false
+        position: 'top-right',
+        iconColor: 'white',
+        customClass: {
+            popup: 'colored-toast'
+        },
+        showConfirmButton: false,
+        timer: 2500,
+        timerProgressBar: true
     })
 }
 

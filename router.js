@@ -28,7 +28,7 @@ const { checkAuthenticated,
     authChangePassword,
     authChangePrices } = require('./src/middleware/authFunctions')
 
-const { validateSubscriptions, redirectBySubscriptionStatus, validateLocation } = require('./src/middleware/validateFunctions')
+const { validateSubscriptions, redirectBySubscriptionStatus, validateLocation, validateSelectCurrectLocation } = require('./src/middleware/validateFunctions')
 
 // Main Route
 router.get('/', checkAuthenticated, (req, res) => {
@@ -115,6 +115,7 @@ router.get('/edit-car/:id', checkAuthenticated, authEditCar, carsController.edit
 router.post('/syncUtilization', checkAuthenticated, carsController.syncUtilization)
 
 //------ Subscriptions/Memberships Routes ------
+router.get('/memberships', checkAuthenticated, validateSubscriptions, redirectBySubscriptionStatus, subscriptionsController.memberships)
 router.get('/validateMembership', checkAuthenticated, authValidateMembership, subscriptionsController.validateMembership)
 router.post('/validateMembership', checkAuthenticated, authValidateMembership, subscriptionsController.validate)
 router.post('/carcheck', subscriptionsController.carCheck)
@@ -140,7 +141,7 @@ router.get('/delete-service/:id', checkAuthenticated, authDeleteService, service
 
 //------ Location Routes ------
 router.get('/locations', checkAuthenticated, locationController.locations)
-router.get('/getCurrentLocation', locationController.getCurrentLocation)
+router.get('/getCurrentLocation', validateSelectCurrectLocation, locationController.getCurrentLocation)
 router.get('/create-location', checkAuthenticated, locationController.createLocation)
 router.get('/view-location/:id', checkAuthenticated, locationController.viewLocation)
 router.get('/edit-location/:id', checkAuthenticated, authEditLocation, locationController.editLocation)

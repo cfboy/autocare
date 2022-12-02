@@ -307,7 +307,8 @@ exports.getCurrentLocation = async (req, res) => {
         var currentLocation = req.session.location
         var userHasThisLocation = req.user.locations.some(location => location.id === currentLocation?._id)
 
-        res.status(200).send(currentLocation && userHasThisLocation ? currentLocation?._id : null)
+        const redirect = currentLocation && userHasThisLocation ? false : true;
+        res.status(200).send({ redirect: redirect, location: currentLocation ? currentLocation?._id : null })
 
     } catch (error) {
         console.error("ERROR: locationController -> Tyring to send current location.")

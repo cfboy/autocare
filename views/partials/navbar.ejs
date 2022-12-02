@@ -137,6 +137,25 @@
                     <% } %>
                 </div>
             </li>
+            <% if(NODE_ENV === 'development') { %>
+            <li class="nav-item dropdown d-lg-block test-dropdown">
+                <a class="nav-link" id="TestDropdown" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+                    <!-- <img class="img-xs rounded-circle" src="../../images/faces/profile/user.png" alt="Profile image"> -->
+                    <i class="fas fa-file-code text-primary"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="TestDropdown">
+                    <div class="dropdown-header text-center">
+                        <p class="mb-1 mt-3 font-weight-semibold">
+                            Testing Triggers
+                        </p>
+                    </div>
+
+                    <button type="button" class="dropdown-item" onclick="testNotification()">
+                        Test Toast Notification
+                    </button>
+                </div>
+            </li>
+            <% } %>
             <li class="nav-item dropdown d-lg-block user-dropdown">
                 <a class="nav-link" id="UserDropdown" href="#" data-bs-toggle="dropdown" aria-expanded="false">
                     <img class="img-xs rounded-circle" src="../../images/faces/profile/user.png" alt="Profile image">
@@ -220,10 +239,13 @@
             contentType: "application/json"
         }).done(function (result) {
             // console.log('Current Location: ' + result)
-            if (result)
-                $('#locationDropdown').removeClass('d-none').val(result);
-            else
+            if (result.redirect)
                 window.location.href = '/';
+            else {
+                if (result.location)
+                    $('#locationDropdown').removeClass('d-none').val(result.location);
+            }
+
 
         }).fail(function (err) {
             console.log(err);
@@ -291,6 +313,11 @@
         toastAlert(data?.message);
 
     })
+
+    function testNotification() {
+        toastAlert('Test NotificationNotificationNotificationNotificationNotificationNotificationNotificationNotificationNotificationNotificationNotificationNotificationNotificationNotificationNotification');
+
+    }
 
     function changeNotificationState(notificationId, newStatus, allNotifications) {
         var userId = '<%- user.id%>';

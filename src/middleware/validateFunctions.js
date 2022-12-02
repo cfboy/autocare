@@ -40,7 +40,7 @@ async function validateLocation(req, res, next) {
         userHasThisLocation = req.user.locations.some(location => location.id === currentLocation?._id)
 
     if ([ROLES.CUSTOMER].includes(user.role)) {
-        res.next()
+        return next()
     } else {
         if (user?.locations.length == 0) {
             //If the user is not associated to any location, then redirect to logout.
@@ -66,8 +66,28 @@ async function validateLocation(req, res, next) {
     }
 }
 
+
+/**
+ * This function verify if the user need to auto-select the current location.
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ * @returns 
+ */
+async function validateSelectCurrectLocation(req, res, next) {
+    let user = req.user
+
+    if ([ROLES.CUSTOMER].includes(user.role)) {
+        return res.send('This user not need to select location.')
+    } else {
+        return next()
+    }
+}
+
+
 module.exports = {
     validateSubscriptions,
     redirectBySubscriptionStatus,
-    validateLocation
+    validateLocation,
+    validateSelectCurrectLocation
 }
