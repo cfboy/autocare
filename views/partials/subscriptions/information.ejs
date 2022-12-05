@@ -8,7 +8,7 @@
             <% } %>
         </h4>
         <% if(customer?.balance) { %>
-        <h6>Balance: <%= customer?.balance%></h6>
+        <h6 class="font-monospace text-primary mt-2">Account Balance: <%= customer?.balance%></h6>
         <% } %>
     </div>
     <div class="col-lg-6 col-md-6 col-sm-12 text-end">
@@ -190,9 +190,10 @@
                                         <br>
                                         <br>
                                         <% if(stripeSubscription?.data.cancel_at) { %>
-                                        <b>
-                                            Cancel At:
+                                        <b class="error">
+                                            This membership its valid until:
                                             <br>
+                                            <i class="fa-solid fa-calendar fa-fw"></i>
                                             <%= moment(stripeSubscription?.data?.cancel_at * 1000).isValid() ? moment(stripeSubscription?.data?.cancel_at * 1000).format(shortDateFormat) : 'N/A' %>
                                         </b>
                                         <% } %>
