@@ -69,7 +69,7 @@
                                                             <%- car?.model%>
                                                             (<%- car?.plate%>)
                                                             <% if(car?.cancel_date) { %>
-                                                            <b>
+                                                            <b class="warning">
                                                                 (<%= lingua.membership.validUntil%>:
                                                                 <%= moment(car?.cancel_date).isValid() ? moment(car?.cancel_date).format(shortDateFormat) : 'N/A' %>
                                                                 )
@@ -83,7 +83,7 @@
                                                     <% } else { %>
                                                     <!-- If the length of cars is less than item quantity, then show add car btn. -->
                                                     <% if(item.cars.length < item.data.quantity) { %>
-                                                        <!-- First Show the cars -->
+                                                    <!-- First Show the cars -->
                                                     <% for(car of item.cars) { %>
                                                     <a href="/car/<%- car?.id%>" class="text-decoration-none">
                                                         <li
@@ -103,7 +103,7 @@
                                                         </li>
                                                     </a>
                                                     <% } %>
-                                                    <% for(let i=0; i < (item.data.quantity-item.cars.length+1); i++) { %>
+                                                    <% for(let i=0; i < (item.data.quantity-item.cars.length); i++) { %>
 
                                                     <a href="/cars/create?itemID=<%- item.id%>&userID=<%- customer.id%>"
                                                         class="text-decoration-none">
@@ -216,9 +216,8 @@
                                     <% if([stripeStatus.ACTIVE, stripeStatus.TRIALING].includes(stripeSubscription?.data?.status)) { %>
                                     <i class="fas fa-3x fa-check-circle valid"></i>
 
-
                                     <% } else if([stripeStatus.CANCELED, stripeStatus.UNPAID, stripeStatus.NONE].includes(stripeSubscription?.data?.status)) { %>
-                                    <i class="far fa-3x fa-times-circle invalid"></i>
+                                    <i class="fas fa-3x fa-times-circle invalid"></i>
                                     <% } %>
 
                                     <p style="text-transform: uppercase" title="Membership Status" data-toggle="tooltip"
