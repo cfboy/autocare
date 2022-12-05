@@ -53,12 +53,12 @@
                                             <a class="nav-link" id="members-tab" data-bs-toggle="tab" href="#members"
                                                 role="tab" aria-controls="members" aria-selected="true">Members</a>
                                         </li> -->
-                                        <% if(user?.hasSubscription) { %>
+                                        <!-- <%# if(user?.hasSubscription) { %>
                                         <li class="nav-item">
                                             <a class="nav-link" id="profile-tab" data-bs-toggle="tab" href="#plan"
                                                 role="tab" aria-selected="false"><%= lingua.myPlans%></a>
                                         </li>
-                                        <% } %>
+                                        <%# } %> -->
                                         <li class="nav-item">
                                             <a class="nav-link" id="adminActions-tab" data-bs-toggle="tab"
                                                 href="#adminActions" role="tab" aria-controls="adminActions"
@@ -95,12 +95,12 @@
                                             src="<%= reportURL%>"></iframe>
 
                                     </div>
-                                    <% if(user?.hasSubscription) { %>
+                                    <!-- <%# if(user?.hasSubscription) { %>
                                     <div class="tab-pane" id="plan" role="tabpanel" aria-labelledby="plan">
-                                        <%- include('../partials/subscriptions/subscriptions.ejs' , {user, hasSubscription : user?.hasSubscription, 
+                                        <%# include('../partials/subscriptions/subscriptions.ejs' , {user, hasSubscription : user?.hasSubscription, 
                                             prices, subscriptions}); %>
                                     </div>
-                                    <% } %>
+                                    <%# } %> -->
                                     <div class="tab-pane show vh-100" id="adminActions" role="tabpanel">
                                         <div class="row flex-grow">
                                             <div class="col-12 grid-margin stretch-card">

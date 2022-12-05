@@ -44,17 +44,19 @@ exports.account = async (req, res) => {
         // Passport store the user in req.user
         let user = req.user,
             role = user.role,
-            prices = await Stripe.getAllPrices(),
+            // prices = await Stripe.getAllPrices(),
             params
 
         // Show balance on dashboard.
-        if (user?.billingID) {
-            let { totalString } = await Stripe.getCustomerBalanceTransactions(user.billingID)
-            user.balance = totalString
-        }
+        // if (user?.billingID) {
+        //     let { totalString } = await Stripe.getCustomerBalanceTransactions(user.billingID)
+        //     user.balance = totalString
+        // }
         params = {
-            user, prices, message, alertType,
-            subscriptions: user?.subscriptions
+            user,
+            //  prices,
+            message, alertType
+            // , subscriptions: user?.subscriptions
         }
 
         let reports = await ReportsService.getReports()
@@ -63,17 +65,18 @@ exports.account = async (req, res) => {
             case ROLES.ADMIN:
                 reportURL = reports.find(report => report.name.indexOf('Dashboard') != -1)?.url
                 // Get Customers
-                customers = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
-                params = { ...params, customers, reportURL }
+                // customers = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
+                params = { ...params, reportURL }
                 res.render('dashboards/mainDashboard.ejs', params)
                 break;
             case ROLES.CUSTOMER:
-                res.render('dashboards/customer.ejs', params)
+                // res.render('dashboards/customer.ejs', params)
+                res.redirect('/memberships')
                 break;
             case ROLES.MANAGER:
                 reportURL = reports.find(report => report.name.indexOf('Service') != -1)?.url
                 // Get Customers
-                customers = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
+                // customers = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
                 params = { ...params, customers, reportURL }
 
                 res.render('dashboards/mainDashboard.ejs', params)

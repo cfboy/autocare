@@ -9,6 +9,35 @@ const Stripe = require('../connect/stripe')
 
 let readingObjs = {}
 
+exports.memberships = async (req, res) => {
+    try {
+        let { message, alertType } = req.session
+        // clear message y alertType
+        req.session.message = ''
+        req.session.alertType = ''
+
+        let user = req.user
+        if (user.billingID) {
+            let { totalString } = await Stripe.getCustomerBalanceTransactions(user.billingID),
+                subscriptions = user?.subscriptions
+
+            user.balance = totalString
+
+            res.render('subscriptions/index.ejs', { message, alertType, user, subscriptions })
+        } else {
+            req.session.message = "This user don't have stripe account."
+            req.session.alertType = alertTypes.WarningAlert
+            res.redirect('/account')
+        }
+    }
+    catch (error) {
+        console.error(error)
+        req.session.message = error.message
+        req.session.alertType = alertTypes.ErrorAlert
+        res.redirect('/account')
+    }
+}
+
 /**
  * This function render the create subscriptions form.
  * @param {*} req 

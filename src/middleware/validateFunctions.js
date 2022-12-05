@@ -35,13 +35,13 @@ async function redirectBySubscriptionStatus(req, res, next) {
  * @returns 
  */
 async function validateLocation(req, res, next) {
-    let user = req.user,
-        currentLocation = req.session.location,
-        userHasThisLocation = req.user.locations.some(location => location.id === currentLocation?._id)
-
+    let user = req.user
     if ([ROLES.CUSTOMER].includes(user.role)) {
         return next()
     } else {
+        let currentLocation = req.session.location,
+            userHasThisLocation = req.user.locations.some(location => location.id === currentLocation?._id)
+
         if (user?.locations.length == 0) {
             //If the user is not associated to any location, then redirect to logout.
             req.flash('error', 'This user not have any location assigned to work. Please contact the administrator.')

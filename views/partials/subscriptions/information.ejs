@@ -1,5 +1,5 @@
-<div class="d-flex justify-content-between align-items-start">
-    <div>
+<div class="row">
+    <div class="col-md-6 col-sm-12">
         <h4 class="card-title card-title-dash">
             <% if(invalid) { %>
             <%= lingua.membership.invalidMemberships%>
@@ -11,7 +11,7 @@
         <h6>Balance: <%= customer?.balance%></h6>
         <% } %>
     </div>
-    <div class="d-sm-flex justify-content-between align-items-start">
+    <div class="col-lg-6 col-md-6 col-sm-12 text-end">
         <% if(showManageBtn) { %>
         <a id="manage-billing-button" class="btn btn-primary btn-icon-text text-white manage-billing-button m-1"
             style="margin: 0;" type="submit" value="<%- customer.billingID%>" email="<%- customer.email%>">
@@ -27,21 +27,13 @@
     </div>
 
 </div>
+
 <div class="table-responsive mt-1">
-    <table class="table">
+    <table class="table" id="subscriptions">
         <thead>
             <tr>
                 <th>
                     <%= lingua.membership.info%>
-                </th>
-                <th>
-                    <%= lingua.membership.period%>
-                    <br>
-                    <small>(<%= lingua.membership.startDate%>) / (<%= lingua.membership.endDate%>)</small>
-
-                </th>
-                <th class="text-center">
-                    <%= lingua.membership.status%>
                 </th>
             </tr>
         </thead>
@@ -49,128 +41,204 @@
             <% for(stripeSubscription of subscriptions) { %>
             <tr>
                 <td>
-                    <% for(item of stripeSubscription.items) { %>
-                    <p>
-                        <b><%- item.data.price.product.name %></b> (<%= item.cars.length %>/<%= item.data.quantity%>
-                        <small> <%= lingua.car.carsQty%></small>)
-                    </p>
-                    <ul class="mb-0">
-                        <% if(item.isValid) { %>
-                        <% for(car of item.cars) { %>
-                        <li class="mt-1 mb-1 m-3">
-                            <a href="/car/<%= car.id%>">
+                    <div class="card p-3">
+                        <div class="row">
+                            <div class="col-md-6 col-sm-12">
+                                <h6>Products</h4>
+                                    <hr>
+                                    <% for(item of stripeSubscription.items) { %>
+                                    <div class="col-auto p-1">
+                                        <div class="card p-2 mb-2">
+                                            <div class="card-title m-1">
+                                                <p>
+                                                    <b><%- item.data.price.product.name %></b>
+                                                    (<%= item.cars.length %>/<%= item.data.quantity%>
+                                                    <small> <%= lingua.car.carsQty%></small>)
+                                                </p>
+                                            </div>
+                                            <div class="card-body p-0">
+                                                <ul class="px-0">
+                                                    <!-- If everything is ok. -->
+                                                    <% if(item.isValid) { %>
+                                                    <% for(car of item.cars) { %>
+                                                    <a href="/car/<%- car?.id%>" class="text-decoration-none">
+                                                        <li class="btn text-start card list-group-item rounded-2">
+                                                            <i class="fa-solid fa-car fa-fw"></i>
 
-                                <%- car.brand%> - <%- car.model%> - <%- car.plate%>
-                            </a>
-                            <% if(car?.cancel_date) { %>
-                            <b>
-                                (<%= lingua.membership.validUntil%>:
-                                <%= moment(car?.cancel_date).isValid() ? moment(car?.cancel_date).format(shortDateFormat) : 'N/A' %>
-                                )
-                            </b>
-                            <% } %>
-                        </li>
-                        <% } %>
+                                                            <%- car?.brand%>
+                                                            <%- car?.model%>
+                                                            (<%- car?.plate%>)
+                                                            <% if(car?.cancel_date) { %>
+                                                            <b>
+                                                                (<%= lingua.membership.validUntil%>:
+                                                                <%= moment(car?.cancel_date).isValid() ? moment(car?.cancel_date).format(shortDateFormat) : 'N/A' %>
+                                                                )
+                                                            </b>
+                                                            <% } %>
+                                                        </li>
+                                                    </a>
 
-                        <% } else { %>
-                        <!-- If the length of cars is less than item quantity, then show add car btn. -->
-                        <% if(item.cars.length < item.data.quantity) { %>
-                        <% for(car of item.cars) { %>
-                        <li class="mt-1 mb-1 m-3">
-                            <a href="/car/<%= car.id%>">
-                                <%- car.brand%> - <%- car.model%> - <%- car.plate%>
-                            </a>
-                            <% if(car?.cancel_date) { %>
-                            <b>
-                                (<%= lingua.membership.validUntil%>:
-                                <%= moment(car?.cancel_date * 1000).isValid() ? moment(car?.cancel_date * 1000).format(shortDateFormat) : 'N/A' %>
-                                )
-                            </b>
-                            <% } %>
-                        </li>
-                        <% } %>
-                        <% for(let i=0; i < (item.data.quantity-item.cars.length); i++) { %>
-                        <li class="mt-1 mb-1 m-3">
-                            <a href="/cars/create?itemID=<%- item.id%>&userID=<%- customer.id%>" id="add-car-button"
-                                class="btn btn-warning p-2" style="margin: 0;" type="submit">
-                                <%= lingua.car.addMissingCar%></a>
-                        </li>
-                        <% } %>
-                        <% } else if(item.cars.length > item.data.quantity) { %>
+                                                    <% } %>
 
-                        <form id="handle-valid-cars-form-<%= item.id%>" action="/confirmValidCars" method="post">
-                            <input id="subscriptionID" name="subscriptionID" value="<%=  stripeSubscription.id%>"
-                                hidden>
+                                                    <% } else { %>
+                                                    <!-- If the length of cars is less than item quantity, then show add car btn. -->
+                                                    <% if(item.cars.length < item.data.quantity) { %>
+                                                        <!-- First Show the cars -->
+                                                    <% for(car of item.cars) { %>
+                                                    <a href="/car/<%- car?.id%>" class="text-decoration-none">
+                                                        <li
+                                                            class="btn text-start card mt-1 mb-1 m-3 list-group-item rounded-2">
+                                                            <i class="fa-solid fa-car fa-fw"></i>
 
-                            <!-- <input id="itemID" name="itemID" value="<%=  item.id%>" hidden> -->
-                            <input id="requiredQty-<%=  item.id%>" name="requiredQty" value="<%=  item.data.quantity %>"
-                                hidden>
-                            <input type="text" name="selectedCars" id="selectedCars-<%=  item.id%>" value="" hidden>
-                            <input type="text" name="carsToRemove" id="carsToRemove-<%=  item.id%>" value="" hidden>
-                            <p class="alert badge-outline-warning text-center"><%= lingua.select%> <b>
-                                    <%=  item.data.quantity %>
-                                </b> <%= lingua.car.toUseOnNextPeriod%>.</p>
-                            <div class="form-group">
-                                <% for(car of item.cars) { %>
+                                                            <%- car?.brand%>
+                                                            <%- car?.model%>
+                                                            (<%- car?.plate%>)
+                                                            <% if(car?.cancel_date) { %>
+                                                            <b>
+                                                                (<%= lingua.membership.validUntil%>:
+                                                                <%= moment(car?.cancel_date).isValid() ? moment(car?.cancel_date).format(shortDateFormat) : 'N/A' %>
+                                                                )
+                                                            </b>
+                                                            <% } %>
+                                                        </li>
+                                                    </a>
+                                                    <% } %>
+                                                    <% for(let i=0; i < (item.data.quantity-item.cars.length+1); i++) { %>
 
-                                <div class="form-check form-check-primary">
+                                                    <a href="/cars/create?itemID=<%- item.id%>&userID=<%- customer.id%>"
+                                                        class="text-decoration-none">
+                                                        <li
+                                                            class="btn btn-warning text-start card mt-1 mb-1 m-3 list-group-item rounded-2">
+                                                            <i class="fa-solid fa-warning fa-fw"></i> Click Here to
+                                                            <%= lingua.car.addMissingCar%>
+                                                        </li>
+                                                    </a>
 
-                                    <label class="form-check-label">
+                                                    <% } %>
+                                                    <% } else if(item.cars.length > item.data.quantity) { %>
 
-                                        <input type="checkbox" class="form-check-input" name="cars"
-                                            onclick="validateCheckboxes(`<%= item.id%>`)" value="<%= car._id%>">
-                                        <%- car.brand %> - <%- car.model %> - <%- car.plate %>
+                                                    <form id="handle-valid-cars-form-<%= item.id%>"
+                                                        action="/confirmValidCars" method="post">
+                                                        <input id="subscriptionID" name="subscriptionID"
+                                                            value="<%=  stripeSubscription.id%>" hidden>
 
-                                    </label>
+                                                        <!-- <input id="itemID" name="itemID" value="<%=  item.id%>" hidden> -->
+                                                        <input id="requiredQty-<%=  item.id%>" name="requiredQty"
+                                                            value="<%=  item.data.quantity %>" hidden>
+                                                        <input type="text" name="selectedCars"
+                                                            id="selectedCars-<%=  item.id%>" value="" hidden>
+                                                        <input type="text" name="carsToRemove"
+                                                            id="carsToRemove-<%=  item.id%>" value="" hidden>
+                                                        <p class="alert badge-outline-warning text-center">
+                                                            <%= lingua.select%>
+                                                            <b>
+                                                                <%=  item.data.quantity %>
+                                                            </b> <%= lingua.car.toUseOnNextPeriod%>.
+                                                        </p>
+                                                        <div class="form-group">
+                                                            <% for(car of item.cars) { %>
+
+                                                            <div class="form-check form-check-primary">
+
+                                                                <label class="form-check-label">
+
+                                                                    <input type="checkbox" class="form-check-input"
+                                                                        name="cars"
+                                                                        onclick="validateCheckboxes(`<%= item.id%>`)"
+                                                                        value="<%= car._id%>">
+                                                                    <%- car.brand %> - <%- car.model %> -
+                                                                    <%- car.plate %>
+
+                                                                </label>
+
+                                                            </div>
+                                                            <% } %>
+
+                                                        </div>
+                                                        <div id="validationTxt-<%= item.id%>"></div>
+                                                        <button id="confirm-valid-cars-button-<%= item.id%>"
+                                                            class="btn btn-secondary" style="margin: 0;" type="submit"
+                                                            itemid="<%= item.id%>" disabled>
+                                                            <%= lingua.car.confirmCarsForNextPeriod%> <span
+                                                                id="selectedDisplay-<%= item.id%>">(0/<%=  item.data.quantity %>)</span>
+                                                        </button>
+                                                    </form>
+                                                    <% } %>
+                                                    <% } %>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- <br> -->
+                                    <% } %>
+                            </div>
+
+                            <div class="col-md-3 col-sm-12">
+                                <h6>
+                                    <%= lingua.membership.period%>
+                                    <!-- <small>(<%= lingua.membership.startDate%>) /
+                                    (<%= lingua.membership.endDate%>)</small> -->
+                                </h6>
+                                <hr>
+                                <div class="">
+                                    <p>
+                                        <i class="fa-solid fa-calendar fa-fw"></i>
+                                        <%= moment(stripeSubscription?.data?.current_period_start * 1000).isValid() ? moment(stripeSubscription?.data?.current_period_start * 1000).format(shortDateFormat) : 'N/A' %>
+                                        /
+                                        <%= moment(stripeSubscription?.data?.current_period_end * 1000).isValid() ? moment(stripeSubscription?.data?.current_period_end * 1000).format(shortDateFormat) : 'N/A' %>
+                                        <br>
+                                        <br>
+                                        <% if(stripeSubscription?.data.cancel_at) { %>
+                                        <b>
+                                            Cancel At:
+                                            <br>
+                                            <%= moment(stripeSubscription?.data?.cancel_at * 1000).isValid() ? moment(stripeSubscription?.data?.cancel_at * 1000).format(shortDateFormat) : 'N/A' %>
+                                        </b>
+                                        <% } %>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-12">
+
+                                <h6> <%= lingua.membership.status%>
+                                    <% if([roles.ADMIN].includes(user.role)) { %>
+                                    <button id="sync-btn-<%- stripeSubscription.id%>"
+                                        value="<%- stripeSubscription.id%>"
+                                        class="sync-btn btn btn-icon p-0 text-primary border-0 m-0"
+                                        title="Sync with Stripe">
+                                        <i class="fa-solid fa-rotate"></i>
+                                    </button>
+                                    <% } %>
+                                </h6>
+                                <hr>
+                                <div class="text-center">
+                                    <% if([stripeStatus.ACTIVE, stripeStatus.TRIALING].includes(stripeSubscription?.data?.status)) { %>
+                                    <i class="fas fa-3x fa-check-circle valid"></i>
+
+
+                                    <% } else if([stripeStatus.CANCELED, stripeStatus.UNPAID, stripeStatus.NONE].includes(stripeSubscription?.data?.status)) { %>
+                                    <i class="far fa-3x fa-times-circle invalid"></i>
+                                    <% } %>
+
+                                    <p style="text-transform: uppercase" title="Membership Status" data-toggle="tooltip"
+                                        data-placement="bottom">
+                                        <%= stripeSubscription?.data?.status %>
+                                    </p>
+
+                                    <div id="sync-update-<%- stripeSubscription.id%>" class="text-small text-wrap">
+                                    </div>
 
                                 </div>
-                                <% } %>
 
                             </div>
-                            <div id="validationTxt-<%= item.id%>"></div>
-                            <button id="confirm-valid-cars-button-<%= item.id%>" class="btn btn-secondary"
-                                style="margin: 0;" type="submit" itemid="<%= item.id%>" disabled>
-                                <%= lingua.car.confirmCarsForNextPeriod%> <span
-                                    id="selectedDisplay-<%= item.id%>">(0/<%=  item.data.quantity %>)</span>
-                            </button>
-                        </form>
-                        <% } %>
-                        <% } %>
-                    </ul>
 
-                    <br>
-                    <% } %>
+                        </div>
 
-                    <p class="mt-2">
-                        <small><b>ID: <%= stripeSubscription.id%></b></small>
-                    </p>
-                </td>
-                <td>
-                    (<%= moment(stripeSubscription?.data?.current_period_start * 1000).isValid() ? moment(stripeSubscription?.data?.current_period_start * 1000).format(shortDateFormat) : 'N/A' %>)
-                    /
-                    (<%= moment(stripeSubscription?.data?.current_period_end * 1000).isValid() ? moment(stripeSubscription?.data?.current_period_end * 1000).format(shortDateFormat) : 'N/A' %>)
-                    <br>
-                    <br>
-                    <% if(stripeSubscription?.data.cancel_at) { %>
-                    <b>
-                        Cancel At:
-                        <br>
-                        <%= moment(stripeSubscription?.data?.cancel_at * 1000).isValid() ? moment(stripeSubscription?.data?.cancel_at * 1000).format(shortDateFormat) : 'N/A' %>
-                    </b>
-                    <% } %>
-                </td>
-                <td class="text-center">
-                    <span style="text-transform: uppercase;">
-                        <%- stripeSubscription?.data.status%>
-                    </span>
-                    <% if([roles.ADMIN].includes(user.role)) { %>
-                    <br>
-                    <button id="sync-btn-<%- stripeSubscription.id%>" value="<%- stripeSubscription.id%>"
-                        class="sync-btn btn btn-primary btn-icon-text text-white p-1 m-1" style="line-height: 17px!important">
-                        <i class="fa-solid fa-rotate"></i> Sync with Stripe
-                    </button>
-                    <div id="sync-update-<%- stripeSubscription.id%>"></div>
-                    <% } %>
+                        <p class="mt-2">
+                            <small><b>ID: <%= stripeSubscription.id%></b></small>
+                        </p>
+                    </div>
                 </td>
             </tr>
             <% } %>
@@ -198,7 +266,7 @@
             beforeSend: function () {
                 showResult(`#sync-update-${value}`,
                     `<div class="spinner text-center p-1 m-1">
-                            <div class="spinner-grow" style="width: 2rem; height: 2rem"></div>
+                            <div class="spinner-grow spinner-grow-sm"></div>
                     </div>`
                 );
             }
