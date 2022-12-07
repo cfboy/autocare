@@ -157,6 +157,47 @@ const getServicesByCar = (Service) => async (car) => {
 }
 
 /**
+ * This function returns a list of service by user.
+ * @param {*} Service 
+ * @returns 
+ */
+const getServicesByUser = (Service) => async (user) => {
+    return Service.find({ user: user })
+        .populate({ path: 'location', model: 'location' })
+        .populate({ path: 'authorizedBy', model: 'user' })
+        .populate({ path: 'user', model: 'user' })
+        .populate({ path: 'car', model: 'car' })
+        .then(result => {
+            if (result) {
+                // console.debug(`getServicesByCar(): Successfully found ${result.length} services.`);
+                return result
+            }
+            //  else {
+            // console.debug("getServicesByCar(): No document matches the provided query.");
+            // }
+        })
+        .catch(err => console.error(`Failed to find document: ${err}`));
+}
+
+/**
+ * This function returns a list of service by location.
+ * @param {*} Service 
+ * @returns 
+ */
+const getServicesByLocation = (Service) => async (location) => {
+    return Service.find({ location: location })
+        .populate({ path: 'location', model: 'location' })
+        .populate({ path: 'authorizedBy', model: 'user' })
+        .populate({ path: 'user', model: 'user' })
+        .populate({ path: 'car', model: 'car' })
+        .then(result => {
+            if (result) {
+                return result
+            }
+        })
+        .catch(err => console.error(`Failed to find document: ${err}`));
+}
+/**
  * This funtion returns a list of service by car between dates,
  * @param {*} car 
  * @returns Service list
@@ -216,6 +257,8 @@ module.exports = (Service) => {
         updateService: updateService(Service),
         deleteService: deleteService(Service),
         getServicesByCar: getServicesByCar(Service),
+        getServicesByUser: getServicesByUser(Service),
+        getServicesByLocation: getServicesByLocation(Service),
         getServicesByCars: getServicesByCars(Service),
         getServicesByCarBetweenDates: getServicesByCarBetweenDates(Service)
     }

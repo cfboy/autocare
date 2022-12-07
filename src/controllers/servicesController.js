@@ -15,33 +15,26 @@ exports.services = async (req, res) => {
         let { message, alertType } = req.session
         // Passport store the user in req.user
         // TODO: implement for othe user.
-        user = await SubscriptionService.setStripeInfoToUser(req.user)
+        // user = await SubscriptionService.setStripeInfoToUser(req.user)
 
+        user = req.user
         // clear message y alertType
         if (message) {
             req.session.message = ''
             req.session.alertType = ''
         }
+        
+        let services
+        if ([ROLES.ADMIN, ROLES.MANAGER].includes(user.role)) {
+            services = await ServiceService.getServicesByLocation(req.session.location)
+        } else
+            services = await ServiceService.getServicesByUser(user)
 
-        if (!user) {
-            res.redirect('/')
-        } else {
-            let cars = []
-            if ([ROLES.ADMIN, ROLES.MANAGER].includes(user.role))
-                cars = await CarService.getCars()
-            else
-                cars = await CarService.getAllCarsByUser(user)
-
-
-            let services = await ServiceService.getServicesByCars(cars)
-
-            // Manage services by car on client side.
-            res.render('services/index.ejs', {
-                user, message, alertType,
-                services
-            })
-
-        }
+        // Manage services by car on client side.
+        res.render('services/index.ejs', {
+            user, message, alertType,
+            services
+        })
     } catch (error) {
         console.error(error.message)
         req.session.message = "Error trying to render the user services."
