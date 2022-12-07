@@ -288,7 +288,7 @@ exports.handleInvalidSubscriptions = async (req, res) => {
 
         // Clear session variables
         // TODO: Move to external function
-        // req.session.invalidSubs = null
+
         req.session.message = null
         req.session.alertType = null
 

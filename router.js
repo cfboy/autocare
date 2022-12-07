@@ -28,7 +28,7 @@ const { checkAuthenticated,
     authChangePassword,
     authChangePrices } = require('./src/middleware/authFunctions')
 
-const { validateSubscriptions, redirectBySubscriptionStatus, validateLocation, validateSelectCurrectLocation } = require('./src/middleware/validateFunctions')
+const { validateSubscriptions, validateLocation, validateSelectCurrectLocation } = require('./src/middleware/validateFunctions')
 
 // Main Route
 router.get('/', checkAuthenticated, (req, res) => {
@@ -41,7 +41,7 @@ router.get('/home', dashboardsController.home)
 
 router.get('/termsandconditions', dashboardsController.termsAndConditions)
 
-router.get('/account', checkAuthenticated, validateLocation, validateSubscriptions, redirectBySubscriptionStatus, dashboardsController.account)
+router.get('/account', checkAuthenticated, validateLocation, dashboardsController.account)
 
 //------ Auth Routes ------
 
@@ -115,13 +115,13 @@ router.get('/edit-car/:id', checkAuthenticated, authEditCar, carsController.edit
 router.post('/syncUtilization', checkAuthenticated, carsController.syncUtilization)
 
 //------ Subscriptions/Memberships Routes ------
-router.get('/memberships', checkAuthenticated, validateSubscriptions, redirectBySubscriptionStatus, subscriptionsController.memberships)
+router.get('/memberships', checkAuthenticated, validateSubscriptions, subscriptionsController.memberships)
 router.get('/validateMembership', checkAuthenticated, authValidateMembership, subscriptionsController.validateMembership)
 router.post('/validateMembership', checkAuthenticated, authValidateMembership, subscriptionsController.validate)
 router.post('/carcheck', subscriptionsController.carCheck)
 router.post('/readingData', subscriptionsController.readingData)
 router.get('/create-subscriptions', checkAuthenticated, subscriptionsController.createSubscriptions)
-router.get('/handleInvalidSubscriptions', checkAuthenticated, validateSubscriptions, subscriptionsController.handleInvalidSubscriptions)
+router.get('/handleInvalidSubscriptions', checkAuthenticated, subscriptionsController.handleInvalidSubscriptions)
 router.post('/confirmValidCars', checkAuthenticated, subscriptionsController.confirmValidCars)
 router.post('/syncSubscription', checkAuthenticated, subscriptionsController.syncSubscription)
 

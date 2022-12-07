@@ -26,6 +26,7 @@ exports.cars = async (req, res) => {
         let { message, alertType } = req.session,
             cars,
             // Passport store the user in req.user
+            //Used in canAddCar
             user = await SubscriptionService.setStripeInfoToUser(req.user)
 
         // clear message y alertType
@@ -34,33 +35,30 @@ exports.cars = async (req, res) => {
             req.session.alertType = ''
         }
 
-        if (!user) {
-            res.redirect('/')
+
+        if ([ROLES.ADMIN, ROLES.MANAGER].includes(user.role)) {
+            // Handle invalid Cars
+            let nullUserCars = await CarService.getCarsWithUserNull()
+            if (nullUserCars.length > 0)
+                await CarService.handleCarsWithUserNull(nullUserCars)
+
+            cars = await CarService.getCars()
+
         } else {
-            if ([ROLES.ADMIN, ROLES.MANAGER].includes(user.role)) {
-                // Handle invalid Cars
-                let nullUserCars = await CarService.getCarsWithUserNull()
-                if (nullUserCars.length > 0)
-                    await CarService.handleCarsWithUserNull(nullUserCars)
-
-                cars = await CarService.getCars()
-
-            } else {
-                cars = await CarService.getAllCarsByUser(user)
-            }
-
-            // Get allServices for car. 
-            for (carObj of cars) {
-                carObj.allServices = await ServiceService.getServicesByCar(carObj)
-            }
-
-            res.render('cars/index.ejs', {
-                user, cars, message, alertType,
-                canAddCar: canAddCar(user),
-                canManageCars: canManageCars(user)
-            })
-
+            cars = await CarService.getAllCarsByUser(user)
         }
+
+        // Get allServices for car. 
+        for (carObj of cars) {
+            carObj.allServices = await ServiceService.getServicesByCar(carObj)
+        }
+
+        res.render('cars/index.ejs', {
+            user, cars, message, alertType,
+            canAddCar: canAddCar(user),
+            canManageCars: canManageCars(user)
+        })
+
     } catch (error) {
         console.error("ERROR: carsController -> Tyring to find user cars.")
         console.error(error.message)
@@ -236,7 +234,7 @@ exports.save = async (req, res) => {
             if (await CarService.canUseThisCarForNewSubs(car)) {
                 //Remove old car of old subscriptions. 
                 if (car.cancel_date != null)
-                    await CarsService.removeCarFromAllSubscriptions(car)
+                    await CarService.removeCarFromAllSubscriptions(car)
                 // Add car to subscription
                 // fields.subItem.split('/')[0] has the subscription ID
                 // fields.subItem.split('/')[1] has the subItem ID 

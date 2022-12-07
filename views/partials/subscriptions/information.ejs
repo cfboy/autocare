@@ -64,12 +64,11 @@
                                                     <a href="/car/<%- car?.id%>" class="text-decoration-none">
                                                         <li class="btn text-start card list-group-item rounded-2">
                                                             <i class="fa-solid fa-car fa-fw"></i>
-
                                                             <%- car?.brand%>
                                                             <%- car?.model%>
                                                             (<%- car?.plate%>)
                                                             <% if(car?.cancel_date) { %>
-                                                            <b class="warning">
+                                                            <b>
                                                                 (<%= lingua.membership.validUntil%>:
                                                                 <%= moment(car?.cancel_date).isValid() ? moment(car?.cancel_date).format(shortDateFormat) : 'N/A' %>
                                                                 )
@@ -86,8 +85,7 @@
                                                     <!-- First Show the cars -->
                                                     <% for(car of item.cars) { %>
                                                     <a href="/car/<%- car?.id%>" class="text-decoration-none">
-                                                        <li
-                                                            class="btn text-start card mt-1 mb-1 m-3 list-group-item rounded-2">
+                                                        <li class="btn text-start card list-group-item rounded-2">
                                                             <i class="fa-solid fa-car fa-fw"></i>
 
                                                             <%- car?.brand%>
@@ -108,7 +106,7 @@
                                                     <a href="/cars/create?itemID=<%- item.id%>&userID=<%- customer.id%>"
                                                         class="text-decoration-none">
                                                         <li
-                                                            class="btn btn-warning text-start card mt-1 mb-1 m-3 list-group-item rounded-2">
+                                                            class="btn text-start card list-group-item rounded-2 btn-warning">
                                                             <i class="fa-solid fa-warning fa-fw"></i> Click Here to
                                                             <%= lingua.car.addMissingCar%>
                                                         </li>

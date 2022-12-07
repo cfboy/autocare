@@ -77,7 +77,7 @@ exports.account = async (req, res) => {
                 reportURL = reports.find(report => report.name.indexOf('Service') != -1)?.url
                 // Get Customers
                 // customers = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
-                params = { ...params, customers, reportURL }
+                params = { ...params, reportURL }
 
                 res.render('dashboards/mainDashboard.ejs', params)
                 break;
