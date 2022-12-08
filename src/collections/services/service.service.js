@@ -1,3 +1,7 @@
+const LocationService = require('../location')
+const Stripe = require('../../connect/stripe')
+const Dinero = require('dinero.js')
+
 /**
  * This function add new service to DB
  * @param {car, authorizedBy, location, user} Service 
@@ -105,9 +109,6 @@ const getServices = (Service) => async () => {
         if (err) {
             console.error(err)
         }
-        // else {
-        //     console.debug("SERVICE-SERVICE: Found Services: ", docs.length);
-        // }
     }).populate({ path: 'location', model: 'location' })
         .populate({ path: 'authorizedBy', model: 'user' })
         .populate({ path: 'user', model: 'user' })
@@ -226,6 +227,29 @@ const getServicesByCarBetweenDates = (Service) => async (car, startDate, endDate
 }
 
 /**
+ * This funtion returns a list of service between dates,
+ * @param {*} car 
+ * @returns Service list
+ */
+const getServicesBetweenDates = (Service) => async (startDate, endDate) => {
+    return Service.find({
+        created_date: {
+            $gte: startDate,
+            // TODO: Test Dates
+            $lte: endDate
+        }
+    }).populate({ path: 'location', model: 'location' })
+        .then(result => {
+            if (result) {
+                return result
+            }
+
+        })
+        .catch(err => console.error(`Failed to find document: ${err}`));
+}
+
+
+/**
  * This function returns a list of services by cars.
  * @param {*} cars 
  * @returns Service list
@@ -249,6 +273,67 @@ const getServicesByCars = (Service) => async (cars) => {
         .catch(err => console.error(`Failed to find document: ${err}`));
 }
 
+
+/**
+ * This funtion calculate the Gross Volume factor between dates.
+ * @param {*} startDate 
+ * @param {*} endDate 
+ * @param {*} allServices 
+ * @returns 
+ */
+async function getGrossVolumeFactor(startDate, endDate, allServices) {
+    try {
+
+        let factor = 0;
+
+        const stripeBalance = await Stripe.getBalanceTransactions(startDate, endDate)
+
+
+        factor = allServices?.length > 0 ? stripeBalance?.grossVolume.divide(allServices?.length).getAmount() : 0
+
+        return { factor, grossVolume: stripeBalance?.grossVolume?.getAmount() }
+
+    } catch (error) {
+        console.debug(`ERROR-ServiceService: getGrossVolumeFactor()`);
+        console.debug(`ERROR-ServiceService: ${error.message}`);
+
+        return null
+    }
+}
+
+async function getLocationsWithGrossVolumeDistributed(date) {
+    try {
+        date = date ? date.split('-')[2] ? new Date(date) : new Date(date + '-1') : new Date();
+        const startDate = new Date(date.getFullYear(), date.getMonth(), 1);
+        console.log(startDate);
+        const endDate = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+        console.log(endDate);
+
+        const allServices = await this.getServicesBetweenDates(startDate, endDate)
+
+        const { factor, grossVolume } = await getGrossVolumeFactor(startDate, endDate, allServices),
+            factorString = Dinero({ amount: factor }).toFormat('$0,0.00')
+        grossVolumeString = Dinero({ amount: grossVolume }).toFormat('$0,0.00')
+
+
+        const locations = await LocationService.getLocations()
+
+        for (location of locations) {
+            location.serviceQty = (allServices.filter(service => service.location.id == location.id)).length
+            location.grossVolume = factor * (location.serviceQty ? location.serviceQty : 0)
+            location.grossVolumeString = location.grossVolume ? Dinero({ amount: location.grossVolume }).toFormat('$0,0.00') : '$0'
+        }
+
+        return { serviceQty: allServices?.length, grossVolume, grossVolumeString, factor, factorString, locations }
+
+    } catch (error) {
+        console.debug(`ERROR-ServiceService: getLocationsWithGrossVolumeDistributed()`);
+        console.debug(`ERROR-ServiceService: ${error.message}`);
+
+        return null
+    }
+}
+
 module.exports = (Service) => {
     return {
         getServices: getServices(Service),
@@ -260,6 +345,8 @@ module.exports = (Service) => {
         getServicesByUser: getServicesByUser(Service),
         getServicesByLocation: getServicesByLocation(Service),
         getServicesByCars: getServicesByCars(Service),
-        getServicesByCarBetweenDates: getServicesByCarBetweenDates(Service)
+        getServicesByCarBetweenDates: getServicesByCarBetweenDates(Service),
+        getServicesBetweenDates: getServicesBetweenDates(Service),
+        getLocationsWithGrossVolumeDistributed
     }
 }

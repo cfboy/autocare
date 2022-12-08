@@ -1,0 +1,42 @@
+<div class="row">
+    <% for(const header of headers) { %>
+    <div class="col-4">
+        <div class="card">
+            <div class="card-header" style="border-radius: 20px 20px 0 0;">
+                <%= header.title%>
+            </div>
+            <div class="card-body">
+                <%= header.value%>
+            </div>
+        </div>
+    </div>
+    <% } %>
+</div>
+<div class="table-responsive  mt-1">
+    <table class="table table-hover stripe">
+        <thead>
+            <tr>
+                <th>Location</th>
+                <th>Services</th>
+                <th>Gross Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% for(const location of locations) { %>
+            <tr>
+                <td>
+                    <a class="btn-link" href="/location/<%- location.id%>">
+                        <%- location.name %>
+                    </a>
+                </td>
+                <td>
+                    <%- location.serviceQty%>
+                </td>
+                <td>
+                    <%- location.grossVolumeString%>
+                </td>
+            </tr>
+            <% } %>
+        </tbody>
+    </table>
+</div>

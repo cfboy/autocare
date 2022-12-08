@@ -162,6 +162,7 @@ router.post('/create-report', checkAuthenticated, reportsController.save)
 router.post('/edit-report', checkAuthenticated, reportsController.update)
 router.get('/delete-report/:id', checkAuthenticated, reportsController.delete)
 
+router.post('/getGrossVolumeDistributedReport', checkAuthenticated, reportsController.getGrossVolumeDistributedReport)
 
 //------ Stripe and Payment Routes ------
 router.get('/charges', checkAuthenticated, stripeController.charges)

@@ -55,7 +55,8 @@
                                                 </div>
                                                 <div>
                                                     <a href="<%= financialReports%>" target="_blank"
-                                                        class="btn btn-primary btn-icon-text m-1" type="button">Financial
+                                                        class="btn btn-primary btn-icon-text m-1"
+                                                        type="button">Financial
                                                         Reports <i
                                                             class="fa-solid fa-arrow-up-right-from-square btn-icon-append"></i></a>
                                                     <a href="/create-report" class="btn btn-primary btn-icon-text m-1"
@@ -103,6 +104,44 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="row flex-grow">
+                                <div class="col-12 grid-margin stretch-card">
+                                    <div class="card card-rounded">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <h4 class="card-title card-title-dash">Gross Volume Distribution
+                                                        Report</h4>
+                                                </div>
+                                                <div>
+                                                    <form id="form-genrate-report" class="" method="post">
+                                                        <div class="form-group">
+                                                            <label>Report Date</label>
+                                                            <div class="input-group col-xs-12">
+                                                                <input type="month" id="reportDate" name="reportDate"
+                                                                    placeholder="mm/dd/yyyy"
+                                                                    class="form-control form-control-lg w-auto"
+                                                                    required />
+                                                                <span class="input-group-append">
+
+                                                                    <button onclick="generateReport(this.event)"
+                                                                        class="btn btn-primary h-100" type="button">
+
+                                                                        Generate Report
+                                                                    </button>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                            <div id="reportResults"></div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -139,6 +178,41 @@
     <!-- Alerts Code -->
     <%- include('../partials/alerts.ejs', {message, alertType}); %>
     <%- include('../partials/dataTable.ejs', {tableID : '#reports'}); %>
+    <script>
+
+        function generateReport() {
+            event.preventDefault();
+            event.stopPropagation();
+            var valueToValidate = $("#reportDate");
+            // reportValidity and checkValidity validate inputs on form.
+            valueToValidate[0].reportValidity();
+            if (valueToValidate[0].checkValidity()) {
+
+                $.ajax({
+                    url: "/getGrossVolumeDistributedReport",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        date: valueToValidate.val()
+                    }),
+                    beforeSend: function () {
+                        showResult('#reportResults',
+                            `<div class="spinner text-center p-5">
+                                <div class="spinner-grow"></div>
+                            </div>`
+                        );
+
+                    }
+                }).done(function (result) {
+                    showResult('#reportResults', result);
+                }).fail(function (err) {
+                    console.log(err);
+                    showResult('#reportResults', 'Error trying to generate report.');
+
+                })
+            }
+        }
+    </script>
 </body>
 
 </html>
