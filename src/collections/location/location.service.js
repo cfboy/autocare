@@ -3,7 +3,7 @@
  * @param {*} Location 
  * @returns location object
  */
-const addLocation = (Location) => async ({ name, services, users }) => {
+const addLocation = (Location) => async ({ name, services, users, agentID }) => {
     if (!name) {
         throw new Error(`Missing Data. Please provide the name of the location.`)
     }
@@ -13,7 +13,8 @@ const addLocation = (Location) => async ({ name, services, users }) => {
     const location = new Location({
         name,
         services: services,
-        users: users
+        users: users,
+        agentID: agentID
     })
 
     return await location.save()

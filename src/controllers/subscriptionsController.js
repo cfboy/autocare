@@ -257,7 +257,7 @@ exports.readingData = async (req, res) => {
                      * Every minute, the Scout Agent adds one heartbeat message to the queue. 
                      * The heartbeat provides general health and status information.
                      */
-                    console.log(`HEARTBEAT -> Agent: ${bodyResult.agent_hostname} (${bodyResult.video_streams.length} Streams)`)
+                    // console.log(`HEARTBEAT -> Agent: ${bodyResult.agent_hostname} (${bodyResult.video_streams.length} Streams)`)
 
                     break;
 

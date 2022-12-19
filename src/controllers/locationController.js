@@ -75,11 +75,12 @@ exports.save = async (req, res) => {
     try {
         console.log('Creating New Location: ', fields.name)
 
+        let newLocation = { name: fields.name, services: fields.services, users: fields.users, agentID: fields.agentID }
         let location = await LocationService.getLocationByName(fields.name)
         if (!location) {
             console.debug(`Location ${fields.name} does not exist. Making one...`)
             // Add Location to DB
-            location = await LocationService.addLocation({ name: fields.name, services: fields.services, users: fields.users })
+            location = await LocationService.addLocation(newLocation)
 
             if (location.users) {
                 // Update user locations.
@@ -100,7 +101,7 @@ exports.save = async (req, res) => {
             req.session.alertType = alertTypes.CompletedActionAlert
             req.flash('info', 'Location created.')
 
-            res.redirect('/locations')
+            res.redirect(`/view-location/${location.id}`)
 
         } else {
             let message = `That Location ${location.name} already exist.`
