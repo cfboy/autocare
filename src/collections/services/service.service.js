@@ -187,6 +187,7 @@ const getServicesByUser = (Service) => async (user) => {
  */
 const getServicesByLocation = (Service) => async (location) => {
     return Service.find({ location: location })
+        .sort({ created_date: 'descending' })
         .populate({ path: 'location', model: 'location' })
         .populate({ path: 'authorizedBy', model: 'user' })
         .populate({ path: 'user', model: 'user' })
