@@ -3,7 +3,7 @@
  * @param {*} Location 
  * @returns location object
  */
-const addLocation = (Location) => async ({ name, services, users }) => {
+const addLocation = (Location) => async ({ name, services, users, agentID }) => {
     if (!name) {
         throw new Error(`Missing Data. Please provide the name of the location.`)
     }
@@ -13,7 +13,8 @@ const addLocation = (Location) => async ({ name, services, users }) => {
     const location = new Location({
         name,
         services: services,
-        users: users
+        users: users,
+        agentID: agentID
     })
 
     return await location.save()
@@ -30,7 +31,7 @@ const updateLocation = (Location) => async (id, updates) => {
         if (err) {
             console.error(err.message)
         } else {
-            console.debug("Updated : ", doc.name);
+            console.debug("Location Updated : ", doc.name);
         }
     })
 }
@@ -67,13 +68,13 @@ const getLocations = (Location) => () => {
  * @returns location object
  */
 const getLocationById = (Location) => (id) => {
-    console.log(`getLocationById() by ID: ${id}`)
+    // console.log(`getLocationById() by ID: ${id}`)
 
     return Location.findOne({ _id: id }, function (err, docs) {
         if (err) {
             console.error(err)
-        } else {
-            console.debug("Found location to edit: ", docs);
+            // } else {
+            //     console.debug("Found location to edit: ", docs);
         }
     })
 }

@@ -16,7 +16,7 @@ passport.use(new LocalStrategy({ usernameField: 'email', passReqToCallback: true
             return done(null, false, { message: lingua.validation.userNotExist(email) });
         }
 
-        console.debug("PASSPORT: Currentuser: ", currentUser.email)
+        console.debug("PASSPORT -> Logged User: ", currentUser.email)
 
         try {
             if (!bcrypt.compareSync(password, currentUser.password)) {

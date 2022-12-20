@@ -75,11 +75,12 @@ exports.save = async (req, res) => {
     try {
         console.log('Creating New Location: ', fields.name)
 
+        let newLocation = { name: fields.name, services: fields.services, users: fields.users, agentID: fields.agentID }
         let location = await LocationService.getLocationByName(fields.name)
         if (!location) {
             console.debug(`Location ${fields.name} does not exist. Making one...`)
             // Add Location to DB
-            location = await LocationService.addLocation({ name: fields.name, services: fields.services, users: fields.users })
+            location = await LocationService.addLocation(newLocation)
 
             if (location.users) {
                 // Update user locations.
@@ -100,7 +101,7 @@ exports.save = async (req, res) => {
             req.session.alertType = alertTypes.CompletedActionAlert
             req.flash('info', 'Location created.')
 
-            res.redirect('/locations')
+            res.redirect(`/view-location/${location.id}`)
 
         } else {
             let message = `That Location ${location.name} already exist.`
@@ -225,20 +226,25 @@ exports.update = async (req, res) => {
                     let updatedUser = await UserService.addUserLocation(user, location)
                     if (!updatedUser)
                         console.debug(`ERROR: LOCATION-CONTROLLER: Can't update User ${updatedUser?.email}.`)
-                    else
-                        console.debug(`LOCATION-CONTROLLER: Updated User ${updatedUser?.email}.`)
+                    // else
+                    //     console.debug(`LOCATION-CONTROLLER: Updated User ${updatedUser?.email}.`)
 
                 }
             }
             if (unselectedUsers.length > 0) {
                 for (user of unselectedUsers) {
-                    let updatedUser = await UserService.removeUserLocation(user, location)
+                    let updatedUser = await UserService.removeUserLocation(user, location._id)
                     if (!updatedUser)
                         console.debug(`ERROR: LOCATION-CONTROLLER: Can't remove User ${updatedUser?.email}.`)
-                    else
-                        console.debug(`LOCATION-CONTROLLER: Removed user ${updatedUser?.email}.`)
+                    // else
+                    //     console.debug(`LOCATION-CONTROLLER: Removed user ${updatedUser?.email}.`)
 
                 }
+            }
+
+            //Update the location in session if is the same location.
+            if (location.id == req.session.location._id) {
+                req.session.location = location
             }
 
             req.flash('info', 'Location Updated.')
@@ -289,4 +295,24 @@ exports.delete = async (req, res) => {
     }
     res.redirect('/locations')
 
+}
+
+
+/**
+ * This function retutn the current locations.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.getCurrentLocation = async (req, res) => {
+    try {
+        var currentLocation = req.session.location
+        var userHasThisLocation = req.user.locations.some(location => location.id === currentLocation?._id)
+
+        const redirect = currentLocation && userHasThisLocation ? false : true;
+        res.status(200).send({ redirect: redirect, location: currentLocation ? currentLocation?._id : null })
+
+    } catch (error) {
+        console.error("ERROR: locationController -> Tyring to send current location.")
+        res.status(500).send(error)
+    }
 }

@@ -66,3 +66,29 @@ function clearForm(form) {
 function showResult(updateDiv, result) {
     $(updateDiv).html(result);
 }
+
+function changeLocation(element, fromSelect) {
+    var locationID;
+    if (fromSelect) {
+        locationID = element.options[element.selectedIndex].value;
+    }
+    else {
+        locationID = element.getAttribute('id');
+    }
+    // console.log(`changeLocation to ID: ${locationID}`)
+
+    $.ajax({
+        url: "/changeLocation",
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({
+            locationID: locationID
+        }),
+
+    }).done(function (result) {
+        window.location.href = "/account";
+    }).fail(function (err) {
+        console.log(err);
+    })
+
+}

@@ -87,9 +87,7 @@ const addUtilization = (Utilization) => async (car, startDate, endDate, services
         }
 
         const utilization = await Utilization.findOneAndUpdate(query, update, options)
-        console.debug(`Utilization-SERVICE: New utilization ID: ${utilization.id}`)
-        console.debug('addUtilization to car: ' + car.plate)
-
+        console.debug(`Utilization-SERVICE: New utilization ID: ${utilization.id} to car ${car.plate}`)
         return utilization
 
     } catch (error) {

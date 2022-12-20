@@ -251,7 +251,7 @@ const getSubscriptionItemByCar = (Subscription) => async (car) => {
     }).populate('user').populate({ path: 'items.cars', model: 'car' })
         .then(result => {
             if (result) {
-                console.debug(`getSubscriptionItemByCar(): Successfully found ${result?.id}.`);
+                // console.debug(`getSubscriptionItemByCar(): Successfully found ${result?.id}.`);
                 let item = result.items.find(item => item.cars.find(carObj => carObj.id == car.id))
                 return { item, subscription: result }
             }
@@ -259,7 +259,7 @@ const getSubscriptionItemByCar = (Subscription) => async (car) => {
             //     console.debug("getSubscriptionItemByCar(): No document matches the provided query.");
             // }
         })
-        .catch(err => console.error(`Failed to find document: ${err}`));
+        .catch(err => console.error(`ERROR: getSubscriptionItemByCar Failed to find document: ${err}`));
 }
 
 const getSubscriptionCarsById = (Subscription) => async (id) => {

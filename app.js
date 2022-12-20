@@ -2,7 +2,7 @@
 require('dotenv').config() //Loads environment variables from .env file into the process
 // }
 require("express-async-errors");
-require('log-timestamp')(function() { return '[' + new Date().toLocaleString() + '] %s' });
+require('log-timestamp')(function () { return '[' + new Date().toLocaleString() + '] %s' });
 
 const bodyParser = require('body-parser'),
     express = require('express'),
@@ -15,6 +15,8 @@ const bodyParser = require('body-parser'),
     { ROLES } = require('./src/collections/user/user.model'),
     passport = require('passport'),
     { STATUS } = require('./src/connect/stripe');
+
+const cookieParser = require('cookie-parser'); //npm i cookie-parser
 
 var MemoryStore = require('memorystore')(session),
     router = require('./router'),
@@ -31,7 +33,12 @@ const app = express()
 const server = require('http').createServer(app)
 const io = require('socket.io')(server, { cors: { origin: "*" } })
 
-app.use(session({
+// convert a connect middleware to a Socket.IO middleware
+const wrap = middleware => (socket, next) => middleware(socket.request, {}, next);
+
+app.use(cookieParser());
+
+const sessionMiddleware = session({
     saveUninitialized: false,
     cookie: { maxAge: 86400000 },
     store: new MemoryStore({
@@ -39,7 +46,9 @@ app.use(session({
     }),
     resave: false,
     secret: process.env.SESSION_SECRET
-}))
+})
+
+app.use(sessionMiddleware)
 
 // place this middleware before any other route definitions
 // makes io available as req.io in all request handlers
@@ -78,6 +87,7 @@ app.locals.stripeStatus = STATUS
 
 app.locals.version = pjson.version
 app.locals.domain = process.env.DOMAIN
+app.locals.NODE_ENV = process.env.NODE_ENV
 app.locals.financialReports = process.env.FINANCIAL_REPORTS_LINK
 app.locals.pkStripe = process.env.PK_STRIPE
 
@@ -95,6 +105,20 @@ app.use(lingua(app, {
     }
 }));
 
+//Pass the passport to io
+io.use(wrap(sessionMiddleware));
+io.use(wrap(passport.initialize()));
+io.use(wrap(passport.session()));
+
+// Use socket only when the user is logged in.
+io.use((socket, next) => {
+    if (socket.request.user) {
+        next();
+    } else {
+        next(new Error('unauthorized'))
+    }
+});
+
 app.use('/', router);
 
 app.use((error, req, res, next) => {
@@ -110,6 +134,49 @@ server.listen(port, () => {
 });
 
 io.on('connect', (socket) => {
-    // console.debug("Socket connected: " + socket.connected)
-    // console.debug("Socket ID: " + socket.id)
+    // console.log(`New connection ${socket.id}`);
+
+
+    //Create a room based on the userID for notifications.
+    const user = socket.request.user
+    socket.join(user.id)
+
+    // socket.on('whoami', (cb) => {
+    //     cb(socket.request.user ? socket.request.user.email : '');
+    // });
+if (![ROLES.CUSTOMER].includes(user.role)) {
+
+        const agentRoom = socket.request.session?.location?.agentID
+
+        // socket.on('join-to-agent-room', () => {
+        // console.log('Join room')
+        //Create a room based on a location agentID for cameras data.
+        if (agentRoom) {
+            // console.log(`Agent Room: ${agentRoom}`);
+            socket.join(agentRoom)
+        }
+        // socket.emit('agent', agentRoom ? agentRoom : '');
+        // })
+
+
+        socket.on('agent', (cb) => { cb(agentRoom ? agentRoom : '') });
+
+
+        socket.on('getRooms', (cb) => {
+            const rooms = Array.from(io.sockets.adapter.rooms)
+            const filtered = rooms.filter(room => !room[1].has(room[0]))
+            const actives = filtered.map(i => i[0])
+            cb(actives);
+        });
+
+        socket.on('getConnectedSockets', (agentID, cb) => {
+            const clients = io.sockets.adapter.rooms.get(agentID)
+            const actives = clients?.size
+            cb(actives ? actives : 0);
+        });
+    }
+    const session = socket.request.session;
+    // console.log(`Saving sid ${socket.id} in session ${session.id}`);
+    session.socketId = socket.id;
+    session.save();
 });

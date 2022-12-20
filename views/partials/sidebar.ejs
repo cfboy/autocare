@@ -1,6 +1,6 @@
 <nav class="sidebar sidebar-offcanvas" id="sidebar">
     <ul class="nav">
-        <% if([roles.ADMIN, roles.MANAGER, roles.CUSTOMER].includes(user.role)) { %>
+        <% if([roles.ADMIN, roles.MANAGER].includes(user.role)) { %>
 
         <li class="nav-item">
             <a class="nav-link" href="/account">
@@ -8,6 +8,20 @@
                 <span class="menu-title"><%= lingua.home%></span>
             </a>
         </li>
+        <% } %>
+        <% if([roles.ADMIN, roles.MANAGER, roles.CUSTOMER].includes(user.role)) { %>
+
+        <% if(user.billingID) { %>
+        <li class="nav-item">
+            <a class="nav-link" href="/memberships">
+                <i class="fas fa-file-signature menu-icon"></i>
+                <span class="menu-title">
+                    My Memberships
+                    <!-- <%= lingua.membership.memberships%> -->
+                </span>
+            </a>
+        </li>
+        <% } %>
         <% } %>
 
         <% if([roles.ADMIN, roles.MANAGER].includes(user.role)) { %>
@@ -65,7 +79,9 @@
         <% if([roles.ADMIN, roles.MANAGER, roles.CASHIER].includes(user.role)) { %>
         <li class="nav-item">
             <a class="nav-link" href="/validateMembership">
-                <i class="fas fa-warehouse menu-icon"></i>
+                <!-- <i class="fas fa-warehouse menu-icon"></i> -->
+                <i class="fas fa-video menu-icon"></i>
+
                 <span class="menu-title"><%= lingua.membership.validate%></span>
             </a>
         </li>

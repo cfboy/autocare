@@ -1,7 +1,7 @@
-(function($) {
+(function ($) {
   'use strict';
-  $(function() {
-    $('[data-bs-toggle="offcanvas"]').on("click", function() {
+  $(function () {
+    $('[data-bs-toggle="offcanvas"]').on("click", function () {
       $('.sidebar-offcanvas').toggleClass('active')
     });
   });

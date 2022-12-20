@@ -1,4 +1,5 @@
 const ReportsService = require('../collections/reports')
+const ServiceService = require('../collections/services')
 const alertTypes = require('../helpers/alertTypes')
 
 exports.reports = async (req, res) => {
@@ -201,4 +202,27 @@ exports.delete = async (req, res) => {
 
     res.redirect('/reports')
 
+}
+
+/**
+ * This functions is the route to generate Gross Volume Distributed Report.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.getGrossVolumeDistributedReport = async (req, res) => {
+    try {
+        const date = req.body.date;
+        const result = await ServiceService.getLocationsWithGrossVolumeDistributed(date)
+
+        let headers = [
+            { title: 'Gross Amount', value: result?.grossVolumeString },
+            { title: 'Factor', value: result?.factorString },
+            { title: 'Service Qty.', value: result?.serviceQty }
+        ]
+        res.render('reports/partials/locationGrossVolumeReport.ejs', { headers, locations: result?.locations })
+
+    } catch (error) {
+        console.error("ERROR: reportsController -> getGrossVolumeDistributedReport()")
+        res.status(500).send(error)
+    }
 }

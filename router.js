@@ -28,7 +28,7 @@ const { checkAuthenticated,
     authChangePassword,
     authChangePrices } = require('./src/middleware/authFunctions')
 
-const { validateSubscriptions, redirectBySubscriptionStatus } = require('./src/middleware/validateFunctions')
+const { validateSubscriptions, validateLocation, validateSelectCurrectLocation } = require('./src/middleware/validateFunctions')
 
 // Main Route
 router.get('/', checkAuthenticated, (req, res) => {
@@ -41,7 +41,7 @@ router.get('/home', dashboardsController.home)
 
 router.get('/termsandconditions', dashboardsController.termsAndConditions)
 
-router.get('/account', checkAuthenticated, validateSubscriptions, redirectBySubscriptionStatus, dashboardsController.account)
+router.get('/account', checkAuthenticated, validateLocation, dashboardsController.account)
 
 //------ Auth Routes ------
 
@@ -64,7 +64,13 @@ router.get('/create-account', checkNotAuthenticated, authController.createAccoun
 
 router.post('/register', checkNotAuthenticated, authController.register)
 
+router.get('/logout', checkAuthenticated, authController.logout)
+
 router.delete('/logout', checkAuthenticated, authController.logout)
+
+router.get('/selectLocation', checkAuthenticated, authController.selectLocation)
+
+router.post('/changeLocation', checkAuthenticated, authController.changeLocation)
 
 //------ Forgot Password Routes ------
 router.get('/resetPasswordRequest', checkNotAuthenticated, authController.resetPasswordRequest)
@@ -73,8 +79,8 @@ router.post("/resetPasswordRequest", checkNotAuthenticated, authController.reset
 router.post("/resetPassword", checkNotAuthenticated, authController.resetPasswordController);
 
 //------ History Routes ------
-router.get('/history', checkAuthenticated, historyController.history)
-router.get('/activity', checkAuthenticated, historyController.activity)
+router.get('/history', checkAuthenticated, validateLocation, historyController.history)
+router.get('/activity', checkAuthenticated, validateLocation, historyController.activity)
 
 router.get('/history/:id', checkAuthenticated, historyController.viewHistory)
 
@@ -101,7 +107,7 @@ router.get('/notifications', checkAuthenticated, userController.notifications)
 router.post('/changeNotificationState', checkAuthenticated, userController.changeNotificationState)
 
 //------ Cars Routes ------
-router.get('/cars', checkAuthenticated, carsController.cars)
+router.get('/cars', checkAuthenticated, validateLocation, carsController.cars)
 router.get('/car/:id', checkAuthenticated, carsController.view)
 router.get('/cars/create', checkAuthenticated, authAddCar, carsController.create)
 router.get('/edit-car/:id', checkAuthenticated, authEditCar, carsController.edit)
@@ -109,11 +115,13 @@ router.get('/edit-car/:id', checkAuthenticated, authEditCar, carsController.edit
 router.post('/syncUtilization', checkAuthenticated, carsController.syncUtilization)
 
 //------ Subscriptions/Memberships Routes ------
+router.get('/memberships', checkAuthenticated, validateSubscriptions, subscriptionsController.memberships)
 router.get('/validateMembership', checkAuthenticated, authValidateMembership, subscriptionsController.validateMembership)
 router.post('/validateMembership', checkAuthenticated, authValidateMembership, subscriptionsController.validate)
 router.post('/carcheck', subscriptionsController.carCheck)
+router.post('/readingData', subscriptionsController.readingData)
 router.get('/create-subscriptions', checkAuthenticated, subscriptionsController.createSubscriptions)
-router.get('/handleInvalidSubscriptions', checkAuthenticated, validateSubscriptions, subscriptionsController.handleInvalidSubscriptions)
+router.get('/handleInvalidSubscriptions', checkAuthenticated, subscriptionsController.handleInvalidSubscriptions)
 router.post('/confirmValidCars', checkAuthenticated, subscriptionsController.confirmValidCars)
 router.post('/syncSubscription', checkAuthenticated, subscriptionsController.syncSubscription)
 
@@ -133,6 +141,7 @@ router.get('/delete-service/:id', checkAuthenticated, authDeleteService, service
 
 //------ Location Routes ------
 router.get('/locations', checkAuthenticated, locationController.locations)
+router.get('/getCurrentLocation', validateSelectCurrectLocation, locationController.getCurrentLocation)
 router.get('/create-location', checkAuthenticated, locationController.createLocation)
 router.get('/view-location/:id', checkAuthenticated, locationController.viewLocation)
 router.get('/edit-location/:id', checkAuthenticated, authEditLocation, locationController.editLocation)
@@ -153,6 +162,7 @@ router.post('/create-report', checkAuthenticated, reportsController.save)
 router.post('/edit-report', checkAuthenticated, reportsController.update)
 router.get('/delete-report/:id', checkAuthenticated, reportsController.delete)
 
+router.post('/getGrossVolumeDistributedReport', checkAuthenticated, reportsController.getGrossVolumeDistributedReport)
 
 //------ Stripe and Payment Routes ------
 router.get('/charges', checkAuthenticated, stripeController.charges)

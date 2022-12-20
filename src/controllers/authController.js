@@ -1,4 +1,5 @@
 const UserService = require('../collections/user')
+const LocationService = require('../collections/location')
 const { ROLES } = require('../collections/user/user.model')
 const Stripe = require('../connect/stripe')
 const alertTypes = require('../helpers/alertTypes')
@@ -128,14 +129,21 @@ exports.register = async (req, res) => {
  * @param {*} res 
  */
 exports.logout = async (req, res) => {
-    // console.debug('Log out...')
-    // req.logOut()
-    // res.redirect("/");
+  
+    let flashTypes = Object.keys(req.session.flash),
+        flashValues = Object.values(req.session.flash)
 
-    req.logout(function(err) {
-    if (err) { return next(err); }
-    res.redirect('/');
-  });
+    req.logout(function (err) {
+        if (err) { return next(err); }
+
+        for (var type of flashTypes) {
+            for (var value of flashValues) {
+                req.flash(type, value)
+            }
+        }
+
+        res.redirect('/');
+    });
 }
 
 /**
@@ -233,3 +241,44 @@ exports.resetPasswordController = async (req, res, next) => {
 
     res.redirect('/login')
 };
+
+/**
+ * This function is for redirect to a selectLocation view.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.selectLocation = async (req, res) => {
+    let user = req.user,
+        userLocations = req.user.locations
+
+    res.render('auth/selectLocation.ejs', { userLocations })
+}
+
+/**
+ * This function receive the id of the new location and then set this value on session. (locationID).
+ * Return a response message.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.changeLocation = async (req, res) => {
+    try {
+        let { locationID } = req.body
+
+        if (locationID) {
+            let location = await LocationService.getLocationById(locationID)
+            // res.cookie('currentLocation', locationID)
+            console.log('CURRENT LOCATION: ' + location?.id);
+            console.log('LOCATION AGENT: ' + location?.agentID);
+            req.session.location = location
+
+            req.flash('info', 'Location ' + location?.name)
+            res.status(200).send(locationID);
+        }
+    } catch (error) {
+        console.debug("ERROR: changeLocation -> Tyring to change location.")
+        console.debug(error)
+        req.session.message = `ERROR: ${error.message}`
+        req.session.alertType = alertTypes.ErrorAlert
+        res.status(500).send(error);
+    }
+}

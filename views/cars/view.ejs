@@ -21,6 +21,9 @@
     <!-- Plugin css for this page -->
     <!-- <link rel="stylesheet" href="../vendors/datatables.net-bs4/dataTables.bootstrap4.css"> -->
     <link rel="stylesheet" href="../js/select.dataTables.min.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.4/css/dataTables.bootstrap5.min.css">
     <!-- End plugin css for this page -->
     <!-- inject:css -->
     <link rel="stylesheet" href="../css/vertical-layout-light/style.css">
@@ -151,12 +154,17 @@
                                                     </tbody>
                                                 </table>
                                             </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
-                                            <br>
-
-                                            <% if(car?.allServices?.length > 0) { %>
+                            <% if(car?.allServices?.length > 0) { %>
+                            <div class="row flex-grow">
+                                <div class="col-12 grid-margin stretch-card">
+                                    <div class="card card-rounded">
+                                        <div class="card-body">
                                             <div class="d-flex justify-content-between align-items-start">
-
                                                 <div>
                                                     <h4 class="card-title card-title-dash"><%= lingua.service.services%>
                                                     </h4>
@@ -164,13 +172,13 @@
 
                                             </div>
                                             <div class="table-responsive mt-1">
-                                                <table class="table table-hover">
+                                                <table id="services" class="table table-hover stripe">
                                                     <thead>
                                                         <tr>
                                                             <th>ID</th>
                                                             <th><%= lingua.date%></th>
-
                                                             <th><%= lingua.car.name%></th>
+                                                            <th><%= lingua.location.name%></th>
                                                             <% if([roles.ADMIN].includes(user.role) && hasDuplicatedServices) { %>
                                                             <th>Action</th>
                                                             <% } %>
@@ -195,6 +203,9 @@
                                                                 <br>
                                                                 <%= lingua.car.plate%>: <%- car?.plate%>
                                                             </td>
+                                                            <td>
+                                                                <%= service?.location?.name%>
+                                                            </td>
                                                             <% if([roles.ADMIN].includes(user.role) && hasDuplicatedServices) { %>
 
                                                             <td>
@@ -215,11 +226,12 @@
                                                     </tbody>
                                                 </table>
                                             </div>
-                                            <% } %>
                                         </div>
+
                                     </div>
                                 </div>
                             </div>
+                            <% } %>
                         </div>
                     </div>
                     <% } %>
@@ -256,6 +268,8 @@
 
     <!-- Alerts Code -->
     <%- include('../partials/alerts.ejs', {message, alertType}); %>
+    <%- include('../partials/dataTable.ejs', {tableID : '#services', dateColumn: 2 }); %>
+
 </body>
 
 </html>

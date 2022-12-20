@@ -55,13 +55,7 @@
                                                     <thead>
                                                         <tr>
                                                             <th>ID</th>
-                                                            <th><%= lingua.car.name%></th>
-                                                            <th><%= lingua.membership.product%></th>
-                                                            <th><%= lingua.user.firstName%></th>
-                                                            <th><%= lingua.date%></th>
-                                                            <th><%= lingua.user.authorizedBy%></th>
-                                                            <th><%= lingua.inputBy%></th>
-                                                            <th><%= lingua.location.name%></th>
+                                                            <th>Service Details</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -69,41 +63,76 @@
                                                         <% for(service of services) { %>
                                                         <tr>
                                                             <td>
-                                                                <a class="btn-link"
-                                                                    href="/service/<%- service?._id%>">
+                                                                <a class="btn-link" href="/service/<%- service?._id%>">
 
                                                                     <%- service?.id%>
                                                                 </a>
 
                                                             </td>
                                                             <td>
-                                                                <a class="btn-link" href="/car/<%- service?.car?.id%>">
-                                                                    <%= lingua.car.brand%>: <%- service?.car?.brand%>
-                                                                    <br>
-                                                                    <%= lingua.car.model%>: <%- service?.car?.model%>
-                                                                    <br>
-                                                                    <%= lingua.car.plate%>: <%- service?.car?.plate%>
-                                                                </a>
-                                                            </td>
-                                                            <td><%= service?.product%></td>
-                                                            <td>
-                                                                <a class="btn-link"
-                                                                    href="/customers/<%- service?.user?.id%>">
-                                                                    <%= service.user.email%>
-                                                                </a>
-                                                            </td>
-                                                            <td>
-                                                                <%= moment(service?.created_date).isValid() ? moment(service?.created_date).format(completeDateFormat) : 'N/A' %>
+                                                                <div class="row">
+                                                                    <div class="col-6">
+                                                                        <p>
+                                                                            <i
+                                                                                class="fa-solid fa-map-marker-alt fa-fw"></i>
+                                                                            <%- service?.location?.name %>
+                                                                        </p>
+                                                                        <p>
+                                                                            <i
+                                                                                class="fa-solid fa-hand-sparkles fa-fw"></i>
 
-                                                            </td>
-                                                            <td>
-                                                                <%- service?.authorizedBy?.personalInfo?.firstName + ' ' + service?.authorizedBy?.personalInfo?.lastName %>
-                                                            </td>
-                                                            <td>
-                                                                <%- service?.inputType %>
-                                                            </td>
-                                                            <td>
-                                                                <%- service?.location?.name %>
+                                                                            <%= service?.product%>
+                                                                        </p>
+                                                                        <p>
+                                                                            <i class="fa-solid fa-calendar fa-fw"></i>
+
+                                                                            <%= moment(service?.created_date).isValid() ? moment(service?.created_date).format(completeDateFormat) : 'N/A' %>
+                                                                        </p>
+                                                                        <p>
+                                                                            <i class="fa-solid fa-user-check fa-fw"></i>
+
+                                                                            <%- service?.authorizedBy?.personalInfo?.firstName + ' ' + service?.authorizedBy?.personalInfo?.lastName %>
+                                                                        </p>
+                                                                    </div>
+                                                                    <div class="col-6">
+
+                                                                        <p>
+                                                                            <i class="fa-solid fa-car fa-fw"></i>
+
+                                                                            <a class="btn-link"
+                                                                                href="/car/<%- service?.car?.id%>">
+                                                                                <%- service?.car?.brand%>
+                                                                                <%- service?.car?.model%>
+                                                                                (<%- service?.car?.plate%>)
+                                                                            </a>
+                                                                        </p>
+                                                                        <p>
+                                                                            <i class="fa-solid fa-user fa-fw"></i>
+
+                                                                            <a class="btn-link"
+                                                                                href="/customers/<%- service?.user?.id%>">
+                                                                                <%= service.user.email%>
+                                                                            </a>
+                                                                        </p>
+                                                                        <p>
+                                                                            <% if(service?.inputType.toUpperCase() == "MANUAL") { %>
+                                                                            <i class="fa-regular fa-keyboard fa-fw"
+                                                                                data-toggle="tooltip"
+                                                                                data-placement="bottom"
+                                                                                title="Manual Input">
+
+                                                                            </i>
+                                                                            Manual
+                                                                            <% } else if(service?.inputType.toUpperCase() == "SYSTEM") { %>
+                                                                            <i class="fa-solid fa-video fa-fw"
+                                                                                title="Camera Input"
+                                                                                data-placement="bottom"
+                                                                                data-toogle="tooltip"></i>
+                                                                            By System/Camera
+                                                                            <% } %>
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
                                                             </td>
                                                         </tr>
                                                         <% } %>
@@ -143,13 +172,12 @@
     <!-- Custom js for this page-->
 
     <script src="../js/jquery.cookie.js" type="text/javascript"></script>
-    <script src="../js/dashboard.js"></script>
 
     <!-- End custom js for this page-->
     <script src="../js/helper-functions.js"></script>
     <!-- Alerts Code -->
     <%- include('../partials/alerts.ejs', {message, alertType}); %>
-    <%- include('../partials/dataTable.ejs', {tableID : '#service', dateColumn : 2}); %>
+    <%- include('../partials/dataTable.ejs', {tableID : '#service', ordering: false}); %>
 </body>
 
 </html>

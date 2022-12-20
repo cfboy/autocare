@@ -208,5 +208,6 @@
     },
     "clear": "Clear",
     "utilizationHistory": "Utilization History",
-    "loading": "Loading"
+    "loading": "Loading",
+    "agentID": "Agent ID"
 }

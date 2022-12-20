@@ -301,29 +301,6 @@ const getProductInfoById = async (id) => {
     }
 }
 
-
-// /**
-//  * This function que the customer subscriptions.
-//  * @param {*} customerID 
-//  * @returns subscription list
-//  */
-// const getCustomerSubscription = async (customerID) => {
-//     try {
-//         console.debug(`STRIPE: getCustomerSubscription(${customerID})`);
-//         const subscription = await Stripe.subscriptions.list({
-//             customer: customerID,
-//             limit: 3
-//         });
-//         console.debug(`STRIPE: Subscription Found`);
-
-//         return subscription
-//     } catch (error) {
-//         console.debug(`ERROR-STRIPE: Stripe Subscription Not Found`);
-//         console.debug(`ERROR-STRIPE: ${error.message}`);
-
-//         return null
-//     }
-// }
 /**
  * This function get the customer events on stripe.
  * @param {*} customerID 
@@ -504,6 +481,52 @@ async function updateStripeSubscription(id, updates) {
     return subscription
 }
 
+/**
+ * This function return the stripe balance transactions between dates.
+ * Calculate the Gross Volume
+ * @param {*} startDate 
+ * @param {*} endDate 
+ * @returns 
+ */
+async function getBalanceTransactions(startDate, endDate) {
+
+    try {
+        let totalVolume = 0.00, grossVolume = 0
+
+        for await (const balance of Stripe.balanceTransactions.list(
+            {
+                limit: 10,
+                created: { 'gte': startDate, 'lte': endDate }
+            }
+        )) {
+            // Do something with customer
+            if (balance.type == 'charge') {
+                totalVolume += balance.amount
+            } else
+                grossVolume += balance.amount
+        }
+
+        let grossVolumeString = null, totalVolumeString = null
+        //if the grossVolume == 0 || grossVolume is > 0 then keep the same value, if not then multiplu by -1.
+        grossVolume = grossVolume >= 0 ? grossVolume : grossVolume * -1
+        grossVolume = Dinero({ amount: grossVolume })
+        grossVolumeString = grossVolume.toFormat('$0,0.00')
+        console.debug('Gross Volume: ' + grossVolumeString)
+
+
+        if (totalVolume > 0) {
+            totalVolumeString = Dinero({ amount: totalVolume }).toFormat('$0,0.00')
+            console.debug('Total Volume: ' + totalVolumeString)
+        }
+        return { grossVolume, grossVolumeString, totalVolumeString }
+    } catch (error) {
+        console.debug(`ERROR-STRIPE: getBalanceTransactions()`);
+        console.debug(`ERROR-STRIPE: ${error.message}`);
+
+        return null
+    }
+}
+
 module.exports = {
     STATUS,
     getCustomerByID,
@@ -525,5 +548,6 @@ module.exports = {
     getSubscriptionById,
     getSubscriptionItemById,
     getCustomerBalanceTransactions,
-    updateStripeSubscription
+    updateStripeSubscription,
+    getBalanceTransactions
 }

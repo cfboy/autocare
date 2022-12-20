@@ -9,6 +9,35 @@ const Stripe = require('../connect/stripe')
 
 let readingObjs = {}
 
+exports.memberships = async (req, res) => {
+    try {
+        let { message, alertType } = req.session
+        // clear message y alertType
+        req.session.message = ''
+        req.session.alertType = ''
+
+        let user = req.user
+        if (user.billingID) {
+            let { totalString } = await Stripe.getCustomerBalanceTransactions(user.billingID),
+                subscriptions = user?.subscriptions
+
+            user.balance = totalString
+
+            res.render('subscriptions/index.ejs', { message, alertType, user, subscriptions })
+        } else {
+            req.session.message = "This user don't have stripe account."
+            req.session.alertType = alertTypes.WarningAlert
+            res.redirect('/account')
+        }
+    }
+    catch (error) {
+        console.error(error)
+        req.session.message = error.message
+        req.session.alertType = alertTypes.ErrorAlert
+        res.redirect('/account')
+    }
+}
+
 /**
  * This function render the create subscriptions form.
  * @param {*} req 
@@ -52,7 +81,7 @@ exports.createSubscriptions = async (req, res) => {
  */
 exports.validateMembership = async (req, res) => {
     // Message for alerts
-    let { message, alertType } = req.session
+    let { message, alertType, location } = req.session
 
     // clear message y alertType
     if (message) {
@@ -61,7 +90,7 @@ exports.validateMembership = async (req, res) => {
     }
     let user = req.user
 
-    res.render('dashboards/validateMembership.ejs', { user, message, alertType })
+    res.render('dashboards/validateMembership.ejs', { user, message, alertType, agentID: location?.agentID })
 
 }
 
@@ -89,8 +118,12 @@ exports.validate = async (req, res) => {
             subscription = await SubscriptionService.getLastSubscriptionByCar(car)
 
             customer = subscription?.user
-            services = await ServiceService.getServicesByCar(car)
-            hasService = services.some(service => service.created_date.setHours(0, 0, 0, 0) === new Date().setHours(0, 0, 0, 0))
+            // services = await ServiceService.getServicesByCar(car)
+            // hasService = services.some(service => service.created_date.setHours(0, 0, 0, 0) === new Date().setHours(0, 0, 0, 0))
+            let today = new Date(), tomorrow = new Date()
+            tomorrow = new Date(tomorrow.setDate(today.getDate() + 1))
+            services = await ServiceService.getServicesByCarBetweenDates(car, today.setHours(0, 0, 0, 0), tomorrow.setHours(0, 0, 0, 0))
+            hasService = services.length > 0
             car.hasService = hasService
             car.isValid = car?.cancel_date ? (car.cancel_date < new Date()) : true
             // TODO: use selected location 
@@ -120,21 +153,43 @@ exports.validate = async (req, res) => {
  * @param {*} res 
  */
 exports.carCheck = async (req, res) => {
-    // console.debug('START carCheck...')
     try {
         if (req.body?.error) {
             console.log(`REKOR-SCOUT: ERROR on JSON ${req.body.error}`)
         }
         else {
-            let dataType = req.body.data_type,
-                bodyResult = req.body
-            // console.log(`REKOR-SCOUT: Data Type: ${dataType}`)
+            let agentRoom = req.body.agent_uid;
+            if (agentRoom) {
+                // req.io.socket.join(agentRoom);
+                req.io.in(agentRoom).emit('carcheck-data', req.body);
+            }
+        }
+
+        res.status(200).send('Ok')
+    } catch (error) {
+        console.error(error)
+        console.error('REKOR-SCOUT: ERROR --> ' + error.message)
+        res.status(500).send("Error")
+    }
+}
+
+exports.readingData = async (req, res) => {
+    try {
+        let dataType = req.body.data_type,
+            bodyResult = req.body
+        sessionAgentID = req.session.location?.agentID,
+            agentID = bodyResult.agent_uid
+
+        let authorizedAgent = (agentID == sessionAgentID)
+
+        if (authorizedAgent) {
             switch (dataType) {
                 case 'alpr_results':
-                    req.io.emit('reading-plates');
 
-                    // Timer to delay
-                    // await new Promise(resolve => setTimeout(resolve, 2000));
+
+                    // console.log(`REKOR-SCOUT: Camera: ${bodyResult.agentID}`)
+                    // Emmit the results to all clients/sockets in the Agent ROOM.
+                    req.io.in(agentID).emit('reading-plates');
 
                     /**
                      * Scout generates an alpr_results JSON value for every
@@ -147,17 +202,18 @@ exports.carCheck = async (req, res) => {
                     // console.log("Processing Time (MS): " + bodyResult.processing_time_ms)
 
                     let plate = bodyResult.results[0].plate
-                    // console.log(`IDENTFIED PLATE: ${plate} (${bodyResult.results[0].confidence})`)
+
                     readingObjs = {
                         "plate": plate
                     }
 
                     if (readingObjs.plate !== '' & readingObjs.plate?.length > 3) {
                         // console.debug(`IDENTFIED PLATE: ${plate} (${bodyResult.results[0].confidence})`)
-                        req.io.emit('read-plates', readingObjs);
+                        req.io.in(agentID).emit('read-plates', readingObjs);
                     }
 
-                    req.io.emit('stop-reading-plates');
+                    req.io.in(agentID).emit('stop-reading-plates');
+
                     break;
 
                 case 'alpr_group':
@@ -169,6 +225,10 @@ exports.carCheck = async (req, res) => {
                      * 
                      * https://docs.rekor.ai/rekor-scout/application-integration/json-group-results
                      */
+                    // if (authorizedAgent) {
+                    // console.log(`REKOR-SCOUT: Camera: ${bodyResult.agentID}`)
+
+
                     readingObjs = {
                         "plate": bodyResult.best_plate_number,
                         // "color": bodyResult.vehicle.color[0].name,
@@ -189,7 +249,7 @@ exports.carCheck = async (req, res) => {
 
 
                     // req.io.emit('read-plates', readingQueue);
-
+                    // }
                     break;
 
                 case 'heartbeat':
@@ -197,7 +257,7 @@ exports.carCheck = async (req, res) => {
                      * Every minute, the Scout Agent adds one heartbeat message to the queue. 
                      * The heartbeat provides general health and status information.
                      */
-                    // console.log('Video Streams: (' + bodyResult.video_streams.length + ')')
+                    // console.log(`HEARTBEAT -> Agent: ${bodyResult.agent_hostname} (${bodyResult.video_streams.length} Streams)`)
 
                     break;
 
@@ -206,6 +266,7 @@ exports.carCheck = async (req, res) => {
             }
         }
 
+
         res.status(200).send('Ok')
     } catch (error) {
         console.error(error)
@@ -213,7 +274,6 @@ exports.carCheck = async (req, res) => {
         res.status(500).send("Error")
     }
 }
-
 
 /**
  * This function renders the handle invalid subscriptions template.
@@ -228,7 +288,7 @@ exports.handleInvalidSubscriptions = async (req, res) => {
 
         // Clear session variables
         // TODO: Move to external function
-        // req.session.invalidSubs = null
+
         req.session.message = null
         req.session.alertType = null
 

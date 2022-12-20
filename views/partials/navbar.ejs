@@ -24,7 +24,10 @@
         <ul class="navbar-nav">
             <li class="nav-item font-weight-semibold d-none d-lg-block ms-0">
                 <h1 class="welcome-text">
-                    <%= lingua.welcome%>, <span class="text-black fw-bold"><%- user.personalInfo.firstName%></span>
+                    <%# lingua.welcome%>
+                    <span class="text-black fw-bold"><%- user.personalInfo.firstName%>
+                        <%- user.personalInfo.lastName%></span>
+                    <small class="text-small text-uppercase"><%- user.role%></small>
                 </h1>
 
                 <% if (messages.error) { %>
@@ -46,6 +49,18 @@
             </li>
         </ul>
         <ul class="navbar-nav ms-auto">
+            <li class="nav-item dropdown ms-0" title="Locations">
+                <select class="form-select nav-dropdown w-100 d-none" name="location" id="locationDropdown"
+                    onchange="changeLocation(this, true)">
+                    <!-- <option value="">Select Location</option> -->
+                    <% for(const location of user.locations) { %>
+                    <% var selected = (false) ? "selected" : "";   %>
+                    <option value="<%= location.id%>">
+                        <%= location.name %>
+                    </option>
+                    <% } %>
+                </select>
+            </li>
             <li class="nav-item dropdown">
                 <a class="nav-link" id="languageDropdown" href="#" data-bs-toggle="dropdown" aria-expanded="false">
                     <!-- <i class="icon-globe"></i> -->
@@ -95,7 +110,7 @@
 
                 </a>
                 <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list pb-0 vh-50 overflow-auto notifications-dropdown"
-                    aria-labelledby="notificationDropdown" onclick="">
+                    aria-labelledby="notificationDropdown" onclick="" style="max-height: 50vh;">
                     <a class="dropdown-item py-3 border-bottom">
                         <p class="mb-0 font-weight-medium float-left">
                             <%= lingua.newNotifications(user?.notifications?.filter(notification => notification.isRead == false).length)%>
@@ -122,6 +137,25 @@
                     <% } %>
                 </div>
             </li>
+            <% if(NODE_ENV === 'development') { %>
+            <li class="nav-item dropdown d-lg-block test-dropdown">
+                <a class="nav-link" id="TestDropdown" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+                    <!-- <img class="img-xs rounded-circle" src="../../images/faces/profile/user.png" alt="Profile image"> -->
+                    <i class="fas fa-file-code text-primary"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="TestDropdown">
+                    <div class="dropdown-header text-center">
+                        <p class="mb-1 mt-3 font-weight-semibold">
+                            Testing Triggers
+                        </p>
+                    </div>
+
+                    <button type="button" class="dropdown-item" onclick="testNotification()">
+                        Test Toast Notification
+                    </button>
+                </div>
+            </li>
+            <% } %>
             <li class="nav-item dropdown d-lg-block user-dropdown">
                 <a class="nav-link" id="UserDropdown" href="#" data-bs-toggle="dropdown" aria-expanded="false">
                     <img class="img-xs rounded-circle" src="../../images/faces/profile/user.png" alt="Profile image">
@@ -183,10 +217,11 @@
         </button>
     </div>
 </nav>
-
+<!-- <div id="notifications-target"></div> -->
 <script src="../js/helper-functions.js"></script>
 <script src="https://cdn.socket.io/socket.io-3.0.1.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script type="text/javascript" src="../js/sweet-alerts.js"></script>
 
 <script>
     window.onload = function () {
@@ -197,6 +232,24 @@
         });
         //YOUR JQUERY CODE
         manageLangDropdown();
+
+        $.ajax({
+            url: "/getCurrentLocation",
+            type: "GET",
+            contentType: "application/json"
+        }).done(function (result) {
+            // console.log('Current Location: ' + result)
+            if (result.redirect)
+                window.location.href = '/';
+            else {
+                if (result.location)
+                    $('#locationDropdown').removeClass('d-none').val(result.location);
+            }
+
+
+        }).fail(function (err) {
+            console.log(err);
+        })
 
         const manageBillingButton = $('.manage-billing-button');
         manageBillingButton.click(function () {
@@ -222,8 +275,23 @@
 
     var readFlag = false;
 
-    const socket = io('<%= domain%>');
+    const socket = io();
 
+    // const socketIdSpan = document.getElementById("socketId");
+    // const usernameSpan = document.getElementById("username");
+    // const locationSpan = document.getElementById("location");
+
+    // socket.on('connect', () => {
+    //     socketIdSpan.innerText = socket.id;
+
+    //     socket.emit('whoami', (username) => {
+    //         usernameSpan.innerText = username;
+    //     });
+
+    //     socket.emit('location', (location) => {
+    //         locationSpan.innerText = location;
+    //     });
+    // });
     // Receive data
     socket.on('notifications', (data) => {
         console.log(JSON.stringify(data));
@@ -241,7 +309,15 @@
         $('#notificationDropdownBtn').append(`
         <span class="count"></span>`)
 
+        // TODO: TEST
+        toastAlert(data?.message);
+
     })
+
+    function testNotification() {
+        toastAlert('Test NotificationNotificationNotificationNotificationNotificationNotificationNotificationNotificationNotificationNotificationNotificationNotificationNotificationNotificationNotification');
+
+    }
 
     function changeNotificationState(notificationId, newStatus, allNotifications) {
         var userId = '<%- user.id%>';
@@ -259,10 +335,6 @@
                 })
             }).done(function (result) {
                 readFlag = true;
-                // if (newStatus == "true")
-                // $(`#a-${notificationId}`).remove();
-                // else
-                // $(`#${notificationId}`).addClass('text-primary');
 
             }).fail(function (err) {
                 console.log(err);

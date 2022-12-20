@@ -78,5 +78,26 @@ function confirmAlert(message, lingua) {
     })
 }
 
+function toastAlert(message) {
+    Swal.fire({
+        icon: 'info',
+        title: 'Notification',
+        text: message,
+        // target: '#notifications-target',
+        // customClass: {
+        //     container: 'position-absolute'
+        // },
+        toast: true,
+        position: 'top-right',
+        iconColor: 'white',
+        customClass: {
+            popup: 'colored-toast'
+        },
+        showConfirmButton: false,
+        timer: 2500,
+        timerProgressBar: true
+    })
+}
+
 // TODO: Add more cases
 // https://sweetalert2.github.io/#examples

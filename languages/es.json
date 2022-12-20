@@ -208,5 +208,7 @@
     },
     "clear": "Limpiar",
     "utilizationHistory": "Historial de Utilización",
-    "loading": "Cargando"
+    "loading": "Cargando",
+    "agentID": "Agent ID"
+
 }

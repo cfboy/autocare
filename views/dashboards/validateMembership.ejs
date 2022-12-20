@@ -55,11 +55,16 @@
                                                             <div class="card p-3">
                                                                 <div
                                                                     class="d-flex d-sm-flex justify-content-between align-items-start">
-                                                                    <h5><%= lingua.membership.readyByCamera%>:</h5>
+                                                                    <div class="d-flex">
+                                                                        <div id="agent" class="text-small"></div>
+                                                                        <h5><%= lingua.membership.readyByCamera%>:</h5>
 
+                                                                    </div>
                                                                     <button id="clearCameraResults"
-                                                                        class="btn btn-sm btn-outline-dark p-2 br-5"><%= lingua.clear%></button>
+                                                                        class="btn btn-sm btn-outline-dark p-2 br-5"><%= lingua.clear%>
+                                                                    </button>
                                                                 </div>
+
                                                                 <div id="resultOfCameraScan">
                                                                 </div>
                                                                 <div style="height: 10px !important"
@@ -119,7 +124,7 @@
     <!-- Plugin js for this page -->
     <script src="../vendors/chart.js/Chart.min.js"></script>
     <script src="../vendors/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
-    <script src="../vendors/progressbar.js/progressbar.min.js"></script>
+    <!-- <script src="../vendors/progressbar.js/progressbar.min.js"></script> -->
     <script type="text/javascript"
         src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 
@@ -156,13 +161,49 @@
                 this.value = this.value.replace(/\s/g, "");
             }
         });
-        // The socket is already define on navbar.
+
+        // The socket is already defined on navbar.
+        // socket.emit('join-to-agent-room');
+
+        // const usernameSpan = document.getElementById("username");
+        const agentSpan = $("#agent");
+
+        socket.emit('agent', (agent) => {
+            if (agent) {
+                agentSpan.html(`<i class="fa-solid fa-circle text-success me-2"
+                                                                            style="cursor: pointer"
+                                                                            data-toggle="tooltip"
+                                                                            data-placement="bottom"
+                                                                            title="Active agent in session: ${agent}"></i>`);
+            } else {
+                agentSpan.html(`<i class="fa-solid fa-circle text-danger me-2"
+                                                                            style="cursor: pointer"
+                                                                            data-toggle="tooltip"
+                                                                            data-placement="bottom"
+                                                                            title="The agent is not in the session. Please refresh the page or log in again."></i>`);
+            }
+        });
+
         socket.on('reading-plates', () => {
             showResult('#resultOfCameraScanLoading', '<p>Reading...</p>')
         })
 
         socket.on('stop-reading-plates', () => {
             showResult('#resultOfCameraScanLoading', '')
+        })
+
+        socket.on('carcheck-data', (data) => {
+            if (data) {
+                $.ajax({
+                    url: "/readingData",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(data)
+                }).fail(function (err) {
+                    console.log('Error on carcheck-data AJAX.');
+                    console.log(err);
+                })
+            }
         })
 
         // Receive data
