@@ -219,7 +219,7 @@ exports.getGrossVolumeDistributedReport = async (req, res) => {
             { title: 'Factor', value: result?.factorString },
             { title: 'Service Qty.', value: result?.serviceQty }
         ]
-        res.render('reports/partials/locationGrossVolumeReport.ejs', { headers, locations: result?.locations })
+        res.render('reports/partials/locationGrossVolumeReport.ejs', { headers, locations: result?.locations, startDate: result.startDate, endDate: result.endDate})
 
     } catch (error) {
         console.error("ERROR: reportsController -> getGrossVolumeDistributedReport()")

@@ -325,7 +325,7 @@ async function getLocationsWithGrossVolumeDistributed(date) {
             location.grossVolumeString = location.grossVolume ? Dinero({ amount: location.grossVolume }).toFormat('$0,0.00') : '$0'
         }
 
-        return { serviceQty: allServices?.length, grossVolume, grossVolumeString, factor, factorString, locations }
+        return { startDate, endDate, serviceQty: allServices?.length, grossVolume, grossVolumeString, factor, factorString, locations }
 
     } catch (error) {
         console.debug(`ERROR-ServiceService: getLocationsWithGrossVolumeDistributed()`);

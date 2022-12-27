@@ -1,4 +1,9 @@
 <div class="row">
+    <p>
+        <%= moment(startDate).isValid() ? moment(startDate).format("MMMM DD, YYYY") : 'N/A' %>
+        -
+        <%= moment(endDate).isValid() ? moment(endDate).format("MMMM DD, YYYY") : 'N/A' %>
+    </p>
     <% for(const header of headers) { %>
     <div class="col-4">
         <div class="card">
