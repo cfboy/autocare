@@ -7,7 +7,7 @@ const HistoryService = require('../collections/history')
 const { historyTypes } = require('../collections/history/history.model')
 const Stripe = require('../connect/stripe')
 
-let readingObjs = {}
+// let readingObjs = {}
 
 exports.memberships = async (req, res) => {
     try {
@@ -177,6 +177,7 @@ exports.readingData = async (req, res) => {
             agentID = bodyResult.agent_uid
 
         let authorizedAgent = (agentID == sessionAgentID)
+        let readingObjs = {}
 
         if (authorizedAgent) {
             switch (dataType) {
