@@ -135,7 +135,7 @@ exports.save = async (req, res) => {
             console.log(`Email ${fields.email} does not exist. Making one...`)
             customerInfo = await Stripe.getCustomerByEmail(fields.email)
             if (!customerInfo) {
-                customerInfo = await Stripe.addNewCustomer(fields.email, fields.firstName,
+                customerInfo = await Stripe.addNewCustomer(fields.email?.toLowerCase(), fields.firstName,
                     fields.lastName,
                     fields.phoneNumber,
                     fields.city)
@@ -144,7 +144,7 @@ exports.save = async (req, res) => {
             var hashPassword = await bcrypt.hash(fields.password, 10)
 
             user = await UserService.addUser({
-                email: fields.email,
+                email: fields.email?.toLowerCase(),
                 password: hashPassword,
                 billingID: customerInfo.id,
                 role: fields.role,
