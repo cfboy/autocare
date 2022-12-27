@@ -10,15 +10,15 @@ async function validateSubscriptions(req, res, next) {
     if (user?.subscriptions?.length < 1 && [ROLES.CUSTOMER].includes(user.role)) {
         req.flash('warning', 'Create a membership to continue.')
         res.redirect('/create-subscriptions')
+    } else {
+        let invalidSubs = user?.subscriptions.filter(subs => subs.items.some(item => !item.isValid))
+
+        if (invalidSubs?.length > 0) {
+            req.session.invalidSubs = invalidSubs
+            res.redirect('/handleInvalidSubscriptions')
+        } else
+            return next()
     }
-
-    let invalidSubs = user?.subscriptions.filter(subs => subs.items.some(item => !item.isValid))
-
-    if (invalidSubs?.length > 0) {
-        req.session.invalidSubs = invalidSubs
-        res.redirect('/handleInvalidSubscriptions')
-    } else
-        return next()
 }
 
 // async function redirectBySubscriptionStatus(req, res, next) {
