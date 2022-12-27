@@ -7,7 +7,7 @@ const HistoryService = require('../collections/history')
 const { historyTypes } = require('../collections/history/history.model')
 const Stripe = require('../connect/stripe')
 
-let readingObjs = {}
+// let readingObjs = {}
 
 exports.memberships = async (req, res) => {
     try {
@@ -112,24 +112,20 @@ exports.validate = async (req, res) => {
         let customer, subscription, services, hasService
 
         if (car) {
+            console.log(`subscriptionsController.validate(): FOUND CAR: '${car?.plate}' in ${req.session?.location?.name}.`)
+
             // TODO: Handle new/different subscriptions for old cars.
             // subscription = await SubscriptionService.getSubscriptionByCar(car)
             // subscription = await SubscriptionService.getLastActiveSubscriptionByCar(car)
             subscription = await SubscriptionService.getLastSubscriptionByCar(car)
 
             customer = subscription?.user
-            // services = await ServiceService.getServicesByCar(car)
-            // hasService = services.some(service => service.created_date.setHours(0, 0, 0, 0) === new Date().setHours(0, 0, 0, 0))
             let today = new Date(), tomorrow = new Date()
             tomorrow = new Date(tomorrow.setDate(today.getDate() + 1))
             services = await ServiceService.getServicesByCarBetweenDates(car, today.setHours(0, 0, 0, 0), tomorrow.setHours(0, 0, 0, 0))
             hasService = services.length > 0
             car.hasService = hasService
             car.isValid = car?.cancel_date ? (car.cancel_date < new Date()) : true
-            // TODO: use selected location 
-            //Log this action.
-            // let actionType = inputType == 'System' ? historyTypes.SYSTEM_ACTION : historyTypes.USER_ACTION
-            // HistoryService.addHistory(`Validate Membership: ${carPlate}`, actionType, req.user, req?.user?.locations[0])
         }
 
         res.render('ajaxSnippets/validationResult.ejs', {
@@ -140,7 +136,7 @@ exports.validate = async (req, res) => {
             subscription
         })
     } catch (error) {
-        console.error("ERROR: dashboardController -> Tyring to validate membership.")
+        console.error("ERROR: subscriptionsController -> Tyring to validate membership.")
         console.error(error.message)
         res.render('Error validating membership.')
     }
@@ -181,6 +177,7 @@ exports.readingData = async (req, res) => {
             agentID = bodyResult.agent_uid
 
         let authorizedAgent = (agentID == sessionAgentID)
+        let readingObjs = {}
 
         if (authorizedAgent) {
             switch (dataType) {

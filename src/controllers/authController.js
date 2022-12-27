@@ -95,12 +95,13 @@ exports.register = async (req, res) => {
 
             // Login the user
             req.login(customer, function (err) {
-                if (err) {
+                if (!err) {
+                    res.redirect('/create-subscriptions')
+                } else {
                     console.log(err);
                 }
             })
 
-            res.redirect('create-subscriptions')
 
         } else {
             let message = lingua.existEmail
@@ -116,6 +117,7 @@ exports.register = async (req, res) => {
             res.redirect('/login')
         }
     } catch (error) {
+        console.error('ERROR: authController - register()')
         console.error(error)
         req.session.message = error.message
         req.session.alertType = alertTypes.ErrorAlert
@@ -129,7 +131,7 @@ exports.register = async (req, res) => {
  * @param {*} res 
  */
 exports.logout = async (req, res) => {
-  
+
     let flashTypes = Object.keys(req.session.flash),
         flashValues = Object.values(req.session.flash)
 

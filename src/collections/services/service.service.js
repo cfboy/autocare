@@ -187,6 +187,7 @@ const getServicesByUser = (Service) => async (user) => {
  */
 const getServicesByLocation = (Service) => async (location) => {
     return Service.find({ location: location })
+        .sort({ created_date: 'descending' })
         .populate({ path: 'location', model: 'location' })
         .populate({ path: 'authorizedBy', model: 'user' })
         .populate({ path: 'user', model: 'user' })
@@ -324,7 +325,7 @@ async function getLocationsWithGrossVolumeDistributed(date) {
             location.grossVolumeString = location.grossVolume ? Dinero({ amount: location.grossVolume }).toFormat('$0,0.00') : '$0'
         }
 
-        return { serviceQty: allServices?.length, grossVolume, grossVolumeString, factor, factorString, locations }
+        return { startDate, endDate, serviceQty: allServices?.length, grossVolume, grossVolumeString, factor, factorString, locations }
 
     } catch (error) {
         console.debug(`ERROR-ServiceService: getLocationsWithGrossVolumeDistributed()`);

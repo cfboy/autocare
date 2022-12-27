@@ -213,12 +213,13 @@ const getCarByPlate = (Car) => async (plate) => {
     return Car.findOne({ $and: [{ plate: new RegExp(`^${plate}$`, 'i') }, { plate: { $ne: '' } }] }, function (err, doc) {
         if (err) {
             console.error(err)
-        } else {
-            if (doc)
-                console.debug(`CAR-SERVICE: Found car: ${doc?.brand} - ${doc?.model} - ${doc?.plate}`);
-            // else
-            //     console.debug(`CAR-SERVICE: Not Found car with plate: ${plate}`);
         }
+        //  else {
+        //     if (doc)
+        //         console.debug(`CAR-SERVICE: Found car: ${doc?.brand} - ${doc?.model} - ${doc?.plate}`);
+        //     // else
+        //     //     console.debug(`CAR-SERVICE: Not Found car with plate: ${plate}`);
+        // }
     })
 }
 
