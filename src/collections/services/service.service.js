@@ -154,7 +154,7 @@ const getServicesByCar = (Service) => async (car) => {
             // console.debug("getServicesByCar(): No document matches the provided query.");
             // }
         })
-        .catch(err => console.error(`Failed to find document: ${err}`));
+        .catch(err => console.error(`getServicesByCar(): ${err}`));
 }
 
 /**
@@ -177,7 +177,7 @@ const getServicesByUser = (Service) => async (user) => {
             // console.debug("getServicesByCar(): No document matches the provided query.");
             // }
         })
-        .catch(err => console.error(`Failed to find document: ${err}`));
+        .catch(err => console.error(`getServicesByUser(): ${err}`));
 }
 
 /**
@@ -197,7 +197,7 @@ const getServicesByLocation = (Service) => async (location) => {
                 return result
             }
         })
-        .catch(err => console.error(`Failed to find document: ${err}`));
+        .catch(err => console.error(`getServicesByLocation(): ${err}`));
 }
 /**
  * This funtion returns a list of service by car between dates,
@@ -224,7 +224,7 @@ const getServicesByCarBetweenDates = (Service) => async (car, startDate, endDate
             //     console.debug("getServicesByCarBetweenDates(): No document matches the provided query.");
             // }
         })
-        .catch(err => console.error(`Failed to find document: ${err}`));
+        .catch(err => console.error(`getServicesByCarBetweenDates(): ${err}`));
 }
 
 /**
@@ -236,7 +236,6 @@ const getServicesBetweenDates = (Service) => async (startDate, endDate) => {
     return Service.find({
         created_date: {
             $gte: startDate,
-            // TODO: Test Dates
             $lte: endDate
         }
     }).populate({ path: 'location', model: 'location' })
@@ -246,7 +245,7 @@ const getServicesBetweenDates = (Service) => async (startDate, endDate) => {
             }
 
         })
-        .catch(err => console.error(`Failed to find document: ${err}`));
+        .catch(err => console.error(`getServicesBetweenDates(): ${err}`));
 }
 
 
@@ -271,7 +270,7 @@ const getServicesByCars = (Service) => async (cars) => {
             //     console.debug("getServicesByCars(): No document matches the provided query.");
             // }
         })
-        .catch(err => console.error(`Failed to find document: ${err}`));
+        .catch(err => console.error(`getServicesByCars(): ${err}`));
 }
 
 
