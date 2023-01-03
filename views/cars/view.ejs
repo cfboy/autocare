@@ -121,8 +121,8 @@
 
                                                                     <li style="margin-left: 20px;">
                                                                         <%= lingua.service.qty%>:
-                                                                        <%- car.utilization.services%>
-                                                                        (<%- (car.utilization.percentage * 100).toFixed(1)%>%)
+                                                                        <%- car.utilization.services ? car.utilization.services : 0 %>
+                                                                        (<%- (car.utilization.percentage ? car.utilization.services : 0 * 100).toFixed(1)%>%)
                                                                     </li>
                                                                 </ul>
                                                             </td>
