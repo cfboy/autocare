@@ -58,8 +58,6 @@
                                             </div>
                                             <div class="card-body p-0">
                                                 <ul class="px-0">
-                                                    <!-- If everything is ok. -->
-                                                    <% if(item.isValid) { %>
                                                     <% for(car of item.cars) { %>
                                                     <a href="/car/<%- car?.id%>" class="text-decoration-none">
                                                         <li class="btn text-start card list-group-item rounded-2">
@@ -79,28 +77,13 @@
 
                                                     <% } %>
 
-                                                    <% } else { %>
+                                                    <!-- If everything is ok. -->
+                                                    <%# if(!item.isValid) { %>
+
                                                     <!-- If the length of cars is less than item quantity, then show add car btn. -->
                                                     <% if(item.cars.length < item.data.quantity) { %>
                                                     <!-- First Show the cars -->
-                                                    <% for(car of item.cars) { %>
-                                                    <a href="/car/<%- car?.id%>" class="text-decoration-none">
-                                                        <li class="btn text-start card list-group-item rounded-2">
-                                                            <i class="fa-solid fa-car fa-fw"></i>
 
-                                                            <%- car?.brand%>
-                                                            <%- car?.model%>
-                                                            (<%- car?.plate%>)
-                                                            <% if(car?.cancel_date) { %>
-                                                            <b>
-                                                                (<%= lingua.membership.validUntil%>:
-                                                                <%= moment(car?.cancel_date).isValid() ? moment(car?.cancel_date).format(shortDateFormat) : 'N/A' %>
-                                                                )
-                                                            </b>
-                                                            <% } %>
-                                                        </li>
-                                                    </a>
-                                                    <% } %>
                                                     <% for(let i=0; i < (item.data.quantity-item.cars.length); i++) { %>
 
                                                     <a href="/cars/create?itemID=<%- item.id%>&userID=<%- customer.id%>"
@@ -162,7 +145,7 @@
                                                         </button>
                                                     </form>
                                                     <% } %>
-                                                    <% } %>
+                                                    <%# } %>
                                                 </ul>
                                             </div>
                                         </div>
