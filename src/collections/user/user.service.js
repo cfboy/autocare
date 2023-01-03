@@ -291,9 +291,10 @@ const changeNotificationState = (User) => async (userID, notificationID, value) 
             if (err) {
                 console.error(err)
                 console.error(err.message)
-            } else {
-                console.debug("Notification Changed.");
-            }
+            } 
+            // else {
+            //     console.debug("Notification Changed.");
+            // }
         })
 
     let notification = (customer.notifications.find(({ id }) => id === notificationID))
@@ -322,9 +323,10 @@ const readAllNotifications = (User) => async (userID) => {
             if (err) {
                 console.error(err)
                 console.error(err.message)
-            } else {
-                console.debug("Notification Changed.");
-            }
+            } 
+            // else {
+            //     console.debug("Notification Changed.");
+            // }
         })
 
     return customer

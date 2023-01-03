@@ -16,7 +16,7 @@ const addSubscription = (Subscription) => async ({ id, items, data, user }) => {
         throw new Error(`Subscription: Missing Data.`)
     }
 
-    console.log(`Subscription: addSubscription()`)
+    // console.log(`Subscription: addSubscription()`)
 
     const query = {
         id,
@@ -153,7 +153,7 @@ const getSubscriptionsByPrice = (Subscription) => async (price) => {
  * @returns Subscription
  */
 const getSubscriptionById = (Subscription) => (id) => {
-    console.log(`getSubscriptionById() by ID: ${id}`)
+    // console.log(`getSubscriptionById() by ID: ${id}`)
 
     return Subscription.findOne({ id: id }, function (err, docs) {
         if (err) {

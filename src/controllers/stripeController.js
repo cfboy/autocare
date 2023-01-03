@@ -76,7 +76,7 @@ exports.webhook = async (req, res) => {
 
                 break
             case 'customer.subscription.created':
-                console.log(`WEBHOOK: Subscription: ${data.id}`)
+                console.log(`WEBHOOK: customer.subscription.created: ${data.id}`)
 
                 subscription = data
                 if (subscription.status == 'active') {
@@ -89,8 +89,13 @@ exports.webhook = async (req, res) => {
                             subscription = await Stripe.getSubscriptionById(data.id)
                             subscriptionItems = subscription.items.data
                             let cars = []
-                            if (subscription?.metadata?.cars)
-                                cars = JSON.parse(subscription?.metadata?.cars)
+                            let userCartItems = customer?.cart?.items
+                            if (userCartItems) {
+                                // cars = userCartItems ? userCartItems : JSON.parse(subscription?.metadata?.cars)
+                                cars = userCartItems
+                            } else {
+                                console.error('Not found cars in customer Cart.')
+                            }
 
                             let items = []
                             for (subItem of subscriptionItems) {
@@ -163,7 +168,7 @@ exports.webhook = async (req, res) => {
                 }
                 break;
             case 'customer.subscription.updated':
-                console.log(`WEBHOOK: Subscription: ${data.id}`)
+                console.log(`WEBHOOK: customer.subscription.updated: ${data.id}`)
                 subscription = data
                 customer = await UserService.getUserByBillingID(subscription.customer)
                 if (customer) {
@@ -211,9 +216,10 @@ exports.webhook = async (req, res) => {
                             else {
                                 // TODO: validate this section.
                                 console.log(`ERROR: Not Found item tu update sub (ID: ${mySubscription?.id}).`)
-                                if (subscription?.metadata?.cars)
-                                    cars = JSON.parse(subscription?.metadata?.cars)
-
+                                // if (customer?.cart?.items || subscription?.metadata?.cars) {
+                                // cars = customer?.cart?.items ? customer.cart.items : JSON.parse(subscription?.metadata?.cars)
+                                cars = customer?.cart?.items
+                                // }
                                 newItem = { id: subItem.id, cars: [], data: subItem }
 
                                 for (carObj of cars) {
@@ -261,7 +267,8 @@ exports.webhook = async (req, res) => {
 
                     } else {
                         // Create Subs
-                        let cars = JSON.parse(subscription.metadata.cars)
+                        // let cars = customer?.cart?.items ? customer.cart.items : JSON.parse(subscription.metadata.cars)
+                        let cars = customer?.cart?.items
                         let subscriptionItems = subscription.items.data
                         let items = []
                         for (subItem of subscriptionItems) {
@@ -326,7 +333,7 @@ exports.webhook = async (req, res) => {
 
                 break
             case 'customer.subscription.deleted':
-                console.log(`WEBHOOK: Subscription Deleted: ${data.id}`)
+                console.log(`WEBHOOK: customer.subscription.deleted: ${data.id}`)
                 subscription = data
                 customer = await UserService.getUserByBillingID(subscription.customer)
                 if (customer) {
@@ -413,9 +420,11 @@ exports.checkout = async (req, res) => {
         const subscriptionsGroup = groupByKey(subscriptions, 'priceID', { omitKey: false })
         const session = await Stripe.createCheckoutSession(customerID, subscriptions, Object.entries(subscriptionsGroup))
         // res.redirect(session.url)
-        res.send({
-            sessionId: session.id
-        })
+        if (session) {
+            res.send({
+                sessionId: session.id
+            })
+        }
     } catch (e) {
         console.log(e)
         res.status(400)
@@ -441,12 +450,6 @@ exports.completeCheckoutSuccess = async (req, res) => {
         let { session_id, subscription_id } = req.query,
             session, subscriptionID
 
-        // clean cart items.
-        let user = await UserService.emptyCart(req.user.id)
-        // if (user.cart.items?.lenght == 0)
-        // console.debug("The Cart is empty.")
-
-
         if (session_id) {
             console.debug("sessionID: " + session_id)
             session = await Stripe.getSessionByID(session_id)
@@ -465,7 +468,8 @@ exports.completeCheckoutSuccess = async (req, res) => {
             subscription = await Stripe.getSubscriptionById(subscriptionID)
             let customer = await UserService.getUserByBillingID(subscription.customer)
 
-            const cars = JSON.parse(subscription.metadata.cars)
+            // const cars = customer?.cart?.items ? customer.cart.items : JSON.parse(subscription.metadata.cars)
+            const cars = customer?.cart?.items
 
             let subscriptionItems = subscription.items.data
             let items = []
@@ -495,6 +499,10 @@ exports.completeCheckoutSuccess = async (req, res) => {
         } else {
             newSubscription = subscription
         }
+        // clean cart items.
+        let user = await UserService.emptyCart(req.user.id)
+        // if (user.cart.items?.lenght == 0)
+        // console.debug("The Cart is empty.")
 
         // TODO: completed message, add history
         if (newSubscription) {
@@ -505,7 +513,7 @@ exports.completeCheckoutSuccess = async (req, res) => {
             req.session.alertType = alertTypes.ErrorAlert
         }
 
-        res.redirect('/account')
+        res.redirect('/memberships')
 
     }
     catch (error) {

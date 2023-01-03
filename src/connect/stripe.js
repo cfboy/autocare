@@ -18,46 +18,56 @@ const Stripe = stripe(process.env.STRIPE_SECRET_KEY, {
 })
 
 const createCheckoutSession = async (customerID, subscriptions, subscriptionsEntries) => {
-    let items = [];
-    let cars_price = subscriptions;
-    if (subscriptionsEntries) {
-        // Prepare items to create a session.
-        // The first position [0] has the priceID (divided by groups)
-        // The second position [1] has the list of cars per priceID.
-        for (sub of subscriptionsEntries) {
-            items.push({
-                price: sub[0], quantity: sub[1].length
-            })
+    try {
+        let items = [];
+        let cars_price = subscriptions;
+        if (subscriptionsEntries) {
+            // Prepare items to create a session.
+            // The first position [0] has the priceID (divided by groups)
+            // The second position [1] has the list of cars per priceID.
+            for (sub of subscriptionsEntries) {
+                items.push({
+                    price: sub[0], quantity: sub[1].length
+                })
+            }
         }
-    }
 
-    const taxes = await Stripe.taxRates.list({
-        active: true
-    });
+        const taxes = await Stripe.taxRates.list({
+            active: true
+        });
 
-    let defaultTaxes = []
-    if (taxes.data.length > 0)
-        defaultTaxes = taxes?.data?.map(({ id }) => (id));
+        let defaultTaxes = []
+        if (taxes.data.length > 0)
+            defaultTaxes = taxes?.data?.map(({ id }) => (id));
 
+        let cars = []
+        for (obj of cars_price) {
+            cars.push({ plate: obj.plate, priceID: obj.priceID })
+        }
+        const session = await Stripe.checkout.sessions.create({
+            mode: 'subscription',
+            payment_method_types: ['card'],
+            customer: customerID,
+            line_items: items,
+            subscription_data: {
+                metadata: {
+                    cars_data: JSON.stringify(cars)
+                },
+                default_tax_rates: defaultTaxes,
 
-    const session = await Stripe.checkout.sessions.create({
-        mode: 'subscription',
-        payment_method_types: ['card'],
-        customer: customerID,
-        line_items: items,
-        subscription_data: {
-            metadata: {
-                cars: JSON.stringify(cars_price)
             },
-            default_tax_rates: defaultTaxes,
+            allow_promotion_codes: true,
+            success_url: `${process.env.DOMAIN}/completeCheckoutSuccess?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${process.env.DOMAIN}`
+        })
 
-        },
-        allow_promotion_codes: true,
-        success_url: `${process.env.DOMAIN}/completeCheckoutSuccess?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${process.env.DOMAIN}`
-    })
-
-    return session
+        return session
+    }
+    catch (error) {
+        console.error(`ERROR-STRIPE: createCheckoutSession`);
+        console.error(`ERROR-STRIPE: ${error.message}`);
+        return null
+    }
 }
 
 const createBillingSession = async (customer) => {
