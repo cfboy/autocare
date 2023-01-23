@@ -23516,7 +23516,8 @@ code {
     color: #000000;
     font-weight: 500;
     font-size: 12px;
-    line-height: 12px;
+    /* line-height: 12px; */
+    line-height: normal;
     margin-bottom: 12px;
     margin-right: 12px;
     align-items: center;
