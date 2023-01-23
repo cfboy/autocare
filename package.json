@@ -13,6 +13,8 @@
     },
     "license": "ISC",
     "dependencies": {
+        "@bugsnag/js": "^7.18.0",
+        "@bugsnag/plugin-express": "^7.18.0",
         "@mdi/font": "^3.6.95",
         "ace-builds": "^1.2.9",
         "bcrypt": "^5.0.1",

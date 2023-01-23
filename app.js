@@ -24,11 +24,23 @@ var MemoryStore = require('memorystore')(session),
 
 const pjson = require('./package.json');
 
+var Bugsnag = require('@bugsnag/js')
+var BugsnagPluginExpress = require('@bugsnag/plugin-express')
+Bugsnag.start({
+    apiKey: process.env.BUGSNAG_KEY,
+    plugins: [BugsnagPluginExpress],
+    autoTrackSessions: false,
+    // enabledReleaseStages: [ 'production', 'test', 'development'], 
+    appVersion: pjson.version
+})
+var bugsnagMiddleware = Bugsnag.getPlugin('express')
 
 // Connections
 require('./src/connect/mongodb') //Connection to MongoDB
 
 const app = express()
+
+app.use(bugsnagMiddleware.requestHandler)
 
 const server = require('http').createServer(app)
 const io = require('socket.io')(server, { cors: { origin: "*" } })
@@ -124,6 +136,8 @@ app.use('/', router);
 app.use((error, req, res, next) => {
     res.status(500).json({ error: error.message });
 });
+
+app.use(bugsnagMiddleware.errorHandler)
 
 const port = process.env.PORT || 3000
 
