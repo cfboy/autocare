@@ -337,9 +337,9 @@ async function removeCarFromAllSubscriptions(car) {
  */
 async function getAllMakes() {
 
-    let allMakes = [], allModels = []
+    let allMakes = [], allModels = [], useCarAPI = process.env.USE_CAR_API ? process.env.USE_CAR_API : false
 
-    if (JSON.parse(process.env.USE_CAR_API)) {
+    if (JSON.parse(useCarAPI)) {
         // console.debug("getAllMakes from API")
         const apiRoute = 'GetAllMakes?format=json'
         const apiResponse = await fetch(
@@ -350,6 +350,8 @@ async function getAllMakes() {
         if (apiResponse.ok) {
             apiResponseJSON = await apiResponse.json()
             allMakes = apiResponseJSON?.Results
+        } else {
+            throw new Error('Cars API not working.')
         }
     } else {
         // console.debug("getAllMakes from local list")
