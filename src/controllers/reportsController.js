@@ -69,8 +69,11 @@ exports.createReport = async (req, res) => {
     try {
         res.render('reports/create.ejs', { user: req.user, message, alertType })
     } catch (error) {
-        console.error("ERROR: reportController -> Tyring to render create report form.")
-        console.error(error.message)
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
+        console.error(`ERROR: reportController -> Tyring to render create report form. ${error.message}`)
         req.session.message = 'Error tyring to render create report form.'
         req.session.alertType = alertTypes.ErrorAlert
         res.redirect('/reports')
@@ -114,10 +117,13 @@ exports.save = async (req, res) => {
             res.redirect('/reports')
         }
     } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
         console.error(error.message)
         req.session.message = 'Error trying to create new report.'
         req.session.alertType = alertTypes.ErrorAlert
-        // res.status(400).send(error)
         res.redirect('/reports')
     }
 }
@@ -140,6 +146,10 @@ exports.editReport = async (req, res) => {
             res.redirect(`${url}`)
         }
     } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
         console.error(error.message)
         req.session.message = 'Error trying to render edit report form.'
         req.session.alertType = alertTypes.ErrorAlert
@@ -171,6 +181,10 @@ exports.update = async (req, res) => {
         res.redirect(`${url}`)
 
     } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
         console.error(error.message)
         req.session.message = "Error trying to update the report information."
         req.session.alertType = alertTypes.ErrorAlert
@@ -219,9 +233,13 @@ exports.getGrossVolumeDistributedReport = async (req, res) => {
             { title: 'Factor', value: result?.factorString },
             { title: 'Service Qty.', value: result?.serviceQty }
         ]
-        res.render('reports/partials/locationGrossVolumeReport.ejs', { headers, locations: result?.locations, startDate: result.startDate, endDate: result.endDate})
+        res.render('reports/partials/locationGrossVolumeReport.ejs', { headers, locations: result?.locations, startDate: result.startDate, endDate: result.endDate })
 
     } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
         console.error("ERROR: reportsController -> getGrossVolumeDistributedReport()")
         res.status(500).send(error)
     }

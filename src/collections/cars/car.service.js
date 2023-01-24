@@ -145,8 +145,7 @@ const addCar = (Car) => async (brand, model, plate, user_id) => {
 
         return car
     } catch (error) {
-        console.log(`ERROR: CAR-SERVICE: addCar()`)
-        console.error(error)
+        console.error(`ERROR: CAR-SERVICE: addCar(). ${error.message}`)
         return null
     }
 }
@@ -324,8 +323,8 @@ async function removeCarFromAllSubscriptions(car) {
     }
     catch (error) {
         completed = false
-        console.log('ERROR: removeCarFromAllSubscriptions(): ' + car.id)
-        console.log(error)
+        console.error('ERROR: removeCarFromAllSubscriptions(): ' + car.id)
+        console.error(error)
         return completed
 
     }

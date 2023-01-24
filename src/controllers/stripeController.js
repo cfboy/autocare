@@ -39,6 +39,7 @@ exports.webhook = async (req, res) => {
     try {
         event = Stripe.createWebhook(req.body, req.header('Stripe-Signature'))
     } catch (err) {
+        req.bugsnag.notify(new Error(err))
         console.log(err)
         return res.sendStatus(400)
     }
@@ -94,6 +95,10 @@ exports.webhook = async (req, res) => {
                                 // cars = userCartItems ? userCartItems : JSON.parse(subscription?.metadata?.cars)
                                 cars = userCartItems
                             } else {
+                                req.bugsnag.notify(new Error(`Not found cars in customer Cart.`),
+                                    function (event) {
+                                        event.setUser(customer.email)
+                                    })
                                 console.error('Not found cars in customer Cart.')
                             }
 
@@ -117,7 +122,11 @@ exports.webhook = async (req, res) => {
                                                 newItem.cars.push(newCar)
                                             else {
                                                 // add alert to add car
-                                                console.log("ERROR: Car not created at 'customer.subscription.created'")
+                                                req.bugsnag.notify(new Error(`Car not created at 'customer.subscription.created' (${carObj.brand} - ${carObj.model} - ${carObj.plate})`),
+                                                    function (event) {
+                                                        event.setUser(customer.email)
+                                                    })
+                                                console.error("ERROR: Car not created at 'customer.subscription.created'")
                                             }
                                         }
 
@@ -154,8 +163,11 @@ exports.webhook = async (req, res) => {
                                 console.debug('Email Sent: ' + resultEmail?.accepted[0])
 
                             } else {
-
-                                console.debug('WARNING: Email Not Sent.')
+                                req.bugsnag.notify(new Error(`Email Not Sent`),
+                                    function (event) {
+                                        event.setUser(customer.email)
+                                    })
+                                console.error('ERROR: Email Not Sent.')
                             }
                         }
 
@@ -209,8 +221,11 @@ exports.webhook = async (req, res) => {
                                         }
                                     }
                                 } catch (e) {
-                                    console.log(e)
-                                    console.log('Error trying to clear cancel_date of subscription: ' + mySubscription.id)
+                                    req.bugsnag.notify(new Error(e),
+                                        function (event) {
+                                            event.setUser(customer.email)
+                                        })
+                                    console.error('Error trying to clear cancel_date of subscription: ' + mySubscription.id)
                                 }
                             }
                             else {
@@ -238,7 +253,11 @@ exports.webhook = async (req, res) => {
                                             newItem.cars.push(newCar)
                                         else {
                                             // add alert to add car
-                                            console.log("ERROR: Car not created at 'customer.subscription.updated'")
+                                            req.bugsnag.notify(new Error(`Car not created at 'customer.subscription.updated' (${carObj.brand} - ${carObj.model} - ${carObj.plate})`),
+                                                function (event) {
+                                                    event.setUser(customer.email)
+                                                })
+                                            console.error("ERROR: Car not created at 'customer.subscription.updated'")
                                         }
                                     }
 
@@ -290,7 +309,11 @@ exports.webhook = async (req, res) => {
                                         newItem.cars.push(newCar)
                                     else {
                                         // add alert to add car
-                                        console.log("ERROR: Car not created at 'customer.subscription.updated'")
+                                        req.bugsnag.notify(new Error(`Car not created at 'customer.subscription.updated' (${carObj.brand} - ${carObj.model} - ${carObj.plate})`),
+                                            function (event) {
+                                                event.setUser(customer.email)
+                                            })
+                                        console.error("ERROR: Car not created at 'customer.subscription.updated'")
                                     }
                                 }
 
@@ -322,8 +345,11 @@ exports.webhook = async (req, res) => {
                             console.debug('Email Sent: ' + resultEmail?.accepted[0])
 
                         } else {
-
-                            console.debug('WARNING: Email Not Sent.')
+                            req.bugsnag.notify(new Error(`Email Not Sent`),
+                                function (event) {
+                                    event.setUser(customer.email)
+                                })
+                            console.error('ERROR: Email Not Sent.')
                         }
                     }
 
@@ -382,8 +408,11 @@ exports.webhook = async (req, res) => {
                             console.debug('Email Sent: ' + resultEmail?.accepted[0])
 
                         } else {
-
-                            console.debug('WARNING: Email Not Sent.')
+                            req.bugsnag.notify(new Error(`Email Not Sent.`),
+                                function (event) {
+                                    event.setUser(customer.email)
+                                })
+                            console.error('ERROR: Email Not Sent.')
                         }
                     }
 
@@ -398,9 +427,8 @@ exports.webhook = async (req, res) => {
         }
         res.sendStatus(200)
     } catch (error) {
-        console.log(`ERROR-WEBHOOK-EVENT: ${data?.object?.id}`)
-        console.log(`ERROR stripeController: ${error.message}`)
-        console.log(error)
+        req.bugsnag.notify(new Error(error))
+        console.error(`ERROR-WEBHOOK-EVENT: ${data?.object?.id}. ${error.message}`)
         res.sendStatus(500)
     }
 }
@@ -426,9 +454,12 @@ exports.checkout = async (req, res) => {
             })
         }
     } catch (e) {
-        console.log(e)
-        res.status(400)
-        res.send({
+        req.bugsnag.notify(new Error(e),
+            function (event) {
+                event.setUser(req.user.email)
+            })
+        console.error(e)
+        res.status(400).send({
             error: {
                 message: e.message
             }
@@ -509,6 +540,10 @@ exports.completeCheckoutSuccess = async (req, res) => {
             req.session.message = `Subcription Created to customer ${newSubscription.user.email}`
             req.session.alertType = alertTypes.CompletedActionAlert
         } else {
+            req.bugsnag.notify(new Error('Failed to add a Subscription.'),
+                function (event) {
+                    event.setUser(req.user.email)
+                })
             req.session.message = `Failed to add a Subscription.`
             req.session.alertType = alertTypes.ErrorAlert
         }
@@ -517,7 +552,11 @@ exports.completeCheckoutSuccess = async (req, res) => {
 
     }
     catch (error) {
-        console.log(error.message)
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
+        console.error(error.message)
         req.session.message = error.message
         req.session.alertType = alertTypes.ErrorAlert
         res.status(400).redirect('/account')
@@ -539,7 +578,8 @@ exports.stripeCheckout = async (req, res) => {
         const session = await Stripe.createCheckoutSession(customerID, priceID)
         res.redirect(session.url)
     } catch (e) {
-        console.log(e)
+        req.bugsnag.notify(new Error(e))
+        console.error(e)
         res.status(400)
         return res.send({
             error: {
@@ -596,6 +636,10 @@ exports.charges = async (req, res) => {
         }
 
     } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
         console.error(error.message)
         req.session.message = "Error trying to render the user events."
         req.session.alertType = alertTypes.ErrorAlert
@@ -635,11 +679,14 @@ exports.invoices = async (req, res) => {
         }
 
     } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
         console.error(error.message)
         req.session.message = "Error trying to render the user invoices."
         req.session.alertType = alertTypes.ErrorAlert
         res.redirect('/account')
-
     }
 
 }
@@ -702,8 +749,11 @@ exports.changePrice = async (req, res) => {
         }
 
     } catch (error) {
-        console.error("ERROR: stripeController.changePrice()")
-        console.error(error)
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
+        console.error(`ERROR: stripeController.changePrice(). ${error.message}`)
         req.session.message = "Error trying to change old price."
         req.session.alertType = alertTypes.ErrorAlert
 

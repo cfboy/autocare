@@ -71,7 +71,7 @@ const getHistoryById = (History) => (id) => {
  * @returns history object
  */
 const getMyHistory = (History) => (userId) => {
-    console.log(`getMyHistory() by ID: ${userId}`)
+    // console.log(`getMyHistory() by ID: ${userId}`)
 
     return History.find({ user: userId }, function (err, docs) {
         if (err) {

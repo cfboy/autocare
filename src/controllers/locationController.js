@@ -31,8 +31,11 @@ exports.locations = async (req, res) => {
 
         }
     } catch (error) {
-        console.error("ERROR: locationController -> Tyring to find locations.")
-        console.error(error.message)
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
+        console.error(`ERROR: locationController -> Tyring to find locations. ${error.message}`)
         req.session.message = 'Error tyring to find locations.'
         req.session.alertType = alertTypes.ErrorAlert
         res.redirect('/account')
@@ -57,8 +60,7 @@ exports.createLocation = async (req, res) => {
 
         res.render('location/create.ejs', { user: req.user, products, users, message, alertType })
     } catch (error) {
-        console.error("ERROR: locationController -> Tyring to render create location form.")
-        console.error(error.message)
+        console.error(`ERROR: locationController -> Tyring to render create location form. ${error.message}`)
         req.session.message = 'Error tyring to render create location form.'
         req.session.alertType = alertTypes.ErrorAlert
         res.redirect('/locations')
@@ -113,6 +115,10 @@ exports.save = async (req, res) => {
             res.redirect('/locations')
         }
     } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
         console.error(error.message)
         req.session.message = 'Error trying to create new location.'
         req.session.alertType = alertTypes.ErrorAlert
@@ -157,6 +163,10 @@ exports.viewLocation = async (req, res) => {
             res.redirect('/locations')
         }
     } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
         console.error(error.message)
         req.session.message = 'Error trying to view location details.'
         req.session.alertType = alertTypes.ErrorAlert
@@ -185,6 +195,10 @@ exports.editLocation = async (req, res) => {
             res.redirect(`${url}`)
         }
     } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
         console.error(error.message)
         req.session.message = 'Error trying to render edit location form.'
         req.session.alertType = alertTypes.ErrorAlert
@@ -254,6 +268,10 @@ exports.update = async (req, res) => {
         res.redirect(`${url}`)
 
     } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
         console.error(error.message)
         req.session.message = "Error trying to update the location information."
         req.session.alertType = alertTypes.ErrorAlert
@@ -280,7 +298,11 @@ exports.delete = async (req, res) => {
         req.session.alertType = alertTypes.CompletedActionAlert
 
     } catch (error) {
-        console.log(`ERROR-LOCATION-CONTROLLER : ${error.message}`)
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
+        console.error(`ERROR-LOCATION-CONTROLLER : ${error.message}`)
         req.session.message = "Can't delete location."
         req.session.alertType = alertTypes.ErrorAlert
     }
@@ -289,7 +311,11 @@ exports.delete = async (req, res) => {
     try {
         HistoryService.addHistory("Location deleted", historyTypes.USER_ACTION, req.user, null)
     } catch (error) {
-        console.debug(`ERROR-LOCATION-CONTROLLER : ${error.message}`)
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
+        console.error(`ERROR-LOCATION-CONTROLLER : ${error.message}`)
         req.session.message = "Can't add to History Log."
         req.session.alertType = alertTypes.ErrorAlert
     }
@@ -299,7 +325,7 @@ exports.delete = async (req, res) => {
 
 
 /**
- * This function retutn the current locations.
+ * This function return the current locations.
  * @param {*} req 
  * @param {*} res 
  */
@@ -312,6 +338,10 @@ exports.getCurrentLocation = async (req, res) => {
         res.status(200).send({ redirect: redirect, location: currentLocation ? currentLocation?._id : null })
 
     } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
         console.error("ERROR: locationController -> Tyring to send current location.")
         res.status(500).send(error)
     }
