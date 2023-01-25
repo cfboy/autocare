@@ -8,7 +8,7 @@ module.exports = {
         env_test: {
             NODE_ENV: "test",
             STRIPE_SECRET_KEY: "sk_test_51JbqswL5YqSpFl3KmcGHdnRQ3tE8ZxBlTr0CPJqRhjhZSD74iiBsMz7nSgw08Q7XXew31EHAC1BOuT8nc0t99mhh00Xs0UqeEt",
-            MONGODB: "mongodb+srv://autocare:autocarepass@autocareclustertest.rwevq.mongodb.net/myFirstDatabase?retryWrites:true&w=majority",
+            MONGODB: "mongodb+srv://autocare:autocarepass@autocareclustertest.rwevq.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
             STRIPE_WEBHOOK_SECRET: "whsec_e54e2daf93508819bb1f50c091b737a356058c7cddb2b5c7dd700314775bff50",
             DOMAIN: "http://localhost:3000",
             SESSION_SECRET: "keyboard cat",
