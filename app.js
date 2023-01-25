@@ -24,11 +24,24 @@ var MemoryStore = require('memorystore')(session),
 
 const pjson = require('./package.json');
 
+var Bugsnag = require('@bugsnag/js')
+var BugsnagPluginExpress = require('@bugsnag/plugin-express')
+
+Bugsnag.start({
+    apiKey: process.env.BUGSNAG_KEY,
+    plugins: [BugsnagPluginExpress],
+    // autoTrackSessions: false,
+    // enabledReleaseStages: [ 'production', 'test', 'development'], 
+    appVersion: pjson.version
+})
 
 // Connections
 require('./src/connect/mongodb') //Connection to MongoDB
 
 const app = express()
+var bugsnagMiddleware = Bugsnag.getPlugin('express')
+
+app.use(bugsnagMiddleware.requestHandler)
 
 const server = require('http').createServer(app)
 const io = require('socket.io')(server, { cors: { origin: "*" } })
@@ -121,8 +134,13 @@ io.use((socket, next) => {
 
 app.use('/', router);
 
+app.use(bugsnagMiddleware.errorHandler)
+
 app.use((error, req, res, next) => {
-    res.status(500).json({ error: error.message });
+    // res.status(500).json({ error: error.message });
+    console.error(`Error ${error.message}`)
+    const status = error.status || 400
+    res.status(status).render('error.ejs', { error: error, status })
 });
 
 const port = process.env.PORT || 3000
@@ -144,7 +162,7 @@ io.on('connect', (socket) => {
     // socket.on('whoami', (cb) => {
     //     cb(socket.request.user ? socket.request.user.email : '');
     // });
-if (![ROLES.CUSTOMER].includes(user.role)) {
+    if (![ROLES.CUSTOMER].includes(user.role)) {
 
         const agentRoom = socket.request.session?.location?.agentID
 

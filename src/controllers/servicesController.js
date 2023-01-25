@@ -36,6 +36,10 @@ exports.services = async (req, res) => {
             services
         })
     } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
         console.error(error.message)
         req.session.message = "Error trying to render the user services."
         req.session.alertType = alertTypes.ErrorAlert
@@ -71,6 +75,10 @@ exports.view = async (req, res) => {
 
         }
     } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
         console.error(error.message)
         req.session.message = "Error trying to render the service."
         req.session.alertType = alertTypes.ErrorAlert
@@ -117,8 +125,11 @@ exports.useService = async (req, res) => {
             res.render(`Error trying to log service.`)
         }
     } catch (error) {
-        console.debug("ERROR: dashboardController -> Tyring to log use service.")
-        console.debug(error)
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
+        console.error(`ERROR: dashboardController -> Tyring to log use service. ${error.message}`)
         req.session.message = `ERROR: ${error.message}`
         req.session.alertType = alertTypes.ErrorAlert
         res.render(`Error trying to log service.`)
@@ -141,8 +152,11 @@ exports.delete = async (req, res) => {
         req.session.alertType = alertTypes.CompletedActionAlert
 
     } catch (error) {
-        console.debug(error)
-        console.log(`ERROR-SERVICE-CONTROLLER : ${error.message}`)
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
+        console.error(`ERROR-SERVICE-CONTROLLER : ${error.message}`)
         req.session.message = "Can't delete service."
         req.session.alertType = alertTypes.ErrorAlert
     }

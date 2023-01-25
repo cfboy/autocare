@@ -46,6 +46,10 @@ exports.users = async (req, res) => {
 
         }
     } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
         console.error("ERROR: userController -> Tyring to find users.")
         console.error(error.message)
         req.session.message = 'Error tyring to find users.'
@@ -83,6 +87,10 @@ exports.customers = async (req, res) => {
 
         }
     } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
         console.error("ERROR: userController -> Tyring to find customers.")
         console.error(error.message)
         req.session.message = 'Error tyring to find customers.'
@@ -176,6 +184,10 @@ exports.save = async (req, res) => {
             res.redirect('/create-user')
         }
     } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
         console.error(error.message)
         req.session.message = "Error trying to create user."
         req.session.alertType = alertTypes.ErrorAlert
@@ -238,6 +250,10 @@ exports.viewUser = async (req, res) => {
             res.redirect('/users', { message, alertType })
         }
     } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
         console.error(error)
         console.error(error.message)
         req.session.message = "Error trying to render the user information."
@@ -272,6 +288,10 @@ exports.editUser = async (req, res) => {
             res.redirect(`${url}`)
         }
     } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
         console.error(error.message)
         req.session.message = "Error trying to render edit user form."
         req.session.alertType = alertTypes.ErrorAlert
@@ -292,7 +312,7 @@ exports.changePassword = async (req, res) => {
         const customer = await UserService.getUserById(id)
 
         if (customer) {
-                                                                                            //  (url == '/users' || url == '/account' || url == '/validateMembership') ? url : `${url}/${id}`
+            //  (url == '/users' || url == '/account' || url == '/validateMembership') ? url : `${url}/${id}`
             let composedUrl = (req.user.role == ROLES.CUSTOMER) ? `/customers/${req.user.id}` : ((url || userType) == '/users' || (url || userType) == '/customers' || url == '/account' || url == '/validateMembership') ? url : url == "/editCustomers" ? `/customers/${id}` : `${url}/${id}`
 
             res.status(200).render('user/changePassword.ejs', { user: req.user, customer, url: composedUrl })
@@ -301,6 +321,10 @@ exports.changePassword = async (req, res) => {
             res.redirect(`${url}`)
         }
     } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
         console.error(error.message)
         req.session.message = "Error trying to render change password form."
         req.session.alertType = alertTypes.ErrorAlert
@@ -341,6 +365,10 @@ exports.update = async (req, res) => {
 
 
     } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
         req.session.message = error.message
         req.session.alertType = alertTypes.ErrorAlert
         // res.status(400).send(error)
@@ -372,6 +400,10 @@ exports.updatePassword = async (req, res) => {
         res.redirect(`${url}`)
 
     } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
         req.session.message = error.message
         req.session.alertType = alertTypes.ErrorAlert
         res.redirect(`${url}`)

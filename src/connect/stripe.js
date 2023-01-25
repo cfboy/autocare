@@ -64,8 +64,7 @@ const createCheckoutSession = async (customerID, subscriptions, subscriptionsEnt
         return session
     }
     catch (error) {
-        console.error(`ERROR-STRIPE: createCheckoutSession`);
-        console.error(`ERROR-STRIPE: ${error.message}`);
+        console.error(`ERROR-STRIPE: createCheckoutSession. ${error.message}`);
         return null
     }
 }
@@ -106,8 +105,7 @@ const getCustomerByID = async (id) => {
         return customer
 
     } catch (error) {
-        console.debug(`ERROR-STRIPE: Customer Not Found`);
-        console.debug(`ERROR-STRIPE: ${error.message}`);
+        console.error(`ERROR-STRIPE: Customer Not Found. ${error.message}`);
     }
 
 }
@@ -126,8 +124,7 @@ const updateCustomer = async (id, updates) => {
         return customer
     }
     catch (error) {
-        console.log(`ERROR-STRIPE: updateCustomer()`);
-        console.log(`ERROR-STRIPE: ${error}`);
+        console.error(`ERROR-STRIPE: updateCustomer(). ${error.message}`);
     }
 
 }
@@ -150,7 +147,7 @@ const getCustomerByEmail = async (email) => {
         return customer.data[0]
 
     } catch (error) {
-        console.debug(`ERROR-STRIPE: Stripe Customer Not Found`);
+        console.error(`ERROR-STRIPE: Stripe Customer Not Found`);
     }
 }
 
@@ -169,8 +166,6 @@ const addNewCustomer = async (email,
     phoneNumber,
     city) => {
     try {
-        // console.debug(`STRIPE: addNewCustomer()`);
-
         const customer = await Stripe.customers.create({
             email,
             description: 'New Customer',
@@ -183,9 +178,8 @@ const addNewCustomer = async (email,
 
         return customer
     } catch (error) {
-        console.debug(`ERROR-STRIPE: Fail Add New Customer`);
-
-        console.debug(`ERROR-STRIPE: ${error.message}`);
+        console.error(`ERROR-STRIPE: Fail Add New Customer. ${error.message}`);
+        throw new Error(error)
     }
 }
 
@@ -304,9 +298,7 @@ const getProductInfoById = async (id) => {
         return product
 
     } catch (error) {
-        console.debug(`ERROR-STRIPE: Product Not Found`);
-        console.debug(`ERROR-STRIPE: ${error.message}`);
-
+        console.error(`ERROR-STRIPE: Product Not Found. ${error.message}`);
         return null
     }
 }
@@ -327,8 +319,7 @@ const getCustomerEvents = async (customerID) => {
 
         return eventsToReturn
     } catch (error) {
-        console.debug(`ERROR-STRIPE: Stripe Events Not Found`);
-        console.debug(`ERROR-STRIPE: ${error.message}`);
+        console.error(`ERROR-STRIPE: Stripe Events Not Found.  ${error.message}`);
 
         return null
     }
@@ -365,8 +356,7 @@ const getCustomerCharges = async (user) => {
         }
         return chargesToReturn
     } catch (error) {
-        console.debug(`ERROR-STRIPE: Stripe Charges Not Found`);
-        console.debug(`ERROR-STRIPE: ${error.message}`);
+        console.error(`ERROR-STRIPE: Stripe Charges Not Found. ${error.message}`);
 
         return null
     }
@@ -403,9 +393,7 @@ const getCustomerInvoices = async (user) => {
         }
         return invoicesToReturn
     } catch (error) {
-        console.debug(`ERROR-STRIPE: Stripe Charges Not Found`);
-        console.debug(`ERROR-STRIPE: ${error.message}`);
-
+        console.error(`ERROR-STRIPE: Stripe Charges Not Found. ${error.message}`);
         return null
     }
 }
@@ -530,8 +518,7 @@ async function getBalanceTransactions(startDate, endDate) {
         }
         return { grossVolume, grossVolumeString, totalVolumeString }
     } catch (error) {
-        console.debug(`ERROR-STRIPE: getBalanceTransactions()`);
-        console.debug(`ERROR-STRIPE: ${error.message}`);
+        console.error(`ERROR-STRIPE: getBalanceTransactions(). ${error.message}`);
 
         return null
     }

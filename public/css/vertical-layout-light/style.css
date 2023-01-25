@@ -23516,7 +23516,8 @@ code {
     color: #000000;
     font-weight: 500;
     font-size: 12px;
-    line-height: 12px;
+    /* line-height: 12px; */
+    line-height: normal;
     margin-bottom: 12px;
     margin-right: 12px;
     align-items: center;
@@ -31954,7 +31955,7 @@ table.dataTable tbody td.select-checkbox:after {
 
 .swal2-modal .swal2-icon,
 .swal2-modal .swal2-success-ring {
-    margin-top: 0;
+    /* margin-top: 0; */
     margin-bottom: 42px;
 }
 

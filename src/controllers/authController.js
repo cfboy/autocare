@@ -117,9 +117,9 @@ exports.register = async (req, res) => {
             res.redirect('/login')
         }
     } catch (error) {
-        console.error('ERROR: authController - register()')
-        console.error(error)
-        req.session.message = error.message
+        req.bugsnag.notify(new Error(error))
+        console.error(`ERROR: authController - register(). ${error.message}`)
+        req.session.message = `Error on registration.`
         req.session.alertType = alertTypes.ErrorAlert
         res.redirect('/login')
     }
@@ -277,8 +277,11 @@ exports.changeLocation = async (req, res) => {
             res.status(200).send(locationID);
         }
     } catch (error) {
-        console.debug("ERROR: changeLocation -> Tyring to change location.")
-        console.debug(error)
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
+        console.error(`ERROR: changeLocation -> Tyring to change location. ${error.message}`)
         req.session.message = `ERROR: ${error.message}`
         req.session.alertType = alertTypes.ErrorAlert
         res.status(500).send(error);

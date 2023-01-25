@@ -4,8 +4,6 @@ const { STATUS } = require('../connect/stripe');
 const ServiceService = require('../collections/services')
 const UserService = require('../collections/user')
 const CarService = require('../collections/cars')
-const HistoryService = require('../collections/history')
-const { historyTypes } = require('../collections/history/history.model')
 const alertTypes = require('../helpers/alertTypes')
 const UtilizationService = require('../collections/utilization')
 const { canDeleteCar,
@@ -60,8 +58,11 @@ exports.cars = async (req, res) => {
         })
 
     } catch (error) {
-        console.error("ERROR: carsController -> Tyring to find user cars.")
-        console.error(error.message)
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
+        console.error(`ERROR: carsController -> Tyring to find user cars. ${error.message}`)
         req.session.message = 'Error tyring to find user cars.'
         req.session.alertType = alertTypes.ErrorAlert
         res.redirect('/account')
@@ -140,6 +141,10 @@ exports.view = async (req, res) => {
             res.redirect('/cars', { message, alertType })
         }
     } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
         console.error(error.message)
         req.session.message = "Error trying to render the car information."
         req.session.alertType = alertTypes.ErrorAlert
@@ -186,7 +191,11 @@ exports.create = async (req, res) => {
         res.render('cars/create.ejs', { user, allMakes, allModels, siToAddCar, itemID, userCars, message, alertType })
 
     } catch (error) {
-        console.log(error)
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
+        console.error(error)
         res.status(500).send('Something went worng')
     }
 }
@@ -211,6 +220,10 @@ exports.edit = async (req, res) => {
         }
 
     } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
         console.error(error.message)
         req.session.message = "Error trying to render edit cars form."
         req.session.alertType = alertTypes.ErrorAlert
@@ -259,7 +272,10 @@ exports.save = async (req, res) => {
         res.redirect('/cars')
 
     } catch (error) {
-        console.error(error)
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
         console.error(error.message)
 
         if (error.code === 11000)
@@ -296,6 +312,10 @@ exports.update = async (req, res) => {
         res.redirect(`${url}`)
 
     } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
         console.error(error.message)
         req.session.message = "Error trying to update the car information."
         req.session.alertType = alertTypes.ErrorAlert
@@ -329,8 +349,7 @@ exports.delete = async (req, res) => {
         }
 
     } catch (error) {
-        console.debug(error)
-        console.log(`ERROR-CAR-CONTROLLER : ${error.message}`)
+        console.error(`ERROR-CAR-CONTROLLER : ${error.message}`)
         req.session.message = "Can't delete car."
         req.session.alertType = alertTypes.ErrorAlert
     }
@@ -376,8 +395,11 @@ exports.validatePlate = async (req, res) => {
         res.send({ existingCar: invalidCar, invalidMsj: invalidMsj, item })
 
     } catch (error) {
-        console.error("ERROR: carController -> Tyring to validate car plate.")
-        console.error(error.message)
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
+        console.error(`ERROR: carController -> Tyring to validate car plate. ${error.message}`)
         res.render('Error validating car plate.')
     }
 
@@ -397,8 +419,11 @@ exports.syncUtilization = async (req, res) => {
 
 
     } catch (error) {
-        console.error("ERROR: carsController -> Tyring to syncUtilization.")
-        console.error(error.message)
-        res.render({ message: 'Error on sync % utilization.' })
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
+        console.error(`ERROR: carsController -> Tyring to syncUtilization. ${error.message}`)
+        res.send({ message: 'Error on sync % utilization.' })
     }
 }

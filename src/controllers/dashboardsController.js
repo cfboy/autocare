@@ -96,7 +96,10 @@ exports.account = async (req, res) => {
         }
 
     } catch (error) {
-        console.error("ERROR: dashboardController -> Tyring generate user dashboard.")
-        console.error(error.message)
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
+        console.error(`ERROR: dashboardController -> Tyring generate user dashboard. ${error.message}`)
     }
 }

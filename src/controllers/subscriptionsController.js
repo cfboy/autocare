@@ -2,9 +2,6 @@ const SubscriptionService = require('../collections/subscription')
 const CarService = require('../collections/cars')
 const alertTypes = require('../helpers/alertTypes')
 const ServiceService = require('../collections/services')
-const { STATUS } = require('../connect/stripe');
-const HistoryService = require('../collections/history')
-const { historyTypes } = require('../collections/history/history.model')
 const Stripe = require('../connect/stripe')
 
 // let readingObjs = {}
@@ -31,6 +28,10 @@ exports.memberships = async (req, res) => {
         }
     }
     catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
         console.error(error)
         req.session.message = error.message
         req.session.alertType = alertTypes.ErrorAlert
@@ -136,6 +137,10 @@ exports.validate = async (req, res) => {
             subscription
         })
     } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
         console.error("ERROR: subscriptionsController -> Tyring to validate membership.")
         console.error(error.message)
         res.render('Error validating membership.')
@@ -163,6 +168,7 @@ exports.carCheck = async (req, res) => {
 
         res.status(200).send('Ok')
     } catch (error) {
+        req.bugsnag.notify(new Error(error))
         console.error(error)
         console.error('REKOR-SCOUT: ERROR --> ' + error.message)
         res.status(500).send("Error")
@@ -293,6 +299,10 @@ exports.handleInvalidSubscriptions = async (req, res) => {
         res.status(200).render('subscriptions/handleInvalidSubscriptions.ejs', { user, message, alertType, invalidSubs })
 
     } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
         console.error(error.message)
         req.session.message = "Error trying to render edit cars form."
         req.session.alertType = alertTypes.ErrorAlert
@@ -336,8 +346,11 @@ exports.confirmValidCars = async (req, res) => {
         req.session.alertType = alertTypes.CompletedActionAlert
 
     } catch (error) {
-        console.debug(error.message)
-        console.debug(error)
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
+        console.error(error)
         req.session.message = "Error trying to confirm valid cars."
         req.session.alertType = alertTypes.ErrorAlert
     }
@@ -393,8 +406,11 @@ exports.syncSubscription = async (req, res) => {
         }
 
     } catch (error) {
-        console.error("ERROR: subscriptionsController -> Tyring to sync membership.")
-        console.error(error.message)
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
+        console.error(`ERROR: subscriptionsController -> Tyring to sync membership. ${error.message}`)
         res.render('Error on sync membership.')
     }
 }

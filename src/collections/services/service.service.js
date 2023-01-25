@@ -294,8 +294,8 @@ async function getGrossVolumeFactor(startDate, endDate, allServices) {
         return { factor, grossVolume: stripeBalance?.grossVolume?.getAmount() }
 
     } catch (error) {
-        console.debug(`ERROR-ServiceService: getGrossVolumeFactor()`);
-        console.debug(`ERROR-ServiceService: ${error.message}`);
+        console.error(`ERROR-ServiceService: getGrossVolumeFactor()`);
+        console.error(`ERROR-ServiceService: ${error.message}`);
 
         return null
     }
@@ -327,8 +327,8 @@ async function getLocationsWithGrossVolumeDistributed(date) {
         return { startDate, endDate, serviceQty: allServices?.length, grossVolume, grossVolumeString, factor, factorString, locations }
 
     } catch (error) {
-        console.debug(`ERROR-ServiceService: getLocationsWithGrossVolumeDistributed()`);
-        console.debug(`ERROR-ServiceService: ${error.message}`);
+        console.error(`ERROR-ServiceService: getLocationsWithGrossVolumeDistributed()`);
+        console.error(`ERROR-ServiceService: ${error.message}`);
 
         return null
     }

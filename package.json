@@ -1,6 +1,6 @@
 {
     "name": "autocare-subscriptions-app",
-    "version": "2.1.0",
+    "version": "2.1.1",
     "author": "cfboy",
     "description": "AutoCare Memberships web application using Express, MongoDB, and Stripe.",
     "main": "app.js",
@@ -13,6 +13,8 @@
     },
     "license": "ISC",
     "dependencies": {
+        "@bugsnag/js": "^7.18.0",
+        "@bugsnag/plugin-express": "^7.18.0",
         "@mdi/font": "^3.6.95",
         "ace-builds": "^1.2.9",
         "bcrypt": "^5.0.1",
