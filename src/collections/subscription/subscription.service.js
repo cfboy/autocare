@@ -34,8 +34,14 @@ const addSubscription = (Subscription) => async ({ id, items, data, user }) => {
         setDefaultsOnInsert: true
     }
 
-    const subscription = await Subscription.findOneAndUpdate(query, update, options)
-        .populate({ path: 'user', model: 'user' })
+    const subscription = await Subscription.findOneAndUpdate(query, update, options, function (error, result) {
+        if (error) {
+            console.error(error)
+            throw new Error(error)
+        } else {
+            return result
+        };
+    }).populate({ path: 'user', model: 'user' })
 
     return subscription
 }
