@@ -1,7 +1,0 @@
-clone:
-  depth: full
-pipelines:
-  default:
-    - step:
-        script:
-          - git push --mirror https://github.com/E3-Consulting/autocare.git
