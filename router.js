@@ -141,7 +141,7 @@ router.get('/delete-service/:id', checkAuthenticated, authDeleteService, service
 
 //------ Location Routes ------
 router.get('/locations', checkAuthenticated, locationController.locations)
-router.get('/getCurrentLocation', validateSelectCurrectLocation, locationController.getCurrentLocation)
+router.get('/getCurrentLocation', checkAuthenticated, validateSelectCurrectLocation, locationController.getCurrentLocation)
 router.get('/create-location', checkAuthenticated, locationController.createLocation)
 router.get('/view-location/:id', checkAuthenticated, locationController.viewLocation)
 router.get('/edit-location/:id', checkAuthenticated, authEditLocation, locationController.editLocation)

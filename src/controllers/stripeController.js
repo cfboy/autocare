@@ -40,7 +40,8 @@ exports.webhook = async (req, res) => {
         event = Stripe.createWebhook(req.body, req.header('Stripe-Signature'))
     } catch (err) {
         req.bugsnag.notify(new Error(err))
-        console.log(err)
+        console.error(err)
+        console.error(`ERROR: stripeController.webhook -> req.body: ${req.body}`)
         return res.sendStatus(400)
     }
     try {
