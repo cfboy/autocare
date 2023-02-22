@@ -250,8 +250,16 @@ exports.save = async (req, res) => {
                     await CarService.removeCarFromAllSubscriptions(car)
                 // Add car to subscription
                 // fields.subItem.split('/')[0] has the subscription ID
+                let subscriptionID = fields.subItem.split('/')[0]
                 // fields.subItem.split('/')[1] has the subItem ID 
-                let subscription = await SubscriptionService.addSubscriptionCar(fields.subItem.split('/')[0], car, fields.subItem.split('/')[1])
+                let itemID = fields.subItem.split('/')[1]
+
+                //Get subscription by id to handleutilization.
+                let currentSub = await SubscriptionService.getSubscriptionById(subscriptionID)
+                // Add old utilization / History
+                await UtilizationService.handleUtilization(car, currentSub.data.current_period_start, currentSub.data.current_period_end)
+
+                let subscription = await SubscriptionService.addSubscriptionCar(subscriptionID, car, itemID)
 
                 if (subscription) {
                     req.session.message = `Added Car to subscription: ${subscription.id}. New Car:  ${car.brand} - ${car.model} - ${car.plate}`
