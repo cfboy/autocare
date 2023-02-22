@@ -27,13 +27,20 @@
     </div>
 
 </div>
-
+<div id="sync-all-update" class="text-small text-wrap">
+</div>
 <div class="table-responsive mt-1">
     <table class="table" id="subscriptions">
         <thead>
             <tr>
                 <th>
                     <%= lingua.membership.info%>
+                    <% if([roles.ADMIN].includes(user.role)) { %>
+                    <button id="sync-all-btn" value="<%- customer.billingID%>"
+                        class="sync-all-btn btn btn-icon p-0 text-primary border-0 m-0" title="Sync all subscriptions with Stripe">
+                        <i class="fa-solid fa-rotate"></i>
+                    </button>
+                    <% } %>
                 </th>
             </tr>
         </thead>
@@ -230,6 +237,8 @@
 <script>
 
     const syncBtn = $('.sync-btn');
+    const syncAllBtn = $('.sync-all-btn');
+
     syncBtn.click(function (event) {
         syncBtn.prop('disabled', true);
         event.preventDefault();
@@ -267,6 +276,46 @@
         })
 
     })
+
+
+    syncAllBtn.click(function (event) {
+        syncAllBtn.prop('disabled', true);
+        event.preventDefault();
+        event.stopPropagation();
+
+        const value = $(this).attr("value");
+
+        $.ajax({
+            url: "/syncCustomerSubscriptions",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({
+                value: value
+            }),
+            beforeSend: function () {
+                showResult(`#sync-all-update`,
+                    `<div class="spinner text-center p-1 m-1">
+                            <div class="spinner-grow spinner-grow-sm"></div>
+                    </div>`
+                );
+            }
+        }).done(function (result) {
+            showResult(`#sync-all-update`, result);
+            var delayInMilliseconds = 3000; //1 second
+
+            setTimeout(function () {
+                showResult(`#sync-update-${value}`, '');
+                // syncBtn.prop('disabled', false);
+                location.reload();
+
+            }, delayInMilliseconds);
+
+        }).fail(function (err) {
+            console.log(err);
+        })
+
+    })
+
 
     function validateCheckboxes(itemid) {
         var selected = [];

@@ -410,6 +410,20 @@ async function getAllSubscriptions() {
 }
 
 /**
+ * This function get all subsctiptions by customerID.
+ * @returns subscriptions list
+ */
+async function getCustomerSubscriptions(customerID) {
+    const subscriptions = await Stripe.subscriptions.list(
+        {
+            customer: customerID,
+            status: 'all'
+        })
+
+    return subscriptions.data
+}
+
+/**
  * This function get a subsctiption by id.
  * @returns subscriptions list
  */
@@ -546,5 +560,6 @@ module.exports = {
     getSubscriptionItemById,
     getCustomerBalanceTransactions,
     updateStripeSubscription,
-    getBalanceTransactions
+    getBalanceTransactions,
+    getCustomerSubscriptions
 }

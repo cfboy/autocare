@@ -1,4 +1,5 @@
 const SubscriptionService = require('../collections/subscription')
+const UserService = require('../collections/user')
 const CarService = require('../collections/cars')
 const alertTypes = require('../helpers/alertTypes')
 const ServiceService = require('../collections/services')
@@ -412,5 +413,120 @@ exports.syncSubscription = async (req, res) => {
             })
         console.error(`ERROR: subscriptionsController -> Tyring to sync membership. ${error.message}`)
         res.render('Error on sync membership.')
+    }
+}
+
+/**
+ * This function sync all subscriptions with stripe. Update all information of the subscriptions.
+ * If the subscription is not found in the DB, then create. 
+ * The btn has the property value and this value is the customerID / billingID.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.syncCustomerSubscriptions = async (req, res) => {
+    try {
+
+        let customerID = req.body.value
+
+        if (customerID) {
+            let stripeSubscriptions = await Stripe.getCustomerSubscriptions(customerID)
+            let updatedCount = 0, createdCount = 0;
+
+            for (stripeSubscription of stripeSubscriptions) {
+                // let subscription = await Stripe.getCustomerSubscriptions(customerID)
+
+                let subscriptionItems = stripeSubscription.items.data
+                let mySubscription = await SubscriptionService.getSubscriptionById(stripeSubscription.id)
+                let subscription
+                if (mySubscription) {
+                    //If the subscription exist in the DB, then update. 
+                    items = []
+                    for (subItem of subscriptionItems) {
+                        let itemToUpdate = mySubscription?.items?.find(item => item.id == subItem.id)
+                        if (itemToUpdate) {
+                            let newItem = { id: itemToUpdate.id, cars: itemToUpdate.cars, data: subItem }
+                            items.push(newItem)
+                        }
+                    }
+
+                    updates = {
+                        data: stripeSubscription,
+                        items: items
+                    }
+
+                    subscription = await SubscriptionService.updateSubscription(stripeSubscription.id, updates);
+
+                    // if(subscription.data.status == Stripe.STATUS.CANCELED){
+
+                    // }
+                    if (subscription)
+                        updatedCount++
+
+                } else {
+                    //If the subscription does not exist in the DB, then create. 
+                    let customer = await UserService.getUserByBillingID(customerID)
+                    if (customer) {
+                        // Find subcription again for expand product information
+                        stripeSubscription = await Stripe.getSubscriptionById(stripeSubscription.id)
+                        subscriptionItems = stripeSubscription.items.data
+                        let cars = [], userCartItems = customer?.cart?.items
+                        if (userCartItems.length > 0) {
+                            // cars = userCartItems ? userCartItems : JSON.parse(subscription?.metadata?.cars)
+                            cars = userCartItems
+                        }
+
+                        let items = []
+                        for (subItem of subscriptionItems) {
+                            let newItem = { id: subItem.id, cars: [], data: subItem }
+                            if (cars.length > 0) {
+                                for (carObj of cars) {
+                                    if (subItem.price.id === carObj.priceID) {
+                                        let newCar = await CarService.getCarByPlate(carObj.plate)
+                                        if (newCar) {
+                                            // Add old utilization / History
+                                            await UtilizationService.handleUtilization(newCar, stripeSubscription.current_period_start, stripeSubscription.current_period_end)
+                                            if (newCar.cancel_date != null)
+                                                await CarService.removeCarFromAllSubscriptions(newCar)
+                                        }
+                                        else
+                                            newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate, customer.id)
+
+                                        if (newCar)
+                                            newItem.cars.push(newCar)
+                                    }
+
+                                }
+                            }
+                            items.push(newItem)
+
+                        }
+
+                        subscription = await SubscriptionService.addSubscription({ id: stripeSubscription.id, items: items, data: stripeSubscription, user: customer });
+                        if (subscription)
+                            createdCount++
+
+                    } else {
+                        console.log('syncCustomerSubscriptions: Not Found Customer.')
+                    }
+
+                }
+
+            }
+
+            res.send(`Sync Completed. Updated: (${updatedCount}) Created: (${createdCount}).
+            The page is reloaded in a few seconds...`)
+
+        } else {
+            console.log('Missing Customer ID')
+            res.send('Missing Customer ID.')
+        }
+
+    } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
+        console.error(`ERROR: subscriptionsController -> Tyring to sync all memberships. ${error.message}`)
+        res.render('Error on sync all memberships.')
     }
 }
