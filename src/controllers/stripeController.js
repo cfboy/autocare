@@ -3,11 +3,8 @@ const CarService = require('../collections/cars')
 const UserService = require('../collections/user')
 const SubscriptionService = require('../collections/subscription')
 const UtilizationService = require('../collections/utilization')
-
 const { ROLES } = require('../collections/user/user.model')
 const alertTypes = require('../helpers/alertTypes')
-const moment = require('moment');
-const { completeDateFormat } = require('../helpers/formats')
 const sendEmail = require("../utils/email/sendEmail");
 
 const bcrypt = require('bcrypt');
@@ -34,7 +31,7 @@ const groupByKey = (list, key, { omitKey = false }) =>
 exports.webhook = async (req, res) => {
     // TODO: implement all necessary webhooks
     let event
-    const lingua = req.res.lingua.content
+    // const lingua = req.res.lingua.content
 
     try {
         event = Stripe.createWebhook(req.body, req.header('Stripe-Signature'))
@@ -76,7 +73,7 @@ exports.webhook = async (req, res) => {
                 }
                 // console.debug(`Customer created: ${user.email}`)
 
-                break
+                break;
             case 'customer.subscription.created':
                 console.log(`WEBHOOK: customer.subscription.created: ${data.id}`)
 
@@ -148,30 +145,27 @@ exports.webhook = async (req, res) => {
 
                         req.io.in(customer?.id).emit('notifications', notification);
 
-                        if (process.env.NODE_ENV === "production") {
-                            //Send Email
-                            var resultEmail = await sendEmail(
-                                customer.email,
-                                lingua.email.title,
-                                {
-                                    name: customer?.personalInfo?.firstName + ' ' + customer?.personalInfo?.lastName,
-                                    message: alertInfo.message
-                                },
-                                "../template/subscriptions.handlebars"
-                            )
-
-                            if (resultEmail) {
-                                console.debug('Email Sent: ' + resultEmail?.accepted[0])
-
-                            } else {
-                                req.bugsnag.notify(new Error(`Email Not Sent`),
-                                    function (event) {
-                                        event.setUser(customer.email)
-                                    })
-                                console.error('ERROR: Email Not Sent.')
+                        //Send Email
+                        var resultEmail = await sendEmail(
+                            customer.email,
+                            'subscription_created',
+                            {
+                                name: customer?.personalInfo?.firstName + ' ' + customer?.personalInfo?.lastName,
+                                subscription_id: subscription.id,
+                                message: alertInfo.message,
+                                subject: 'New Subscription - AutoCare Memberships'
                             }
-                        }
+                        );
+                        if (resultEmail.sent) {
+                            console.debug('Email Sent: ' + customer.email)
 
+                        } else {
+                            req.bugsnag.notify(new Error(resultEmail.data),
+                                function (event) {
+                                    event.setUser(customer.email)
+                                })
+                            console.error('ERROR: Email Not Sent.')
+                        }
 
                     } else {
                         console.log('customer.subscription.created: Not Found Customer.')
@@ -278,14 +272,36 @@ exports.webhook = async (req, res) => {
 
                         subscription = await SubscriptionService.updateSubscription(subscription.id, updates);
 
-                        alertInfo = { message: `Your membership ${subscription.id} has been updated successfully. `, alertType: alertTypes.BasicAlert }
+                        alertInfo = { message: `Your membership ${subscription.id} has been updated successfully.`, alertType: alertTypes.BasicAlert }
 
                         // Send customer balance on email.
                         let { totalString } = await Stripe.getCustomerBalanceTransactions(customer.billingID)
                         if (totalString)
                             alertInfo.message += `Your current balance on your account is ${totalString}.`
 
-                    } else {
+                        //Send Email
+                        var resultEmail = await sendEmail(
+                            customer.email,
+                            'subscription_updated',
+                            {
+                                name: customer?.personalInfo?.firstName + ' ' + customer?.personalInfo?.lastName,
+                                subscription_id: subscription.id,
+                                message: alertInfo.message,
+                                subject: 'Subscription Updated - AutoCare Memberships'
+                            }
+                        );
+                        if (resultEmail.sent) {
+                            console.debug('Email Sent: ' + customer.email)
+
+                        } else {
+                            req.bugsnag.notify(new Error(resultEmail.data),
+                                function (event) {
+                                    event.setUser(customer.email)
+                                })
+                            console.error('ERROR: Email Not Sent.')
+                        }
+                    }
+                    else {
                         // Create Subs
                         // let cars = customer?.cart?.items ? customer.cart.items : JSON.parse(subscription.metadata.cars)
                         let cars = customer?.cart?.items
@@ -323,30 +339,23 @@ exports.webhook = async (req, res) => {
                         }
                         newSubscription = await SubscriptionService.addSubscription({ id: subscription.id, data: subscription, items: items, user: customer })
                         alertInfo = { message: `Your membership ${subscription.id} has been created successfully.`, alertType: alertTypes.BasicAlert }
-                    }
-
-                    // Add notification to user.
-                    [customer, notification] = await UserService.addNotification(customer.id, alertInfo.message)
-
-                    req.io.in(customer?.id).emit('notifications', notification);
-
-                    if (process.env.NODE_ENV === "production") {
                         //Send Email
                         var resultEmail = await sendEmail(
                             customer.email,
-                            lingua.email.title,
+                            'subscription_created',
                             {
                                 name: customer?.personalInfo?.firstName + ' ' + customer?.personalInfo?.lastName,
-                                message: alertInfo.message
-                            },
-                            "../template/subscriptions.handlebars"
-                        )
+                                subscription_id: subscription.id,
+                                message: alertInfo.message,
+                                subject: 'New Subscription - AutoCare Memberships'
+                            }
+                        );
 
-                        if (resultEmail) {
-                            console.debug('Email Sent: ' + resultEmail?.accepted[0])
+                        if (resultEmail.sent) {
+                            console.debug('Email Sent: ' + customer.email)
 
                         } else {
-                            req.bugsnag.notify(new Error(`Email Not Sent`),
+                            req.bugsnag.notify(new Error(resultEmail.data),
                                 function (event) {
                                     event.setUser(customer.email)
                                 })
@@ -354,11 +363,16 @@ exports.webhook = async (req, res) => {
                         }
                     }
 
+                    // Add notification to user.
+                    [customer, notification] = await UserService.addNotification(customer.id, alertInfo.message)
+
+                    req.io.in(customer?.id).emit('notifications', notification);
+
                 } else {
                     console.log('customer.subscription.updated: Not Found Customer.')
                 }
 
-                break
+                break;
             case 'customer.subscription.deleted':
                 console.log(`WEBHOOK: customer.subscription.deleted: ${data.id}`)
                 subscription = data
@@ -393,30 +407,27 @@ exports.webhook = async (req, res) => {
                     [customer, notification] = await UserService.addNotification(customer.id, alertInfo.message)
 
                     req.io.in(customer?.id).emit('notifications', notification);
-                    if (process.env.NODE_ENV === "production") {
-                        //Send Email
-                        var resultEmail = await sendEmail(
-                            customer.email,
-                            lingua.email.title,
-                            {
-                                name: customer?.personalInfo?.firstName + ' ' + customer?.personalInfo?.lastName,
-                                message: alertInfo.message
-                            },
-                            "../template/subscriptions.handlebars"
-                        )
-
-                        if (resultEmail) {
-                            console.debug('Email Sent: ' + resultEmail?.accepted[0])
-
-                        } else {
-                            req.bugsnag.notify(new Error(`Email Not Sent.`),
-                                function (event) {
-                                    event.setUser(customer.email)
-                                })
-                            console.error('ERROR: Email Not Sent.')
+                    //Send Email
+                    var resultEmail = await sendEmail(
+                        customer.email,
+                        'subscription_cancelled',
+                        {
+                            name: customer?.personalInfo?.firstName + ' ' + customer?.personalInfo?.lastName,
+                            subscription_id: subscription.id,
+                            message: alertInfo.message,
+                            subject: 'Subscription Cancelled - AutoCare Memberships'
                         }
-                    }
+                    );
+                    if (resultEmail.sent) {
+                        console.debug('Email Sent: ' + customer.email)
 
+                    } else {
+                        req.bugsnag.notify(new Error(resultEmail.data),
+                            function (event) {
+                                event.setUser(customer.email)
+                            })
+                        console.error('ERROR: Email Not Sent.')
+                    }
                 } else {
                     console.log('customer.subscription.cancelled: Not Found Customer.')
                 }
