@@ -7,6 +7,7 @@ const bcrypt = require('bcrypt');
 const passport = require('passport')
 const Auth = require('../config/auth.service')
 const { municipalities } = require('../helpers/municipalities');
+const sendEmail = require("../utils/email/sendEmail");
 
 require("../config/passport");
 require("../config/local");
@@ -85,22 +86,42 @@ exports.register = async (req, res) => {
                 city
             })
 
-            console.debug(
-                `A new user added to DB. The ID for ${customer.email} is ${customer.id}`
-            )
+            if (customer) {
+                console.debug(
+                    `A new user added to DB. The ID for ${customer.email} is ${customer.id}`
+                )
 
-            req.session.message = lingua.accountCreated
-            req.session.alertType = alertTypes.CompletedActionAlert
-            req.flash('info', lingua.accountCreated);
+                req.session.message = lingua.accountCreated
+                req.session.alertType = alertTypes.CompletedActionAlert
+                req.flash('info', lingua.accountCreated);
 
-            // Login the user
-            req.login(customer, function (err) {
-                if (!err) {
-                    res.redirect('/create-subscriptions')
-                } else {
-                    console.log(err);
+                // Login the user
+                req.login(customer, function (err) {
+                    if (!err) {
+                        res.redirect('/create-subscriptions')
+                    } else {
+                        console.log(err);
+                    }
+                })
+
+                // Send Email
+                var resultEmail = await sendEmail(
+                    customer.email,
+                    "welcome",
+                    {
+                        name: customer?.personalInfo?.firstName + ' ' + customer?.personalInfo?.lastName
+                    }
+                )
+
+                if (!resultEmail.sent) {
+                    bugsnag.notify(new Error(resultEmail.data),
+                        function (event) {
+                            event.setUser(email)
+                        })
                 }
-            })
+            } else {
+                req.bugsnag.notify(new Error('Account Not Created.'))
+            }
 
 
         } else {
@@ -202,8 +223,7 @@ exports.resetPasswordRequestController = async (req, res, next) => {
     const lingua = req.res.lingua.content
 
     const [requestSuccess, message] = await Auth.resetPasswordRequest(lingua,
-        req.body.email
-    );
+        req.body.email, req.bugsnag);
 
     if (requestSuccess) {
         req.flash('info', message);
@@ -228,7 +248,8 @@ exports.resetPasswordController = async (req, res, next) => {
     const [requestSuccess, message] = await Auth.resetPassword(lingua,
         req.body.userId,
         req.body.token,
-        req.body.password
+        req.body.password,
+        req.bugsnag
     );
 
     if (requestSuccess) {

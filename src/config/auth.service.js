@@ -12,7 +12,7 @@ const clientURL = process.env.DOMAIN;
  * @param {*} email 
  * @returns 
  */
-const resetPasswordRequest = async (lingua, email) => {
+const resetPasswordRequest = async (lingua, email, bugsnag) => {
 
     const user = await User.findOne({ email });
     var requestSuccess = false
@@ -37,21 +37,25 @@ const resetPasswordRequest = async (lingua, email) => {
 
     var resultEmail = await sendEmail(
         user.email,
-        lingua.email.passwordReset,
+        "reset_password_request",
         {
             name: user?.personalInfo?.firstName + ' ' + user?.personalInfo?.lastName,
-            link: link,
-        },
-        "../template/resetPasswordRequest.handlebars"
+            link: link
+        }
     )
 
-    if (resultEmail) {
-        console.debug('Email Sent: ' + resultEmail?.accepted[0])
+    if (resultEmail.sent) {
+        // console.debug('Email Sent: ' + resultEmail?.data.accepted[0])
         requestSuccess = true
-        return [requestSuccess, lingua.email.verifyEmail(resultEmail?.accepted[0])]
-    } else {
-        return [requestSuccess, lingua.validation.requestNotSend]
+        // return [requestSuccess, lingua.email.verifyEmail(resultEmail?.data?.accepted[0])]
+        return [requestSuccess, lingua.email.verifyEmail(user.email)]
 
+    } else {
+        bugsnag.notify(new Error(resultEmail.data),
+            function (event) {
+                event.setUser(email)
+            })
+        return [requestSuccess, lingua.validation.requestNotSend]
     }
 };
 
@@ -86,14 +90,13 @@ const resetPassword = async (lingua, userId, token, password) => {
 
     var resultEmail = await sendEmail(
         user.email,
-        lingua.email.resetSucessfully,
+        "password_changed",
         {
             name: user?.personalInfo?.firstName + ' ' + user?.personalInfo?.lastName,
-        },
-        "../template/resetPassword.handlebars"
+        }
     );
-    if (resultEmail) {
-        console.debug('Result Email: ' + resultEmail?.accepted[0])
+    if (resultEmail.sent) {
+        console.debug('Result Email: ' + user.email)
         requestSuccess = true
     } else {
         return [requestSuccess, lingua.email.notSend]
@@ -101,7 +104,7 @@ const resetPassword = async (lingua, userId, token, password) => {
     }
     await resetPasswordToken.deleteOne();
 
-    return [requestSuccess, lingua.validation.passwordUpdated(resultEmail.accepted[0])]
+    return [requestSuccess, lingua.validation.passwordUpdated(user.email)]
 };
 
 /**

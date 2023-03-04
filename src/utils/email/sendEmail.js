@@ -1,78 +1,157 @@
+const { MailtrapClient } = require("mailtrap");
 const nodemailer = require("nodemailer");
-// const { google } = require("googleapis")
-// const { OAuth2 } = google.auth
 const handlebars = require("handlebars");
 const fs = require("fs");
 const path = require("path");
-
 /**
  * This function send emails.
  * @param {*} email 
- * @param {*} subject 
+ * @param {*} emailType 
  * @param {*} payload 
- * @param {*} template 
  * @returns 
  */
-const sendEmail = async (email, subject, payload, template) => {
+const sendEmail = async (email, emailType, payload) => {
     try {
-        // const OAUTH_PLAYGROUND = 'https://developers.google.com/oauthplayground';
+        var emailResult
         const {
-            //     MAILING_SERVICE_CLIENT_ID,
-            //     MAILING_SERVICE_CLIENT_SECRET,
-            //     MAILING_SERVICE_REFRESH_TOKEN,
             SENDER_EMAIL_ADDRESS,
-            SENDER_EMAIL_PASSWORD,
-            EMAIL_SERVICE
+            NODE_ENV
         } = process.env;
 
-        // const oauth2Client = new OAuth2(
-        //     MAILING_SERVICE_CLIENT_ID_2,
-        //     MAILING_SERVICE_CLIENT_SECRET_2,
-        //     OAUTH_PLAYGROUND
-        // );
+        var template_variables = {
+            "subject": payload.subject,
+            "user_email": email,
+            "user_name": payload.name,
+            "reset_link": payload.link,
+            "link": `${process.env.DOMAIN}/account`,
+            "message": payload.message,
+            "subscription_id": payload.subscription_id
+        }
 
-        // oauth2Client.setCredentials({
-        //     refresh_token: MAILING_SERVICE_REFRESH_TOKEN_2,
-        // });
+        if (NODE_ENV == "production") {
+            const {
+                MAILTRAP_TOKEN,
+                MAILTRAP_ENDPOINT
+            } = process.env;
 
-        // const accessToken = await oauth2Client.getAccessToken();
+            var MAILTRAP_TEMPLATE = null;
 
-        // create reusable transporter object using the default SMTP transport
-        let transporter = nodemailer.createTransport({
-            service: EMAIL_SERVICE,
-            host: "smtpout.secureserver.net",
-            secureConnection: true,
-            port: 465,
-            auth: { user: SENDER_EMAIL_ADDRESS, pass: SENDER_EMAIL_PASSWORD },
+            switch (emailType) {
+                case 'welcome':
+                    MAILTRAP_TEMPLATE = process.env.WELCOME_ID
+                    break;
+                case 'reset_password_request':
+                    MAILTRAP_TEMPLATE = process.env.RESET_PASSWORD_REQUEST_ID
+                    break;
+                case 'password_changed':
+                    MAILTRAP_TEMPLATE = process.env.PASSWORD_CHANGED_ID
+                    break;
+                case 'subscription_created':
+                    MAILTRAP_TEMPLATE = process.env.SUBSCRIPTION_TEMPLATE_ID
+                    break;
+                case 'subscription_updated':
+                    MAILTRAP_TEMPLATE = process.env.SUBSCRIPTION_TEMPLATE_ID
+                    break;
+                case 'subscription_cancelled':
+                    MAILTRAP_TEMPLATE = process.env.SUBSCRIPTION_TEMPLATE_ID
+                    break;
+                default:
+                    MAILTRAP_TEMPLATE = null
 
-            // service: "Gmail",
-            // auth: {
-            //     type: 'OAuth2',
-            //     user: SENDER_EMAIL_ADDRESS,
-            //     clientId: MAILING_SERVICE_CLIENT_ID_2,
-            //     clientSecret: MAILING_SERVICE_CLIENT_SECRET_2,
-            //     // refreshToken: MAILING_SERVICE_REFRESH_TOKEN_2,
-            //     // accessToken,
-            // }
-        });
+            }
 
-        const source = fs.readFileSync(path.join(__dirname, template), "utf8");
-        const compiledTemplate = handlebars.compile(source);
-        const options = () => {
-            return {
-                from: SENDER_EMAIL_ADDRESS,
-                to: email,
-                subject: subject,
-                html: compiledTemplate(payload)
+            const client = new MailtrapClient({ endpoint: MAILTRAP_ENDPOINT, token: MAILTRAP_TOKEN });
+            const sender = { name: "Memberships System", email: SENDER_EMAIL_ADDRESS };
+
+            emailResult = await client.send({
+                from: sender,
+                to: [{ email: email }],
+                template_uuid: MAILTRAP_TEMPLATE,
+                template_variables: template_variables
+            }).then(result => {
+                if (result.success) {
+                    return { sent: true, data: null }
+                } else {
+                    return { sent: false, data: null }
+                }
+            }).catch(err => {
+                console.error(`Failed to sent email: ${err}`)
+                return { sent: false, data: err }
+            });
+        } else if (NODE_ENV == 'development') {
+
+            var template, subject
+
+            switch (emailType) {
+                case 'welcome':
+                    subject = `Welcome to AutoCare Memberships, ${template_variables.user_name}!`
+                    template = '../template/welcome.handlebars'
+                    break;
+                case 'reset_password_request':
+                    subject = 'Password reset request'
+                    template = '../template/resetPasswordRequest.handlebars'
+                    break;
+                case 'password_changed':
+                    subject = 'Memberships System - Password Changed '
+
+                    template = '../template/resetPassword.handlebars'
+                    break;
+                case 'subscription_created':
+                    subject = template_variables.subject
+                    template = '../template/subscriptions.handlebars'
+                    break;
+                case 'subscription_updated':
+                    subject = template_variables.subject
+                    template = '../template/subscriptions.handlebars'
+                    break;
+                case 'subscription_cancelled':
+                    subject = template_variables.subject
+                    template = '../template/subscriptions.handlebars'
+                    break;
+                default:
+                    template = null
+
+            }
+
+            var transport = nodemailer.createTransport({
+                host: "sandbox.smtp.mailtrap.io",
+                port: 2525,
+                auth: {
+                    user: "500f11dddd07ab",
+                    pass: "edf19eb82a63f1"
+                }
+            });
+
+            const source = fs.readFileSync(path.join(__dirname, template), "utf8");
+            const compiledTemplate = handlebars.compile(source);
+            const options = () => {
+                return {
+                    from: SENDER_EMAIL_ADDRESS,
+                    to: email,
+                    subject: subject,
+                    html: compiledTemplate(template_variables)
+                };
             };
-        };
 
-        // Send email
-        return await transporter.sendMail(options());
+            // Send email
+            emailResult = await transport.sendMail(options());
+
+            if (emailResult.accepted.length) {
+                emailResult = { sent: true, data: null }
+            } else {
+                emailResult = { sent: false, data: null }
+            }
+
+        } else {
+            //Not send email in test. 
+            emailResult = { sent: true, data: null };
+        }
+
+        return emailResult;
 
     } catch (error) {
         console.error(error)
-        return false;
+        return { sent: false, data: error };
     }
 };
 
