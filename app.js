@@ -30,7 +30,7 @@ var BugsnagPluginExpress = require('@bugsnag/plugin-express')
 Bugsnag.start({
     apiKey: process.env.BUGSNAG_KEY,
     plugins: [BugsnagPluginExpress],
-    autoTrackSessions: false,
+    // autoTrackSessions: false,
     // enabledReleaseStages: [ 'production', 'test', 'development'], 
     appVersion: pjson.version
 })
