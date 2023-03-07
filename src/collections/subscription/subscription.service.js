@@ -19,13 +19,13 @@ const addSubscription = (Subscription) => async ({ id, items, data, user }) => {
     // console.log(`Subscription: addSubscription()`)
 
     const query = {
-        id,
-        items,
-        data,
-        user
+        id
     }
 
     const update = {
+        items,
+        data,
+        user
     }
 
     const options = {
