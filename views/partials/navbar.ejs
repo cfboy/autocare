@@ -122,8 +122,14 @@
                     <% if(user?.notifications) { %>
                     <div id="notifications">
                     </div>
+                    <% var userNotifications = user?.notifications.filter(notification => notification.isRead == false).sort(function(a,b) {
+                        // Turn your strings into dates, and then subtract them
+                        // to get a value that is either negative, positive, or zero.
+                        return new Date(b.created_date) - new Date(a.created_date);
+                    });
+                    %>
 
-                    <% for(notification of user.notifications.filter(notification => notification.isRead == false)) { %>
+                    <% for(notification of userNotifications) { %>
                     <a id="a-<%= notification.id%>" class="dropdown-item preview-item py-3">
                         <div class="preview-item-content">
                             <h6 class="preview-subject fw-normal text-dark mb-1"><%= notification?.message%></h6>
