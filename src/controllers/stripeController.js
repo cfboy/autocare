@@ -440,7 +440,7 @@ exports.webhook = async (req, res) => {
         res.sendStatus(200)
     } catch (error) {
         req.bugsnag.notify(new Error(error))
-        console.error(`ERROR-WEBHOOK-EVENT: ${data?.object?.id}. ${error.message}`)
+        console.error(`ERROR-WEBHOOK-EVENT: ${error.message}`)
         res.sendStatus(500)
     }
 }
