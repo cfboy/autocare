@@ -435,6 +435,7 @@ exports.syncCustomerSubscriptions = async (req, res) => {
             for (stripeSubscription of stripeSubscriptions) {
                 // let subscription = await Stripe.getCustomerSubscriptions(customerID)
 
+                stripeSubscription = await Stripe.getSubscriptionById(stripeSubscription.id)
                 let subscriptionItems = stripeSubscription.items.data
                 let mySubscription = await SubscriptionService.getSubscriptionById(stripeSubscription.id)
                 let subscription
