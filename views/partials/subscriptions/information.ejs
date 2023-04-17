@@ -235,7 +235,7 @@
 
                         <p class="mt-2">
                             <small><b>ID: <%= stripeSubscription.id%></b></small> <br>
-                            <small>Created: <%= moment(stripeSubscription?.data?.created * 1000)%></small>
+                            <small>Created: <%= moment(stripeSubscription?.data?.created * 1000).format(completeDateFormat)%></small>
                         </p>
                     </div>
                 </td>
