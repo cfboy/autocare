@@ -46,7 +46,12 @@
             </tr>
         </thead>
         <tbody>
-            <% for(stripeSubscription of subscriptions) { %>
+            <% let subsOrdered = subscriptions.sort(function(a,b) {
+                // Turn your strings into dates, and then subtract them
+                // to get a value that is either negative, positive, or zero.
+                return b.data.created - a.data.created;
+            }) %>
+            <% for(stripeSubscription of subsOrdered) { %>
             <tr>
                 <td>
                     <div class="card p-3">
@@ -229,7 +234,8 @@
                         </div>
 
                         <p class="mt-2">
-                            <small><b>ID: <%= stripeSubscription.id%></b></small>
+                            <small><b>ID: <%= stripeSubscription.id%></b></small> <br>
+                            <small>Created: <%= moment(stripeSubscription?.data?.created * 1000).format(completeDateFormat)%></small>
                         </p>
                     </div>
                 </td>
