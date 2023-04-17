@@ -49,7 +49,7 @@
             <% let subsOrdered = subscriptions.sort(function(a,b) {
                 // Turn your strings into dates, and then subtract them
                 // to get a value that is either negative, positive, or zero.
-                return a.data.created - b.data.created;
+                return b.data.created - a.data.created;
             }) %>
             <% for(stripeSubscription of subsOrdered) { %>
             <tr>
