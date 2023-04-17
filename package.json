@@ -1,6 +1,6 @@
 {
     "name": "autocare-subscriptions-app",
-    "version": "2.1.5",
+    "version": "2.1.6",
     "author": "cfboy",
     "description": "AutoCare Memberships web application using Express, MongoDB, and Stripe.",
     "main": "app.js",
