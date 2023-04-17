@@ -37,7 +37,8 @@
                     <%= lingua.membership.info%>
                     <% if([roles.ADMIN].includes(user.role)) { %>
                     <button id="sync-all-btn" value="<%- customer.billingID%>"
-                        class="sync-all-btn btn btn-icon p-0 text-primary border-0 m-0" title="Sync all subscriptions with Stripe">
+                        class="sync-all-btn btn btn-icon p-0 text-primary border-0 m-0"
+                        title="Sync all subscriptions with Stripe">
                         <i class="fa-solid fa-rotate"></i>
                     </button>
                     <% } %>
@@ -53,6 +54,7 @@
                             <div class="col-md-6 col-sm-12">
                                 <h6>Products</h4>
                                     <hr>
+                                    <% var subStatus = stripeSubscription.data.status %>
                                     <% for(item of stripeSubscription.items) { %>
                                     <div class="col-auto p-1">
                                         <div class="card p-2 mb-2">
@@ -86,7 +88,9 @@
 
                                                     <!-- If everything is ok. -->
                                                     <%# if(!item.isValid) { %>
-
+                                                    <% if(![stripeStatus.CANCELED, stripeStatus.UNPAID,
+                                                        stripeStatus.NONE,
+                                                        stripeStatus.INCOMPLETE_EXPIRED].includes(subStatus)) { %>
                                                     <!-- If the length of cars is less than item quantity, then show add car btn. -->
                                                     <% if(item.cars.length < item.data.quantity) { %>
                                                     <!-- First Show the cars -->
@@ -152,6 +156,7 @@
                                                         </button>
                                                     </form>
                                                     <% } %>
+                                                    <% } %>
                                                     <%# } %>
                                                 </ul>
                                             </div>
@@ -205,7 +210,7 @@
                                     <% if([stripeStatus.ACTIVE, stripeStatus.TRIALING].includes(stripeSubscription?.data?.status)) { %>
                                     <i class="fas fa-3x fa-check-circle valid"></i>
 
-                                    <% } else if([stripeStatus.CANCELED, stripeStatus.UNPAID, stripeStatus.NONE].includes(stripeSubscription?.data?.status)) { %>
+                                    <% } else if([stripeStatus.CANCELED, stripeStatus.UNPAID, stripeStatus.NONE, stripeStatus.INCOMPLETE_EXPIRED].includes(subStatus)) { %>
                                     <i class="fas fa-3x fa-times-circle invalid"></i>
                                     <% } %>
 

@@ -310,7 +310,7 @@ async function setStripeInfoToUser(customerObj) {
                 for (sub of customer.subscriptions) {
                     for (item of sub.items) {
                         // If the status of subscriptions is CANCELED, then is not necessary to validateItemQty.
-                        item.isValid = (sub.data.status == STATUS.CANCELED) ? true : await validateItemQty(item)
+                        item.isValid = (sub.data.status == STATUS.CANCELED || sub.data.status == STATUS.INCOMPLETE_EXPIRED) ? true : await validateItemQty(item)
                     }
                 }
             }
