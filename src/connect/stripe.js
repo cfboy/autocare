@@ -456,25 +456,32 @@ async function getSubscriptionItemById(id) {
  * @returns balance transactions list, amount, and string amount
  */
 async function getCustomerBalanceTransactions(id) {
-    const balanceTransactions = await Stripe.customers.listBalanceTransactions(
-        id
-    );
+    try {
+        const balanceTransactions = await Stripe.customers.listBalanceTransactions(
+            id
+        );
 
-    // console.debug("Balance Transactions: " + balanceTransactions.data.length)
+        // console.debug("Balance Transactions: " + balanceTransactions.data.length)
 
-    let total = 0.00
-    for (balance of balanceTransactions.data) {
-        total += balance.amount
+        let total = 0.00
+        for (balance of balanceTransactions.data) {
+            total += balance.amount
+        }
+        let totalString = null
+
+        // If the total is zero then totalString is null/undefined.
+        if (total * -1 > 0) {
+            totalString = Dinero({ amount: total * -1 }).toFormat('$0,0.00')
+            console.debug('Total Customer Balance: ' + totalString)
+        }
+
+        return { transactions: balanceTransactions.data, total: total, totalString: totalString }
     }
-    let totalString = null
+    catch (error) {
+        console.error(`ERROR-STRIPE: getCustomerBalanceTransactions(). ${error.message}`);
 
-    // If the total is zero then totalString is null/undefined.
-    if (total * -1 > 0) {
-        totalString = Dinero({ amount: total * -1 }).toFormat('$0,0.00')
-        console.debug('Total Customer Balance: ' + totalString)
+        return { transactions: null, total: null, totalString: null }
     }
-
-    return { transactions: balanceTransactions.data, total: total, totalString: totalString }
 }
 
 /**
