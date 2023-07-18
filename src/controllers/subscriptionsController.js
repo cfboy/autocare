@@ -121,6 +121,7 @@ exports.validate = async (req, res) => {
             // subscription = await SubscriptionService.getLastActiveSubscriptionByCar(car)
             subscription = await SubscriptionService.getLastSubscriptionByCar(car)
 
+            // TODO: get the customer by another source if the subscription not exist
             customer = subscription?.user
             let today = new Date(), tomorrow = new Date()
             tomorrow = new Date(tomorrow.setDate(today.getDate() + 1))
@@ -529,5 +530,38 @@ exports.syncCustomerSubscriptions = async (req, res) => {
             })
         console.error(`ERROR: subscriptionsController -> Tyring to sync all memberships. ${error.message}`)
         res.render('Error on sync all memberships.')
+    }
+}
+
+/**
+ * This function remove a car from a subscription.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.removeCarOfSubscription = async (req, res) => {
+    try {
+
+        let { subscriptionID, itemID, carID } = req.body
+
+        if (subscriptionID && itemID && carID) {
+            let car = await CarService.getCarByID(carID)
+
+            let subscription = await SubscriptionService.removeSubscriptionCar(subscriptionID, itemID, car)
+            if (subscription) {
+                res.send(`Car Removed.`)
+            }
+
+        } else {
+            console.log('Missing values.')
+            res.send('Missing values.')
+        }
+
+    } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
+        console.error(`ERROR: subscriptionsController -> Tyring to remove car from subscription. ${error.message}`)
+        res.render('Error on remove car.')
     }
 }

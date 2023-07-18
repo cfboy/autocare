@@ -55,7 +55,8 @@
                                                 </div>
                                                 <div class="d-flex justify-content-between align-items-start">
                                                     <a href="/changePassword/<%- customer.id%>?url=/editCustomers&userType=<%- userType%>"
-                                                        type="button" class="btn btn-primary btn-icon-text m-1 text-white">
+                                                        type="button"
+                                                        class="btn btn-primary btn-icon-text m-1 text-white">
                                                         <i class="fa-solid fa-key"></i>
                                                         <%= lingua.user.password.changePassword%>
                                                     </a>
@@ -145,7 +146,11 @@
                                                             <td>
                                                                 <%# car.subscription.data%>
                                                                 <span style="text-transform: uppercase;">
-                                                                    <%- car.subscription.data.status%>
+                                                                    <% if(car?.subscription) { %>
+                                                                    <%- car?.subscription?.data?.status%>
+                                                                    <% } else { %>
+                                                                    N/A <i class="warning fa-solid fa-warning fa-fw"></i>
+                                                                    <% } %>
                                                                 </span>
                                                             </td>
                                                             <td>
