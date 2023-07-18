@@ -33433,7 +33433,7 @@ div.tagsinput span.tag a {
     margin-top: 0;
     right: 0;
     left: auto;
-    top: 70px;
+    /* top: 50px; */
     padding-top: 0;
 }
 

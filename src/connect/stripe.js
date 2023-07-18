@@ -163,17 +163,16 @@ const getCustomerByEmail = async (email) => {
 const addNewCustomer = async (email,
     firstName,
     lastName,
-    phoneNumber,
-    city) => {
+    phoneNumber) => {
     try {
         const customer = await Stripe.customers.create({
             email,
-            description: 'New Customer',
+            description: 'Created by app.',
             name: firstName + ' ' + lastName,
-            phone: phoneNumber,
-            address: {
-                city: city
-            }
+            phone: phoneNumber
+            // address: {
+            //     city: city
+            // }
         })
 
         return customer

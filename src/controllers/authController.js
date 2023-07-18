@@ -46,8 +46,8 @@ exports.register = async (req, res) => {
             firstName,
             lastName,
             phoneNumber,
-            dateOfBirth,
-            city
+            // dateOfBirth,
+            // city
         } = req.body
 
         const lingua = req.res.lingua.content
@@ -68,8 +68,7 @@ exports.register = async (req, res) => {
             if (!customerInfo) {
                 customerInfo = await Stripe.addNewCustomer(email, firstName,
                     lastName,
-                    phoneNumber,
-                    city)
+                    phoneNumber)
             }
 
             hashPassword = await bcrypt.hash(password, 10)
@@ -82,8 +81,8 @@ exports.register = async (req, res) => {
                 firstName,
                 lastName,
                 phoneNumber,
-                dateOfBirth,
-                city
+                // dateOfBirth,
+                // city
             })
 
             if (customer) {

@@ -102,19 +102,6 @@
                                                                 <%- customer.personalInfo.phoneNumber %>
                                                             </td>
                                                         </tr>
-                                                        <tr>
-                                                            <td><%= lingua.user.dateOfBirth%></td>
-                                                            <td>
-                                                                <%= moment(customer.personalInfo.dateOfBirth).isValid() ? moment(customer.personalInfo.dateOfBirth).utc().format(shortDateFormat) : 'N/A' %>
-
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td><%= lingua.user.city%></td>
-                                                            <td>
-                                                                <%- customer.personalInfo.city %>
-                                                            </td>
-                                                        </tr>
                                                     </tbody>
                                                 </table>
                                             </div>

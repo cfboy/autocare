@@ -69,30 +69,7 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-6">
-                                        <div class="form-group">
-                                            <label for="password"
-                                                class="required"><%= lingua.user.password.name%></label>
-
-                                            <input type="password" id="password" name="password"
-                                                class="form-control mb-3 form-control-lg"
-                                                pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
-                                                title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters"
-                                                placeholder="Password" required />
-                                            <div id="message">
-                                                <p>
-                                                    <%= lingua.user.password.nameRequirement%>
-                                                </p>
-                                                <p> <span id="letter" class="invalid"> <b>1
-                                                            <%= lingua.user.password.lowerCase%></b>
-                                                    </span>, <span id="capital" class="invalid"><b>1
-                                                            <%= lingua.user.password.upperCase%></b></span>, <span
-                                                        id="number" class="invalid"> <b>1
-                                                            <%= lingua.user.password.number%></b></span>,
-                                                    <span id="length" class="invalid"> <b>8
-                                                            <%= lingua.user.password.characters%></b></span>
-                                                </p>
-                                            </div>
-                                        </div>
+                                        <%- include('../user/passwordField.ejs'); %>
                                     </div>
                                     <div class="col-lg-6">
                                         <div class="form-group">
@@ -123,7 +100,7 @@
                                                 required />
                                         </div>
                                     </div>
-                                    <div class="col-lg-6">
+                                    <!-- <div class="col-lg-6">
                                         <div class="form-group">
                                             <label for="dateOfBirth"
                                                 class="required"><%= lingua.user.dateOfBirth%></label>
@@ -132,8 +109,8 @@
                                                 name="dateOfBirth" placeholder="mm/dd/yyyy"
                                                 class="form-control mb-3 form-control-lg" required />
                                         </div>
-                                    </div>
-                                    <div class="col-lg-6">
+                                    </div> -->
+                                    <!-- <div class="col-lg-6">
 
                                         <div class="form-group">
                                             <label for="city" class="required"><%= lingua.user.city%></label>
@@ -146,7 +123,7 @@
                                                 <% } %>
                                             </select>
                                         </div>
-                                    </div>
+                                    </div> -->
                                 </div>
                                 <div class="row">
                                     <div class="mt-3">
@@ -177,12 +154,10 @@
     <script src="../../js/off-canvas.js"></script>
     <script src="../../js/hoverable-collapse.js"></script>
     <script src="../../js/template.js"></script>
-    <script src="../../js/settings.js"></script>
-    <script src="../../js/todolist.js"></script>
     <!-- endinject -->
     <!-- Custom js for this page-->
     <script src="../../js/dashboard.js"></script>
-    <script src="../../js/register.js"></script>
+    <!-- <script src="../../js/register.js"></script> -->
     <script src="./js/jquery.cookie.js" type="text/javascript"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.10/jquery.mask.js"></script>
     <script src="../../vendors/select2/select2.min.js"></script>
