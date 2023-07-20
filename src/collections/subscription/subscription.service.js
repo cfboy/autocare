@@ -96,7 +96,7 @@ const removeSubscriptionCar = (Subscription) => async (id, item, car) => {
             if (err) {
                 console.error(err.message)
             } else {
-                console.debug(`Car ${car.model} Removed of subscription: ${doc.id}`);
+                console.debug(`Car ${car.carName()} Removed of subscription: ${doc.id}`);
             }
         }).populate('user').populate({ path: 'items.cars', model: 'car' })
 }

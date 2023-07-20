@@ -154,8 +154,7 @@
                                                                         name="cars"
                                                                         onclick="validateCheckboxes(`<%= item.id%>`)"
                                                                         value="<%= car._id%>">
-                                                                    <%- car.brand %> - <%- car.model %> -
-                                                                    <%- car.plate %>
+                                                                    <%= car.carName() %>
 
                                                                 </label>
 

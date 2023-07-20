@@ -43,7 +43,8 @@ $colors: (
 $theme-colors: (
   primary: #1856a7, 
   secondary: #F1F1F1, 
-  success:#34B1AA, 
+  // success:#34B1AA, 
+  success:#008000, 
   info: #52CDFF, 
   warning: #ffaf00, 
   danger: #F95F53, 
@@ -53,7 +54,7 @@ $theme-colors: (
 
 $primary: #1856a7; 
 $secondary: #F1F1F1; 
-$success:#34B1AA; 
+$success:#008000; 
 $info: #52CDFF; 
 $warning: #ffaf00; 
 $danger: #F95F53; 
