@@ -81,21 +81,9 @@
                                                     </thead>
                                                     <tbody>
                                                         <tr>
-                                                            <td><%= lingua.car.brand%></td>
+                                                            <td><%= lingua.car.name%></td>
                                                             <td>
-                                                                <%- car.brand%>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td><%= lingua.car.model%></td>
-                                                            <td>
-                                                                <%- car.model%>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td><%= lingua.car.plate%></td>
-                                                            <td>
-                                                                <%- car.plate%>
+                                                                <%- car.carName()%>
                                                             </td>
                                                         </tr>
                                                         <tr>
@@ -197,11 +185,7 @@
                                                                 <%= moment(service?.created_date).isValid() ? moment(service?.created_date).format(completeDateFormat) : 'N/A' %>
                                                             </td>
                                                             <td>
-                                                                <%= lingua.car.brand%>: <%- car?.brand%>
-                                                                <br>
-                                                                <%= lingua.car.model%>: <%- car?.model%>
-                                                                <br>
-                                                                <%= lingua.car.plate%>: <%- car?.plate%>
+                                                                <%= lingua.car.name%>: <%- car?.carName()%>
                                                             </td>
                                                             <td>
                                                                 <%= service?.location?.name%>

@@ -123,9 +123,7 @@
                                                 <table id="users" class="table table-hover stripe">
                                                     <thead>
                                                         <tr>
-                                                            <th><%= lingua.car.brand%></th>
-                                                            <th><%= lingua.car.model%></th>
-                                                            <th><%= lingua.car.plate%></th>
+                                                            <th><%= lingua.car.name%></th>
                                                             <th><%= lingua.membership.name%></th>
                                                             <th><%= lingua.action%></th>
                                                         </tr>
@@ -137,19 +135,28 @@
 
                                                         <tr>
                                                             <td>
-                                                                <a class="btn-link"
-                                                                    href="/car/<%- car.id%>"><%- car.brand%></a>
-                                                            </td>
+                                                                <a href="/car/<%- car?.id%>"
+                                                                    class="text-decoration-none">
 
-                                                            <td><%- car.model%></td>
-                                                            <td><%- car.plate%></td>
+                                                                    <i class="fa-solid fa-car fa-fw"></i>
+                                                                    <%- car?.carName()%>
+                                                                    <% if(car?.cancel_date) { %>
+                                                                    <b>
+                                                                        (<%= lingua.membership.validUntil%>:
+                                                                        <%= moment(car?.cancel_date).isValid() ? moment(car?.cancel_date).format(shortDateFormat) : 'N/A' %>
+                                                                        )
+                                                                    </b>
+                                                                    <% } %>
+                                                                </a>
+                                                            </td>
                                                             <td>
                                                                 <%# car.subscription.data%>
                                                                 <span style="text-transform: uppercase;">
                                                                     <% if(car?.subscription) { %>
                                                                     <%- car?.subscription?.data?.status%>
                                                                     <% } else { %>
-                                                                    N/A <i class="warning fa-solid fa-warning fa-fw"></i>
+                                                                    N/A <i
+                                                                        class="warning fa-solid fa-warning fa-fw"></i>
                                                                     <% } %>
                                                                 </span>
                                                             </td>

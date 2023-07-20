@@ -38,6 +38,12 @@ const userSchema = new Schema({
     }
 })
 
+userSchema.methods.fullName = function () {
+    var strings = [this.personalInfo.firstName, this.personalInfo.middleName, this.personalInfo.lastName];
+
+    return strings.filter(Boolean).join(" ");
+};
+
 const User = mongoose.model('user', userSchema, 'user')
 
 module.exports = { ROLES, User }

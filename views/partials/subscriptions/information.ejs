@@ -79,9 +79,7 @@
                                                         <a href="/car/<%- car?.id%>" class="text-decoration-none">
 
                                                             <i class="fa-solid fa-car fa-fw"></i>
-                                                            <%- car?.brand%>
-                                                            <%- car?.model%>
-                                                            (<%- car?.plate%>)
+                                                            <%- car?.carName()%>
                                                             <% if(car?.cancel_date) { %>
                                                             <b>
                                                                 (<%= lingua.membership.validUntil%>:

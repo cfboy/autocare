@@ -77,7 +77,7 @@
                                                         <tr>
                                                             <td>
                                                                 <a class="btn-link" href="/customers/<%- user.id%>?userType=/<%- userType%>">
-                                                                    <%- user.personalInfo.firstName + ' ' + user.personalInfo.lastName %>
+                                                                    <%- user.fullName() %>
                                                                     <!-- <%# if(!user.hasAllInformation) { %>
                                                                     <i class="mdi mdi-alert text-warning"
                                                                         style="padding-left: 10px;"></i>

@@ -72,17 +72,19 @@ function autofillCarInfo(selectedCar, linguaString) {
         // Set the values to the form fields.
         if (carBrand.data('select2'))
             carBrand.select2().val(brand).trigger('change'); //This trigger the function findModel on cars.js
-        else { 
+        else {
             carBrand.val(brand);
         }
         carBrand.attr('disabled', false);
         // Set timeout in which the models loads.
         setTimeout(function () {
             carModel.attr('disabled', true);
-            if (carModel.data('select2'))
-                carModel.select2().val(model).trigger('change');
-            else {
-                carModel.val(model);
+            if (model) {
+                if (carModel.data('select2'))
+                    carModel.select2().val(model).trigger('change');
+                else {
+                    carModel.val(model);
+                }
             }
             carModel.attr('disabled', false);
             carPlate.attr('disabled', false);
