@@ -341,7 +341,7 @@
           autoStyleContainer: false
         },
         from: {
-          color: '#34B1AA',
+          color: '#008000',
           width: 15
         },
         to: {

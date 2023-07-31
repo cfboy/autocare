@@ -5,7 +5,7 @@ const { historyTypes } = require('../collections/history/history.model')
 const Stripe = require('../connect/stripe')
 const alertTypes = require('../helpers/alertTypes')
 const bcrypt = require('bcrypt');
-const { municipalities } = require('../helpers/municipalities')
+// const { municipalities } = require('../helpers/municipalities')
 const CarService = require('../collections/cars')
 const ServiceService = require('../collections/services')
 const SubscriptionService = require('../collections/subscription')
@@ -122,7 +122,7 @@ exports.createUser = async (req, res) => {
             selectRoles = Object.entries(subset)
         }
 
-        res.render('user/create.ejs', { user: req.user, municipalities, message, alertType, selectRoles })
+        res.render('user/create.ejs', { user: req.user, message, alertType, selectRoles })
     }
 }
 
@@ -145,8 +145,7 @@ exports.save = async (req, res) => {
             if (!customerInfo) {
                 customerInfo = await Stripe.addNewCustomer(fields.email?.toLowerCase(), fields.firstName,
                     fields.lastName,
-                    fields.phoneNumber,
-                    fields.city)
+                    fields.phoneNumber)
             }
 
             var hashPassword = await bcrypt.hash(fields.password, 10)
@@ -158,9 +157,7 @@ exports.save = async (req, res) => {
                 role: fields.role,
                 firstName: fields.firstName,
                 lastName: fields.lastName,
-                phoneNumber: fields.phoneNumber,
-                dateOfBirth: fields.dateOfBirth,
-                city: fields.city
+                phoneNumber: fields.phoneNumber
             })
 
             console.log(`A new user added to DB. The ID for ${user.email} is ${user.id}`)
@@ -282,7 +279,7 @@ exports.editUser = async (req, res) => {
 
             let composedUrl = (req.user.role == ROLES.CUSTOMER) ? `/customers/${req.user.id}` : ((url || userType) == '/users' || (url || userType) == '/customers' || url == '/account' || url == '/validateMembership') ? url : url == "/editCustomers" ? `/customers/${id}` : `${url}/${id}`
 
-            res.status(200).render('user/edit.ejs', { user: req.user, customer, municipalities, selectRoles, url: composedUrl })
+            res.status(200).render('user/edit.ejs', { user: req.user, customer, selectRoles, url: composedUrl })
         } else {
             console.log('User not found.')
             res.redirect(`${url}`)

@@ -262,14 +262,14 @@ exports.save = async (req, res) => {
                 let subscription = await SubscriptionService.addSubscriptionCar(subscriptionID, car, itemID)
 
                 if (subscription) {
-                    req.session.message = `Added Car to subscription: ${subscription.id}. New Car:  ${car.brand} - ${car.model} - ${car.plate}`
+                    req.session.message = `Added Car to subscription: ${subscription.id}. New Car:  ${car.carName()}`
                 }
 
-                req.session.message = `New Car:  ${car.brand} - ${car.model} - ${car.plate}.`
+                req.session.message = `New Car:  ${car.carName()}.`
                 req.session.alertType = alertTypes.CompletedActionAlert
                 req.flash('info', 'Car created.')
             } else {
-                req.session.message = `This Car:  ${car.brand} - ${car.model} - ${car.plate} can not be added to this subscription..`
+                req.session.message = `This Car: (${car.carName()}) can not be added to this subscription..`
                 req.session.alertType = alertTypes.WarningAlert
             }
         } else {
@@ -314,7 +314,7 @@ exports.update = async (req, res) => {
 
         } else {
             req.flash('info', 'Car Updated.')
-            req.session.message = `Car updated: ${car.model} - ${car.brand} - ${car.plate}.`
+            req.session.message = `Car updated: ${car.carName()}.`
             req.session.alertType = alertTypes.CompletedActionAlert
         }
         res.redirect(`${url}`)

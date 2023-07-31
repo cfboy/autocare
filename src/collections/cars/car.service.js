@@ -118,7 +118,7 @@ const getCarByID = (Car) => async (carID) => {
  */
 const addCar = (Car) => async (brand, model, plate, user_id) => {
     try {
-        if (!brand || !model || !plate) {
+        if (!brand || !plate) {
             throw new Error(`Missing Data. Please provide all data for car.`)
         }
 
@@ -161,7 +161,7 @@ const updateCar = (Car) => async (id, updates) => {
         if (err) {
             console.error(err.message)
         } else {
-            console.debug(`CAR-SERVICE: Car Updated : ${doc.brand} - ${doc.model} - ${doc.plate}`);
+            console.debug(`CAR-SERVICE: Car Updated : ${doc.carName()}`);
         }
     })
 }

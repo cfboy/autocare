@@ -34,22 +34,9 @@
                     </p>
                     <p>
                         <b>
-                            <%= lingua.car.brand%>:
+                            <%= lingua.car.name%>:
                         </b>
-                        <%- car?.brand%>
-
-                    </p>
-                    <p>
-                        <b>
-                            <%= lingua.car.model%>:
-                        </b>
-                        <%- car?.model%>
-                    </p>
-                    <p>
-                        <b>
-                            <%= lingua.car.plate%>:
-                        </b>
-                        <%- car?.plate%>
+                        <%= car?.carName()%>
                     </p>
                     <% if(car?.cancel_date) { %>
                     <p class="bg-warning">
@@ -131,10 +118,11 @@
                             <% if(!car?.hasService) { %>
                             <button id="use-service-button" user-id="<%= customer?.id%>" car-id="<%= car?.id%>"
                                 inputType="<%= inputType%>" onclick="confirmValidation(this)"
-                                class="btn btn-block btn-success btn-lg font-weight-medium btn-icon-text m-1"
+                                class="btn btn-block btn-outline-success btn-lg font-weight-medium btn-icon-text m-1"
                                 type="submit">
                                 <%= lingua.service.use%>
-                                <i class="menu-icon mdi mdi-car-wash btn-icon-apepend"></i>
+                                
+                                <i class="fa-solid fa-circle-check btn-icon-apepend m-2"></i>
                             </button>
                             <% } %>
                             <% } %>

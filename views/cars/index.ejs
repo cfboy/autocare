@@ -76,9 +76,7 @@
                                                 <table id="users" class="table table-hover stripe">
                                                     <thead>
                                                         <tr>
-                                                            <th><%= lingua.car.brand%></th>
-                                                            <th><%= lingua.car.model%></th>
-                                                            <th><%= lingua.car.plate%></th>
+                                                            <th><%= lingua.car.name%></th>
                                                             <th><%= lingua.service.qty%></th>
                                                             <th><%= lingua.createdDate%></th>
                                                             <%# if(canManageCars) { %>
@@ -92,7 +90,7 @@
                                                         <tr>
                                                             <td>
                                                                 <a class="btn-link"
-                                                                    href="/car/<%- car.id%>"><%- car.brand%></a>
+                                                                    href="/car/<%- car.id%>"><%= car.carName()%></a>
                                                                 <% if(car?.cancel_date) { %>
                                                                 <br>
                                                                 <p class="mt-1">
@@ -105,9 +103,6 @@
                                                                 </p>
                                                                 <% } %>
                                                             </td>
-
-                                                            <td><%- car.model%></td>
-                                                            <td><%- car.plate%></td>
                                                             <td><%- car?.allServices?.length%></td>
                                                             <td>
                                                                 <%= moment(car?.created_date).isValid() ? moment(car?.created_date).format(completeDateFormat) : 'N/A' %>
@@ -179,7 +174,7 @@
     <script src="../js/helper-functions.js"></script>
     <!-- Alerts Code -->
     <%- include('../partials/alerts.ejs', {message, alertType}); %>
-    <%- include('../partials/dataTable.ejs', {tableID : '#users', dateColumn: 4 }); %>
+    <%- include('../partials/dataTable.ejs', {tableID : '#users', dateColumn: 2 }); %>
 
     <script>
         function syncUtilization() {

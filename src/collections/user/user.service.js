@@ -11,8 +11,8 @@ const addUser = (User) => async ({
     firstName,
     lastName,
     phoneNumber,
-    dateOfBirth,
-    city
+    // dateOfBirth,
+    // city
 }) => {
     if (!email || !password || !firstName || !lastName || !phoneNumber || !billingID) {
         throw new Error(`USER: Missing Data. Please provide values for email=${email}, password=${password}, billingID=${billingID}, firstName=${firstName}, lastName=${lastName}, dateOfBirth=${dateOfBirth}`)
@@ -29,8 +29,8 @@ const addUser = (User) => async ({
             firstName,
             lastName,
             phoneNumber,
-            dateOfBirth,
-            city
+            // dateOfBirth,
+            // city
         }
     }
 
