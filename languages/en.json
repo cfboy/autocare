@@ -68,6 +68,7 @@
             "forgot": "Forgot Password?",
             "name": "Password",
             "new": "New Password",
+            "create": "Create Password",
             "changePassword": "Change Password",
             "passwordRequirement": "Password must contain the following:",
             "lowerCase": "lowercase letter",

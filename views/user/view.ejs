@@ -57,23 +57,38 @@
                                                 <div class="d-flex justify-content-between align-items-start">
 
                                                     <% if(isMyProfile && user.googleID) { %>
-                                                    <a href="" class="login-with-google-btn m-1 disabled-link">
+                                                    <!-- <a href="" class="login-with-google-btn m-1 disabled-link">
                                                         Signed in with Google
-                                                    </a>
+                                                    </a> -->
+                                                    <div class="google-signup">
+                                                        <a id="googlesetup" class="google-btn m-1 disabled-link"
+                                                            href="/auth/google">
+                                                            <span class="google-signup-icon"></span>
+                                                            <span class="google-signup-btn-text">Signed in with
+                                                                Google</span>
+                                                        </a>
+                                                    </div>
                                                     <% } else if(isMyProfile && !user.googleID) { %>
-                                                    <a href="/connectGoogleAccount" type="button"
-                                                        class="login-with-google-btn m-1">
-                                                        Sign in with Google
-                                                    </a>
+                                                    <div class="google-signup">
+                                                        <a id="googlesetup" class="google-btn m-1" href="/auth/google">
+                                                            <span class="google-signup-icon"></span>
+                                                            <span class="google-signup-btn-text">Sign in with
+                                                                Google</span>
+                                                        </a>
+                                                    </div>
                                                     <% } %>
 
-                                                    <a href="/changePassword/<%- customer.id%>?url=/editCustomers&userType=<%- userType%>"
+                                                    <a href="/changePassword/<%- customer.id%>?url=/editCustomers&userType=<%= userType%>&fromProfile=<%= isMyProfile%>"
                                                         type="button"
                                                         class="btn btn-primary btn-icon-text m-1 text-white">
                                                         <i class="fa-solid fa-key"></i>
+                                                        <% if(user.password) { %>
                                                         <%= lingua.user.password.changePassword%>
+                                                        <% } else { %>
+                                                            <%= lingua.user.password.create%>
+                                                        <% } %>
                                                     </a>
-                                                    <a href="/edit-user/<%- customer.id%>?url=/editCustomers&userType=<%- userType%>"
+                                                    <a href="/edit-user/<%- customer.id%>?url=/editCustomers&userType=<%= userType%>&fromProfile=<%= isMyProfile%>"
                                                         data-id="user" type="button"
                                                         class="btn btn-primary btn-icon-text m-1 text-white">
                                                         <i class="fa-solid fa-user-pen"></i>

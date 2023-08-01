@@ -10,15 +10,14 @@ const addUser = (User) => async ({
     email,
     password,
     role,
+    googleID,
     billingID,
     firstName,
     lastName,
-    phoneNumber,
-    // dateOfBirth,
-    // city
+    phoneNumber
 }) => {
-    if (!email || !password || !firstName || !lastName || !phoneNumber || !billingID) {
-        throw new Error(`USER: Missing Data. Please provide values for email=${email}, password=${password}, billingID=${billingID}, firstName=${firstName}, lastName=${lastName}, dateOfBirth=${dateOfBirth}`)
+    if (!email || !firstName || !lastName || !billingID) {
+        throw new Error(`USER: Missing Data. Please provide values for email=${email}, billingID=${billingID}, firstName=${firstName}, lastName=${lastName}`)
     }
 
     console.log(`USER: addUser(${email})`)
@@ -26,14 +25,13 @@ const addUser = (User) => async ({
     const query = {
         email: email,
         password,
+        googleID,
         billingID,
         role,
         personalInfo: {
             firstName,
             lastName,
-            phoneNumber,
-            // dateOfBirth,
-            // city
+            phoneNumber
         }
     }
 
@@ -429,6 +427,7 @@ async function googleAuth(profile) {
                     email: email,
                     password: '',
                     billingID: stripeUser.id,
+                    googleID: profile.id,
                     role: ROLES.CUSTOMER,
                     firstName: profile.name.givenName,
                     lastName: profile.name.familyName,

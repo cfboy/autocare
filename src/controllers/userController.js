@@ -271,14 +271,17 @@ exports.editUser = async (req, res) => {
     try {
         const id = req.params.id;
         const url = req.query.url ? req.query.url : '/account'
+        const fromProfile = req.query.fromProfile;
         const customer = await UserService.getUserById(id)
         const userType = req.query.userType
 
         if (customer) {
+            let urlQuery = fromProfile ? `?viewType=myProfile` : '';
+
             if (ROLES)
                 selectRoles = Object.entries(ROLES)
 
-            let composedUrl = (req.user.role == ROLES.CUSTOMER) ? `/customers/${req.user.id}` : ((url || userType) == '/users' || (url || userType) == '/customers' || url == '/account' || url == '/validateMembership') ? url : url == "/editCustomers" ? `/customers/${id}` : `${url}/${id}`
+            let composedUrl = (req.user.role == ROLES.CUSTOMER) ? `/customers/${req.user.id}${urlQuery}` : ((url || userType) == '/users' || (url || userType) == '/customers' || url == '/account' || url == '/validateMembership') ? url : url == "/editCustomers" ? `/customers/${id}` : `${url}/${id}${urlQuery}`
 
             res.status(200).render('user/edit.ejs', { user: req.user, customer, selectRoles, url: composedUrl })
         } else {
@@ -307,13 +310,15 @@ exports.changePassword = async (req, res) => {
     try {
         const id = req.params.id;
         const url = req.query.url ? req.query.url : '/account'
+        const fromProfile = req.query.fromProfile;
         const customer = await UserService.getUserById(id)
 
         if (customer) {
+            let urlQuery = fromProfile ? `?viewType=myProfile` : '';
             //  (url == '/users' || url == '/account' || url == '/validateMembership') ? url : `${url}/${id}`
-            let composedUrl = (req.user.role == ROLES.CUSTOMER) ? `/customers/${req.user.id}` : ((url || userType) == '/users' || (url || userType) == '/customers' || url == '/account' || url == '/validateMembership') ? url : url == "/editCustomers" ? `/customers/${id}` : `${url}/${id}`
+            let composedUrl = (req.user.role == ROLES.CUSTOMER) ? `/customers/${req.user.id}${urlQuery}` : ((url || userType) == '/users' || (url || userType) == '/customers' || url == '/account' || url == '/validateMembership') ? url : url == "/editCustomers" ? `/customers/${id}` : `${url}/${id}${urlQuery}`
 
-            res.status(200).render('user/changePassword.ejs', { user: req.user, customer, url: composedUrl })
+            res.status(200).render('user/changePassword.ejs', { user: req.user, customer, url: composedUrl, fromProfile })
         } else {
             console.log('User not found.')
             res.redirect(`${url}`)

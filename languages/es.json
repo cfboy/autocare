@@ -68,6 +68,7 @@
             "forgot": "¿Olvido su contraseña?",
             "name": "Contraseña",
             "new": "Nueva Contraseña",
+            "create": "Crear Contraseña",
             "changePassword": "Modificar Contraseña",
             "passwordRequirement": "Contraseña debe de contener lo siguiente:",
             "lowerCase": "letra minúscula",
