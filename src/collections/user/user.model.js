@@ -12,6 +12,7 @@ const userSchema = new Schema({
     email: String,
     password: String,
     billingID: String, //Stripe ID
+    googleID: String,
     role: { type: String, enum: Object.values(ROLES), default: ROLES.CUSTOMER },
     personalInfo: {
         firstName: String,

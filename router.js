@@ -60,6 +60,10 @@ router.get('/login', checkNotAuthenticated, (req, res) => {
 
 router.post('/login', checkNotAuthenticated, authController.login)
 
+router.get('/auth/google', authController.googleLogin);
+router.get('/auth/google/callback', authController.googleCallBack);
+router.get('/connectGoogleAccount', authController.connectGoogleAccount);
+
 router.get('/create-account', checkNotAuthenticated, authController.createAccount)
 
 router.post('/register', checkNotAuthenticated, authController.register)

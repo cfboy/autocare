@@ -204,7 +204,8 @@ exports.viewUser = async (req, res) => {
         let { message, alertType } = req.session,
             findByBillingID = req?.query?.billingID ? true : false,
             cars,
-            userType = req?.query?.userType
+            userType = req?.query?.userType,
+            viewProfile = req?.query?.viewType === 'myProfile'
 
         if (message) {
             req.session.message = ''
@@ -220,16 +221,16 @@ exports.viewUser = async (req, res) => {
 
         if (customer) {
             isMyProfile = (req.user.id === customer.id)
-            if (customer.billingID) {
+            if (customer.billingID && !viewProfile) {
                 customer = await SubscriptionService.setStripeInfoToUser(customer)
+
+                cars = await CarService.getAllCarsByUser(customer)
+
+                for (car of cars) {
+                    car.subscription = await SubscriptionService.getLastSubscriptionByCar(car)
+                }
+
             }
-
-            cars = await CarService.getAllCarsByUser(customer)
-
-            for (car of cars) {
-                car.subscription = await SubscriptionService.getLastSubscriptionByCar(car)
-            }
-
             res.status(200).render('user/view.ejs', {
                 user: req.user,
                 isMyProfile,

@@ -11,6 +11,7 @@ const sendEmail = require("../utils/email/sendEmail");
 
 require("../config/passport");
 require("../config/local");
+require("../config/google");
 
 /**
  * Authenticate the user. Store the user object on req.user.
@@ -23,6 +24,25 @@ exports.login =
         failureFlash: true
     })
 
+exports.googleLogin =
+    passport.authenticate('google', {
+        scope: ['email', 'profile']
+    })
+
+exports.googleCallBack =
+    passport.authenticate('google', {
+        successRedirect: '/account',
+        failureRedirect: '/login',
+        failureFlash: true
+    })
+
+
+exports.connectGoogleAccount = async (req, res) => {
+    req.logout(function (err) {
+        if (err) { return next(err); }
+        res.redirect('/auth/google');
+    });
+}
 /**
  * This function render the create account form.
  * @param {*} req 

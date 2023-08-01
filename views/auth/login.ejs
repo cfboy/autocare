@@ -68,23 +68,27 @@
                                         class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn w-100"
                                         type="submit"><%= lingua.login%></button>
                                 </div>
-
-                                <div class="mt-3">
-                                    <a href="/create-account"
-                                        class="btn btn-block btn-secondary btn-lg font-weight-medium auth-form-btn w-100 tex-white">
-                                        <%= lingua.create %></a>
-                                </div>
                                 <div class="my-2 d-flex justify-content-between align-items-center">
                                     <a href="/resetPasswordRequest"
                                         class="auth-link text-black"><%= lingua.user.password.forgot%></a>
+                                    <a href="/create-account"
+                                        class="auth-link text-black"><%= lingua.createAccount %></a>
                                 </div>
 
-                                <!-- <div class="text-center mt-4 fw-light">
-                                    <%# lingua.dontHaveAccount %>
-                                    <a href="/create-account" class="text-primary">
-                                        <%# lingua.create %>
-                                    </a>
-                                </div> -->
+                                <div class="mt-4 text-center">
+                                    <div class="signin-other-title">
+                                        <div class="login-or">
+                                            <span>or</span>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <a href="/auth/google" type="button" class="login-with-google-btn w-100">
+                                            Sign in with Google
+                                        </a>
+                                    </div>
+
+                                </div>
                             </form>
                             <br>
                             <div class="dropdown">

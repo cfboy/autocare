@@ -1,3 +1,6 @@
+const Stripe = require("../../connect/stripe");
+const { ROLES } = require('./user.model')
+
 /**
  * This function add new user to DB.
  * @param {*} User 
@@ -58,7 +61,7 @@ const updateUser = (User) => async (id, updates) => {
     console.log(`updateUser() ID: ${id}`)
     // findByIdAndUpdate returns the user
     // updateOne is more quickly but not return the user.
-    return await User.findByIdAndUpdate({ _id: id }, updates, function (err, doc) {
+    return await User.findByIdAndUpdate({ _id: id }, updates, { new: true }, function (err, doc) {
         if (err) {
             console.error(err.message)
         } else {
@@ -169,9 +172,6 @@ const getUserById = (User) => (id) => {
         if (err) {
             console.error(err)
         }
-        // else {
-        //     console.debug("USER-SERVICE: Found user: ", docs.email);
-        // }
     }).populate('locations')
 }
 
@@ -291,7 +291,7 @@ const changeNotificationState = (User) => async (userID, notificationID, value) 
             if (err) {
                 console.error(err)
                 console.error(err.message)
-            } 
+            }
             // else {
             //     console.debug("Notification Changed.");
             // }
@@ -323,7 +323,7 @@ const readAllNotifications = (User) => async (userID) => {
             if (err) {
                 console.error(err)
                 console.error(err.message)
-            } 
+            }
             // else {
             //     console.debug("Notification Changed.");
             // }
@@ -397,6 +397,55 @@ const emptyCart = (User) => async (id) => {
         })
 }
 
+const getUserByGoogleId = (User) => async (googleID) => {
+    try {
+        return await User.findOne({ googleID }).populate('locations');
+    } catch (error) {
+        console.error('Error fetching user:', error);
+        throw error;
+    }
+}
+
+async function googleAuth(profile) {
+    try {
+        let user = await this.getUserByGoogleId(profile.id);
+        if (user) {
+            return user;
+        } else {
+            user = await this.getUserByEmail(profile.email)
+            if (user) {
+                user = await this.updateUser(user.id, { googleID: profile.id })
+                return user;
+
+            } else {
+                let email = profile.emails[0].value;
+                let stripeUser = await Stripe.getCustomerByEmail(email)
+                if (!stripeUser) {
+                    stripeUser = await Stripe.addNewCustomer(email, profile.name.givenName,
+                        profile.name.familyName,
+                        '', '')
+                }
+                let user = await this.addUser({
+                    email: email,
+                    password: '',
+                    billingID: stripeUser.id,
+                    role: ROLES.CUSTOMER,
+                    firstName: profile.name.givenName,
+                    lastName: profile.name.familyName,
+                    phoneNumber: ''
+                })
+
+                //   TODO: Send email
+                return user;
+            }
+        }
+    } catch (error) {
+        console.error('Error fetching user:', error);
+        throw error;
+
+    }
+}
+
 module.exports = (User) => {
     return {
         addUser: addUser(User),
@@ -419,6 +468,8 @@ module.exports = (User) => {
         readAllNotifications: readAllNotifications(User),
         addItemToCart: addItemToCart(User),
         removeItemFromCart: removeItemFromCart(User),
-        emptyCart: emptyCart(User)
+        emptyCart: emptyCart(User),
+        googleAuth,
+        getUserByGoogleId: getUserByGoogleId(User)
     }
 }
