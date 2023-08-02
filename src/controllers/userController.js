@@ -513,3 +513,30 @@ exports.removeFromCart = async (req, res) => {
 
     res.send(returnValues)
 }
+
+exports.validateEmail = async (req, res) => {
+    try {
+        const lingua = req.res.lingua.content
+
+        let { email } = req.body,
+            user = await UserService.getUserByEmail(email),
+            invalidEmail = false,
+            invalidMsj = '';
+
+        if (user) {
+            invalidEmail = true
+            invalidMsj = lingua.existEmail
+        }
+
+        res.send({ invalidEmail: invalidEmail, invalidMsj: invalidMsj })
+
+    } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
+        console.error(`ERROR: userController -> Tyring to validate email. ${error.message}`)
+        res.render('Error validating email.')
+    }
+
+}

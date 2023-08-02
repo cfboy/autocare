@@ -16,6 +16,7 @@
     "validLink": "Enlace es Valido",
     "invalidLink": "Enlace es Invalido",
     "existEmail": "Ese correo electrónico ya existe en nuestra sistema, favor iniciar sesión con sus credenciales.",
+    "validEmail" : "Email Válido",
     "members": "Miembros",
     "add": "Añadir",
     "car": {
@@ -43,7 +44,8 @@
         "validCar": "Número de Tablilla Valido",
         "membershipToAddCar": "Membresía a la que va añadir el vehículo",
         "alreadyAddedToCart": "Este vehículo ya fué añadido a la lista.",
-        "selectOrCreate": "Seleccione o cree un nuevo vehículo"
+        "selectOrCreate": "Seleccione o cree un nuevo vehículo",
+        "select": "Seleccione un vehículo"
     },
     "user": {
         "name": "Usuario",

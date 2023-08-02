@@ -125,6 +125,7 @@ router.post('/validateMembership', checkAuthenticated, authValidateMembership, s
 router.post('/carcheck', subscriptionsController.carCheck)
 router.post('/readingData', subscriptionsController.readingData)
 router.get('/create-subscriptions', checkAuthenticated, subscriptionsController.createSubscriptions)
+router.get('/subscribe', subscriptionsController.subscribe)
 router.get('/handleInvalidSubscriptions', checkAuthenticated, subscriptionsController.handleInvalidSubscriptions)
 router.post('/confirmValidCars', checkAuthenticated, subscriptionsController.confirmValidCars)
 router.post('/syncSubscription', checkAuthenticated, subscriptionsController.syncSubscription)
@@ -138,6 +139,7 @@ router.get('/delete-car/:id', checkAuthenticated, authDeleteCar, carsController.
 
 // router.post('/clearQueue', checkAuthenticated, subscriptionsController.clearQueue)
 router.post('/validatePlate', checkAuthenticated, carsController.validatePlate)
+router.post('/validateEmail', userController.validateEmail)
 router.post('/removeFromCart', checkAuthenticated, userController.removeFromCart)
 
 //------ Services Routes ------

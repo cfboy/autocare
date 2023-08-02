@@ -16,6 +16,7 @@
     "validLink": "Valid Link",
     "invalidLink": "Invalid Link",
     "existEmail": "That email already exists in our system, please login.",
+    "validEmail" : "Valid Email",
     "members": "Members",
     "add": "Add",
     "car": {
@@ -43,7 +44,8 @@
         "validCar": "Valid Car License Plate",
         "membershipToAddCar": "Membership to add a Car",
         "alreadyAddedToCart": "This car is already added to the cart.",
-        "selectOrCreate": "Select or create a new car"
+        "selectOrCreate": "Select or create a new car",
+        "select": "Select a car"
     },
     "user": {
         "name": "User",
