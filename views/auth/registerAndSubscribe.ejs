@@ -38,19 +38,20 @@
             <div class="content-wrapper d-flex align-items-center auth px-0">
                 <div class="row w-100 mx-0">
                     <div class="col-lg-8 mx-auto">
-                        <div class="auth-form-light text-left py-5 px-4 px-sm-5">
-                            <% if(user) { %>
+                        <% if(user) { %>
 
-                            <a class="btn btn-outline-primary btn-icon-text float-end" id="close-registration"
-                                href="/account">
-                                <%= lingua.home%> <i class="fa-solid fa-home m-1 mb-0 mt-0"></i>
-                            </a>
-                            <% } else { %>
-                            <a class="btn btn-outline-primary btn-icon-text float-end" id="close-registration"
-                                href="/ogin">
-                                <%= lingua.login%> <i class="fa-solid fa-arrow-right-to-bracket m-1 mb-0 mt-0"></i>
-                            </a>
-                            <% } %>
+                        <a class="btn btn-outline-primary btn-icon-text float-end" id="close-registration"
+                            href="/account">
+                            <%= lingua.home%> <i class="fa-solid fa-home m-1 mb-0 mt-0"></i>
+                        </a>
+                        <% } else { %>
+                        <a class="btn btn-outline-primary btn-icon-text float-end" id="close-registration"
+                            href="/login">
+                            <%= lingua.login%> <i class="fa-solid fa-arrow-right-to-bracket m-1 mb-0 mt-0"></i>
+                        </a>
+                        <% } %>
+                        <div class="auth-form-light text-left py-5 px-4 px-sm-5">
+
 
                             <div class="brand-logo text-center">
                                 <img src="/images/charlieBoy/CB-5.jpg" alt="logo" style="width: 25% !important;">
@@ -59,95 +60,130 @@
                             <h4>
                                 <%= lingua.membership.createSusbscriptions%>
                             </h4>
-                            <!-- <h6 class="fw-light">Sign in to continue.</h6> -->
-                            <form id="form-register" class="pt-3" action="/register" method="post"
-                                onsubmit="disableSubmitBtn()">
-                                <div class="row">
+                            <!-- <a href="#addsubscription" data-bs-toggle="collapse" href="#tables"
+                                aria-expanded="false">Add</a> -->
 
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-12 col-md-12 col-lg-12 mb-3">
-                                        <div class="card">
-                                            <div class="card-body">
-                                                <div class="card-title">
-                                                    <%= lingua.membership.createSubscriptions%>
-                                                </div>
-                                                <form id="form-subscriptions" class="pt-3" method="post">
-                                                    <div class="row">
-                                                        <h5><i class="fa-solid fa-1 list-number"></i>
-                                                            <%= lingua.user.email%>
-                                                        </h5>
-                                                        <hr>
-                                                        <div class="col-lg-12">
-                                                            <input id="userID" name="userID" value="<%= user?.id%>"
-                                                                hidden />
-                                                            <div class="form-group">
-                                                                <label class="required"
-                                                                    for="email"><%= lingua.user.email%></label>
-                                                                <input type="email" id="email" name="email"
-                                                                    onfocusout="validateEmail()"
-                                                                    class="form-control form-control-lg"
-                                                                    placeholder="example@gmail.com" required />
-
-                                                                <div id="emailValidationResult"></div>
-
-                                                            </div>
-                                                        </div>
-
-
-                                                        <h5><i class="fa-solid fa-2 list-number"></i>
-                                                            <%= lingua.car.select%>
-                                                        </h5>
-                                                        <hr>
-
-                                                        <%- include('../cars/formFields.ejs', {allMakes, car: null, userCars : []}); %>
-
-                                                        <h5><i class="fa-solid fa-3 list-number"></i>
-                                                            <%= lingua.membership.selectMembership%>
-                                                        </h5>
-                                                        <hr>
-                                                        <div class="col-lg-12">
-                                                            <div class="form-group">
-                                                                <label for="product"
-                                                                    class="required"><%= lingua.membership.name%></label>
-
-                                                                <select id="product" name="product" required autofocus
-                                                                    class="form-control mb-3 form-control-lg js-example-basic-single w-100">
-                                                                    <option value=""><%= lingua.selectOne%></option>
-                                                                    <% for(const price of prices) { %>
-                                                                    <option value="<%= price.id%>"
-                                                                        name="<%= price.product.name%>"
-                                                                        price="<%= price.unit_amount%>">
-                                                                        (<%= price.unit_amount%>)
-                                                                        <%= price.product.name%>
-                                                                    </option>
-                                                                    <% } %>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="col-6 mt-4" id="formValidationResult"></div>
-
-                                                        <div class="col-6 mt-3">
-                                                            <button id="addSub" type="submit"
-                                                                class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn float-end">
-                                                                <%= lingua.car.add%></button>
-                                                        </div>
-                                                    </div>
-                                                </form>
+                            <div class="row">
+                                <div class="col-sm-12 col-md-12 col-lg-12 mb-3">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="card-title">
+                                                <%= lingua.membership.createSubscriptions%>
                                             </div>
+                                            <form id="form-subscriptions" class="pt-3" method="post">
+                                                <div class="row">
+                                                    <h5><i class="fa-solid fa-1 list-number"></i>
+                                                        <%= lingua.user.email%>
+                                                    </h5>
+                                                    <hr>
+                                                    <div class="col-lg-12">
+                                                        <% if(!user) { %>
+                                                        <div class="form-group">
+                                                            <label class="required"
+                                                                for="email"><%= lingua.user.email%></label>
+                                                            <input type="email" id="email" name="email"
+                                                                onfocusout="validateEmail()"
+                                                                class="form-control form-control-lg"
+                                                                placeholder="example@gmail.com" required />
+
+                                                            <div id="emailValidationResult"></div>
+
+                                                        </div>
+                                                        <% } else { %>
+                                                        <input id="userID" name="userID" value="<%= user?.id%>"
+                                                            hidden />
+                                                        <p class="alert alert-success"><%= user.email %></p>
+                                                        <% } %>
+                                                    </div>
+
+
+                                                    <h5><i class="fa-solid fa-2 list-number"></i>
+                                                        <%= lingua.car.select%>
+                                                    </h5>
+                                                    <hr>
+
+                                                    <%- include('../cars/formFields.ejs', {allMakes, car: null, userCars : []}); %>
+
+                                                    <h5><i class="fa-solid fa-3 list-number"></i>
+                                                        <%= lingua.membership.selectMembership%>
+                                                    </h5>
+                                                    <hr>
+                                                    <div class="col-lg-12">
+                                                        <div class="form-group">
+                                                            <label for="product"
+                                                                class="required"><%= lingua.membership.name%></label>
+
+                                                            <select id="product" name="product" required autofocus
+                                                                class="form-control mb-3 form-control-lg js-example-basic-single w-100">
+                                                                <option value=""><%= lingua.selectOne%></option>
+                                                                <% for(const price of prices) { %>
+                                                                <option value="<%= price.id%>"
+                                                                    name="<%= price.product.name%>"
+                                                                    price="<%= price.unit_amount%>">
+                                                                    (<%= price.unit_amount%>)
+                                                                    <%= price.product.name%>
+                                                                </option>
+                                                                <% } %>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-6 mt-4" id="formValidationResult"></div>
+
+                                                    <div class="col-6 mt-3">
+                                                        <button id="addSub" type="submit"
+                                                            class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn float-end">
+                                                            <%= lingua.car.add%></button>
+                                                    </div>
+                                                </div>
+                                            </form>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="mt-3">
-                                        <button id="submit-btn"
-                                            class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn float-end"
-                                            type="submit"><%= lingua.membership.createSubscriptions%></button>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12 col-md-12 col-lg-12 mb-3">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h4 class="card-title"> <%= lingua.myCart%></h4>
+                                            <div class="table-responsive-sm">
+                                                <table id="cart-table" class="table table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th><%= lingua.car.name%></th>
+                                                            <th><%= lingua.car.product%></th>
+                                                            <th><%= lingua.membership.price%></th>
+                                                            <th><%= lingua.action%></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="tbody"></tbody>
+                                                    <tfoot>
+                                                        <tr>
+                                                            <th></th>
+                                                            <th style="text-align:right">
+                                                                <%= lingua.membership.subTotal%>:</th>
+                                                            <th></th>
+                                                            <th></th>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
+                                            <div class="m-3">
+                                                <input id="subscription-list" type="text" hidden value="">
+                                                <button id="checkout-btn" hidden value="<%- user?.billingID%>"
+                                                    email="<%- user?.email%>"
+                                                    class="btn btn-block btn-checkout btn-lg font-weight-medium auth-form-btn float-end"
+                                                    type="submit">
+                                                    <%= lingua.membership.proceedToCheckout%>
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
+
                                 </div>
-                            </form>
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -177,6 +213,9 @@
     <script src="../../js/select2.js"></script>
     <script src="../js/helper-functions.js"></script>
 
+    <%- include('../partials/dataTable.ejs', {tableID : '#cart-table', ordering: false, searching: false , info: false, paging: false, footerCheckout: true}); %>
+    <%# include('../partials/alerts.ejs', {message, alertType}); %>
+    <%- include('../partials/subscriptions/checkoutScript.ejs'); %>
     <!-- End custom js for this page-->
     <script>
 
@@ -207,20 +246,197 @@
                         email.setCustomValidity(result.invalidMsj);
                         email.reportValidity();
                         // let reportMessage = `<p class="error">` + result.invalidMsj + `</p>`;
-                        let reportMessage = `<p class="alert alert-fill-danger d-inline-flex mt-2 p-1 success">${result.invalidMsj}</p>`;
+                        let reportMessage = `<p class="alert alert-fill-danger mt-2 p-1"><i class="fa-circle-exclamation fa-solid"></i>${result.invalidMsj}</p>`;
 
                         showResult('#emailValidationResult', reportMessage);
 
                     } else {
                         showResult('#emailValidationResult',
-                            `<p class="alert alert-fill-success d-inline-flex mt-2 p-1 success"><%= lingua.validEmail%></p>`);
+                            `<p class="alert alert-fill-success mt-2 p-1 success"><i class="fa-check-circle fa-solid"></i><%= lingua.validEmail%></p>`);
                     }
+                }).fail(function (error) {
+                    console.log(error);
+                    showResult('#emailValidationResult',
+                        `<p class="alert alert-fill-danger mt-2 p-1"><i class="fa-circle-exclamation fa-solid"></i>Error on email validation.</p>`);
                 });
             } else {
                 email.reportValidity();
                 showResult('#emailValidationResult',
-                    `<p class="alert alert-fill-danger d-inline-flex mt-2 p-1 success">Invalid Email</p>`);
+                    `<p class="alert alert-fill-danger mt-2 p-1"><i class="fa-circle-exclamation fa-solid"></i>Invalid Email</p>`);
             }
+
+            setTimeout(function () {
+
+                showResult('#emailValidationResult', "")
+            }, 2500);
+        }
+
+
+        var rowIdx = 0; //This field is used to filter the list when remove any from de list.
+        let subscriptionList = [];
+        var form = $("#form-subscriptions");
+        var checkoutBtn = $('#checkout-btn'); //This btn is hidden for default
+        var userExist = <%= user ? true : false %>;
+
+        $(document).ready(function () {
+            var cartString = '<%- JSON.stringify(cart) %>';
+            var cart = JSON.parse(getCookie('cart'));
+            if (cartString) {
+                cart = JSON.parse(cartString);
+                if (cart?.items?.length > 0) {
+                    for (item of cart.items) {
+                        rowIdx++;
+                        addDataToTable(item)
+                    }
+                }
+            } else if (cart) {
+                console.log(cart);
+                if (cart?.length > 0) {
+                    for (item of cart) {
+                        rowIdx++;
+                        addDataToTable(item)
+                    }
+                }
+            }
+
+        });
+
+        // Add subscription
+        $('#addSub').on('click', function (event) {
+            $(this).prop('disabled', true);
+            // Clean plate input validator.
+            document.getElementById("carPlate").setCustomValidity("");
+            showResult('#plateValidationResult', ``);
+            showResult('#formValidationResult', ``);
+
+            // Validate form before submit.
+            event.preventDefault();
+            event.stopPropagation();
+            form[0].reportValidity();
+            if (form[0].checkValidity()) {
+                // Get all values
+                var brand = $("#brand").val(),
+                    model = $("#carModel").val(),
+                    plate = $("#carPlate").val().toUpperCase(),
+                    priceID = $("#product").val(),
+                    product = $("#product").find('option:selected').attr("name"),
+                    price = $("#product").find('option:selected').attr("price"),
+                    // Prepare newItem Obj.
+                    newItem = {
+                        id: ++rowIdx,
+                        brand: brand, model: model, plate: plate,
+                        product: product, price: price, priceID: priceID
+                    };
+
+                if (newItem.brand == '' || newItem.model == '' || newItem.plate == '') {
+                    let showMessage = `<p class="error">Missing values</p>`
+                    showResult('#formValidationResult', showMessage);
+
+                } else {
+                    $.ajax({
+                        url: "/validatePlate",
+                        type: "POST",
+                        contentType: "application/json",
+                        data: JSON.stringify({
+                            plateNumber: plate,
+                            newItem: newItem,
+                            subscriptionList: subscriptionList ? subscriptionList : [],
+                            addToCart: true
+                        }),
+                    }).done(function (result) {
+                        if (result.existingCar) {
+                            document.getElementById("carPlate").setCustomValidity(result.invalidMsj);
+                            document.getElementById("carPlate").reportValidity();
+                            let reportMessage = `<p class="error">` + result.invalidMsj + `</p>`
+                            showResult('#plateValidationResult', reportMessage);
+
+                        } else {
+                            // console.log("newItem: " + result.item);
+                            showResult('#plateValidationResult',
+                                `<p class="success"><%= lingua.car.validCar%></p>`);
+
+                            addDataToTable(result.item);
+
+                            // Clear all elements on form for next submit.
+                            clearForm(form);
+                            showResult('#plateValidationResult', ``);
+                        }
+
+                        $('#addSub').prop('disabled', false);
+
+                    }).fail(function (err) {
+                        console.log(err);
+                    })
+                }
+            } else
+                $('#addSub').prop('disabled', false);
+
+
+        });
+        // Remove subscription
+        $('#cart-table tbody').on('click', '.remove', function () {
+            var t = $('#cart-table').DataTable();
+            var id = $(this).attr('value');
+            let itemToRemove = subscriptionList.find(item => item._id == id);
+
+            // Remove from the table.
+            t.row($(this).parents('tr')).remove().draw();
+            // Decrease the row index.
+            rowIdx--;
+
+            $.ajax({
+                url: "/removeFromCart",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    item: itemToRemove
+                }),
+            }).done(function (result) {
+
+                if (result.itemRemoved) {
+                    // Remove the deleted item from de subscriptionList.
+                    subscriptionList = result.subscriptionList;
+
+                    $('#subscription-list').val(JSON.stringify(subscriptionList));
+
+                    // If the susbcription list is empty, then hide ckeckout btn.
+                    if (subscriptionList.length < 1)
+                        checkoutBtn.attr("hidden", true);
+                } else {
+                    console.log('not removed')
+                }
+
+            }).fail(function (err) {
+                console.log(err);
+            })
+        });
+
+        function addDataToTable(newItem) {
+            // Initialize DataTable
+            var t = $('#cart-table').DataTable();
+            // Add row to table.
+            // Set the rowIdx to btn id to get the id of deleted element.
+            t.row.add([
+                `<p> Brand: ${newItem.brand} </p> <br> 
+                            <p> Model: ${newItem.model} </p> <br>
+                            <p> License Plate: ${newItem.plate} </p>`,
+                newItem.product,
+                newItem.price,
+                `<td class="text-center">
+                                <button  id="${rowIdx}" value="${newItem._id}" class="btn btn-icon btn-icon-no-border no-margin remove">
+                                    <i class="fas fa-trash-alt icon-sm text-danger"></i>
+                                </button>
+                            </td>`
+            ]).draw(false);
+            // Add newItem to subscriptionList
+            subscriptionList.push(newItem);
+            // Stringify the value to store on input element for checkout.
+            var stringSubscriptionList = JSON.stringify(subscriptionList)
+            $('#subscription-list').val(stringSubscriptionList);
+            console.log("List: " + stringSubscriptionList);
+            // If the susbcription has at least one item, then show ckeckout btn.
+            if (subscriptionList.length > 0)
+                checkoutBtn.removeAttr('hidden');
         }
     </script>
 </body>

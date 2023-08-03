@@ -138,7 +138,7 @@ router.post('/edit-car', checkAuthenticated, authEditCar, carsController.update)
 router.get('/delete-car/:id', checkAuthenticated, authDeleteCar, carsController.delete)
 
 // router.post('/clearQueue', checkAuthenticated, subscriptionsController.clearQueue)
-router.post('/validatePlate', checkAuthenticated, carsController.validatePlate)
+router.post('/validatePlate', carsController.validatePlate)
 router.post('/validateEmail', userController.validateEmail)
 router.post('/removeFromCart', checkAuthenticated, userController.removeFromCart)
 

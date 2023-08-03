@@ -528,7 +528,7 @@ exports.validateEmail = async (req, res) => {
             invalidMsj = lingua.existEmail
         }
 
-        res.send({ invalidEmail: invalidEmail, invalidMsj: invalidMsj })
+        res.status(200).send({ invalidEmail: invalidEmail, invalidMsj: invalidMsj })
 
     } catch (error) {
         req.bugsnag.notify(new Error(error),
@@ -536,7 +536,7 @@ exports.validateEmail = async (req, res) => {
                 event.setUser(req.user.email)
             })
         console.error(`ERROR: userController -> Tyring to validate email. ${error.message}`)
-        res.render('Error validating email.')
+        res.status(500).send('Error validating email.')
     }
 
 }

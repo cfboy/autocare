@@ -11733,7 +11733,7 @@ progress {
 .typeahead[readonly],
 .tt-query[readonly],
 .tt-hint[readonly] {
-    background-color: #e9ecef;
+    background-color: #e9ecef !important;
     opacity: 1;
 }
 

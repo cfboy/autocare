@@ -394,10 +394,21 @@ exports.validatePlate = async (req, res) => {
             invalidMsj = lingua.car.alreadyAddedToCart
 
         } else if (addToCart) {
-            [customer, item] = await UserService.addItemToCart(req.user.id, newItem)
+            if (req.user) {
+                [customer, item] = await UserService.addItemToCart(req.user.id, newItem)
 
-            if (customer && item)
-                console.debug('Item Added successfully')
+                if (customer && item)
+                    console.debug('Item Added successfully')
+
+            } else {
+
+                let cookieCart = req.cookies.cart ? req.cookies.cart : res.cookie('cart', JSON.stringify([]));
+                cookieCart = JSON.parse(cookieCart);
+                cookieCart.push(newItem)
+                res.cookie('cart', JSON.stringify(cookieCart));
+                item = newItem;
+            }
+
         }
 
         res.send({ existingCar: invalidCar, invalidMsj: invalidMsj, item })

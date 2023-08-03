@@ -83,12 +83,13 @@ exports.createSubscriptions = async (req, res) => {
  */
 exports.subscribe = async (req, res) => {
     try {
-        let user = req.user
+        let user = req.user,
+            cart = user?.cart;
         let { allMakes, allModels } = await CarService.getAllMakes()
 
         const prices = await Stripe.getAllPrices()
 
-        res.render('auth/registerAndSubscribe.ejs', { user, allMakes, allModels, prices })
+        res.render('auth/registerAndSubscribe.ejs', { user, cart, allMakes, allModels, prices })
 
     }
     catch (error) {
