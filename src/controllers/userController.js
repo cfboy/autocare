@@ -501,15 +501,35 @@ exports.changeNotificationState = async (req, res) => {
 }
 
 exports.removeFromCart = async (req, res) => {
-
-    let itemToRemove = req.body.item
+    // NOTE: in the cart the items have the propperty id, in the DB is _id
+    let itemToRemove = req.body.item,
+        subscriptionList = req.body.subscriptionList
     let returnValues
+    let user = req.user;
+    if (user) {
+        if (itemToRemove.addType == 'cookie') {
+            let cookieCart = req.cookies.cart;
+            cookieCart = JSON.parse(cookieCart);
+            cookieCart = cookieCart.filter(item => item.id !== itemToRemove.id);
+            res.cookie('cart', JSON.stringify(cookieCart));
+            cookieCart = cookieCart.filter(item => item.id !== itemToRemove.id);
+        }
 
-    let user = await UserService.removeItemFromCart(req.user.id, itemToRemove)
-    if (user)
-        returnValues = { itemRemoved: true, subscriptionList: user.cart?.items }
-    else
-        returnValues = { itemRemoved: false, subscriptionList: [] }
+        //Anyways try to remove from the DB if the user is logged in.
+        let result = await UserService.removeItemFromCart(req.user.id, itemToRemove)
+        if (result) {
+            subscriptionList = subscriptionList.filter(item => item._id !== itemToRemove._id)
+            returnValues = { itemRemoved: true, subscriptionList: subscriptionList }
+        } else
+            returnValues = { itemRemoved: false, subscriptionList: subscriptionList }
+
+    } else {
+        let cookieCart = req.cookies.cart;
+        cookieCart = JSON.parse(cookieCart);
+        cookieCart = cookieCart.filter(item => item.id !== itemToRemove.id);
+        res.cookie('cart', JSON.stringify(cookieCart));
+        returnValues = { itemRemoved: true, subscriptionList: cookieCart }
+    }
 
     res.send(returnValues)
 }

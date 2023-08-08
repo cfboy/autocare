@@ -427,14 +427,21 @@ async function getCustomerSubscriptions(customerID) {
  * @returns subscriptions list
  */
 async function getSubscriptionById(id) {
-    const subscription = await Stripe.subscriptions.retrieve(id,
-        {
-            expand: ['items.data.price.product']
-        })
+    try {
+        const subscription = await Stripe.subscriptions.retrieve(id,
+            {
+                expand: ['items.data.price.product']
+            })
 
-    // console.debug("Subscription: " + subscription.id)
+        // console.debug("Subscription: " + subscription.id)
 
-    return subscription
+        return subscription
+    }
+    catch (error) {
+        console.error(`ERROR-STRIPE: getSubscriptionById(). ${error.message}`);
+
+        return null
+    }
 }
 
 /**

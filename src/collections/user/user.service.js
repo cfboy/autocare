@@ -354,7 +354,7 @@ const addItemToCart = (User) => async (id, item) => {
 
     let itemToRtrn = customer?.cart.items.find(obj => obj.plate == item.plate)
 
-    return [customer, itemToRtrn]
+    return {customer, itemToRtrn}
 }
 
 /**
@@ -366,7 +366,7 @@ const removeItemFromCart = (User) => async (id, item) => {
     console.log(`removeItemFromCart() ID: ${id}`)
 
     return await User.findByIdAndUpdate({ _id: id },
-        { $pull: { 'cart.items': item } },
+        { $pull: { 'cart.items': { 'id': item.id } } },
         { new: true }, function (err, doc) {
             if (err) {
                 console.error(err.message)

@@ -382,7 +382,8 @@ exports.validatePlate = async (req, res) => {
             invalidCar = false,
             invalidMsj = ''
         canUseThisCar = car ? await CarService.canUseThisCarForNewSubs(car) : false
-        let customer, item = null
+        let customer, item = null,
+            addType
 
         // if the canUseThisCar is true, it means that this car is an existing and valid car to assign to a new membership.
         if ((car && !canUseThisCar)) {
@@ -395,13 +396,16 @@ exports.validatePlate = async (req, res) => {
 
         } else if (addToCart) {
             if (req.user) {
-                [customer, item] = await UserService.addItemToCart(req.user.id, newItem)
-
-                if (customer && item)
+                addType = 'db'
+                // If the user is logged create a cart in the DB.
+                let result = await UserService.addItemToCart(req.user.id, newItem)
+                item = result.itemToRtrn
+                if (result.customer && item)
                     console.debug('Item Added successfully')
 
             } else {
-
+                addType = 'cookie'
+                // If the user is not logged in create a cart in the cookies.
                 let cookieCart = req.cookies.cart ? req.cookies.cart : res.cookie('cart', JSON.stringify([]));
                 cookieCart = JSON.parse(cookieCart);
                 cookieCart.push(newItem)
@@ -411,12 +415,12 @@ exports.validatePlate = async (req, res) => {
 
         }
 
-        res.send({ existingCar: invalidCar, invalidMsj: invalidMsj, item })
+        res.send({ existingCar: invalidCar, invalidMsj: invalidMsj, item, addType })
 
     } catch (error) {
         req.bugsnag.notify(new Error(error),
             function (event) {
-                event.setUser(req.user.email)
+                event.setUser(req?.user?.email)
             })
         console.error(`ERROR: carController -> Tyring to validate car plate. ${error.message}`)
         res.render('Error validating car plate.')
