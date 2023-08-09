@@ -16,7 +16,7 @@
     "validLink": "Enlace es Valido",
     "invalidLink": "Enlace es Invalido",
     "existEmail": "Ese correo electrónico ya existe en nuestra sistema, favor iniciar sesión con sus credenciales.",
-    "validEmail" : "Email Válido",
+    "validEmail": "Email Válido",
     "members": "Miembros",
     "add": "Añadir",
     "car": {
@@ -107,7 +107,8 @@
         "price": "Precio",
         "subTotal": "Sub Total",
         "proceedToCheckout": "Proceder al Pago",
-        "selectMembership": "Seleccione un plan"
+        "selectMembership": "Seleccione un plan",
+        "completeSubscription": "Completar subscripción"
     },
     "service": {
         "qty": "Cantidad de Servicios",
@@ -213,5 +214,4 @@
     "utilizationHistory": "Historial de Utilización",
     "loading": "Cargando",
     "agentID": "Agent ID"
-
 }

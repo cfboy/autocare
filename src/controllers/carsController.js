@@ -376,7 +376,7 @@ exports.validatePlate = async (req, res) => {
     try {
         const lingua = req.res.lingua.content
 
-        let { plateNumber, newItem, addToCart } = req.body,
+        let { plateNumber, newItem, addToCart, subscriptionEmail } = req.body,
             car = await CarService.getCarByPlate(plateNumber),
             subscriptionList = req.body.subscriptionList,
             invalidCar = false,
@@ -401,7 +401,7 @@ exports.validatePlate = async (req, res) => {
                 let result = await UserService.addItemToCart(req.user.id, newItem)
                 item = result.itemToRtrn
                 if (result.customer && item)
-                    console.debug('Item Added successfully')
+                    console.debug('Item Added successfully to ' + subscriptionEmail)
 
             } else {
                 addType = 'cookie'
@@ -410,12 +410,13 @@ exports.validatePlate = async (req, res) => {
                 cookieCart = JSON.parse(cookieCart);
                 cookieCart.push(newItem)
                 res.cookie('cart', JSON.stringify(cookieCart));
+                res.cookie('subscriptionEmail', subscriptionEmail);
                 item = newItem;
             }
 
         }
 
-        res.send({ existingCar: invalidCar, invalidMsj: invalidMsj, item, addType })
+        res.send({ existingCar: invalidCar, invalidMsj: invalidMsj, item, addType, subscriptionEmail })
 
     } catch (error) {
         req.bugsnag.notify(new Error(error),
