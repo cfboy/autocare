@@ -183,12 +183,25 @@
                                                 </div>
                                                 <div class="m-3">
                                                     <input id="subscription-list" type="text" hidden value="">
-                                                    <button id="checkout-btn" hidden value="<%- user?.billingID%>"
-                                                        email="<%- user?.email%>"
-                                                        class="btn btn-block btn-checkout btn-lg font-weight-medium auth-form-btn float-end"
-                                                        type="submit">
-                                                        <%= lingua.membership.proceedToCheckout%>
-                                                    </button>
+                                                    <div class="d-flex float-end">
+                                                        <span id="error-message"></span>
+
+                                                        <% if(user) { %>
+                                                        <button id="checkout-btn" hidden value="<%- user?.billingID%>"
+                                                            email="<%- user?.email%>"
+                                                            class="btn btn-block btn-checkout btn-lg font-weight-medium auth-form-btn float-end"
+                                                            type="submit">
+                                                            <%= lingua.membership.proceedToCheckout%>
+                                                        </button>
+                                                        <% } else { %>
+                                                        <button id="checkout-btn" hidden
+                                                            class="btn btn-block btn-checkout btn-lg font-weight-medium auth-form-btn float-end"
+                                                            type="submit">
+                                                            <%= lingua.membership.proceedToCheckout%>
+                                                        </button>
+                                                        <% } %>
+
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -247,12 +260,25 @@
                     </div>`
             );
             initializeCart(cartString);
+            manageCheckoutBtn();
             setTimeout(function () {
                 showResult(`#loading-div`, ``);
                 manageDivViews(subscriptionList);
             }, 1000);
         });
 
+        function manageCheckoutBtn() {
+            if (!userExist) {
+                var email = document.getElementById("email");
+
+                if (!email?.value) {
+                    checkoutBtn.attr("hidden", true);
+                } else {
+                    checkoutBtn.attr("hidden", false);
+                }
+            }
+
+        }
         function initializeCart(cartString) {
             // Manage DB Cart
             if (cartString) {
@@ -333,6 +359,7 @@
                             `<p class="alert alert-fill-danger mt-2 p-1"><i class="fa-circle-exclamation fa-solid"></i>Error on email validation.</p>`);
                     });
                 } else {
+                    checkoutBtn.attr("hidden", true);
                     email.reportValidity();
                     showResult('#emailValidationResult',
                         `<p class="alert alert-fill-danger mt-2 p-1"><i class="fa-circle-exclamation fa-solid"></i>Invalid Email</p>`);

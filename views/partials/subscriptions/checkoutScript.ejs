@@ -4,31 +4,96 @@
 
         const checkoutBtn = $('#checkout-btn'); //New checkout btn
         const publishableKey = `<%= pkStripe%>`;
-        const stripe = Stripe(publishableKey)
+        const stripe = Stripe(publishableKey);
+        // showing loading
+        function displayLoading() {
+            showResult('#error-message',
+                `<div class="mx-4 my-2 spinner text-center">
+                    <div class="spinner-grow spinner-grow-sm"></div>
+                </div>`);
+            // // to stop loading after some time
+            setTimeout(() => {
+                showResult('#error-message', ``);
+            }, 5000);
+        }
         // Checkout
-        checkoutBtn.click(function () {
-            const subscriptions = JSON.parse($('#subscription-list').val());
-            const billingID = $(this).attr("value");
-            const email = $(this).attr("email");
-
-            if (billingID) {
-                fetch('/checkout', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'email': email
-                    },
-                    body: JSON.stringify({
-                        subscriptions,
-                        customerID: billingID
+        if (userExist) {
+            checkoutBtn.click(function () {
+                const subscriptions = JSON.parse($('#subscription-list').val());
+                const billingID = $(this).attr("value");
+                const email = $(this).attr("email");
+                displayLoading();
+                if (billingID) {
+                    fetch('/checkout', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'email': email
+                        },
+                        body: JSON.stringify({
+                            subscriptions,
+                            customerID: billingID
+                        })
                     })
-                })
-                    .then((result) => result.json())
-                    .then(({ sessionId }) => stripe.redirectToCheckout({ sessionId }))
-                    .catch((error) => alert(error))
-            } else {
-                alert("This user don't have billing id.")
-            }
-        })
-    })
+                        .then((result) => result.json())
+                        .then(({ sessionId }) => stripe.redirectToCheckout({ sessionId }))
+                        .catch((error) => alert(error))
+                } else {
+                    alert("This user don't have billing id.")
+                }
+            })
+        } else {
+            // If the user is not logged in.
+            checkoutBtn.click(function () {
+                const subscriptions = JSON.parse($('#subscription-list').val());
+                const email = $('#email').val();
+
+                if (email) {
+                    displayLoading();
+                    // TODO: Create account, Stripe account, send email
+                    alert('Succeed');
+                    $.ajax({
+                        url: "/registerAndSubscribe",
+                        type: "POST",
+                        contentType: "application/json",
+                        data: JSON.stringify({
+                            email: email
+                        }),
+                    }).done(function (result) {
+                        if (result.accountCreated) {
+
+                            fetch('/checkout', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'email': email
+                                },
+                                body: JSON.stringify({
+                                    subscriptions,
+                                    customerID: billingID
+                                })
+                            })
+                                .then((result) => result.json())
+                                .then(({ sessionId }) => stripe.redirectToCheckout({ sessionId }))
+                                .catch((error) => alert(error))
+                        } else {
+                            // Account not created
+                            showResult('#error-message',
+                                `<p class="alert alert-fill-danger mt-2 p-1">
+                                <i class="fa-circle-exclamation fa-solid"></i>Account not created.
+                            </p>`);
+                        }
+                    }).fail(function (error) {
+                        console.log(error);
+                        showResult('#error-message',
+                            `<p class="alert alert-fill-danger mt-2 p-1"><i class="fa-circle-exclamation fa-solid"></i>Error on checkout.</p>`);
+                    });
+
+
+                } else {
+                    alert("The email is null.");
+                }
+            })
+        }
+    });
 </script>
