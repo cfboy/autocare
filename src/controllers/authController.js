@@ -1,4 +1,5 @@
 const UserService = require('../collections/user')
+const AuthService = require('../config/auth.service')
 const LocationService = require('../collections/location')
 const { ROLES } = require('../collections/user/user.model')
 const Stripe = require('../connect/stripe')
@@ -65,9 +66,7 @@ exports.register = async (req, res) => {
         const {
             firstName,
             lastName,
-            phoneNumber,
-            // dateOfBirth,
-            // city
+            phoneNumber
         } = req.body
 
         const lingua = req.res.lingua.content
@@ -100,9 +99,7 @@ exports.register = async (req, res) => {
                 role: ROLES.CUSTOMER,
                 firstName,
                 lastName,
-                phoneNumber,
-                // dateOfBirth,
-                // city
+                phoneNumber
             })
 
             if (customer) {
@@ -164,6 +161,160 @@ exports.register = async (req, res) => {
         res.redirect('/login')
     }
 }
+
+/**
+ * This function register the user in the App, then proceed to subscribe. 
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.registerAndSubscribe = async (req, res) => {
+    try {
+        const lingua = req.res.lingua.content
+
+        var { email } = req.body
+
+        if (!email) {
+            res.send({ accountCreated: false, errorMessage: "Missing Email" })
+        } else {
+            email = email?.toLowerCase()
+
+            // Validate if the email exists. 
+            let customer = await UserService.getUserByEmail(email)
+            let customerInfo = {}
+
+            if (!customer) {
+                console.debug(`Email ${email} does not exist. Making one.`)
+
+                customerInfo = await Stripe.getCustomerByEmail(email)
+                // If not exist an Stripe account with this email, then create one.
+                if (!customerInfo) {
+                    customerInfo = await Stripe.addNewCustomer(email)
+                }
+
+                // Add user to DB
+                customer = await UserService.addUser({
+                    email,
+                    billingID: customerInfo.id,
+                    role: ROLES.CUSTOMER
+                })
+
+                if (customer) {
+                    console.debug(
+                        `A new user added to DB. The ID for ${customer.email} is ${customer.id}`);
+
+                    const [requestSuccess, message] = await AuthService.generateAtivationLink(lingua, customer.email, req.bugsnag);
+
+                    if (requestSuccess) {
+                        req.flash('info', message);
+
+                    } else {
+                        req.flash('error', message);
+                    }
+                } else {
+                    req.bugsnag.notify(new Error('Account Not Created.'))
+                    res.send({ accountCreated: false, errorMessage: "Account not created." })
+                }
+            }
+            // Login the user
+            req.login(customer, function (err) {
+                if (!err) {
+                    res.send({ accountCreated: true, customer: customer })
+                }
+            })
+
+
+        }
+    } catch (error) {
+        req.bugsnag.notify(new Error(error))
+        console.error(`ERROR: authController - registerAndSubscribe(). ${error.message}`)
+        req.session.message = `Error on registration.`
+        req.session.alertType = alertTypes.ErrorAlert
+        // res.redirect('/login')
+        res.send({ accountCreated: true, errorMessage: error.message })
+    }
+}
+
+/**
+ * This function render the acctivation account form.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.activateAccountForm = async (req, res) => {
+    try {
+        let { message, alertType } = req.session
+        const lingua = req.res.lingua.content
+        let { id, token } = req.query;
+        let user = req.user;
+
+        // Clear session alerts variables.
+        if (message) {
+            req.session.message = ''
+            req.session.alertType = ''
+        }
+
+        if (user) {
+            if (user.isIncomplete()) {
+                res.render('auth/activateAccount.ejs', { message, user, alertType })
+            } else {
+                res.redirect('/account')
+
+            }
+        } else {
+            let [isValid, tokenMessage] = await Auth.validateToken(lingua, id, token, "account")
+
+
+            if (isValid) {
+                user = await UserService.getUserById(id);
+                // Login the user
+                req.login(user, function (err) {
+                    if (!err) {
+                        res.render('auth/activateAccount.ejs', { message, user, alertType, token })
+                    }
+                })
+            }
+            else {
+                req.flash('error', tokenMessage);
+                res.redirect('/login')
+            }
+        }
+
+    } catch (error) {
+        req.bugsnag.notify(new Error(error))
+        console.error(`ERROR: authController - activateAccount(). ${error.message}`)
+        req.session.message = `Error on registration.`
+        req.session.alertType = alertTypes.ErrorAlert
+        res.redirect('/login')
+    }
+}
+
+
+/**
+ * This function handle the reset password.
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
+exports.activateAccount = async (req, res, next) => {
+    const lingua = req.res.lingua.content
+
+    const [requestSuccess, message] = await Auth.activateAccount(lingua,
+        req.body.userId,
+        req.body.token,
+        req.body
+    );
+
+    if (requestSuccess) {
+        req.flash('info', message);
+        req.session.message = message
+        req.session.alertType = alertTypes.CompletedActionAlert
+    } else {
+        req.flash('error', message);
+        req.session.message = message
+        req.session.alertType = alertTypes.ErrorAlert
+    }
+
+    res.redirect('/account')
+};
 
 /**
  * This method clean the session and remove the authenticated user.

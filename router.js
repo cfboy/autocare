@@ -28,10 +28,11 @@ const { checkAuthenticated,
     authChangePassword,
     authChangePrices } = require('./src/middleware/authFunctions')
 
-const { validateSubscriptions, validateLocation, validateSelectCurrectLocation } = require('./src/middleware/validateFunctions')
+const { validateSubscriptions, validateLocation, validateSelectCurrectLocation, validateActiveAccount } = require('./src/middleware/validateFunctions')
+
 
 // Main Route
-router.get('/', checkAuthenticated, (req, res) => {
+router.get('/', checkAuthenticated, validateActiveAccount, (req, res) => {
     res.redirect('/account')
 })
 
@@ -41,7 +42,7 @@ router.get('/home', dashboardsController.home)
 
 router.get('/termsandconditions', dashboardsController.termsAndConditions)
 
-router.get('/account', checkAuthenticated, validateLocation, dashboardsController.account)
+router.get('/account', checkAuthenticated, validateActiveAccount, validateLocation, dashboardsController.account)
 
 //------ Auth Routes ------
 
@@ -67,6 +68,11 @@ router.get('/connectGoogleAccount', authController.connectGoogleAccount);
 router.get('/create-account', checkNotAuthenticated, authController.createAccount)
 
 router.post('/register', checkNotAuthenticated, authController.register)
+router.post('/registerAndSubscribe', authController.registerAndSubscribe)
+
+// Activate account
+router.get('/activateAccount', authController.activateAccountForm)
+router.post('/activateAccount', authController.activateAccount)
 
 router.get('/logout', checkAuthenticated, authController.logout)
 

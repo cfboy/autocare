@@ -1,5 +1,6 @@
 const SubscriptionService = require('../collections/subscription')
 const LocationService = require('../collections/location')
+const UserService = require('../collections/user')
 const { ROLES } = require('../collections/user/user.model')
 const alertTypes = require('../helpers/alertTypes')
 
@@ -9,7 +10,8 @@ async function validateSubscriptions(req, res, next) {
 
     if (user?.subscriptions?.length < 1 && [ROLES.CUSTOMER].includes(user.role)) {
         req.flash('warning', 'Create a membership to continue.')
-        res.redirect('/create-subscriptions')
+        // res.redirect('/create-subscriptions')
+        res.redirect('/subscribe')
     } else {
         let invalidSubs = user?.subscriptions.filter(subs => subs.items.some(item => !item.isValid))
 
@@ -94,9 +96,33 @@ async function validateSelectCurrectLocation(req, res, next) {
 }
 
 
+/**
+ * This function validate if the account of the logged user is completed (Active)
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ * @returns 
+ */
+async function validateActiveAccount(req, res, next) {
+
+    if (req.user) {
+        let user = await UserService.getUserById(req.user.id)
+
+        if (user?.isIncomplete()) {
+            req.flash('warning', 'Finish your account information to continue.')
+            res.redirect('/activateAccount')
+        } else {
+            return next()
+        }
+    } else {
+        res.redirect('/logout');
+    }
+}
+
 module.exports = {
     validateSubscriptions,
     // redirectBySubscriptionStatus,
     validateLocation,
-    validateSelectCurrectLocation
+    validateSelectCurrectLocation,
+    validateActiveAccount
 }

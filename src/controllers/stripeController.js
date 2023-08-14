@@ -453,12 +453,12 @@ exports.webhook = async (req, res) => {
  */
 exports.checkout = async (req, res) => {
     // The validation if the car is valid are handled on the client side..
-    const { subscriptions, customerID } = req.body
+    const { subscriptions, customerID, backURL } = req.body
 
     try {
         // Group by priceID
         const subscriptionsGroup = groupByKey(subscriptions, 'priceID', { omitKey: false })
-        const session = await Stripe.createCheckoutSession(customerID, subscriptions, Object.entries(subscriptionsGroup))
+        const session = await Stripe.createCheckoutSession(customerID, subscriptions, Object.entries(subscriptionsGroup), backURL)
         // res.redirect(session.url)
         if (session) {
             res.send({
@@ -491,65 +491,19 @@ exports.checkout = async (req, res) => {
 exports.completeCheckoutSuccess = async (req, res) => {
     try {
         let { session_id, subscription_id } = req.query,
-            session, subscriptionID
+            session, subscriptionID, customer
 
         if (session_id) {
             console.debug("sessionID: " + session_id)
             session = await Stripe.getSessionByID(session_id)
-            // console.log(session)
-            subscriptionID = session.subscription
-        }
-        if (!subscriptionID && subscription_id) {
-            subscriptionID = subscription_id
+            customer = await Stripe.getCustomerByID(session.customer)
         }
 
-        let subscription = await SubscriptionService.getSubscriptionById(subscriptionID)
-        let newSubscription
-
-        // This code is not nescessary.
-        if (!subscription) {
-            subscription = await Stripe.getSubscriptionById(subscriptionID)
-            let customer = await UserService.getUserByBillingID(subscription.customer)
-
-            // const cars = customer?.cart?.items ? customer.cart.items : JSON.parse(subscription.metadata.cars)
-            const cars = customer?.cart?.items
-
-            let subscriptionItems = subscription.items.data
-            let items = []
-            for (subItem of subscriptionItems) {
-                let newItem = { id: subItem.id, cars: [], data: subItem }
-                for (carObj of cars) {
-                    if (subItem.price.id === carObj.priceID) {
-                        let newCar = await CarService.getCarByPlate(carObj.plate)
-                        if (newCar) {
-                            // Add old utilization / History
-                            await UtilizationService.handleUtilization(newCar, subscription.current_period_start, subscription.current_period_end)
-                            if (newCar.cancel_date != null)
-                                await CarService.removeCarFromAllSubscriptions(newCar)
-                        }
-                        else
-                            newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate, customer.id)
-
-                        newItem.cars.push(newCar)
-                    }
-
-                }
-                items.push(newItem)
-            }
-
-
-            newSubscription = await SubscriptionService.addSubscription({ id: subscription.id, data: subscription, items: items, user: customer })
-        } else {
-            newSubscription = subscription
-        }
         // clean cart items.
         let user = await UserService.emptyCart(req.user.id)
-        // if (user.cart.items?.lenght == 0)
-        // console.debug("The Cart is empty.")
 
-        // TODO: completed message, add history
-        if (newSubscription) {
-            req.session.message = `Subcription Created to customer ${newSubscription.user.email}`
+        if (customer) {
+            req.session.message = `Subcription Created.`
             req.session.alertType = alertTypes.CompletedActionAlert
         } else {
             req.bugsnag.notify(new Error('Failed to add a Subscription.'),

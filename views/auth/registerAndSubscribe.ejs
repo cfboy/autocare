@@ -38,43 +38,39 @@
             <div class="content-wrapper d-flex align-items-center auth px-0">
                 <div class="row w-100 mx-0">
                     <div class="col-lg-8 mx-auto">
-                        <div class="auth-form-light text-left py-5 px-4 px-sm-5">
-                            <div class="row">
-                                <div>
-                                    <% if(user) { %>
-                                    <input id="userExist" name="userExist" value="true" hidden />
-                                    <a class="btn btn-outline-primary btn-icon-text float-end" id="close-registration"
-                                        href="/account">
-                                        <%= lingua.home%> <i class="fa-solid fa-home m-1 mb-0 mt-0"></i>
-                                    </a>
-                                    <% } else { %>
-                                    <input id="userExist" name="userExist" value="false" hidden />
-
-                                    <a class="btn btn-outline-primary btn-icon-text float-end" id="close-registration"
-                                        href="/login">
-                                        <%= lingua.login%> <i
-                                            class="fa-solid fa-arrow-right-to-bracket m-1 mb-0 mt-0"></i>
-                                    </a>
-                                    <% } %>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="brand-logo text-center">
-                                    <img src="/images/charlieBoy/CB-5.jpg" alt="logo" style="width: 25% !important;">
-                                </div>
-                            </div>
-                            <h4>
-                                <%= lingua.membership.createSusbscriptions%>
-                            </h4>
-                            <!-- <a href="#addsubscription" data-bs-toggle="collapse" href="#tables"
-                                aria-expanded="false">Add</a> -->
-
+                        <div class="text-left py-4 px-4 px-sm-4">
                             <div class="row">
                                 <div class="col-sm-12 col-md-12 col-lg-12 mb-3">
                                     <div class="card">
                                         <div class="card-body">
-                                            <div class="card-title">
-                                                <%= lingua.membership.createSubscriptions%>
+                                            <div class="card-title d-flex flex-nowrap">
+                                                <div class="w-100">
+                                                    <%= lingua.membership.createSubscriptions%>
+                                                </div>
+
+
+                                                <div class="brand-logo text-center mb-1 w-100">
+                                                    <img src="/images/charlieBoy/CB-5.jpg" alt="logo"
+                                                        style="width: 50% !important;">
+                                                </div>
+
+                                                <div class="w-100">
+                                                    <% if(user) { %>
+                                                    <input id="userExist" name="userExist" value="true" hidden />
+                                                    <a class="btn btn-outline-primary btn-icon-text float-end"
+                                                        id="close-registration" href="/account">
+                                                        <%= lingua.home%> <i class="fa-solid fa-home m-1 mb-0 mt-0"></i>
+                                                    </a>
+                                                    <% } else { %>
+                                                    <input id="userExist" name="userExist" value="false" hidden />
+
+                                                    <a class="btn btn-outline-primary btn-icon-text float-end"
+                                                        id="close-registration" href="/login">
+                                                        <%= lingua.login%> <i
+                                                            class="fa-solid fa-arrow-right-to-bracket m-1 mb-0 mt-0"></i>
+                                                    </a>
+                                                    <% } %>
+                                                </div>
                                             </div>
                                             <div id="loading-div" class="text-small text-wrap">
                                             </div>
@@ -187,10 +183,9 @@
                                                         </tfoot>
                                                     </table>
                                                 </div>
-                                                <div class="m-3">
+                                                <div class="mt-3">
                                                     <input id="subscription-list" type="text" hidden value="">
-                                                    <div class="d-flex float-end">
-                                                        <span id="error-message"></span>
+                                                    <div class="col-12 float-end">
 
                                                         <% if(user) { %>
                                                         <button id="checkout-btn" hidden value="<%- user?.billingID%>"
@@ -208,6 +203,10 @@
                                                         <% } %>
 
                                                     </div>
+
+                                                </div>
+                                                <div class="col-12">
+                                                    <span id="error-message"></span>
                                                 </div>
                                             </div>
                                         </div>
@@ -260,33 +259,32 @@
         var cartString = '<%- JSON.stringify(cart) %>';
 
         $(document).ready(function () {
-            showResult(`#loading-div`,
-                `<div class="spinner text-center p-1 m-1">
-                            <div class="spinner-grow spinner-grow-sm"></div>
-                    </div>`
-            );
+            displayLoading('#loading-div', 1000)
             initializeCart(cartString);
             manageEmail();
             manageCheckoutBtn();
             setTimeout(function () {
-                showResult(`#loading-div`, ``);
                 manageDivViews(subscriptionList);
             }, 1000);
         });
 
+        // This function display/hidethe checkout btn basend on the email value in the document ready.
         function manageCheckoutBtn() {
-            if (!userExist) {
-                var email = document.getElementById("email");
+            var email;
 
-                if (!email?.value) {
-                    checkoutBtn.attr("hidden", true);
-                } else {
-                    checkoutBtn.attr("hidden", false);
-                }
+            if (userExist) {
+                email = $("#email").val();
+            } else {
+                email = getCookie('subscriptionEmail');
             }
-
+            if (!email) {
+                checkoutBtn.attr("hidden", true);
+            } else {
+                checkoutBtn.attr("hidden", false);
+            }
         }
 
+        // This function initialize the Cart Table from Cookies and/or DB.
         function initializeCart(cartString) {
             // Manage DB Cart
             if (cartString) {
@@ -316,10 +314,12 @@
 
         }
 
+        // This function disable the submit btn.
         function disableSubmitBtn() {
             $('#submit-btn').prop('disabled', true);
         };
 
+        // This function validate the email calling the AJAX function to verify if exist in the DB.
         function validateEmail() {
             showResult('#emailValidationResult', ``);
 
@@ -375,6 +375,7 @@
             }
         }
 
+        // This function manage what is displayed based on the content of the subscriptionList.
         function manageDivViews(subscriptionList) {
             // If the subscriptionList is empty / empty cart, then show add car div.
             if (subscriptionList?.length == 0) {
@@ -387,6 +388,7 @@
             }
         }
 
+        // This function add the data in the table of the cart.
         function addDataToTable(newItem, addType) {
             // Initialize DataTable
             var t = $('#cart-table').DataTable();
@@ -419,6 +421,7 @@
                 checkoutBtn.removeAttr('hidden');
         };
 
+        // This function manage the divs of the email.
         function manageEmail() {
             let email;
             if (userExist) {
@@ -437,7 +440,8 @@
             }
 
         }
-        // Add subscription
+
+        // This event listener handles the click event for Add subscription
         $('#addSub').on('click', function (event) {
             $(this).prop('disabled', true);
             // Clean plate input validator.
@@ -519,7 +523,8 @@
 
 
         });
-        // Remove subscription
+
+        // This event listener handles the click event for Remove subscription
         $('#cart-table tbody').on('click', '.remove', function () {
             $(this).prop('disabled', true);
             var t = $('#cart-table').DataTable();

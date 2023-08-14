@@ -16,8 +16,8 @@ const addUser = (User) => async ({
     lastName,
     phoneNumber
 }) => {
-    if (!email || !firstName || !lastName || !billingID) {
-        throw new Error(`USER: Missing Data. Please provide values for email=${email}, billingID=${billingID}, firstName=${firstName}, lastName=${lastName}`)
+    if (!email || !billingID) {
+        throw new Error(`USER: Missing Data. Please provide values for email=${email}, billingID=${billingID}`)
     }
 
     console.log(`USER: addUser(${email})`)
@@ -354,7 +354,7 @@ const addItemToCart = (User) => async (id, item) => {
 
     let itemToRtrn = customer?.cart.items.find(obj => obj.plate == item.plate)
 
-    return {customer, itemToRtrn}
+    return { customer, itemToRtrn }
 }
 
 /**

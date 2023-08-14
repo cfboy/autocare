@@ -17,7 +17,7 @@ const Stripe = stripe(process.env.STRIPE_SECRET_KEY, {
     apiVersion: '2020-08-27'
 })
 
-const createCheckoutSession = async (customerID, subscriptions, subscriptionsEntries) => {
+const createCheckoutSession = async (customerID, subscriptions, subscriptionsEntries, backURL = null) => {
     try {
         let items = [];
         let cars_price = subscriptions;
@@ -58,7 +58,7 @@ const createCheckoutSession = async (customerID, subscriptions, subscriptionsEnt
             },
             allow_promotion_codes: true,
             success_url: `${process.env.DOMAIN}/completeCheckoutSuccess?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${process.env.DOMAIN}`
+            cancel_url: `${process.env.DOMAIN}/${backURL}`
         })
 
         return session
@@ -161,18 +161,15 @@ const getCustomerByEmail = async (email) => {
  * @returns customer object
  */
 const addNewCustomer = async (email,
-    firstName,
-    lastName,
-    phoneNumber) => {
+    firstName = null,
+    lastName = null,
+    phoneNumber = null) => {
     try {
         const customer = await Stripe.customers.create({
             email,
             description: 'Created by app.',
             name: firstName + ' ' + lastName,
             phone: phoneNumber
-            // address: {
-            //     city: city
-            // }
         })
 
         return customer

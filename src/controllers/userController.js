@@ -511,6 +511,8 @@ exports.removeFromCart = async (req, res) => {
             let cookieCart = req.cookies.cart;
             cookieCart = JSON.parse(cookieCart);
             cookieCart = cookieCart.filter(item => item.id !== itemToRemove.id);
+            if (cookieCart.length == 0)
+                res.cookie('subscriptionEmail', '');
             res.cookie('cart', JSON.stringify(cookieCart));
             cookieCart = cookieCart.filter(item => item.id !== itemToRemove.id);
         }
@@ -527,6 +529,9 @@ exports.removeFromCart = async (req, res) => {
         let cookieCart = req.cookies.cart;
         cookieCart = JSON.parse(cookieCart);
         cookieCart = cookieCart.filter(item => item.id !== itemToRemove.id);
+        if (cookieCart.length == 0)
+            res.cookie('subscriptionEmail', '');
+
         res.cookie('cart', JSON.stringify(cookieCart));
         returnValues = { itemRemoved: true, subscriptionList: cookieCart }
     }

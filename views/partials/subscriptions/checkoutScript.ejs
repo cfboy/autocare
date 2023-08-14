@@ -5,24 +5,15 @@
         const checkoutBtn = $('#checkout-btn'); //New checkout btn
         const publishableKey = `<%= pkStripe%>`;
         const stripe = Stripe(publishableKey);
-        // showing loading
-        function displayLoading() {
-            showResult('#error-message',
-                `<div class="mx-4 my-2 spinner text-center">
-                    <div class="spinner-grow spinner-grow-sm"></div>
-                </div>`);
-            // // to stop loading after some time
-            setTimeout(() => {
-                showResult('#error-message', ``);
-            }, 5000);
-        }
+        const user = `<%- user%>`;
         // Checkout
-        if (userExist) {
+        if (user) {
             checkoutBtn.click(function () {
+                $(this).prop('disabled', true);
                 const subscriptions = JSON.parse($('#subscription-list').val());
                 const billingID = $(this).attr("value");
                 const email = $(this).attr("email");
-                displayLoading();
+                displayLoading('#error-message', 5000);
                 if (billingID) {
                     fetch('/checkout', {
                         method: 'POST',
@@ -32,7 +23,8 @@
                         },
                         body: JSON.stringify({
                             subscriptions,
-                            customerID: billingID
+                            customerID: billingID,
+                            backURL: 'subscribe'
                         })
                     })
                         .then((result) => result.json())
@@ -45,13 +37,12 @@
         } else {
             // If the user is not logged in.
             checkoutBtn.click(function () {
+                $(this).prop('disabled', true);
                 const subscriptions = JSON.parse($('#subscription-list').val());
-                const email = $('#email').val();
+                const email = getCookie('subscriptionEmail');
 
-                if (email) {
-                    displayLoading();
-                    // TODO: Create account, Stripe account, send email
-                    alert('Succeed');
+                if (email && subscriptions) {
+                    displayLoading('#error-message', 5000, false);
                     $.ajax({
                         url: "/registerAndSubscribe",
                         type: "POST",
@@ -61,16 +52,16 @@
                         }),
                     }).done(function (result) {
                         if (result.accountCreated) {
-
                             fetch('/checkout', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
-                                    'email': email
+                                    'email': result.customer.email
                                 },
                                 body: JSON.stringify({
                                     subscriptions,
-                                    customerID: billingID
+                                    customerID: result.customer.billingID,
+                                    backURL: 'subscribe'
                                 })
                             })
                                 .then((result) => result.json())
@@ -80,18 +71,32 @@
                             // Account not created
                             showResult('#error-message',
                                 `<p class="alert alert-fill-danger mt-2 p-1">
-                                <i class="fa-circle-exclamation fa-solid"></i>Account not created.
+                                <i class="fa-circle-exclamation fa-solid"></i> ${result.errorMessage}
                             </p>`);
+                            setTimeout(() => {
+                                showResult("#error-message", ``);
+                            }, 1000);
                         }
                     }).fail(function (error) {
                         console.log(error);
                         showResult('#error-message',
                             `<p class="alert alert-fill-danger mt-2 p-1"><i class="fa-circle-exclamation fa-solid"></i>Error on checkout.</p>`);
+
+                        setTimeout(() => {
+                            showResult("#error-message", ``);
+                        }, 1000);
                     });
 
 
                 } else {
-                    alert("The email is null.");
+                    // invalid
+                    showResult('#error-message',
+                        `<p class="alert alert-fill-danger mt-2 p-1">
+                                <i class="fa-circle-exclamation fa-solid"></i> Invalid email value.
+                            </p>`);
+                    setTimeout(() => {
+                        showResult("#error-message", ``);
+                    }, 1000);
                 }
             })
         }

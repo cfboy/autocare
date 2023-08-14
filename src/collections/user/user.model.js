@@ -45,6 +45,11 @@ userSchema.methods.fullName = function () {
     return strings.filter(Boolean).join(" ");
 };
 
+userSchema.methods.isIncomplete = function () {
+
+    return (!this.personalInfo?.firstName || !this.personalInfo?.lastName || !this.password);
+};
+
 const User = mongoose.model('user', userSchema, 'user')
 
 module.exports = { ROLES, User }
