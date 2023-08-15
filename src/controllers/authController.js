@@ -289,32 +289,36 @@ exports.activateAccountForm = async (req, res) => {
             req.session.alertType = ''
         }
 
-        if (user) {
-            if (user.isIncomplete()) {
-                res.render('auth/activateAccount.ejs', { message, user, alertType })
-            } else {
-                res.redirect('/account')
-
-            }
+        if (!id || !token) {
+            req.flash('error', "Invalid link.");
+            res.redirect('/activateAccountRequest')
         } else {
-            let [isValid, tokenMessage] = await Auth.validateToken(lingua, id, token, "account")
+            if (user) {
+                if (user.isIncomplete()) {
+                    res.render('auth/activateAccount.ejs', { message, user, alertType, token })
+                } else {
+                    res.redirect('/account')
+
+                }
+            } else {
+                let [isValid, tokenMessage] = await Auth.validateToken(lingua, id, token, "account")
 
 
-            if (isValid) {
-                user = await UserService.getUserById(id);
-                // Login the user
-                req.login(user, function (err) {
-                    if (!err) {
-                        res.render('auth/activateAccount.ejs', { message, user, alertType, token })
-                    }
-                })
-            }
-            else {
-                req.flash('error', tokenMessage);
-                res.redirect('/activateAccountRequest')
+                if (isValid) {
+                    user = await UserService.getUserById(id);
+                    // Login the user
+                    req.login(user, function (err) {
+                        if (!err) {
+                            res.render('auth/activateAccount.ejs', { message, user, alertType, token })
+                        }
+                    })
+                }
+                else {
+                    req.flash('error', tokenMessage);
+                    res.redirect('/activateAccountRequest')
+                }
             }
         }
-
     } catch (error) {
         req.bugsnag.notify(new Error(error))
         console.error(`ERROR: authController - activateAccount(). ${error.message}`)
@@ -335,7 +339,7 @@ exports.activateAccount = async (req, res, next) => {
     const lingua = req.res.lingua.content
 
     const [requestSuccess, message] = await Auth.activateAccount(lingua,
-        req.body.userId,
+        req.body.id,
         req.body.token,
         req.body
     );
@@ -344,13 +348,13 @@ exports.activateAccount = async (req, res, next) => {
         req.flash('info', message);
         req.session.message = message
         req.session.alertType = alertTypes.CompletedActionAlert
+        res.redirect('/login')
     } else {
         req.flash('error', message);
         req.session.message = message
         req.session.alertType = alertTypes.ErrorAlert
+        res.redirect(`/activateAccount?token=${req.body.token}&id=${req.body.id}`)
     }
-
-    res.redirect('/account')
 };
 
 /**
@@ -409,7 +413,7 @@ exports.resetPassword = async (req, res) => {
         req.session.alertType = ''
     }
 
-    let [isValid, tokenMessage] = await Auth.validateToken(lingua, id, token)
+    let [isValid, tokenMessage] = await Auth.validateToken(lingua, id, token, "password")
 
     if (isValid)
         res.render('auth/resetPassword.ejs', { message, email, alertType, id, token })

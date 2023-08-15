@@ -97,6 +97,8 @@
                                                     autocomplete="off" method="post" onsubmit="disableSubmitBtn()">
                                                     <input type="text" id="id" name="id" value="<%= user?.id%>"
                                                         hidden />
+                                                    <input type="text" id="token" name="token" value="<%= token%>"
+                                                        hidden />
                                                     <div class="row">
                                                         <div class="col-lg-6">
                                                             <div class="form-group">
@@ -117,7 +119,7 @@
                                                                 <label for="firstName"
                                                                     class="required"><%= lingua.user.firstName%></label>
 
-                                                                <input type="text" id="firstName" name="firstName"
+                                                                <input type="text" id="firstName" name="personalInfo.firstName"
                                                                     class="form-control mb-3 form-control-lg"
                                                                     placeholder="<%= lingua.user.firstName%>"
                                                                     required />
@@ -129,7 +131,7 @@
                                                                 <label for="lastName"
                                                                     class="required"><%= lingua.user.lastName%></label>
 
-                                                                <input type="text" id="lastName" name="lastName"
+                                                                <input type="text" id="lastName" name="personalInfo.lastName"
                                                                     class="form-control mb-3 form-control-lg"
                                                                     placeholder="<%= lingua.user.lastName%>" required />
                                                             </div>

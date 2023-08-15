@@ -173,6 +173,7 @@ const resetPassword = async (lingua, userId, token, password) => {
 const activateAccount = async (lingua, userId, token, body) => {
     let activateToken = await Token.findOne({ userId, type: "account" });
     let requestSuccess = false
+    let password = body.password;
 
     let [isValid, message] = await validateToken(lingua, userId, token, "account")
 
@@ -198,21 +199,27 @@ const activateAccount = async (lingua, userId, token, body) => {
  * @returns 
  */
 const validateToken = async (lingua, userId, token, type) => {
-    let tokenToValidate = await Token.findOne({ userId, type });
-    let isValid = false
-    let message = lingua.validLink
+    try {
+        let tokenToValidate = await Token.findOne({ userId, type });
+        let isValid = false
+        let message = lingua.validLink
 
-    if (!tokenToValidate) {
-        message = lingua.invalidLink
+        if (!tokenToValidate) {
+            message = lingua.invalidLink
+            return [isValid, message]
+        }
+
+        isValid = await bcrypt.compare(token, tokenToValidate.token);
+
+        if (!isValid)
+            message = lingua.invalidLink
+
         return [isValid, message]
+    } catch (error) {
+
+        console.error(error);
+        return [false, error.message]
     }
-
-    isValid = await bcrypt.compare(token, tokenToValidate.token);
-
-    if (!isValid)
-        message = lingua.invalidLink
-
-    return [isValid, message]
 }
 
 module.exports = {

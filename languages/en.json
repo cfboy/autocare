@@ -216,5 +216,6 @@
     "clear": "Clear",
     "utilizationHistory": "Utilization History",
     "loading": "Loading",
-    "agentID": "Agent ID"
+    "agentID": "Agent ID",
+    "subscribe" : "Subcribe"
 }

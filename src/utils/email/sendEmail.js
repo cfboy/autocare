@@ -144,7 +144,7 @@ const sendEmail = async (email, emailType, payload) => {
             emailResult = await transport.sendMail(options());
 
             if (emailResult.accepted.length) {
-                emailResult = { sent: true, data: null }
+                emailResult = { sent: true, data: emailResult }
             } else {
                 emailResult = { sent: false, data: null }
             }
