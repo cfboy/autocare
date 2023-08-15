@@ -234,6 +234,43 @@ exports.registerAndSubscribe = async (req, res) => {
     }
 }
 
+
+/**
+ * This function render the activate account request form.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.activateAccountRequest = async (req, res) => {
+    let { message, email, alertType } = req.session
+
+    // Clear session alerts variables.
+    if (message) {
+        req.session.message = ''
+        req.session.alertType = ''
+    }
+
+    res.render('auth/activateAccountRequest.ejs', { message, email, alertType })
+}
+
+/**
+ * This function send the activation link.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.activateAccountRequestController = async (req, res) => {
+    const lingua = req.res.lingua.content;
+
+    const [requestSuccess, message] = await AuthService.generateAtivationLink(lingua, req.body.email, req.bugsnag);
+
+    if (requestSuccess) {
+        req.flash('info', message);
+        res.redirect('/login')
+    } else {
+        req.flash('error', message);
+        res.redirect('/activateAccountRequest')
+    }
+}
+
 /**
  * This function render the acctivation account form.
  * @param {*} req 
@@ -274,7 +311,7 @@ exports.activateAccountForm = async (req, res) => {
             }
             else {
                 req.flash('error', tokenMessage);
-                res.redirect('/login')
+                res.redirect('/activateAccountRequest')
             }
         }
 
@@ -289,7 +326,7 @@ exports.activateAccountForm = async (req, res) => {
 
 
 /**
- * This function handle the reset password.
+ * This function handle the activation account workflow.
  * @param {*} req 
  * @param {*} res 
  * @param {*} next 

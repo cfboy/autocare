@@ -71,6 +71,8 @@ router.post('/register', checkNotAuthenticated, authController.register)
 router.post('/registerAndSubscribe', authController.registerAndSubscribe)
 
 // Activate account
+router.get('/activateAccountRequest', authController.activateAccountRequest)
+router.post('/activateAccountRequest', authController.activateAccountRequestController)
 router.get('/activateAccount', authController.activateAccountForm)
 router.post('/activateAccount', authController.activateAccount)
 
