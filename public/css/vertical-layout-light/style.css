@@ -15406,7 +15406,8 @@ fieldset:disabled .swal2-modal .swal2-buttonswrapper .swal2-styled,
 
 .page-link:hover {
     z-index: 2;
-    color: #0a58ca;
+    /* color: #0a58ca; */
+    color: var(--bs-primary);
     background-color: #e9ecef;
     border-color: #dee2e6;
 }
@@ -18603,7 +18604,8 @@ fieldset:disabled .swal2-modal .swal2-buttonswrapper .swal2-styled,
 
 .text-primary {
     --bs-text-opacity: 1;
-    color: rgba(var(--bs-primary-rgb), var(--bs-text-opacity)) !important;
+    /* color: rgba(var(--bs-primary-rgb), var(--bs-text-opacity)) !important; */
+    color: var(--bs-primary) !important;
 }
 
 .text-secondary {
@@ -25017,12 +25019,13 @@ code {
 }
 
 .btn-outline-behance {
-    border: 1px solid #1769ff;
-    color: #1769ff;
+    border: 1px solid var(--bs-primary);
+    color: var(--bs-primary);
 }
 
 .btn-outline-behance:hover {
-    background: #1769ff;
+    /* background: #1769ff; */
+    background: var(--bs-primary);
     color: #ffffff;
 }
 
@@ -28172,6 +28175,7 @@ dl li {
 }
 
 .pagination .page-item .page-link:focus {
+    color: var(--bs-primary);
     background: inherit;
 }
 
@@ -32541,7 +32545,7 @@ div.tagsinput span.tag a {
     line-height: 1.5;
 }
 
-.auth form .auth-link {
+.auth form .auth-link, .auth-link {
     font-size: 0.812rem;
 }
 

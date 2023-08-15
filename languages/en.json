@@ -208,7 +208,7 @@
     "hasBeenDeleted": "${message} has been deleted.",
     "email": {
         "title": "Auto Care - Memberships",
-        "verifyEmail": "Verify your email {email} to complete the reset password process.",
+        "verifyEmail": "Verify your email {email} to complete the process.",
         "resetSucessfully": "Auto Care Password Reset Successfully",
         "notSend": "Email Not Send.",
         "passwordReset": "Auto Care Password Reset Request"

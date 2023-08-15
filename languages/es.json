@@ -208,7 +208,7 @@
     "hasBeenDeleted": "{message} ha sido eliminado.",
     "email": {
         "title": "Auto Care - Membresías",
-        "verifyEmail": "Verifique su correo electrónico {email} para completar el proceso de restablecimiento de su contraseña.",
+        "verifyEmail": "Verifique su correo electrónico {email} para completar el proceso.",
         "resetSucessfully": "Auto Care - Contraseña restablecida exitosamente",
         "notSend": "No se pudo enviar el correo electrónico.",
         "passwordReset": "Auto Care - Solicitud de restablecimiento de contraseña"
