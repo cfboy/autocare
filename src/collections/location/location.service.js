@@ -76,7 +76,7 @@ const getLocationById = (Location) => (id) => {
             // } else {
             //     console.debug("Found location to edit: ", docs);
         }
-    })
+    }).populate("users");
 }
 
 /**

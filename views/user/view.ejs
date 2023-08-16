@@ -56,7 +56,7 @@
 
                                                 <div class="d-flex justify-content-between align-items-start">
 
-                                                    <% if(isMyProfile && user.googleID) { %>
+                                                    <% if(isMyProfile && customer.googleID) { %>
                                                     <!-- <a href="" class="login-with-google-btn m-1 disabled-link">
                                                         Signed in with Google
                                                     </a> -->
@@ -68,7 +68,7 @@
                                                                 Google</span>
                                                         </a>
                                                     </div>
-                                                    <% } else if(isMyProfile && !user.googleID) { %>
+                                                    <% } else if(isMyProfile && !customer.googleID) { %>
                                                     <div class="google-signup">
                                                         <a id="googlesetup" class="google-btn m-1" href="/auth/google">
                                                             <span class="google-signup-icon"></span>
@@ -122,7 +122,7 @@
                                                         <tr>
                                                             <td><%= lingua.user.firstName%></td>
                                                             <td>
-                                                                <%- customer.personalInfo.firstName + ' ' + customer.personalInfo.lastName %>
+                                                                <%- customer.fullName() %>
                                                             </td>
                                                         </tr>
                                                         <tr>
@@ -137,7 +137,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <% if(cars) { %>
+                                <% if(cars.length > 0) { %>
                                 <div class="col-sm-12 col-md-12 grid-margin stretch-card">
                                     <div class="card card-rounded">
                                         <div class="card-body">

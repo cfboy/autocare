@@ -65,7 +65,7 @@
                                                         <tr>
                                                             <th><%= lingua.user.name%></th>
                                                             <th><%= lingua.user.role%></th>
-                                                            <th><%= lingua.user.email%></th>
+                                                            <th><%= lingua.name%></th>
                                                             <th><%= lingua.user.phoneNumber%></th>
                                                             <!-- <th>Plan</th> -->
                                                             <th><%= lingua.action%></th>
@@ -73,41 +73,45 @@
                                                     </thead>
                                                     <tbody>
                                                         <% if(users) { %>
-                                                        <% for(const user of users) { %>
+                                                        <% for(const customer of users) { %>
                                                         <tr>
                                                             <td>
-                                                                <a class="btn-link" href="/customers/<%- user.id%>?userType=/<%- userType%>">
-                                                                    <%- user.fullName() %>
-                                                                    <!-- <%# if(!user.hasAllInformation) { %>
-                                                                    <i class="mdi mdi-alert text-warning"
+                                                                <a class="btn-link"
+                                                                    href="/customers/<%- customer.id%>?userType=/<%- userType%>">
+                                                                    <%= customer.email%>
+
+                                                                    <% if(customer.isIncomplete()) { %>
+                                                                    <i class="fa fa-warning text-warning" title="Implete account."
                                                                         style="padding-left: 10px;"></i>
-                                                                    <%# } %> -->
+                                                                    <% } %>
                                                                 </a>
                                                             </td>
                                                             <td>
-                                                                <%- user.role%>
+                                                                <%- customer.role%>
                                                             </td>
                                                             <td>
-                                                                <%- user.email%>
+                                                                <%- customer.fullName() %>
                                                             </td>
                                                             <td>
-                                                                <%- user.personalInfo.phoneNumber %>
+                                                                <%- customer.personalInfo.phoneNumber %>
                                                             </td>
                                                             <td>
-                                                                <a href="/edit-user/<%- user.id%>?url=/<%- userType%>"
+                                                                <a href="/edit-user/<%- customer.id%>?url=/<%- userType%>"
                                                                     type="button"
                                                                     class="btn btn-icon btn-icon-no-border no-margin">
                                                                     <i class="far fa-edit icon-sm"></i>
                                                                 </a>
                                                                 <% if([roles.ADMIN].includes(user.role)) { %>
+                                                                <% if (customer.billingID) { %>
                                                                 <a class="btn btn-icon btn-icon-no-border no-margin manage-billing-button"
                                                                     style="margin: 0;" type="submit"
-                                                                    value="<%- user.billingID%>"
-                                                                    email="<%- user.email%>">
+                                                                    value="<%- customer.billingID%>"
+                                                                    email="<%- customer.email%>">
                                                                     <i class="fab fa-stripe-s icon-sm"></i>
                                                                 </a>
+                                                                <% } %>
                                                                 <a id="deleteBtn"
-                                                                    onclick="return confirmDelete('/delete-user', '<%- user.id%>')"
+                                                                    onclick="return confirmDelete('/delete-user', '<%- customer.id%>')"
                                                                     class="btn btn-icon btn-icon-no-border no-margin">
                                                                     <i class="fas fa-trash-alt icon-sm text-danger"></i>
                                                                 </a>
