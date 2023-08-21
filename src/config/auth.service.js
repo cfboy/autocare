@@ -69,7 +69,7 @@ const resetPasswordRequest = async (lingua, email, bugsnag) => {
  */
 const generateAtivationLink = async (lingua, email, bugsnag) => {
 
-    const user = await User.findOne({ email });
+    const user = await UserService.getUserByEmail(email);
     var requestSuccess = false
     if (!user) {
         return [requestSuccess, lingua.validation.emailNotExist]
@@ -222,10 +222,49 @@ const validateToken = async (lingua, userId, token, type) => {
     }
 }
 
+/**
+ * 
+ * @param {*} lingua 
+ * @param {*} userId 
+ * @param {*} token 
+ * @param {*} type 
+ * @returns 
+ */
+const registerAndActivateLink = async (stripeCustomer, role, lingua, bugsnag) => {
+    try {
+
+        // Add user to DB
+        let customer = await UserService.addUser({
+            email: stripeCustomer.email,
+            billingID: stripeCustomer.id,
+            role: role,
+            firstName: stripeCustomer.name
+        })
+
+        if (customer) {
+            console.debug(`A new user added to DB. The ID for ${customer.email} is ${customer.id}`);
+
+            const [requestSuccess, message] = await generateAtivationLink(lingua, customer.email, bugsnag);
+
+            return [requestSuccess, message, customer];
+
+        } else {
+            bugsnag.notify(new Error('Account Not Created.'))
+            return [false, "Account not created.", null]
+        }
+
+    } catch (error) {
+        console.error(error);
+        return [false, error.message, null]
+    }
+}
+
 module.exports = {
     resetPasswordRequest,
     resetPassword,
     activateAccount,
     validateToken,
-    generateAtivationLink
+    generateAtivationLink,
+    registerAndActivateLink
+
 };

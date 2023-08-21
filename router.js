@@ -55,8 +55,11 @@ router.get('/login', checkNotAuthenticated, (req, res) => {
         req.session.message = ''
         req.session.alertType = ''
     }
-
-    res.render('auth/login.ejs', { message, email, alertType })
+    // TODO: Optimize this approach.
+    if (req.flash('error')[0] == 'VALIDATION')
+        res.redirect('/activateAccountRequest')
+    else
+        res.render('auth/login.ejs', { message, email, alertType })
 })
 
 router.post('/login', checkNotAuthenticated, authController.login)
@@ -68,7 +71,6 @@ router.get('/connectGoogleAccount', authController.connectGoogleAccount);
 router.get('/create-account', checkNotAuthenticated, authController.createAccount)
 
 router.post('/register', checkNotAuthenticated, authController.register)
-router.post('/registerAndSubscribe', authController.registerAndSubscribe)
 
 // Activate account
 router.get('/activateAccountRequest', authController.activateAccountRequest)
@@ -191,8 +193,9 @@ router.post('/changePrices', checkAuthenticated, authChangePrices, stripeControl
 router.post('/webhook', stripeController.webhook)
 
 router.post('/checkout', checkAuthenticated, stripeController.checkout)
+router.post('/checkoutWithEmail', stripeController.checkoutWithEmail)
 
-router.get('/completeCheckoutSuccess', checkAuthenticated, stripeController.completeCheckoutSuccess)
+router.get('/completeCheckoutSuccess', stripeController.completeCheckoutSuccess)
 
 router.get('/stripeCheckout', stripeController.stripeCheckout)
 

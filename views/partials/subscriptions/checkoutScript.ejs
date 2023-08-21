@@ -43,51 +43,26 @@
 
                 if (email && subscriptions) {
                     displayLoading('#error-message', 5000, false);
-                    $.ajax({
-                        url: "/registerAndSubscribe",
-                        type: "POST",
-                        contentType: "application/json",
-                        data: JSON.stringify({
-                            email: email
-                        }),
-                    }).done(function (result) {
-                        if (result.accountCreated) {
-                            fetch('/checkout', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'email': result.customer.email
-                                },
-                                body: JSON.stringify({
-                                    subscriptions,
-                                    customerID: result.customer.billingID,
-                                    backURL: 'subscribe'
-                                })
-                            })
-                                .then((result) => result.json())
-                                .then(({ sessionId }) => stripe.redirectToCheckout({ sessionId }))
-                                .catch((error) => alert(error))
-                        } else {
-                            // Account not created
+                    fetch('/checkoutWithEmail', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'email': email
+                        },
+                        body: JSON.stringify({
+                            subscriptions,
+                            email: email,
+                            backURL: 'subscribe'
+                        })
+                    })
+                        .then((result) => result.json())
+                        .then(({ sessionId }) => stripe.redirectToCheckout({ sessionId }))
+                        .catch((error) => {
                             showResult('#error-message',
                                 `<p class="alert alert-fill-danger mt-2 p-1">
-                                <i class="fa-circle-exclamation fa-solid"></i> ${result.errorMessage}
+                                <i class="fa-circle-exclamation fa-solid"></i> ${error}
                             </p>`);
-                            setTimeout(() => {
-                                showResult("#error-message", ``);
-                            }, 1000);
-                        }
-                    }).fail(function (error) {
-                        console.log(error);
-                        showResult('#error-message',
-                            `<p class="alert alert-fill-danger mt-2 p-1"><i class="fa-circle-exclamation fa-solid"></i>Error on checkout.</p>`);
-
-                        setTimeout(() => {
-                            showResult("#error-message", ``);
-                        }, 1000);
-                    });
-
-
+                        })
                 } else {
                     // invalid
                     showResult('#error-message',

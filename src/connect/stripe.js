@@ -51,7 +51,59 @@ const createCheckoutSession = async (customerID, subscriptions, subscriptionsEnt
             line_items: items,
             subscription_data: {
                 metadata: {
-                    cars_data: JSON.stringify(cars)
+                    cars_data: JSON.stringify(cars_price)
+                },
+                default_tax_rates: defaultTaxes,
+
+            },
+            allow_promotion_codes: true,
+            success_url: `${process.env.DOMAIN}/completeCheckoutSuccess?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${process.env.DOMAIN}/${backURL}`
+        })
+
+        return session
+    }
+    catch (error) {
+        console.error(`ERROR-STRIPE: createCheckoutSession. ${error.message}`);
+        return null
+    }
+}
+
+const createCheckoutSessionWithEmail = async (email, subscriptions, subscriptionsEntries, backURL = null) => {
+    try {
+        let items = [];
+        let cars_price = subscriptions;
+        if (subscriptionsEntries) {
+            // Prepare items to create a session.
+            // The first position [0] has the priceID (divided by groups)
+            // The second position [1] has the list of cars per priceID.
+            for (sub of subscriptionsEntries) {
+                items.push({
+                    price: sub[0], quantity: sub[1].length
+                })
+            }
+        }
+
+        const taxes = await Stripe.taxRates.list({
+            active: true
+        });
+
+        let defaultTaxes = []
+        if (taxes.data.length > 0)
+            defaultTaxes = taxes?.data?.map(({ id }) => (id));
+
+        let cars = []
+        for (obj of cars_price) {
+            cars.push({ plate: obj.plate, priceID: obj.priceID })
+        }
+        const session = await Stripe.checkout.sessions.create({
+            mode: 'subscription',
+            payment_method_types: ['card'],
+            customer_email: email,
+            line_items: items,
+            subscription_data: {
+                metadata: {
+                    cars_data: JSON.stringify(cars_price)
                 },
                 default_tax_rates: defaultTaxes,
 
@@ -556,6 +608,7 @@ module.exports = {
     updateCustomer,
     getSessionByID,
     createCheckoutSession,
+    createCheckoutSessionWithEmail,
     createBillingSession,
     createWebhook,
     getAllProducts,
