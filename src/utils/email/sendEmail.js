@@ -87,11 +87,11 @@ const sendEmail = async (email, emailType, payload) => {
 
             switch (emailType) {
                 case 'welcome':
-                    subject = `Welcome to AutoCare Memberships, ${template_variables.user_name}!`
+                    subject = `Welcome to AutoCare Memberships!`
                     template = '../template/welcome.handlebars'
                     break;
                 case 'activate_account':
-                    subject = `Welcome to AutoCare Memberships!`
+                    subject = `AutoCare Memberships - Activate Account`
                     template = '../template/activateAccount.handlebars'
                     break;
                 case 'reset_password_request':

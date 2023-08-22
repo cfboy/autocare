@@ -220,9 +220,9 @@ const manageUpdateOrCreateSubscriptionsWebhook = async (subscription, bugsnag, l
                 let cars = await SubscriptionService.getSubscriptionCarsById(subscription.id)
 
                 if (cars) {
-                    for (car of cars) {
+                    for (carObj of cars) {
                         // Add old utilization / History
-                        await UtilizationService.handleUtilization(car, subscription.current_period_start, subscription.current_period_end)
+                        await UtilizationService.handleUtilization(carObj, subscription.current_period_start, subscription.current_period_end)
                     }
                 }
             }
@@ -240,9 +240,9 @@ const manageUpdateOrCreateSubscriptionsWebhook = async (subscription, bugsnag, l
 
                     try {
                         if (newItem?.cars?.length == newItem.data.quantity) {
-                            for (car of newItem.cars) {
-                                if (car.cancel_date !== null)
-                                    await CarService.updateCar(car.id, { cancel_date: null })
+                            for (carObj of newItem.cars) {
+                                if (carObj.cancel_date !== null)
+                                    await CarService.updateCar(carObj.id, { cancel_date: null })
                             }
                         }
                     } catch (e) {
@@ -306,7 +306,8 @@ const manageUpdateOrCreateSubscriptionsWebhook = async (subscription, bugsnag, l
         } else {
             // If the subscription not exist, then create one.
             isNew = true;
-            let cars = customer?.cart?.items ? customer.cart.items : JSON.parse(subscription.metadata.cars_data)
+            // let cars = customer?.cart?.items.length > 0 ? customer.cart.items : JSON.parse(subscription.metadata.cars_data)
+            let cars = JSON.parse(subscription.metadata.cars_data)
             // let cars = customer?.cart?.items
             let subscriptionItems = subscription.items.data
             let items = []

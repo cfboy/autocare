@@ -120,19 +120,18 @@
                                                                     class="required"><%= lingua.user.firstName%></label>
 
                                                                 <input type="text" id="firstName" name="personalInfo.firstName"
-                                                                    class="form-control mb-3 form-control-lg"
+                                                                    class="form-control mb-3 form-control-lg" value="<%= user?.personalInfo?.firstName%>"
                                                                     placeholder="<%= lingua.user.firstName%>"
                                                                     required />
                                                             </div>
                                                         </div>
                                                         <div class="col-lg-6">
-
                                                             <div class="form-group">
                                                                 <label for="lastName"
                                                                     class="required"><%= lingua.user.lastName%></label>
 
                                                                 <input type="text" id="lastName" name="personalInfo.lastName"
-                                                                    class="form-control mb-3 form-control-lg"
+                                                                    class="form-control mb-3 form-control-lg" value="<%= user?.personalInfo?.lastName%>"
                                                                     placeholder="<%= lingua.user.lastName%>" required />
                                                             </div>
                                                         </div>
@@ -141,8 +140,8 @@
                                                                 <label for="phoneNumber"
                                                                     class="required"><%= lingua.user.phoneNumber%></label>
 
-                                                                <input type="tel" id="phoneNumber" name="phoneNumber"
-                                                                    class="form-control mb-3 form-control-lg"
+                                                                <input type="tel" id="phoneNumber" name="personalInfo.phoneNumber"
+                                                                    class="form-control mb-3 form-control-lg" value="<%= user?.personalInfo?.phoneNumber%>"
                                                                     placeholder="XXX-XXX-XXXX" required />
                                                             </div>
                                                         </div>
