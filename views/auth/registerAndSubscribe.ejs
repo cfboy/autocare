@@ -496,6 +496,7 @@
                             document.getElementById("carPlate").reportValidity();
                             let reportMessage = `<p class="error">` + result.invalidMsj + `</p>`
                             showResult('#plateValidationResult', reportMessage);
+                            showResult(`#addCarLoading`, ``);
 
                         } else {
                             // console.log("newItem: " + result.item);
