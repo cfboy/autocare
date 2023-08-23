@@ -73,49 +73,15 @@ exports.webhook = async (req, res) => {
             // break;
             // case 'customer.subscription.created':
             // DO the same of the update
-            case 'customer.subscription.deleted':
             case 'customer.subscription.updated':
-                // console.log(`WEBHOOK: ${event.type}: ${data.id}`);
-                let isDeleted = (event.type == 'customer.subscription.deleted' ? true : false);
 
-                [subscription, alertInfo, isNew, customer] = await manageUpdateOrCreateSubscriptionsWebhook(data, req.bugsnag, lingua, isDeleted);
+                let updateOrCreateResult = await manageUpdateOrCreateSubscriptionsWebhook(data, req.bugsnag, lingua, req);
 
-                if (subscription) {
-                    // Add notification to the user
-                    [customer, notification] = await UserService.addNotification(customer.id, alertInfo.message);
+                break;
+            case 'customer.subscription.deleted':
+                // console.log(`WEBHOOK: customer.subscription.deleted: ${data.id}`)
 
-                    req.io.in(customer?.id).emit('notifications', notification);
-
-                    // Prepare email variables
-                    let emailTemplate = isNew ? 'subscription_created' : 'subscription_updated';
-                    let emailSubject = isNew ? 'Subscription Created - AutoCare Memberships' : 'Subscription Updated - AutoCare Memberships';
-
-                    if (isDeleted) {
-                        emailTemplate = 'subscription_cancelled';
-                        emailSubject = 'Subscription Cancelled - AutoCare Memberships';
-                    }
-                    // Send Email
-                    var resultEmail = await sendEmail(
-                        customer.email,
-                        emailTemplate,
-                        {
-                            name: customer?.fullName(),
-                            subscription_id: subscription.id,
-                            message: alertInfo.message,
-                            subject: emailSubject
-                        }
-                    );
-                    if (resultEmail.sent) {
-                        console.debug('Email Sent: ' + customer.email)
-
-                    } else {
-                        req.bugsnag.notify(new Error(resultEmail.data),
-                            function (event) {
-                                event.setUser(customer.email)
-                            })
-                        console.error('ERROR: Email Not Sent.')
-                    }
-                }
+                let deletedResult = await manageDeletedSubscriptionsWebhook(data, req.bugsnag, req);
 
                 break;
             default:
@@ -130,8 +96,65 @@ exports.webhook = async (req, res) => {
     }
 }
 
+const manageDeletedSubscriptionsWebhook = async (subscription, bugsnag, req) => {
+    let customer = await UserService.getUserByBillingID(subscription.customer)
+    let notification, alertInfo
+    if (customer) {
+        subscription = await Stripe.getSubscriptionById(subscription.id) // Find subscription to expand product information.
+        let subscriptionItems = subscription.items.data
+        let mySubscription = await SubscriptionService.getSubscriptionById(subscription.id)
+        if (mySubscription) {
+            items = []
+            for (subItem of subscriptionItems) {
+                let itemToUpdate = mySubscription?.items?.find(item => item.id == subItem.id)
+                if (itemToUpdate) {
+                    let newItem = { id: itemToUpdate.id, cars: itemToUpdate.cars, data: subItem }
+                    items.push(newItem)
+                }
+            }
 
-const manageUpdateOrCreateSubscriptionsWebhook = async (subscription, bugsnag, lingua, isDeleteWebhook = false) => {
+            let updates = {
+                data: subscription,
+                items: items
+            }
+
+
+            subscription = await SubscriptionService.updateSubscription(subscription.id, updates);
+
+            alertInfo = { message: `Your membership ${subscription.id} has been cancelled successfully.`, alertType: alertTypes.BasicAlert };
+
+            // Add notification to user.
+            [customer, notification] = await UserService.addNotification(customer.id, alertInfo.message)
+
+            req.io.in(customer?.id).emit('notifications', notification);
+            //Send Email
+            var resultEmail = await sendEmail(
+                customer.email,
+                'subscription_cancelled',
+                {
+                    name: customer?.fullName(),
+                    subscription_id: subscription.id,
+                    message: alertInfo.message,
+                    subject: 'Subscription Cancelled - AutoCare Memberships'
+                }
+            );
+            if (resultEmail.sent) {
+                console.debug('Email Sent: ' + customer.email)
+
+            } else {
+                bugsnag.notify(new Error(resultEmail.data),
+                    function (event) {
+                        event.setUser(customer.email)
+                    })
+                console.error('ERROR: Email Not Sent.')
+            }
+        }
+    } else {
+        console.log('customer.subscription.cancelled: Not Found Customer.')
+    }
+}
+
+const manageUpdateOrCreateSubscriptionsWebhook = async (subscription, bugsnag, lingua, req) => {
     try {
         console.log('Start manageUpdateOrCreateSubscriptionsWebhook()');
         let isNew = false; //Flag to identify if is a new subscription or update
@@ -149,7 +172,7 @@ const manageUpdateOrCreateSubscriptionsWebhook = async (subscription, bugsnag, l
             [result, message, customer] = await AuthService.registerAndActivateLink(stripeCustomer, ROLES.CUSTOMER, lingua, bugsnag)
 
             if (!customer) {
-                console.log('customer.subscription.updated: Not Found Customer.')
+                console.log('Not Found Customer.')
                 return [result, message, null, null]
             }
         }
@@ -296,6 +319,39 @@ const manageUpdateOrCreateSubscriptionsWebhook = async (subscription, bugsnag, l
             alertInfo = { message: `Your membership ${subscription.id} has been created successfully.`, alertType: alertTypes.BasicAlert }
         }
 
+        if (subscription) {
+            // Add notification to the user
+            [customer, notification] = await UserService.addNotification(customer.id, alertInfo.message);
+
+            req.io.in(customer?.id).emit('notifications', notification);
+
+            // Prepare email variables
+            let emailTemplate = isNew ? 'subscription_created' : 'subscription_updated';
+            let emailSubject = isNew ? 'Subscription Created - AutoCare Memberships' : 'Subscription Updated - AutoCare Memberships';
+
+            // Send Email
+            var resultEmail = await sendEmail(
+                customer.email,
+                emailTemplate,
+                {
+                    name: customer?.fullName(),
+                    subscription_id: subscription.id,
+                    message: alertInfo.message,
+                    subject: emailSubject
+                }
+            );
+            if (resultEmail.sent) {
+                console.debug('Email Sent: ' + customer.email)
+
+            } else {
+                req.bugsnag.notify(new Error(resultEmail.data),
+                    function (event) {
+                        event.setUser(customer.email)
+                    })
+                console.error('ERROR: Email Not Sent.')
+            }
+        }
+
         return [subscription, alertInfo, isNew, customer];
     }
     catch (error) {
@@ -401,7 +457,7 @@ exports.completeCheckoutSuccess = async (req, res) => {
         req.session.message = `Subcription Created to account ${stripeCustomer.email}`
         req.session.alertType = alertTypes.CompletedActionAlert
 
-        res.redirect('/memberships')
+        res.redirect('/account')
 
     }
     catch (error) {

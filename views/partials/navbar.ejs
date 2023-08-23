@@ -89,10 +89,19 @@
                     <i class="fa-solid fa-list text-primary"></i>
                 </a>
             </li>
+            <% if([roles.ADMIN].includes(user.role)) { %>
+            <li class="nav-item">
+                <a class="nav-link" href="/create-subscriptions" aria-expanded="false" title="Add Multiple Membership">
+                    <i class="fa-solid fa-cart-plus text-primary"></i>
+                    <!-- TODO: implement cart qty -->
+                    <!-- <i class="fa-solid fa-list"></i> -->
+                </a>
+            </li>
+            <% } %>
             <% if(user.billingID) { %>
             <li class="nav-item">
-                <a class="nav-link" href="/create-subscriptions" aria-expanded="false" title="Add Membership">
-                    <i class="fa-solid fa-cart-plus text-primary"></i>
+                <a class="nav-link" href="/subscribe" aria-expanded="false" title="Subscribe">
+                    <i class="fa-solid fa-plus-square text-primary"></i>
                     <!-- TODO: implement cart qty -->
                     <!-- <i class="fa-solid fa-list"></i> -->
                 </a>
