@@ -41,7 +41,7 @@ const resetPasswordRequest = async (lingua, email, bugsnag) => {
         user.email,
         "reset_password_request",
         {
-            name: user?.personalInfo?.firstName + ' ' + user?.personalInfo?.lastName,
+            name: user?.fullName(),
             link: link
         }
     )
@@ -95,7 +95,8 @@ const generateAtivationLink = async (lingua, email, bugsnag) => {
         "activate_account",
         {
             name: user?.fullName(),
-            link: link
+            link: link,
+            subject: 'AutoCare Memberships - Activate Account'
         }
     )
 
@@ -146,7 +147,7 @@ const resetPassword = async (lingua, userId, token, password) => {
         user.email,
         "password_changed",
         {
-            name: user?.personalInfo?.firstName + ' ' + user?.personalInfo?.lastName,
+            name: user?.fullName(),
         }
     );
     if (resultEmail.sent) {

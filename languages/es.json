@@ -139,7 +139,7 @@
         "userNotExist": "Usuario con el correo electrónico {email} no existe. Favor proceder a Registrarse.",
         "wrongPassword": "Contraseña incorrecta provista",
         "emailNotExist": "Correo Electrónico no existe.",
-        "requestNotSend": "Pedido de Reinicio de Contraseña no fue enviado",
+        "requestNotSend": "Pedido no fue enviado",
         "passwordUpdated": "Contraseña actualizada {email}."
     },
     "invoice": {
