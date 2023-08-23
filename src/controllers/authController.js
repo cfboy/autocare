@@ -276,7 +276,7 @@ exports.activateAccount = async (req, res, next) => {
         req.flash('info', message);
         req.session.message = message
         req.session.alertType = alertTypes.CompletedActionAlert
-        res.redirect('/login')
+        res.redirect('/memberships')
     } else {
         req.flash('error', message);
         req.session.message = message
