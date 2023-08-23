@@ -16,7 +16,8 @@ const sendEmail = async (email, emailType, payload) => {
         const {
             SENDER_EMAIL_ADDRESS,
             NODE_ENV,
-            EMAILS_IN_TEST
+            EMAILS_IN_TEST,
+            DOMAIN
         } = process.env;
 
         var template_variables = {
@@ -24,7 +25,7 @@ const sendEmail = async (email, emailType, payload) => {
             "user_email": email,
             "user_name": payload.name,
             "reset_link": payload.link,
-            "link": `${process.env.DOMAIN}/account`,
+            "link": `${DOMAIN}/account`,
             "message": payload.message,
             "subscription_id": payload.subscription_id
         }
