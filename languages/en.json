@@ -8,6 +8,9 @@
     "login": "Login",
     "signOut": "Sign Out",
     "register": "Register",
+    "activateAccount": "Activate Account",
+    "completeAccount": "Complete Account",
+    "activate": "Activate",
     "pricingList": "Pricing List",
     "dontHaveAccount": "Don't have an account?",
     "create": "Create",
@@ -16,6 +19,7 @@
     "validLink": "Valid Link",
     "invalidLink": "Invalid Link",
     "existEmail": "That email already exists in our system, please login.",
+    "validEmail" : "Valid Email",
     "members": "Members",
     "add": "Add",
     "car": {
@@ -43,7 +47,8 @@
         "validCar": "Valid Car License Plate",
         "membershipToAddCar": "Membership to add a Car",
         "alreadyAddedToCart": "This car is already added to the cart.",
-        "selectOrCreate": "Select or create a new car"
+        "selectOrCreate": "Select or create a new car",
+        "select": "Select a car"
     },
     "user": {
         "name": "User",
@@ -68,6 +73,7 @@
             "forgot": "Forgot Password?",
             "name": "Password",
             "new": "New Password",
+            "create": "Create Password",
             "changePassword": "Change Password",
             "passwordRequirement": "Password must contain the following:",
             "lowerCase": "lowercase letter",
@@ -104,7 +110,8 @@
         "price": "Price",
         "subTotal": "Sub Total",
         "proceedToCheckout": "Proceed to Checkout",
-        "selectMembership": "Select membership plan"
+        "selectMembership": "Select membership plan",
+        "completeSubscription" : "Complete Subscription"
     },
     "service": {
         "qty": "Service (Qty.)",
@@ -201,7 +208,7 @@
     "hasBeenDeleted": "${message} has been deleted.",
     "email": {
         "title": "Auto Care - Memberships",
-        "verifyEmail": "Verify your email {email} to complete the reset password process.",
+        "verifyEmail": "Verify your email {email} to complete the process.",
         "resetSucessfully": "Auto Care Password Reset Successfully",
         "notSend": "Email Not Send.",
         "passwordReset": "Auto Care Password Reset Request"
@@ -209,5 +216,6 @@
     "clear": "Clear",
     "utilizationHistory": "Utilization History",
     "loading": "Loading",
-    "agentID": "Agent ID"
+    "agentID": "Agent ID",
+    "subscribe" : "Subcribe"
 }

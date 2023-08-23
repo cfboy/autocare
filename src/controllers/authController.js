@@ -1,4 +1,5 @@
 const UserService = require('../collections/user')
+const AuthService = require('../config/auth.service')
 const LocationService = require('../collections/location')
 const { ROLES } = require('../collections/user/user.model')
 const Stripe = require('../connect/stripe')
@@ -11,6 +12,7 @@ const sendEmail = require("../utils/email/sendEmail");
 
 require("../config/passport");
 require("../config/local");
+require("../config/google");
 
 /**
  * Authenticate the user. Store the user object on req.user.
@@ -23,6 +25,25 @@ exports.login =
         failureFlash: true
     })
 
+exports.googleLogin =
+    passport.authenticate('google', {
+        scope: ['email', 'profile']
+    })
+
+exports.googleCallBack =
+    passport.authenticate('google', {
+        successRedirect: '/account',
+        failureRedirect: '/login',
+        failureFlash: true
+    })
+
+
+exports.connectGoogleAccount = async (req, res) => {
+    req.logout(function (err) {
+        if (err) { return next(err); }
+        res.redirect('/auth/google');
+    });
+}
 /**
  * This function render the create account form.
  * @param {*} req 
@@ -45,9 +66,7 @@ exports.register = async (req, res) => {
         const {
             firstName,
             lastName,
-            phoneNumber,
-            // dateOfBirth,
-            // city
+            phoneNumber
         } = req.body
 
         const lingua = req.res.lingua.content
@@ -80,9 +99,7 @@ exports.register = async (req, res) => {
                 role: ROLES.CUSTOMER,
                 firstName,
                 lastName,
-                phoneNumber,
-                // dateOfBirth,
-                // city
+                phoneNumber
             })
 
             if (customer) {
@@ -145,6 +162,129 @@ exports.register = async (req, res) => {
     }
 }
 
+
+/**
+ * This function render the activate account request form.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.activateAccountRequest = async (req, res) => {
+    let { message, email, alertType } = req.session
+
+    // Clear session alerts variables.
+    if (message) {
+        req.session.message = ''
+        req.session.alertType = ''
+    }
+
+    res.render('auth/activateAccountRequest.ejs', { message, email, alertType })
+}
+
+/**
+ * This function send the activation link.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.activateAccountRequestController = async (req, res) => {
+    const lingua = req.res.lingua.content;
+
+    const [requestSuccess, message] = await AuthService.generateAtivationLink(lingua, req.body.email, req.bugsnag);
+
+    if (requestSuccess) {
+        req.flash('info', message);
+        res.redirect('/login')
+    } else {
+        req.flash('error', message);
+        res.redirect('/activateAccountRequest')
+    }
+}
+
+/**
+ * This function render the acctivation account form.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.activateAccountForm = async (req, res) => {
+    try {
+        let { message, alertType } = req.session
+        const lingua = req.res.lingua.content
+        let { id, token } = req.query;
+        let user = req.user;
+
+        // Clear session alerts variables.
+        if (message) {
+            req.session.message = ''
+            req.session.alertType = ''
+        }
+
+        if (!id || !token) {
+            req.flash('error', "Invalid link.");
+            res.redirect('/activateAccountRequest')
+        } else {
+            if (user) {
+                if (user.isIncomplete()) {
+                    res.render('auth/activateAccount.ejs', { message, user, alertType, token })
+                } else {
+                    res.redirect('/account')
+
+                }
+            } else {
+                let [isValid, tokenMessage] = await Auth.validateToken(lingua, id, token, "account")
+
+
+                if (isValid) {
+                    user = await UserService.getUserById(id);
+                    // Login the user
+                    req.login(user, function (err) {
+                        if (!err) {
+                            res.render('auth/activateAccount.ejs', { message, user, alertType, token })
+                        }
+                    })
+                }
+                else {
+                    req.flash('error', tokenMessage);
+                    res.redirect('/activateAccountRequest')
+                }
+            }
+        }
+    } catch (error) {
+        req.bugsnag.notify(new Error(error))
+        console.error(`ERROR: authController - activateAccount(). ${error.message}`)
+        req.session.message = `Error on registration.`
+        req.session.alertType = alertTypes.ErrorAlert
+        res.redirect('/login')
+    }
+}
+
+
+/**
+ * This function handle the activation account workflow.
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
+exports.activateAccount = async (req, res, next) => {
+    const lingua = req.res.lingua.content
+
+    const [requestSuccess, message] = await Auth.activateAccount(lingua,
+        req.body.id,
+        req.body.token,
+        req.body
+    );
+
+    if (requestSuccess) {
+        req.flash('info', message);
+        req.session.message = message
+        req.session.alertType = alertTypes.CompletedActionAlert
+        res.redirect('/memberships')
+    } else {
+        req.flash('error', message);
+        req.session.message = message
+        req.session.alertType = alertTypes.ErrorAlert
+        res.redirect(`/activateAccount?token=${req.body.token}&id=${req.body.id}`)
+    }
+};
+
 /**
  * This method clean the session and remove the authenticated user.
  * @param {*} req 
@@ -201,7 +341,7 @@ exports.resetPassword = async (req, res) => {
         req.session.alertType = ''
     }
 
-    let [isValid, tokenMessage] = await Auth.validateToken(lingua, id, token)
+    let [isValid, tokenMessage] = await Auth.validateToken(lingua, id, token, "password")
 
     if (isValid)
         res.render('auth/resetPassword.ejs', { message, email, alertType, id, token })

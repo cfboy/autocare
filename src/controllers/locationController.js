@@ -155,8 +155,8 @@ exports.viewLocation = async (req, res) => {
 
             location.services = services
 
-            const locationUsers = await UserService.getUsersByList(location?.users?.toObject())
-            location.users = locationUsers
+            // const locationUsers = await UserService.getUsersByLocationID(location)
+            // location.users = locationUsers
             res.status(200).render('location/view.ejs', { user: req.user, location, message, alertType })
         } else {
             console.log('LOCATION-CONTROLLER: Location not found.')

@@ -28,10 +28,11 @@ const { checkAuthenticated,
     authChangePassword,
     authChangePrices } = require('./src/middleware/authFunctions')
 
-const { validateSubscriptions, validateLocation, validateSelectCurrectLocation } = require('./src/middleware/validateFunctions')
+const { validateSubscriptions, validateLocation, validateSelectCurrectLocation, validateActiveAccount } = require('./src/middleware/validateFunctions')
+
 
 // Main Route
-router.get('/', checkAuthenticated, (req, res) => {
+router.get('/', checkAuthenticated, validateActiveAccount, (req, res) => {
     res.redirect('/account')
 })
 
@@ -41,7 +42,7 @@ router.get('/home', dashboardsController.home)
 
 router.get('/termsandconditions', dashboardsController.termsAndConditions)
 
-router.get('/account', checkAuthenticated, validateLocation, dashboardsController.account)
+router.get('/account', checkAuthenticated, validateActiveAccount, validateLocation, dashboardsController.account)
 
 //------ Auth Routes ------
 
@@ -54,15 +55,28 @@ router.get('/login', checkNotAuthenticated, (req, res) => {
         req.session.message = ''
         req.session.alertType = ''
     }
-
-    res.render('auth/login.ejs', { message, email, alertType })
+    // TODO: Optimize this approach.
+    if (req.flash('error')[0] == 'VALIDATION')
+        res.redirect('/activateAccountRequest')
+    else
+        res.render('auth/login.ejs', { message, email, alertType })
 })
 
 router.post('/login', checkNotAuthenticated, authController.login)
 
+router.get('/auth/google', authController.googleLogin);
+router.get('/auth/google/callback', authController.googleCallBack);
+router.get('/connectGoogleAccount', authController.connectGoogleAccount);
+
 router.get('/create-account', checkNotAuthenticated, authController.createAccount)
 
 router.post('/register', checkNotAuthenticated, authController.register)
+
+// Activate account
+router.get('/activateAccountRequest', authController.activateAccountRequest)
+router.post('/activateAccountRequest', authController.activateAccountRequestController)
+router.get('/activateAccount', authController.activateAccountForm)
+router.post('/activateAccount', authController.activateAccount)
 
 router.get('/logout', checkAuthenticated, authController.logout)
 
@@ -121,6 +135,7 @@ router.post('/validateMembership', checkAuthenticated, authValidateMembership, s
 router.post('/carcheck', subscriptionsController.carCheck)
 router.post('/readingData', subscriptionsController.readingData)
 router.get('/create-subscriptions', checkAuthenticated, subscriptionsController.createSubscriptions)
+router.get('/subscribe', subscriptionsController.subscribe)
 router.get('/handleInvalidSubscriptions', checkAuthenticated, subscriptionsController.handleInvalidSubscriptions)
 router.post('/confirmValidCars', checkAuthenticated, subscriptionsController.confirmValidCars)
 router.post('/syncSubscription', checkAuthenticated, subscriptionsController.syncSubscription)
@@ -133,8 +148,9 @@ router.post('/edit-car', checkAuthenticated, authEditCar, carsController.update)
 router.get('/delete-car/:id', checkAuthenticated, authDeleteCar, carsController.delete)
 
 // router.post('/clearQueue', checkAuthenticated, subscriptionsController.clearQueue)
-router.post('/validatePlate', checkAuthenticated, carsController.validatePlate)
-router.post('/removeFromCart', checkAuthenticated, userController.removeFromCart)
+router.post('/validatePlate', carsController.validatePlate)
+router.post('/validateEmail', userController.validateEmail)
+router.post('/removeFromCart', userController.removeFromCart)
 
 //------ Services Routes ------
 router.get('/services', checkAuthenticated, servicesController.services)
@@ -177,8 +193,9 @@ router.post('/changePrices', checkAuthenticated, authChangePrices, stripeControl
 router.post('/webhook', stripeController.webhook)
 
 router.post('/checkout', checkAuthenticated, stripeController.checkout)
+router.post('/checkoutWithEmail', stripeController.checkoutWithEmail)
 
-router.get('/completeCheckoutSuccess', checkAuthenticated, stripeController.completeCheckoutSuccess)
+router.get('/completeCheckoutSuccess', stripeController.completeCheckoutSuccess)
 
 router.get('/stripeCheckout', stripeController.stripeCheckout)
 

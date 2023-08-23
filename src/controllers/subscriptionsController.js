@@ -77,6 +77,30 @@ exports.createSubscriptions = async (req, res) => {
 }
 
 /**
+ * This function render the register and create subscriptions form.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.subscribe = async (req, res) => {
+    try {
+        let user = req.user,
+            cart = user?.cart;
+        let { allMakes, allModels } = await CarService.getAllMakes()
+
+        const prices = await Stripe.getAllPrices()
+
+        res.render('auth/registerAndSubscribe.ejs', { user, cart, allMakes, allModels, prices })
+
+    }
+    catch (error) {
+        console.error(error)
+        req.session.message = error.message
+        req.session.alertType = alertTypes.ErrorAlert
+        res.redirect('/account')
+    }
+}
+
+/**
  * This function render the validateMembership template. 
  * @param {*} req 
  * @param {*} res 

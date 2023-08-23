@@ -240,7 +240,7 @@
                             showResult('#plateValidationResult',
                                 `<p class="success"><%= lingua.car.validCar%></p>`);
 
-                            addDataToTable(result.item);
+                            addDataToTable(result.item, result.addType);
                             // Clear all elements on form for next submit.
                             clearForm(form);
                             showResult('#plateValidationResult', ``);
@@ -261,23 +261,24 @@
         $('#cart-table tbody').on('click', '.remove', function () {
             var t = $('#cart-table').DataTable();
             var id = $(this).attr('value');
+            var triggerObj = $(this);
             let itemToRemove = subscriptionList.find(item => item._id == id);
-
-            // Remove from the table.
-            t.row($(this).parents('tr')).remove().draw();
-            // Decrease the row index.
-            rowIdx--;
 
             $.ajax({
                 url: "/removeFromCart",
                 type: "POST",
                 contentType: "application/json",
                 data: JSON.stringify({
-                    item: itemToRemove
+                    item: itemToRemove,
+                    subscriptionList: subscriptionList
                 }),
             }).done(function (result) {
 
                 if (result.itemRemoved) {
+                    // Remove from the table.
+                    t.row(triggerObj.parents('tr')).remove().draw();
+                    // Decrease the row index.
+                    rowIdx--;
                     // Remove the deleted item from de subscriptionList.
                     subscriptionList = result.subscriptionList;
 
@@ -295,7 +296,7 @@
             })
         });
 
-        function addDataToTable(newItem) {
+        function addDataToTable(newItem, addType) {
             // Initialize DataTable
             var t = $('#cart-table').DataTable();
             // Add row to table.
@@ -307,12 +308,16 @@
                 newItem.product,
                 newItem.price,
                 `<td class="text-center">
-                                <button  id="${rowIdx}" value="${newItem._id}" class="btn btn-icon btn-icon-no-border no-margin remove">
-                                    <i class="fas fa-trash-alt icon-sm text-danger"></i>
-                                </button>
-                            </td>`
+                    <div class="d-flex">
+                        <button type="button" id="${rowIdx}" value="${newItem._id ? newItem._id : newItem.id}" class="btn btn-icon btn-icon-no-border no-margin remove">
+                            <i class="fas fa-trash-alt icon-sm text-danger"></i>
+                        </button>
+                        <span class="m-auto" id="deleteSection-${newItem._id ? newItem._id : newItem.id}"></span>
+                    </div>
+                </td>`
             ]).draw(false);
             // Add newItem to subscriptionList
+            newItem.addType = addType;
             subscriptionList.push(newItem);
             // Stringify the value to store on input element for checkout.
             var stringSubscriptionList = JSON.stringify(subscriptionList)
@@ -321,7 +326,7 @@
             // If the susbcription has at least one item, then show ckeckout btn.
             if (subscriptionList.length > 0)
                 checkoutBtn.removeAttr('hidden');
-        }
+        };
     </script>
 </body>
 

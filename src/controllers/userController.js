@@ -204,7 +204,8 @@ exports.viewUser = async (req, res) => {
         let { message, alertType } = req.session,
             findByBillingID = req?.query?.billingID ? true : false,
             cars,
-            userType = req?.query?.userType
+            userType = req?.query?.userType,
+            viewProfile = req?.query?.viewType === 'myProfile'
 
         if (message) {
             req.session.message = ''
@@ -220,16 +221,16 @@ exports.viewUser = async (req, res) => {
 
         if (customer) {
             isMyProfile = (req.user.id === customer.id)
-            if (customer.billingID) {
+            if (customer.billingID && !viewProfile) {
                 customer = await SubscriptionService.setStripeInfoToUser(customer)
+
+                cars = await CarService.getAllCarsByUser(customer)
+
+                for (car of cars) {
+                    car.subscription = await SubscriptionService.getLastSubscriptionByCar(car)
+                }
+
             }
-
-            cars = await CarService.getAllCarsByUser(customer)
-
-            for (car of cars) {
-                car.subscription = await SubscriptionService.getLastSubscriptionByCar(car)
-            }
-
             res.status(200).render('user/view.ejs', {
                 user: req.user,
                 isMyProfile,
@@ -270,14 +271,17 @@ exports.editUser = async (req, res) => {
     try {
         const id = req.params.id;
         const url = req.query.url ? req.query.url : '/account'
+        const fromProfile = req.query.fromProfile;
         const customer = await UserService.getUserById(id)
         const userType = req.query.userType
 
         if (customer) {
+            let urlQuery = fromProfile ? `?viewType=myProfile` : '';
+
             if (ROLES)
                 selectRoles = Object.entries(ROLES)
 
-            let composedUrl = (req.user.role == ROLES.CUSTOMER) ? `/customers/${req.user.id}` : ((url || userType) == '/users' || (url || userType) == '/customers' || url == '/account' || url == '/validateMembership') ? url : url == "/editCustomers" ? `/customers/${id}` : `${url}/${id}`
+            let composedUrl = (req.user.role == ROLES.CUSTOMER) ? `/customers/${req.user.id}${urlQuery}` : ((url || userType) == '/users' || (url || userType) == '/customers' || url == '/account' || url == '/validateMembership') ? url : url == "/editCustomers" ? `/customers/${id}` : `${url}/${id}${urlQuery}`
 
             res.status(200).render('user/edit.ejs', { user: req.user, customer, selectRoles, url: composedUrl })
         } else {
@@ -306,13 +310,15 @@ exports.changePassword = async (req, res) => {
     try {
         const id = req.params.id;
         const url = req.query.url ? req.query.url : '/account'
+        const fromProfile = req.query.fromProfile;
         const customer = await UserService.getUserById(id)
 
         if (customer) {
+            let urlQuery = fromProfile ? `?viewType=myProfile` : '';
             //  (url == '/users' || url == '/account' || url == '/validateMembership') ? url : `${url}/${id}`
-            let composedUrl = (req.user.role == ROLES.CUSTOMER) ? `/customers/${req.user.id}` : ((url || userType) == '/users' || (url || userType) == '/customers' || url == '/account' || url == '/validateMembership') ? url : url == "/editCustomers" ? `/customers/${id}` : `${url}/${id}`
+            let composedUrl = (req.user.role == ROLES.CUSTOMER) ? `/customers/${req.user.id}${urlQuery}` : ((url || userType) == '/users' || (url || userType) == '/customers' || url == '/account' || url == '/validateMembership') ? url : url == "/editCustomers" ? `/customers/${id}` : `${url}/${id}${urlQuery}`
 
-            res.status(200).render('user/changePassword.ejs', { user: req.user, customer, url: composedUrl })
+            res.status(200).render('user/changePassword.ejs', { user: req.user, customer, url: composedUrl, fromProfile })
         } else {
             console.log('User not found.')
             res.redirect(`${url}`)
@@ -495,15 +501,67 @@ exports.changeNotificationState = async (req, res) => {
 }
 
 exports.removeFromCart = async (req, res) => {
-
-    let itemToRemove = req.body.item
+    // NOTE: in the cart the items have the propperty id, in the DB is _id
+    let itemToRemove = req.body.item,
+        subscriptionList = req.body.subscriptionList
     let returnValues
+    let user = req.user;
+    if (user) {
+        if (itemToRemove.addType == 'cookie') {
+            let cookieCart = req.cookies.cart;
+            cookieCart = JSON.parse(cookieCart);
+            cookieCart = cookieCart.filter(item => item.id !== itemToRemove.id);
+            if (cookieCart.length == 0)
+                res.cookie('subscriptionEmail', '');
+            res.cookie('cart', JSON.stringify(cookieCart));
+            cookieCart = cookieCart.filter(item => item.id !== itemToRemove.id);
+        }
 
-    let user = await UserService.removeItemFromCart(req.user.id, itemToRemove)
-    if (user)
-        returnValues = { itemRemoved: true, subscriptionList: user.cart?.items }
-    else
-        returnValues = { itemRemoved: false, subscriptionList: [] }
+        //Anyways try to remove from the DB if the user is logged in.
+        let result = await UserService.removeItemFromCart(req.user.id, itemToRemove)
+        if (result) {
+            subscriptionList = subscriptionList.filter(item => item._id !== itemToRemove._id)
+            returnValues = { itemRemoved: true, subscriptionList: subscriptionList }
+        } else
+            returnValues = { itemRemoved: false, subscriptionList: subscriptionList }
+
+    } else {
+        let cookieCart = req.cookies.cart;
+        cookieCart = JSON.parse(cookieCart);
+        cookieCart = cookieCart.filter(item => item.id !== itemToRemove.id);
+        if (cookieCart.length == 0)
+            res.cookie('subscriptionEmail', '');
+
+        res.cookie('cart', JSON.stringify(cookieCart));
+        returnValues = { itemRemoved: true, subscriptionList: cookieCart }
+    }
 
     res.send(returnValues)
+}
+
+exports.validateEmail = async (req, res) => {
+    try {
+        const lingua = req.res.lingua.content
+
+        let { email } = req.body,
+            user = await UserService.getUserByEmail(email),
+            invalidEmail = false,
+            invalidMsj = '';
+
+        if (user) {
+            invalidEmail = true
+            invalidMsj = lingua.existEmail
+        }
+
+        res.status(200).send({ invalidEmail: invalidEmail, invalidMsj: invalidMsj })
+
+    } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
+        console.error(`ERROR: userController -> Tyring to validate email. ${error.message}`)
+        res.status(500).send('Error validating email.')
+    }
+
 }

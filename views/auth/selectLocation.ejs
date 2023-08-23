@@ -26,28 +26,53 @@
 <body>
     <div class="container-scroller">
         <div class="container-fluid page-body-wrapper full-page-wrapper">
-            <div class="content-wrapper d-flex align-items-center auth px-0">
+            <div class="content-wrapper d-flex align-items-center px-0">
                 <div class="row w-100 mx-0">
-                    <div class="col-lg-4 mx-auto">
-                        <div class="auth-form-light text-center py-4 px-4 px-sm-5">
-                            <div class="brand-logo">
-                                <img src="/images/charlieBoy/CB-5.jpg" alt="logo">
+                    <div class="col-lg-6 col-md-6 col-sm-8 mx-auto">
+                        <div class="text-center py-4 px-4 px-sm-5">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="card-title d-flex flex-nowrap">
+                                                <div class="brand-logo text-center mb-1 w-100">
+                                                    <img class="w-50" src="/images/charlieBoy/CB-5.jpg" alt="logo">
+                                                </div>
+                                            </div>
+                                            <h4 class="card-title">
+                                                Select Location to work
+                                            </h4>
+                                            <div class="text-center">
+                                                <% if (messages.error) { %>
+                                                <p class="error">
+                                                    <%= messages.error %>
+                                                </p>
+                                                <% } %>
+
+                                                <% if (messages.info) { %>
+                                                <p class="info">
+                                                    <%= messages.info %>
+                                                </p>
+                                                <% } %>
+                                                <% if (messages.warning) { %>
+                                                <p class="warning">
+                                                    <%= messages.warning %>
+                                                </p>
+                                                <% } %>
+                                            </div>
+                                            <% for(const location of userLocations) { %>
+                                            <div>
+                                                <a class="btn btn-outline-behance mt-3 w-50" id="<%= location.id%>"
+                                                    onclick="changeLocation(this, false)">
+                                                    <%= location.name %>
+                                                </a>
+                                            </div>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <h4>
-                                Select Location to work
-                            </h4>
 
-                            <h6 class="fw-light">
-
-                            </h6>
-
-                            <% for(const location of userLocations) { %>
-                            <div>
-                                <a class="btn btn-outline-behance mt-3 w-50" id="<%= location.id%>" onclick="changeLocation(this, false)">
-                                    <%= location.name %>
-                                </a>
-                            </div>
-                            <% } %>
                         </div>
                     </div>
                 </div>

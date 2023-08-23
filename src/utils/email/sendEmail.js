@@ -40,6 +40,9 @@ const sendEmail = async (email, emailType, payload) => {
                 case 'welcome':
                     MAILTRAP_TEMPLATE = process.env.WELCOME_ID
                     break;
+                case 'activate_account':
+                    MAILTRAP_TEMPLATE = process.env.ACTIVATE_ID
+                    break;
                 case 'reset_password_request':
                     MAILTRAP_TEMPLATE = process.env.RESET_PASSWORD_REQUEST_ID
                     break;
@@ -84,8 +87,12 @@ const sendEmail = async (email, emailType, payload) => {
 
             switch (emailType) {
                 case 'welcome':
-                    subject = `Welcome to AutoCare Memberships, ${template_variables.user_name}!`
+                    subject = `Welcome to AutoCare Memberships!`
                     template = '../template/welcome.handlebars'
+                    break;
+                case 'activate_account':
+                    subject = `AutoCare Memberships - Activate Account`
+                    template = '../template/activateAccount.handlebars'
                     break;
                 case 'reset_password_request':
                     subject = 'Password reset request'
@@ -137,7 +144,7 @@ const sendEmail = async (email, emailType, payload) => {
             emailResult = await transport.sendMail(options());
 
             if (emailResult.accepted.length) {
-                emailResult = { sent: true, data: null }
+                emailResult = { sent: true, data: emailResult }
             } else {
                 emailResult = { sent: false, data: null }
             }

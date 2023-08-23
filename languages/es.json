@@ -8,6 +8,9 @@
     "login": "Iniciar Sesión",
     "signOut": "Cerrar Sesión",
     "register": "Registrar",
+    "activateAccount": "Activar Cuenta",
+    "completeAccount": "Completar Cuenta",
+    "activate": "Activar",
     "pricingList": "Lista de Precios",
     "dontHaveAccount": "¿No tiene una cuenta?",
     "create": "Crear",
@@ -16,6 +19,7 @@
     "validLink": "Enlace es Valido",
     "invalidLink": "Enlace es Invalido",
     "existEmail": "Ese correo electrónico ya existe en nuestra sistema, favor iniciar sesión con sus credenciales.",
+    "validEmail": "Email Válido",
     "members": "Miembros",
     "add": "Añadir",
     "car": {
@@ -43,7 +47,8 @@
         "validCar": "Número de Tablilla Valido",
         "membershipToAddCar": "Membresía a la que va añadir el vehículo",
         "alreadyAddedToCart": "Este vehículo ya fué añadido a la lista.",
-        "selectOrCreate": "Seleccione o cree un nuevo vehículo"
+        "selectOrCreate": "Seleccione o cree un nuevo vehículo",
+        "select": "Seleccione un vehículo"
     },
     "user": {
         "name": "Usuario",
@@ -68,6 +73,7 @@
             "forgot": "¿Olvido su contraseña?",
             "name": "Contraseña",
             "new": "Nueva Contraseña",
+            "create": "Crear Contraseña",
             "changePassword": "Modificar Contraseña",
             "passwordRequirement": "Contraseña debe de contener lo siguiente:",
             "lowerCase": "letra minúscula",
@@ -104,7 +110,8 @@
         "price": "Precio",
         "subTotal": "Sub Total",
         "proceedToCheckout": "Proceder al Pago",
-        "selectMembership": "Seleccione un plan"
+        "selectMembership": "Seleccione un plan",
+        "completeSubscription": "Completar subscripción"
     },
     "service": {
         "qty": "Cantidad de Servicios",
@@ -201,7 +208,7 @@
     "hasBeenDeleted": "{message} ha sido eliminado.",
     "email": {
         "title": "Auto Care - Membresías",
-        "verifyEmail": "Verifique su correo electrónico {email} para completar el proceso de restablecimiento de su contraseña.",
+        "verifyEmail": "Verifique su correo electrónico {email} para completar el proceso.",
         "resetSucessfully": "Auto Care - Contraseña restablecida exitosamente",
         "notSend": "No se pudo enviar el correo electrónico.",
         "passwordReset": "Auto Care - Solicitud de restablecimiento de contraseña"
@@ -209,6 +216,7 @@
     "clear": "Limpiar",
     "utilizationHistory": "Historial de Utilización",
     "loading": "Cargando",
-    "agentID": "Agent ID"
+    "agentID": "Agent ID",
+    "subscribe" : "Subcribirte"
 
 }

@@ -376,13 +376,14 @@ exports.validatePlate = async (req, res) => {
     try {
         const lingua = req.res.lingua.content
 
-        let { plateNumber, newItem, addToCart } = req.body,
+        let { plateNumber, newItem, addToCart, subscriptionEmail } = req.body,
             car = await CarService.getCarByPlate(plateNumber),
             subscriptionList = req.body.subscriptionList,
             invalidCar = false,
             invalidMsj = ''
         canUseThisCar = car ? await CarService.canUseThisCarForNewSubs(car) : false
-        let customer, item = null
+        let customer, item = null,
+            addType
 
         // if the canUseThisCar is true, it means that this car is an existing and valid car to assign to a new membership.
         if ((car && !canUseThisCar)) {
@@ -394,18 +395,33 @@ exports.validatePlate = async (req, res) => {
             invalidMsj = lingua.car.alreadyAddedToCart
 
         } else if (addToCart) {
-            [customer, item] = await UserService.addItemToCart(req.user.id, newItem)
+            if (req.user) {
+                addType = 'db'
+                // If the user is logged create a cart in the DB.
+                let result = await UserService.addItemToCart(req.user.id, newItem)
+                item = result.itemToRtrn
+                if (result.customer && item)
+                    console.debug('Item Added successfully to ' + subscriptionEmail)
 
-            if (customer && item)
-                console.debug('Item Added successfully')
+            } else {
+                addType = 'cookie'
+                // If the user is not logged in create a cart in the cookies.
+                let cookieCart = req.cookies.cart ? req.cookies.cart : res.cookie('cart', JSON.stringify([]));
+                cookieCart = JSON.parse(cookieCart);
+                cookieCart.push(newItem)
+                res.cookie('cart', JSON.stringify(cookieCart));
+                res.cookie('subscriptionEmail', subscriptionEmail);
+                item = newItem;
+            }
+
         }
 
-        res.send({ existingCar: invalidCar, invalidMsj: invalidMsj, item })
+        res.send({ existingCar: invalidCar, invalidMsj: invalidMsj, item, addType, subscriptionEmail })
 
     } catch (error) {
         req.bugsnag.notify(new Error(error),
             function (event) {
-                event.setUser(req.user.email)
+                event.setUser(req?.user?.email)
             })
         console.error(`ERROR: carController -> Tyring to validate car plate. ${error.message}`)
         res.render('Error validating car plate.')
