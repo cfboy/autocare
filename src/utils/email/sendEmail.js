@@ -81,7 +81,7 @@ const sendEmail = async (email, emailType, payload) => {
                 console.error(`Failed to sent email: ${err}`)
                 return { sent: false, data: err }
             });
-        } else if (NODE_ENV == 'development') {
+        } else if (NODE_ENV == 'development' || NODE_ENV == 'test') {
 
             var template, subject
 
