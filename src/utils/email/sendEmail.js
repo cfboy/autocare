@@ -15,7 +15,8 @@ const sendEmail = async (email, emailType, payload) => {
         var emailResult
         const {
             SENDER_EMAIL_ADDRESS,
-            NODE_ENV
+            NODE_ENV,
+            EMAILS_IN_TEST
         } = process.env;
 
         var template_variables = {
@@ -28,7 +29,7 @@ const sendEmail = async (email, emailType, payload) => {
             "subscription_id": payload.subscription_id
         }
 
-        if (NODE_ENV == "production") {
+        if (NODE_ENV == "production" || EMAILS_IN_TEST == "true") {
             const {
                 MAILTRAP_TOKEN,
                 MAILTRAP_ENDPOINT
@@ -81,7 +82,7 @@ const sendEmail = async (email, emailType, payload) => {
                 console.error(`Failed to sent email: ${err}`)
                 return { sent: false, data: err }
             });
-        } else if (NODE_ENV == 'development' || NODE_ENV == 'test') {
+        } else if (NODE_ENV == 'development') {
 
             var template, subject
 
