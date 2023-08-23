@@ -125,7 +125,7 @@ exports.register = async (req, res) => {
                     customer.email,
                     "welcome",
                     {
-                        name: customer?.personalInfo?.firstName + ' ' + customer?.personalInfo?.lastName
+                        name: customer?.fullName()
                     }
                 )
 

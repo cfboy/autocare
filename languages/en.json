@@ -139,7 +139,7 @@
         "userNotExist": "User with email {email} does not exist. Please Register.",
         "wrongPassword": "Incorrect password provided",
         "emailNotExist": "Email does not exist.",
-        "requestNotSend": "Password Reset Request Not Send",
+        "requestNotSend": "Reset Request Not Send",
         "passwordUpdated": "Password Updated {email}."
     },
     "invoice": {
