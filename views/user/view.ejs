@@ -56,10 +56,8 @@
 
                                                 <div class="d-flex justify-content-between align-items-start">
 
-                                                    <% if(isMyProfile && customer.googleID) { %>
-                                                    <!-- <a href="" class="login-with-google-btn m-1 disabled-link">
-                                                        Signed in with Google
-                                                    </a> -->
+                                                    <!-- <% if(isMyProfile && customer.googleID) { %>
+                                                   
                                                     <div class="google-signup">
                                                         <a id="googlesetup" class="google-btn m-1 disabled-link"
                                                             href="/auth/google">
@@ -76,7 +74,7 @@
                                                                 Google</span>
                                                         </a>
                                                     </div>
-                                                    <% } %>
+                                                    <% } %> -->
 
                                                     <a href="/changePassword/<%- customer.id%>?url=/editCustomers&userType=<%= userType%>&fromProfile=<%= isMyProfile%>"
                                                         type="button"
@@ -137,7 +135,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <% if(cars.length > 0) { %>
+                                <% if(cars?.length > 0) { %>
                                 <div class="col-sm-12 col-md-12 grid-margin stretch-card">
                                     <div class="card card-rounded">
                                         <div class="card-body">

@@ -94,13 +94,13 @@ const generateAtivationLink = async (lingua, email, bugsnag) => {
         user.email,
         "activate_account",
         {
-            name: user?.personalInfo?.firstName + ' ' + user?.personalInfo?.lastName,
+            name: user?.fullName(),
             link: link
         }
     )
 
     if (resultEmail.sent) {
-        console.debug('Email Sent: ' + resultEmail?.data?.accepted[0])
+        console.debug('Email Sent: ' + user.email)
         requestSuccess = true
         return [requestSuccess, lingua.email.verifyEmail(user.email)]
 
