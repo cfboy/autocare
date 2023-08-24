@@ -18,8 +18,8 @@
     "accountCreated": "Account Created",
     "validLink": "Valid Link",
     "invalidLink": "Invalid Link",
-    "existEmail": "That email already exists in our system, please login.",
-    "validEmail" : "Valid Email",
+    "existEmail": "That email already exists in our system.",
+    "validEmail": "Valid Email",
     "members": "Members",
     "add": "Add",
     "car": {
@@ -111,7 +111,7 @@
         "subTotal": "Sub Total",
         "proceedToCheckout": "Proceed to Checkout",
         "selectMembership": "Select membership plan",
-        "completeSubscription" : "Complete Subscription"
+        "completeSubscription": "Complete Subscription"
     },
     "service": {
         "qty": "Service (Qty.)",
@@ -217,5 +217,6 @@
     "utilizationHistory": "Utilization History",
     "loading": "Loading",
     "agentID": "Agent ID",
-    "subscribe" : "Subscribe"
+    "subscribe": "Subscribe",
+    "orderReview": "Order Review"
 }

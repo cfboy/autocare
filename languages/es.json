@@ -18,7 +18,7 @@
     "accountCreated": "Cuenta Creada",
     "validLink": "Enlace es Valido",
     "invalidLink": "Enlace es Invalido",
-    "existEmail": "Ese correo electrónico ya existe en nuestra sistema, favor iniciar sesión con sus credenciales.",
+    "existEmail": "Ese correo electrónico ya existe en nuestra sistema.",
     "validEmail": "Email Válido",
     "members": "Miembros",
     "add": "Añadir",
@@ -217,6 +217,6 @@
     "utilizationHistory": "Historial de Utilización",
     "loading": "Cargando",
     "agentID": "Agent ID",
-    "subscribe" : "Subcribirte"
-
+    "subscribe" : "Subcribirte",
+    "orderReview": "Revisión de la Orden"
 }

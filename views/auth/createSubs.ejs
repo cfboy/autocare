@@ -52,6 +52,8 @@
                                     </div>
                                     <form id="form-subscriptions" class="pt-3" method="post">
                                         <div class="row">
+                                            <input id="oldProcess" name="oldProcess" value="true" hidden />
+
                                             <input id="userID" name="userID" value="<%= user.id%>" hidden />
                                             <h5><i class="fa-solid fa-1 list-number"></i>
                                                 <%= lingua.car.selectOrCreate%>
@@ -226,7 +228,8 @@
                             plateNumber: plate,
                             newItem: newItem,
                             subscriptionList: subscriptionList ? subscriptionList : [],
-                            addToCart: true
+                            addToCart: true,
+                            oldProcess: true
                         }),
                     }).done(function (result) {
                         if (result.existingCar) {

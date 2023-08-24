@@ -376,7 +376,7 @@ exports.validatePlate = async (req, res) => {
     try {
         const lingua = req.res.lingua.content
 
-        let { plateNumber, newItem, addToCart, subscriptionEmail } = req.body,
+        let { plateNumber, newItem, addToCart, subscriptionEmail, oldProcess } = req.body,
             car = await CarService.getCarByPlate(plateNumber),
             subscriptionList = req.body.subscriptionList,
             invalidCar = false,
@@ -395,7 +395,7 @@ exports.validatePlate = async (req, res) => {
             invalidMsj = lingua.car.alreadyAddedToCart
 
         } else if (addToCart) {
-            if (req.user) {
+            if (oldProcess) {
                 addType = 'db'
                 // If the user is logged create a cart in the DB.
                 let result = await UserService.addItemToCart(req.user.id, newItem)
