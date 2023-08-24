@@ -406,8 +406,14 @@ exports.checkoutWithEmail = async (req, res) => {
 
     try {
         // Group by priceID
+        const customer = await UserService.getUserByEmail(email);
         const subscriptionsGroup = groupByKey(subscriptions, 'priceID', { omitKey: false })
-        const session = await Stripe.createCheckoutSessionWithEmail(email, subscriptions, Object.entries(subscriptionsGroup), backURL)
+        let session
+        if (customer)
+            session = await Stripe.createCheckoutSession(customer.billingID, subscriptions, Object.entries(subscriptionsGroup), backURL)
+        else
+            session = await Stripe.createCheckoutSessionWithEmail(email, subscriptions, Object.entries(subscriptionsGroup), backURL)
+
         if (session) {
             res.send({
                 sessionId: session.id
@@ -445,14 +451,15 @@ exports.completeCheckoutSuccess = async (req, res) => {
             stripeCustomer = await Stripe.getCustomerByID(session.customer)
         }
 
-        if (req.user) {
-            // clean cart items.
-            user = await UserService.emptyCart(req.user.id)
+        // if (req.user) {
+        //     // clean cart items.
+        //     user = await UserService.emptyCart(req.user.id)
 
-        } else {
-            // Clear cookie cart
-            res.cookie('cart', JSON.stringify([]));
-        }
+        // } else {
+        // Clear cookie cart
+        res.cookie('cart', JSON.stringify([]));
+        res.cookie('subscriptionEmail', '');
+        // }
 
         req.session.message = `Subcription Created to account ${stripeCustomer.email}`
         req.session.alertType = alertTypes.CompletedActionAlert

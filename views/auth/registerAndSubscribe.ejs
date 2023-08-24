@@ -51,21 +51,21 @@
                                                 </div>
 
                                                 <div class="w-100">
-                                                    <% if(user) { %>
+                                                    <!-- <%# if(user) { %> -->
                                                     <input id="userExist" name="userExist" value="true" hidden />
                                                     <a class="btn btn-outline-primary btn-icon-text float-end"
                                                         id="close-registration" href="/account">
                                                         <%= lingua.home%> <i class="fa-solid fa-home m-1 mb-0 mt-0"></i>
                                                     </a>
-                                                    <% } else { %>
-                                                    <input id="userExist" name="userExist" value="false" hidden />
+                                                    <!-- <%# } else { %> -->
+                                                    <!-- <input id="userExist" name="userExist" value="false" hidden /> -->
 
-                                                    <a class="btn btn-outline-primary btn-icon-text float-end"
-                                                        id="close-registration" href="/login">
-                                                        <%= lingua.login%> <i
-                                                            class="fa-solid fa-arrow-right-to-bracket m-1 mb-0 mt-0"></i>
-                                                    </a>
-                                                    <% } %>
+                                                    <!-- <a class="btn btn-outline-primary btn-icon-text float-end" -->
+                                                    <!-- id="close-registration" href="/login"> -->
+                                                    <!-- <%= lingua.login%> <i -->
+                                                    <!-- class="fa-solid fa-arrow-right-to-bracket m-1 mb-0 mt-0"></i> -->
+                                                    <!-- </a> -->
+                                                    <!-- <%# } %> -->
                                                 </div>
                                             </div>
                                             <h4 class="card-title text-center mb-2">
@@ -82,7 +82,6 @@
                                                         </h5>
                                                         <hr>
                                                         <div class="col-lg-12">
-                                                            <% if(!user) { %>
                                                             <div class="form-group">
                                                                 <label class="required"
                                                                     for="email"><%= lingua.user.email%></label>
@@ -94,13 +93,7 @@
                                                                 <div id="emailValidationResult"></div>
 
                                                             </div>
-                                                            <% } else { %>
-                                                            <input id="userID" name="userID" value="<%= user?.id%>"
-                                                                hidden />
-                                                            <input id="email" name="email" value="<%= user?.email%>"
-                                                                hidden />
-                                                            <p class="alert alert-success"><%= user.email %></p>
-                                                            <% } %>
+
                                                         </div>
                                                     </div>
                                                     <div class="row">
@@ -152,7 +145,8 @@
 
                                             <div class="row d-none" id="cartDiv">
                                                 <h5><i class="fa-solid fa-cart-arrow-down list-number"></i>
-                                                    <%= lingua.myCart%>
+                                                    <%# lingua.myCart%>
+                                                    <%= lingua.orderReview%>
                                                 </h5>
                                                 <hr>
 
@@ -271,11 +265,11 @@
         function manageCheckoutBtn() {
             var email;
 
-            if (userExist) {
-                email = $("#email").val();
-            } else {
-                email = getCookie('subscriptionEmail');
-            }
+            // if (userExist) {
+            //     email = $("#email").val();
+            // } else {
+            email = getCookie('subscriptionEmail');
+            // }
             if (!email) {
                 checkoutBtn.attr("hidden", true);
             } else {
@@ -341,24 +335,24 @@
                         }),
                     }).done(function (result) {
                         if (result.invalidEmail) {
-                            email.setCustomValidity(result.invalidMsj);
+                            // email.setCustomValidity(result.invalidMsj);
                             // email.reportValidity();
                             // let reportMessage = `<p class="error">` + result.invalidMsj + `</p>`;
-                            let reportMessage = `<p class="alert alert-fill-danger mt-2 p-1"><i class="fa-circle-exclamation fa-solid"></i>${result.invalidMsj}</p>`;
+                            let reportMessage = `<p class="alert alert-fill-warning mt-2 p-1"><i class="fa-circle-exclamation fa-solid"></i>${result.invalidMsj}</p>`;
 
                             showResult('#emailValidationResult', reportMessage);
 
-                            checkoutBtn.attr("hidden", true);
+                            // checkoutBtn.attr("hidden", true);
 
                         } else {
                             showResult('#emailValidationResult',
                                 `<p class="alert alert-fill-success mt-2 p-1 success"><i class="fa-check-circle fa-solid"></i><%= lingua.validEmail%></p>`);
                             setTimeout(function () {
-                                email.setCustomValidity("");
+                                // email.setCustomValidity("");
                                 showResult('#emailValidationResult', "");
                             }, 2500);
 
-                            checkoutBtn.attr("hidden", false);
+                            // checkoutBtn.attr("hidden", false);
                         }
                     }).fail(function (error) {
                         console.log(error);
@@ -423,11 +417,11 @@
         // This function manage the divs of the email.
         function manageEmail() {
             let email;
-            if (userExist) {
-                email = $('#email').val();
-            } else {
-                email = getCookie('subscriptionEmail');
-            }
+            // if (userExist) {
+            //     email = $('#email').val();
+            // } else {
+            email = getCookie('subscriptionEmail');
+            // }
             if (email) {
                 showResult('#subscriptionEmail',
                     `<p class="alert alert-success"> 
@@ -482,7 +476,8 @@
                             newItem: newItem,
                             subscriptionList: subscriptionList ? subscriptionList : [],
                             addToCart: true,
-                            subscriptionEmail
+                            subscriptionEmail,
+                            oldProcess: false,
                         }), beforeSend: function () {
                             showResult(`#addCarLoading`,
                                 `<div class="spinner text-center p-1 m-1">

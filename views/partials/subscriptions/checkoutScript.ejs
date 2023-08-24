@@ -3,11 +3,12 @@
     $(document).ready(function () {
 
         const checkoutBtn = $('#checkout-btn'); //New checkout btn
+        const oldProcess = $('#oldProcess').val() == 'true'; //New checkout btn
         const publishableKey = `<%= pkStripe%>`;
         const stripe = Stripe(publishableKey);
         const user = `<%- user%>`;
         // Checkout
-        if (user) {
+        if (oldProcess) {
             checkoutBtn.click(function () {
                 $(this).prop('disabled', true);
                 const subscriptions = JSON.parse($('#subscription-list').val());
