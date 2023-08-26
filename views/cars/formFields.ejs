@@ -10,7 +10,7 @@
             <option value=""><%= lingua.selectOne%></option>
             <% for(const car of userCars) { %>
             <!-- All properties are necessary to autofill the other fields. -->
-            <option value="<%= car.id%>" name="<%= car.id%>" brand="<%= car.brand%>" model="<%= car.model%>"
+            <option value="<%= car.id%>" name="<%= car.id%>" brand="<%= car.brand%>"
                 plate="<%= car.plate%>">
                 <%= car.carName() %>
             </option>
@@ -32,7 +32,6 @@
             placeholder="Brand" autofocus required />
         <% } else { %>
         <select id="brand" name="brand" required autofocus
-            onchange="findModel(this.value, null, `<%= lingua.selectOne%>`)"
             class="form-control mb-3 form-control-lg js-example-basic-single w-100">
             <option value=""><%= lingua.selectOne%></option>
             <% for(const make of allMakes) { %>
@@ -46,7 +45,7 @@
         <% } %>
     </div>
 </div>
-<div class="col-lg-12">
+<!-- <div class="col-lg-12">
     <div class="form-group">
         <label for="carModel" class=""><%= lingua.car.model%></label>
         <% if(allMakes.length == 0) { %>
@@ -59,7 +58,7 @@
         </select>
         <% } %>
     </div>
-</div>
+</div> -->
 <div class="col-lg-12">
     <div class="form-group">
         <label for="carPlate" class="required"><%= lingua.car.plate%></label>

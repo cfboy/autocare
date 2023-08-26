@@ -38,35 +38,28 @@
             <div class="content-wrapper d-flex align-items-center auth px-0">
                 <div class="row w-100 mx-0">
                     <div class="col-lg-8 mx-auto">
-                        <div class="text-left py-4 px-4 px-sm-4">
+                        <div class="text-left px-sm-1 py-4 px-4">
                             <div class="row">
                                 <div class="col-sm-12 col-md-12 col-lg-12 mb-3">
                                     <div class="card">
-                                        <div class="card-body">
-                                            <div class="card-title d-flex flex-nowrap">
+                                        <div class="mt-3 mx-3">
+                                            <a class="btn btn-icon float-end p-1" id="close-registration"
+                                                href="/logout"> <i class="fa-solid fa-sign-out m-1 mb-0 mt-0"></i>
+                                            </a>
+                                            <a class="btn btn-icon float-end p-1" id="close-registration"
+                                                href="/account">
+                                                <i class="fa-solid fa-home m-1 mb-0 mt-0"></i>
+                                            </a>
+                                        </div>
+                                        <div class="card-body pt-0">
+                                            <div class="card-title">
                                                 <div class="w-100"></div>
                                                 <div class="brand-logo text-center mb-1 w-100">
                                                     <img src="/images/charlieBoy/CB-5.jpg" alt="logo"
-                                                        style="width: 50% !important;">
+                                                        style="max-width: 200px">
                                                 </div>
 
-                                                <div class="w-100">
-                                                    <!-- <%# if(user) { %> -->
-                                                    <input id="userExist" name="userExist" value="true" hidden />
-                                                    <a class="btn btn-outline-primary btn-icon-text float-end"
-                                                        id="close-registration" href="/account">
-                                                        <%= lingua.home%> <i class="fa-solid fa-home m-1 mb-0 mt-0"></i>
-                                                    </a>
-                                                    <!-- <%# } else { %> -->
-                                                    <!-- <input id="userExist" name="userExist" value="false" hidden /> -->
 
-                                                    <!-- <a class="btn btn-outline-primary btn-icon-text float-end" -->
-                                                    <!-- id="close-registration" href="/login"> -->
-                                                    <!-- <%= lingua.login%> <i -->
-                                                    <!-- class="fa-solid fa-arrow-right-to-bracket m-1 mb-0 mt-0"></i> -->
-                                                    <!-- </a> -->
-                                                    <!-- <%# } %> -->
-                                                </div>
                                             </div>
                                             <h4 class="card-title text-center mb-2">
                                                 <%= lingua.subscribe%>
@@ -98,7 +91,7 @@
                                                     </div>
                                                     <div class="row">
                                                         <h5><i class="fa-solid fa-2 list-number"></i>
-                                                            <%= lingua.car.select%>
+                                                            <%= lingua.car.info%>
                                                         </h5>
                                                         <hr>
 
@@ -129,75 +122,48 @@
                                                         </div>
                                                     </div>
                                                     <div class="row">
-                                                        <div class="col-6 mt-4" id="formValidationResult"></div>
 
-                                                        <div class="col-6 mt-3">
+                                                        <div class="col-12">
+
                                                             <div class="d-flex float-end">
                                                                 <span id="addCarLoading"></span>
                                                                 <button id="addSub"
                                                                     class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn float-end">
                                                                     <%= lingua.membership.completeSubscription%></button>
                                                             </div>
+
                                                         </div>
+                                                        <div class="col-12 mt-3" id="formValidationResult"></div>
+
                                                     </div>
                                                 </form>
                                             </div>
 
                                             <div class="row d-none" id="cartDiv">
-                                                <h5><i class="fa-solid fa-cart-arrow-down list-number"></i>
-                                                    <%# lingua.myCart%>
-                                                    <%= lingua.orderReview%>
-                                                </h5>
-                                                <hr>
+                                                <div class="col-12">
 
-                                                <h5> <%= lingua.user.email%>
-                                                </h5>
-                                                <div id="subscriptionEmail">
-                                                </div>
-                                                <div class="table-responsive-sm">
-                                                    <table id="cart-table" class="table table-hover">
-                                                        <thead>
-                                                            <tr>
-                                                                <th><%= lingua.car.name%></th>
-                                                                <th><%= lingua.car.product%></th>
-                                                                <th><%= lingua.membership.price%></th>
-                                                                <th><%= lingua.action%></th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody id="tbody"></tbody>
-                                                        <tfoot>
-                                                            <tr>
-                                                                <th></th>
-                                                                <th style="text-align:right">
-                                                                    <%= lingua.membership.subTotal%>:</th>
-                                                                <th></th>
-                                                                <th></th>
-                                                            </tr>
-                                                        </tfoot>
-                                                    </table>
-                                                </div>
-                                                <div class="mt-3">
-                                                    <input id="subscription-list" type="text" hidden value="">
-                                                    <div class="col-12 float-end">
+                                                    <h5><i class="fa-solid fa-cart-arrow-down list-number"></i>
+                                                        <%# lingua.myCart%>
+                                                        <%= lingua.orderReview%>
+                                                    </h5>
+                                                    <hr>
 
-                                                        <% if(user) { %>
-                                                        <button id="checkout-btn" hidden value="<%- user?.billingID%>"
-                                                            email="<%- user?.email%>"
-                                                            class="btn btn-block btn-checkout btn-lg font-weight-medium auth-form-btn float-end"
-                                                            type="submit">
-                                                            <%= lingua.membership.proceedToCheckout%>
-                                                        </button>
-                                                        <% } else { %>
-                                                        <button id="checkout-btn" hidden
-                                                            class="btn btn-block btn-checkout btn-lg font-weight-medium auth-form-btn float-end"
-                                                            type="submit">
-                                                            <%= lingua.membership.proceedToCheckout%>
-                                                        </button>
-                                                        <% } %>
-
+                                                    <div class="row" id="subscriptionData">
                                                     </div>
 
+                                                    <div class="row mt-3">
+                                                        <input id="subscription-list" type="text" hidden value="">
+                                                        <div class="col-12">
+                                                            <button id="checkout-btn" hidden
+                                                                class="btn btn-block btn-checkout btn-lg font-weight-medium auth-form-btn float-end mx-1"
+                                                                type="submit">
+                                                                <%= lingua.membership.proceedToCheckout%>
+                                                            </button>
+                                                        </div>
+
+                                                    </div>
                                                 </div>
+
                                                 <div class="col-12">
                                                     <span id="error-message"></span>
                                                 </div>
@@ -243,18 +209,19 @@
         // Initialize variables
         var rowIdx = 0; //This field is used to filter the list when remove any from de list.
         var subscriptionList = [];
+        var subscriptionEmail = '';
         var form = $("#form-subscriptions");
         var checkoutBtn = $('#checkout-btn'); //This btn is hidden for default
-        var userExist = $("#userExist").val() == "true";
+        // var userExist = $("#userExist").val() == "true";
         var cart = [];
         var addCarDiv = $('#addCar-div');
         var cartDiv = $('#cartDiv');
         var cartString = '<%- JSON.stringify(cart) %>';
 
         $(document).ready(function () {
-            displayLoading('#loading-div', 1000)
-            initializeCart(cartString);
+            displayLoading('#loading-div', 1000);
             manageEmail();
+            initializeCart(cartString);
             manageCheckoutBtn();
             setTimeout(function () {
                 manageDivViews(subscriptionList);
@@ -263,14 +230,13 @@
 
         // This function display/hidethe checkout btn basend on the email value in the document ready.
         function manageCheckoutBtn() {
-            var email;
 
             // if (userExist) {
             //     email = $("#email").val();
             // } else {
-            email = getCookie('subscriptionEmail');
+            subscriptionEmail = getCookie('subscriptionEmail');
             // }
-            if (!email) {
+            if (!subscriptionEmail) {
                 checkoutBtn.attr("hidden", true);
             } else {
                 checkoutBtn.attr("hidden", false);
@@ -365,6 +331,10 @@
                     showResult('#emailValidationResult',
                         `<p class="alert alert-fill-danger mt-2 p-1"><i class="fa-circle-exclamation fa-solid"></i>Invalid Email</p>`);
                 }
+
+                setTimeout(function () {
+                    showResult('#emailValidationResult', "");
+                }, 2500);
             }
         }
 
@@ -381,27 +351,30 @@
             }
         }
 
-        // This function add the data in the table of the cart.
+        // This function add the data to the div of the cart.
         function addDataToTable(newItem, addType) {
-            // Initialize DataTable
-            var t = $('#cart-table').DataTable();
-            // Add row to table.
-            // Set the rowIdx to btn id to get the id of deleted element.
-            t.row.add([
-                `<p> Brand: ${newItem.brand} </p> <br> 
-                    <p> Model: ${newItem.model} </p> <br>
-                    <p> License Plate: ${newItem.plate} </p>`,
-                newItem.product,
-                newItem.price,
-                `<td class="text-center">
-                    <div class="d-flex">
-                        <button type="button" id="${rowIdx}" value="${newItem._id ? newItem._id : newItem.id}" class="btn btn-icon btn-icon-no-border no-margin remove">
-                            <i class="fas fa-trash-alt icon-sm text-danger"></i>
-                        </button>
-                        <span class="m-auto" id="deleteSection-${newItem._id ? newItem._id : newItem.id}"></span>
+            var id = newItem._id ? newItem._id : newItem.id;
+
+            var dataString =
+                `<div class="col-md-6 col-lg-8 col-sm-12 mx-auto" id="divItem-${id}">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="w-100">
+                                <button title="Delete" type="button" id="delete-${id}" value="${id}" class="p-0 btn btn-icon btn-icon-no-border no-margin remove float-end">
+                                <i class="fas fa-xmark-square icon-sm text-danger"></i>
+                                </button>   
+                            </div>
+                            <h5> <i class="fa fa-envelope mx-1 text-primary"></i> ${subscriptionEmail}</h5> <br>
+                            <h5><i class="fa-solid fa-cart-plus mx-1 text-primary"></i> ${newItem.product}</h5> <br>
+                            <h5><i class="fa-solid fa-car mx-1 text-primary"></i> ${newItem.brand} - ${newItem.plate} </h5> <br>
+                            <h5><i class="fa-solid fa-file-invoice-dollar mx-1 text-primary"></i> ${newItem.price}</h5>             
+                       </div>
                     </div>
-                </td>`
-            ]).draw(false);
+                </div>`;
+
+            //Add data to the checkout
+            $('#subscriptionData').append(dataString);
+
             // Add newItem to subscriptionList
             newItem.addType = addType;
             subscriptionList.push(newItem);
@@ -416,16 +389,13 @@
 
         // This function manage the divs of the email.
         function manageEmail() {
-            let email;
-            // if (userExist) {
-            //     email = $('#email').val();
-            // } else {
-            email = getCookie('subscriptionEmail');
-            // }
-            if (email) {
+
+            subscriptionEmail = getCookie('subscriptionEmail');
+
+            if (subscriptionEmail) {
                 showResult('#subscriptionEmail',
                     `<p class="alert alert-success"> 
-                    ${email}
+                    ${subscriptionEmail}
                 </p>`);
             } else {
                 showResult('#subscriptionEmail',
@@ -449,20 +419,23 @@
             if (form[0].checkValidity()) {
                 // Get all values
                 var brand = $("#brand").val(),
-                    model = $("#carModel").val(),
+                    // model = $("#carModel").val(),
                     plate = $("#carPlate").val().toUpperCase(),
                     priceID = $("#product").val(),
                     product = $("#product").find('option:selected').attr("name"),
-                    price = $("#product").find('option:selected').attr("price"),
-                    subscriptionEmail = $('#email').val(),
+                    price = $("#product").find('option:selected').attr("price");
+
+                subscriptionEmail = $('#email').val(),
                     // Prepare newItem Obj.
                     newItem = {
                         id: ++rowIdx,
-                        brand: brand, model: model, plate: plate,
+                        brand: brand,
+                        // model: model, 
+                        plate: plate,
                         product: product, price: price, priceID: priceID
                     };
 
-                if (newItem.brand == '' || newItem.model == '' || newItem.plate == '') {
+                if (newItem.brand == '' || newItem.plate == '') {
                     let showMessage = `<p class="error">Missing values</p>`
                     showResult('#formValidationResult', showMessage);
 
@@ -520,12 +493,13 @@
         });
 
         // This event listener handles the click event for Remove subscription
-        $('#cart-table tbody').on('click', '.remove', function () {
+        $('#subscriptionData').on('click', '.remove', function () {
             $(this).prop('disabled', true);
-            var t = $('#cart-table').DataTable();
+            // var t = $('#cart-table').DataTable();
             var triggerObj = $(this);
             var id = $(this).attr('value');
             let itemToRemove = subscriptionList.find(item => item._id == id || item.id == id);
+            // let itemToRemove = subscriptionList;
 
             $.ajax({
                 url: "/removeFromCart",
@@ -535,7 +509,7 @@
                     item: itemToRemove,
                     subscriptionList: subscriptionList
                 }), beforeSend: function () {
-                    showResult(`#deleteSection-${id}`,
+                    showResult(`#error-message`,
                         `<div class="spinner text-center mx-0">
                             <div class="spinner-grow spinner-grow-sm"></div>
                         </div>`
@@ -544,25 +518,34 @@
             }).done(function (result) {
 
                 if (result.itemRemoved) {
-                    // Remove from the table.
-                    t.row(triggerObj.parents('tr')).remove().draw();
-                    // Decrease the row index.
-                    rowIdx--;
+                    $(`#subscriptionData #divItem-${id}`).remove();
+
+                    // // Remove from the table.
+                    // t.row(triggerObj.parents('tr')).remove().draw();
+                    // // Decrease the row index.
+                    // rowIdx--;
                     // Remove the deleted item from de subscriptionList.
                     subscriptionList = result.subscriptionList;
 
                     $('#subscription-list').val(JSON.stringify(subscriptionList));
 
-                    // If the susbcription list is empty, then hide ckeckout btn.
+                    // // If the susbcription list is empty, then hide ckeckout btn.
                     if (subscriptionList.length < 1)
                         checkoutBtn.attr("hidden", true);
                     manageDivViews(subscriptionList);
+
+                    showResult(`#error-message`,
+                        ``
+                    );
                 } else {
                     console.log('not removed');
                 }
 
             }).fail(function (err) {
                 console.log(err);
+                showResult(`#error-message`,
+                    `${err.message}`
+                );
             })
         });
 

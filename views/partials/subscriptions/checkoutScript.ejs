@@ -6,7 +6,7 @@
         const oldProcess = $('#oldProcess').val() == 'true'; //New checkout btn
         const publishableKey = `<%= pkStripe%>`;
         const stripe = Stripe(publishableKey);
-        const user = `<%- user%>`;
+
         // Checkout
         if (oldProcess) {
             checkoutBtn.click(function () {

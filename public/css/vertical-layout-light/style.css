@@ -32545,7 +32545,8 @@ div.tagsinput span.tag a {
     line-height: 1.5;
 }
 
-.auth form .auth-link, .auth-link {
+.auth form .auth-link,
+.auth-link {
     font-size: 0.812rem;
 }
 
@@ -36147,4 +36148,22 @@ label.required:after {
     font-weight: 700;
     font-family: 'Roboto',sans-serif; */
     margin-right: auto;
+}
+
+@media (max-width: 576px) {
+    h5 {
+        font-size: 1.0rem !important;
+    }
+
+}
+
+@media (max-width: 425px) {
+    h5 {
+        font-size: 0.85rem !important;
+    }
+
+    .card-body {
+        padding: 1rem !important;
+    }
+
 }
