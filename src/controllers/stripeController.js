@@ -158,7 +158,7 @@ const manageUpdateOrCreateSubscriptionsWebhook = async (subscription, bugsnag, l
     try {
         console.log('Start manageUpdateOrCreateSubscriptionsWebhook()');
         let isNew = false; //Flag to identify if is a new subscription or update
-        let items, subscriptionItems, alertInfo, result, message
+        let items, subscriptionItems, alertInfo, result, message, activationResult, activationEmailProperties
 
         // Find the customer in Stripe by BillingID
         let stripeCustomer = await Stripe.getCustomerByID(subscription.customer);
@@ -169,7 +169,7 @@ const manageUpdateOrCreateSubscriptionsWebhook = async (subscription, bugsnag, l
         if (!customer) {
             console.log('Not found Customer: manageUpdateOrCreateSubscriptionsWebhook()');
             // If the user not exist in the DB then create one.
-            [result, message, customer] = await AuthService.registerAndActivateLink(stripeCustomer, ROLES.CUSTOMER, lingua, bugsnag)
+            [activationResult, message, customer, activationEmailProperties] = await AuthService.registerAndActivateLink(stripeCustomer, ROLES.CUSTOMER, lingua, bugsnag)
 
             if (!customer) {
                 console.log('Not Found Customer.')
@@ -326,20 +326,30 @@ const manageUpdateOrCreateSubscriptionsWebhook = async (subscription, bugsnag, l
             req.io.in(customer?.id).emit('notifications', notification);
 
             // Prepare email variables
-            let emailTemplate = isNew ? 'subscription_created' : 'subscription_updated';
-            let emailSubject = isNew ? 'Subscription Created - AutoCare Memberships' : 'Subscription Updated - AutoCare Memberships';
+            let emailTemplate
+            let emailSubject
+            let emailProperties
+            if (activationResult) {
+                emailProperties = activationEmailProperties
+                
+            } else {
+                emailTemplate = isNew ? 'subscription_created' : 'subscription_updated';
+                emailSubject = isNew ? 'Subscription Created - AutoCare Memberships' : 'Subscription Updated - AutoCare Memberships';
+
+                emailProperties = {
+                    email: customer.email,
+                    emailType: emailTemplate,
+                    payload: {
+                        name: customer?.fullName(),
+                        subscription_id: subscription.id,
+                        message: alertInfo.message,
+                        subject: emailSubject
+                    }
+                }
+            }
 
             // Send Email
-            var resultEmail = await sendEmail(
-                customer.email,
-                emailTemplate,
-                {
-                    name: customer?.fullName(),
-                    subscription_id: subscription.id,
-                    message: alertInfo.message,
-                    subject: emailSubject
-                }
-            );
+            var resultEmail = await sendEmail(emailProperties.email, emailProperties.emailType, emailProperties.payload);
             if (resultEmail.sent) {
                 console.debug('Email Sent: ' + customer.email)
 

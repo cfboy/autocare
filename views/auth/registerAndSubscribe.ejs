@@ -206,6 +206,7 @@
     <script src="../../vendors/select2/select2.min.js"></script>
     <script src="../../js/select2.js"></script>
     <script src="../js/helper-functions.js"></script>
+    <%- include('../partials/alerts.ejs', {message, alertType}); %>
 
     <%- include('../partials/dataTable.ejs', {tableID : '#cart-table', ordering: false, searching: false , info: false, paging: false, footerCheckout: true}); %>
     <%# include('../partials/alerts.ejs', {message, alertType}); %>
@@ -506,103 +507,127 @@
 
         // This event listener handles the click event for Remove subscription
         $('#subscriptionData').on('click', '.remove', function () {
-            $(this).prop('disabled', true);
-            // var t = $('#cart-table').DataTable();
-            var triggerObj = $(this);
-            var id = $(this).attr('value');
-            let itemToRemove = subscriptionList.find(item => item._id == id || item.id == id);
-            // let itemToRemove = subscriptionList;
 
-            $.ajax({
-                url: "/removeFromCart",
-                type: "POST",
-                contentType: "application/json",
-                data: JSON.stringify({
-                    item: itemToRemove,
-                    subscriptionList: subscriptionList
-                }), beforeSend: function () {
-                    showResult(`#error-message`,
-                        `<div class="spinner text-center mx-0 my-0">
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete item!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $(this).prop('disabled', true);
+                    // var t = $('#cart-table').DataTable();
+                    var triggerObj = $(this);
+                    var id = $(this).attr('value');
+                    let itemToRemove = subscriptionList.find(item => item._id == id || item.id == id);
+                    // let itemToRemove = subscriptionList;
+
+                    $.ajax({
+                        url: "/removeFromCart",
+                        type: "POST",
+                        contentType: "application/json",
+                        data: JSON.stringify({
+                            item: itemToRemove,
+                            subscriptionList: subscriptionList
+                        }), beforeSend: function () {
+                            showResult(`#error-message`,
+                                `<div class="spinner text-center mx-0 my-0">
                             <div class="spinner-grow spinner-grow-sm"></div>
                         </div>`
-                    );
+                            );
+                        }
+                    }).done(function (result) {
+
+                        if (result.itemRemoved) {
+                            $(`#subscriptionData #divItem-${id}`).remove();
+
+                            // // Remove from the table.
+                            // t.row(triggerObj.parents('tr')).remove().draw();
+                            // // Decrease the row index.
+                            // rowIdx--;
+                            // Remove the deleted item from de subscriptionList.
+                            subscriptionList = result.subscriptionList;
+
+                            $('#subscription-list').val(JSON.stringify(subscriptionList));
+
+                            // // If the susbcription list is empty, then hide ckeckout btn.
+                            if (subscriptionList.length < 1)
+                                checkoutBtn.attr("hidden", true);
+                            manageDivViews(subscriptionList);
+
+                            showResult(`#error-message`,
+                                ``
+                            );
+                        } else {
+                            console.log('not removed');
+                        }
+
+                    }).fail(function (err) {
+                        console.log(err);
+                        showResult(`#error-message`,
+                            `${err.message}`
+                        );
+                    })
                 }
-            }).done(function (result) {
-
-                if (result.itemRemoved) {
-                    $(`#subscriptionData #divItem-${id}`).remove();
-
-                    // // Remove from the table.
-                    // t.row(triggerObj.parents('tr')).remove().draw();
-                    // // Decrease the row index.
-                    // rowIdx--;
-                    // Remove the deleted item from de subscriptionList.
-                    subscriptionList = result.subscriptionList;
-
-                    $('#subscription-list').val(JSON.stringify(subscriptionList));
-
-                    // // If the susbcription list is empty, then hide ckeckout btn.
-                    if (subscriptionList.length < 1)
-                        checkoutBtn.attr("hidden", true);
-                    manageDivViews(subscriptionList);
-
-                    showResult(`#error-message`,
-                        ``
-                    );
-                } else {
-                    console.log('not removed');
-                }
-
-            }).fail(function (err) {
-                console.log(err);
-                showResult(`#error-message`,
-                    `${err.message}`
-                );
             })
         });
 
 
         // This event listener handles the click event for Remove subscription
         $('#cartDiv').on('click', '#cancel-btn', function () {
-            $(this).prop('disabled', true);
-            // var t = $('#cart-table').DataTable();
-            var triggerObj = $(this);
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, cancel order!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $(this).prop('disabled', true);
+                    var triggerObj = $(this);
+                    $.ajax({
+                        url: "/cancelOrder",
+                        type: "POST",
+                        contentType: "application/json",
+                        data: JSON.stringify({
+                            subscriptionList: subscriptionList
+                        }), beforeSend: function () {
+                            showResult(`#error-message`,
+                                `<div class="spinner text-center mx-0 my-0">
+                                    <div class="spinner-grow spinner-grow-sm"></div>
+                                 </div>`
+                            );
+                        }
+                    }).done(function (result) {
+                        if (result.orderCancelled) {
+                            subscriptionList = result.subscriptionList;
+                            $(`#subscriptionData`).html('');
+                            $('#subscription-list').val(JSON.stringify(subscriptionList));
 
-            $.ajax({
-                url: "/cancelOrder",
-                type: "POST",
-                contentType: "application/json",
-                data: JSON.stringify({
-                    subscriptionList: subscriptionList
-                }), beforeSend: function () {
-                    showResult(`#error-message`,
-                        `<div class="spinner text-center mx-0 my-0">
-                            <div class="spinner-grow spinner-grow-sm"></div>
-                        </div>`
-                    );
+                            // // If the susbcription list is empty, then hide ckeckout btn.
+                            if (subscriptionList.length < 1)
+                                checkoutBtn.attr("hidden", true);
+
+                            manageDivViews(subscriptionList);
+
+                            showResult(`#error-message`, ``);
+                        } else {
+
+                        }
+                    }).fail(function (err) {
+                        console.log(err);
+                        showResult(`#error-message`,
+                            `${err.message}`
+                        );
+                    })
                 }
-            }).done(function (result) {
-                if (result.orderCancelled) {
-                    subscriptionList = result.subscriptionList;
-                    $(`#subscriptionData`).html('');
-                    $('#subscription-list').val(JSON.stringify(subscriptionList));
-
-                    // // If the susbcription list is empty, then hide ckeckout btn.
-                    if (subscriptionList.length < 1)
-                        checkoutBtn.attr("hidden", true);
-
-                    manageDivViews(subscriptionList);
-
-                    showResult(`#error-message`, ``);
-                } else {
-
-                }
-            }).fail(function (err) {
-                console.log(err);
-                showResult(`#error-message`,
-                    `${err.message}`
-                );
             })
+
         });
 
     </script>
