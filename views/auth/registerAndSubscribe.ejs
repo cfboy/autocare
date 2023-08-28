@@ -152,10 +152,18 @@
                                                     </div>
 
                                                     <div class="row mt-3">
+                                                        <div class="col-12">
+                                                            <span id="error-message"></span>
+                                                        </div>
                                                         <input id="subscription-list" type="text" hidden value="">
                                                         <div class="col-12">
+                                                            <button id="cancel-btn"
+                                                                class="btn btn-block btn-secondary btn-lg font-weight-medium auth-form-btn float-start mx-1 btn-sm-block"
+                                                                type="submit">
+                                                                <%= lingua.membership.cancelOrder%>
+                                                            </button>
                                                             <button id="checkout-btn" hidden
-                                                                class="btn btn-block btn-checkout btn-lg font-weight-medium auth-form-btn float-end mx-1"
+                                                                class="btn btn-block btn-checkout btn-lg font-weight-medium auth-form-btn float-end mx-1 btn-sm-block"
                                                                 type="submit">
                                                                 <%= lingua.membership.proceedToCheckout%>
                                                             </button>
@@ -164,9 +172,7 @@
                                                     </div>
                                                 </div>
 
-                                                <div class="col-12">
-                                                    <span id="error-message"></span>
-                                                </div>
+
                                             </div>
                                         </div>
                                     </div>
@@ -226,6 +232,12 @@
             setTimeout(function () {
                 manageDivViews(subscriptionList);
             }, 1000);
+
+            $('[title]').tooltip({
+                placement: function (t_el, el) {
+                    return (typeof $(el).data('placement') === 'undefined') ? 'bottom' : $(el).data('placement');
+                }, trigger: 'hover'
+            });
         });
 
         // This function display/hidethe checkout btn basend on the email value in the document ready.
@@ -364,10 +376,10 @@
                                 <i class="fas fa-xmark-square icon-sm text-danger"></i>
                                 </button>   
                             </div>
-                            <h5> <i class="fa fa-envelope mx-1 text-primary"></i> ${subscriptionEmail}</h5> <br>
-                            <h5><i class="fa-solid fa-cart-plus mx-1 text-primary"></i> ${newItem.product}</h5> <br>
-                            <h5><i class="fa-solid fa-car mx-1 text-primary"></i> ${newItem.brand} - ${newItem.plate} </h5> <br>
-                            <h5><i class="fa-solid fa-file-invoice-dollar mx-1 text-primary"></i> ${newItem.price}</h5>             
+                            <h5><i class="fa fa-envelope mx-1 text-primary" data-toggle="tooltip" data-placement="right" title="Email"></i> ${subscriptionEmail}</h5> <br>
+                            <h5><i class="fa-solid fa-cart-plus mx-1 text-primary" data-toggle="tooltip" data-placement="right" title="Product"></i> ${newItem.product}</h5> <br>
+                            <h5><i class="fa-solid fa-car mx-1 text-primary" data-toggle="tooltip" data-placement="right" title="Car"></i> ${newItem.brand} - ${newItem.plate} </h5> <br>
+                            <h5><i class="fa-solid fa-file-invoice-dollar mx-1 text-primary" data-toggle="tooltip" data-placement="right" title="Price"></i> ${newItem.price}</h5>             
                        </div>
                     </div>
                 </div>`;
@@ -510,7 +522,7 @@
                     subscriptionList: subscriptionList
                 }), beforeSend: function () {
                     showResult(`#error-message`,
-                        `<div class="spinner text-center mx-0">
+                        `<div class="spinner text-center mx-0 my-0">
                             <div class="spinner-grow spinner-grow-sm"></div>
                         </div>`
                     );
@@ -541,6 +553,50 @@
                     console.log('not removed');
                 }
 
+            }).fail(function (err) {
+                console.log(err);
+                showResult(`#error-message`,
+                    `${err.message}`
+                );
+            })
+        });
+
+
+        // This event listener handles the click event for Remove subscription
+        $('#cartDiv').on('click', '#cancel-btn', function () {
+            $(this).prop('disabled', true);
+            // var t = $('#cart-table').DataTable();
+            var triggerObj = $(this);
+
+            $.ajax({
+                url: "/cancelOrder",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    subscriptionList: subscriptionList
+                }), beforeSend: function () {
+                    showResult(`#error-message`,
+                        `<div class="spinner text-center mx-0 my-0">
+                            <div class="spinner-grow spinner-grow-sm"></div>
+                        </div>`
+                    );
+                }
+            }).done(function (result) {
+                if (result.orderCancelled) {
+                    subscriptionList = result.subscriptionList;
+                    $(`#subscriptionData`).html('');
+                    $('#subscription-list').val(JSON.stringify(subscriptionList));
+
+                    // // If the susbcription list is empty, then hide ckeckout btn.
+                    if (subscriptionList.length < 1)
+                        checkoutBtn.attr("hidden", true);
+
+                    manageDivViews(subscriptionList);
+
+                    showResult(`#error-message`, ``);
+                } else {
+
+                }
             }).fail(function (err) {
                 console.log(err);
                 showResult(`#error-message`,

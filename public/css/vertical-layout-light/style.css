@@ -36157,13 +36157,24 @@ label.required:after {
 
 }
 
-@media (max-width: 425px) {
+@media (max-width: 500px) {
     h5 {
         font-size: 0.85rem !important;
     }
 
     .card-body {
         padding: 1rem !important;
+    }
+
+    .btn-sm-block {
+        width: 100% !important;
+        float: none !important;
+        margin-bottom: 5px;
+    }
+
+    .px-sm-1 {
+        padding-right: 0.25rem !important;
+        padding-left: 0.25rem !important;
     }
 
 }

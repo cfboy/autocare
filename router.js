@@ -151,6 +151,7 @@ router.get('/delete-car/:id', checkAuthenticated, authDeleteCar, carsController.
 router.post('/validatePlate', carsController.validatePlate)
 router.post('/validateEmail', userController.validateEmail)
 router.post('/removeFromCart', userController.removeFromCart)
+router.post('/cancelOrder', userController.cancelOrder)
 
 //------ Services Routes ------
 router.get('/services', checkAuthenticated, servicesController.services)
