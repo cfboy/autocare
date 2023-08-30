@@ -142,6 +142,7 @@ router.post('/syncSubscription', checkAuthenticated, subscriptionsController.syn
 router.post('/syncCustomerSubscriptions', checkAuthenticated, subscriptionsController.syncCustomerSubscriptions)
 router.post('/removeCar', checkAuthenticated, subscriptionsController.removeCarOfSubscription)
 
+router.post('/cancelSubscription', checkAuthenticated, subscriptionsController.cancelSubscription)
 
 router.post('/cars/create', checkAuthenticated, authAddCar, carsController.save)
 router.post('/edit-car', checkAuthenticated, authEditCar, carsController.update)

@@ -556,6 +556,19 @@ async function updateStripeSubscription(id, updates) {
 }
 
 /**
+ * This function cancel the stripe subscription.
+ * @param {*} id 
+ * @returns subscription obj
+ */
+async function cancelSubscription(id) {
+    console.log('ID: ' + id)
+    // console.log('cancelAt: ' + cancelAt)
+    const subscription = await Stripe.subscriptions.cancel(id);
+
+    return subscription
+}
+
+/**
  * This function return the stripe balance transactions between dates.
  * Calculate the Gross Volume
  * @param {*} startDate 
@@ -623,6 +636,7 @@ module.exports = {
     getSubscriptionItemById,
     getCustomerBalanceTransactions,
     updateStripeSubscription,
+    cancelSubscription,
     getBalanceTransactions,
     getCustomerSubscriptions
 }

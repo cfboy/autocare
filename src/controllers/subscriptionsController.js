@@ -603,3 +603,33 @@ exports.removeCarOfSubscription = async (req, res) => {
         res.render('Error on remove car.')
     }
 }
+
+
+/**
+ * This function cancel the subscription based on the day of the period.
+ * This function is called by ajax function.
+ * The result is rendered in the memberhsips page.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.cancelSubscription = async (req, res) => {
+    try {
+        let subscriptionID = req.body.subscriptionID
+        let day = 0
+
+        if (subscriptionID) {
+            console.log(`subscriptionID:${subscriptionID}`);
+            day = await SubscriptionService.getSubscriptionDayOfPeriod(subscriptionID)
+        }
+
+        res.send({ day })
+    } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
+        console.error("ERROR: cancelSubscription -> Tyring to cancel membership.")
+        console.error(error.message)
+        res.render('Error cancel membership.')
+    }
+}

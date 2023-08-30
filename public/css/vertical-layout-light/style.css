@@ -13651,12 +13651,12 @@ fieldset:disabled .swal2-modal .swal2-buttonswrapper .swal2-styled,
 }
 
 .btn-outline-danger {
-    color: #F95F53;
-    border-color: #F95F53;
+    color: #F95F53 !important;
+    border-color: #F95F53 !important;
 }
 
 .btn-outline-danger:hover {
-    color: #000;
+    color: #000 !important;
     background-color: #F95F53;
     border-color: #F95F53;
 }
@@ -13671,7 +13671,7 @@ fieldset:disabled .swal2-modal .swal2-buttonswrapper .swal2-styled,
 .btn-outline-danger:active,
 .btn-outline-danger.active,
 .btn-outline-danger.dropdown-toggle.show {
-    color: #000;
+    color: #000 !important;
     background-color: #F95F53;
     border-color: #F95F53;
 }

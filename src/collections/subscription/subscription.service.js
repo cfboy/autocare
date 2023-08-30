@@ -381,6 +381,33 @@ async function validateItemQty(item) {
     }
 }
 
+/**
+ * This function find the subscription by id and get the current day of the period.
+ * @param {*} id 
+ * @returns 
+ */
+async function getSubscriptionDayOfPeriod(id) {
+
+    try {
+        let subscription = await this.getSubscriptionById(id)
+        let startDate = new Date(subscription.data.current_period_start * 1000),
+            currentDate = new Date(),
+            // daysBetweenTwoDates = (currentDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24)
+
+            daysSinceStart = Math.floor((currentDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+
+        console.log(`La suscripción se encuentra en el día ${daysSinceStart} de su periodo.`);
+
+
+        return daysSinceStart
+
+    }
+    catch (error) {
+        console.log(`ERROR: subscription.service: getSubscriptionDayOfPeriod()`)
+        console.error(error)
+        return null
+    }
+}
 
 module.exports = (Subscription) => {
     return {
@@ -393,6 +420,7 @@ module.exports = (Subscription) => {
         getSubscriptionsByUser: getSubscriptionsByUser(Subscription),
         getSubscriptionsByPrice: getSubscriptionsByPrice(Subscription),
         getSubscriptionById: getSubscriptionById(Subscription),
+        getSubscriptionDayOfPeriod: getSubscriptionDayOfPeriod,
         getSubscriptionByCar: getSubscriptionByCar(Subscription),
         getSubscriptionsByCar: getSubscriptionsByCar(Subscription),
         getSubscriptionItemByCar: getSubscriptionItemByCar(Subscription),
