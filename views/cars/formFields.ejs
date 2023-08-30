@@ -10,8 +10,7 @@
             <option value=""><%= lingua.selectOne%></option>
             <% for(const car of userCars) { %>
             <!-- All properties are necessary to autofill the other fields. -->
-            <option value="<%= car.id%>" name="<%= car.id%>" brand="<%= car.brand%>"
-                plate="<%= car.plate%>">
+            <option value="<%= car.id%>" name="<%= car.id%>" brand="<%= car.brand%>" plate="<%= car.plate%>">
                 <%= car.carName() %>
             </option>
             <% } %>
@@ -64,7 +63,8 @@
         <label for="carPlate" class="required"><%= lingua.car.plate%></label>
 
         <input type="text" id="carPlate" name="plate" class="form-control mb-3 form-control-lg text-uppercase"
-            placeholder="<%= lingua.car.plate%>" autofocus required value="<%= car?.plate%>" />
+            placeholder="<%= lingua.car.plate%>" autofocus required
+            value="<%= car?.plate ? car.plate : carPlate ? carPlate : ''%>" />
 
         <div id="plateValidationResult"></div>
 

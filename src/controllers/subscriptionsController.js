@@ -88,6 +88,13 @@ exports.subscribe = async (req, res) => {
         req.session.message = ''
         req.session.alertType = ''
 
+        let { carPlate } = req.query
+
+        // If come from the validateMembership Popup
+        if (carPlate) {
+            res.cookie('subscriptionEmail', '');
+            res.cookie('cart', JSON.stringify([]));
+        }
 
         let user = req.user,
             cart = user?.cart;
@@ -95,7 +102,7 @@ exports.subscribe = async (req, res) => {
 
         const prices = await Stripe.getAllPrices()
 
-        res.render('auth/registerAndSubscribe.ejs', { user, cart, allMakes, message, alertType, prices })
+        res.render('auth/registerAndSubscribe.ejs', { user, cart, allMakes, message, alertType, prices, carPlate })
 
     }
     catch (error) {
@@ -166,6 +173,7 @@ exports.validate = async (req, res) => {
             customer,
             inputType,
             car,
+            carPlate,
             subscription
         })
     } catch (error) {
