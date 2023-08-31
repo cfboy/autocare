@@ -398,8 +398,15 @@ async function getSubscriptionDayOfPeriod(id) {
 
         console.log(`La suscripción se encuentra en el día ${daysSinceStart} de su periodo.`);
 
+        let message = `Si cancela no prodrá revertir esta acción.`
 
-        return daysSinceStart
+        if (daysSinceStart > 25) {
+            message = `La suscripción se encuentra en el día ${daysSinceStart} de su periodo.
+             Si cancela se le cobrará el próximo periodo.`
+        }
+
+
+        return { message, daysSinceStart }
 
     }
     catch (error) {

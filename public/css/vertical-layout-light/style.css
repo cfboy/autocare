@@ -14129,7 +14129,7 @@ fieldset:disabled .swal2-modal .swal2-buttonswrapper .swal2-styled,
 .dropdown-item:active {
     color: #fff;
     text-decoration: none;
-    background-color: #0d6efd;
+    background-color: #0c4083 !important;
 }
 
 .dropdown-item.disabled,
@@ -14177,7 +14177,7 @@ fieldset:disabled .swal2-modal .swal2-buttonswrapper .swal2-styled,
 .dropdown-menu-dark .dropdown-item.active,
 .dropdown-menu-dark .dropdown-item:active {
     color: #fff;
-    background-color: #0d6efd;
+    background-color: #0c4083;
 }
 
 .dropdown-menu-dark .dropdown-item.disabled,

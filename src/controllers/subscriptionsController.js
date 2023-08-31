@@ -604,6 +604,35 @@ exports.removeCarOfSubscription = async (req, res) => {
     }
 }
 
+/**
+ * This function cancel the subscription based on the day of the period.
+ * This function is called by ajax function.
+ * The result is rendered in the memberhsips page.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.getSubscriptionDay = async (req, res) => {
+    try {
+        let subscriptionID = req.body.subscriptionID
+
+        if (!subscriptionID)
+            res.send(null);
+
+        console.log(`subscriptionID:${subscriptionID}`);
+        let { message, daysSinceStart } = await SubscriptionService.getSubscriptionDayOfPeriod(subscriptionID)
+
+
+        res.send({ day: daysSinceStart, message })
+    } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
+        console.error("ERROR: cancelSubscription -> Tyring to cancel membership.")
+        console.error(error.message)
+        res.render('Error cancel membership.')
+    }
+}
 
 /**
  * This function cancel the subscription based on the day of the period.
@@ -614,15 +643,18 @@ exports.removeCarOfSubscription = async (req, res) => {
  */
 exports.cancelSubscription = async (req, res) => {
     try {
+        // TODO: implement cancel memberhsip based on the day of the period
         let subscriptionID = req.body.subscriptionID
-        let day = 0
+        let daysSinceStart = 0
 
-        if (subscriptionID) {
-            console.log(`subscriptionID:${subscriptionID}`);
-            day = await SubscriptionService.getSubscriptionDayOfPeriod(subscriptionID)
-        }
+        if (!subscriptionID)
+            res.send({ day: null });
 
-        res.send({ day })
+        console.log(`subscriptionID:${subscriptionID}`);
+        ({ daysSinceStart } = await SubscriptionService.getSubscriptionDayOfPeriod(subscriptionID))
+
+
+        res.send({ day: daysSinceStart })
     } catch (error) {
         req.bugsnag.notify(new Error(error),
             function (event) {
