@@ -81,14 +81,14 @@
                     <hr class="m-2">
                     <div>
                         <% if([stripeStatus.ACTIVE, stripeStatus.TRIALING].includes(stripeSubscription?.data?.status)) { %>
-                        <span class="badge badge-opacity-success badge-outline-success float-end"
+                        <span class="badge badge-outline-success float-end"
                             style="text-transform: uppercase" title="Membership Status" data-toggle="tooltip"
                             data-placement="bottom">
                             <%= stripeSubscription?.data?.status %>
                         </span>
 
                         <% } else if([stripeStatus.CANCELED, stripeStatus.UNPAID, stripeStatus.NONE, stripeStatus.INCOMPLETE_EXPIRED].includes(subStatus)) { %>
-                        <span class="badge badge-danger badge-opacity-danger float-end"
+                        <span class="badge badge-danger float-end"
                             style="text-transform: uppercase" title="Membership Status" data-toggle="tooltip"
                             data-placement="bottom">
                             <%= stripeSubscription?.data?.status %>
