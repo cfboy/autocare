@@ -619,10 +619,10 @@ exports.getSubscriptionDay = async (req, res) => {
             res.send(null);
 
         console.log(`subscriptionID:${subscriptionID}`);
-        let { message, daysSinceStart } = await SubscriptionService.getSubscriptionDayOfPeriod(subscriptionID)
+        let { message, daysSinceStart, cancelDate } = await SubscriptionService.getSubscriptionDayOfPeriod(subscriptionID)
 
 
-        res.send({ day: daysSinceStart, message })
+        res.send({ daysSinceStart, cancelDate, message })
     } catch (error) {
         req.bugsnag.notify(new Error(error),
             function (event) {
@@ -644,17 +644,31 @@ exports.getSubscriptionDay = async (req, res) => {
 exports.cancelSubscription = async (req, res) => {
     try {
         // TODO: implement cancel memberhsip based on the day of the period
-        let subscriptionID = req.body.subscriptionID
-        let daysSinceStart = 0
+        let { subscriptionID, daysSinceStart, cancelDate } = req.body
 
         if (!subscriptionID)
             res.send({ day: null });
 
         console.log(`subscriptionID:${subscriptionID}`);
-        ({ daysSinceStart } = await SubscriptionService.getSubscriptionDayOfPeriod(subscriptionID))
+        if (!daysSinceStart)
+            ({ daysSinceStart } = await SubscriptionService.getSubscriptionDayOfPeriod(subscriptionID))
 
 
-        res.send({ day: daysSinceStart })
+        let updates = {}
+
+        let cancelDateTimeStamp = Date.parse(cancelDate) / 1000;
+
+        if (daysSinceStart > 25) {
+            updates = { cancel_at: cancelDate }
+        }
+        else {
+            updates = { cancel_at_period_end: true }
+        }
+
+        let result = await Stripe.updateStripeSubscription(subscriptionID, updates)
+
+
+        res.send(result)
     } catch (error) {
         req.bugsnag.notify(new Error(error),
             function (event) {
@@ -662,6 +676,6 @@ exports.cancelSubscription = async (req, res) => {
             })
         console.error("ERROR: cancelSubscription -> Tyring to cancel membership.")
         console.error(error.message)
-        res.render('Error cancel membership.')
+        res.send('Error cancel membership.')
     }
 }

@@ -55,6 +55,8 @@ router.get('/login', checkNotAuthenticated, (req, res) => {
         req.session.message = ''
         req.session.alertType = ''
     }
+
+    // TODO: Fix flash
     // TODO: Optimize this approach.
     if (req.flash('error')[0] == 'VALIDATION')
         res.redirect('/activateAccountRequest')

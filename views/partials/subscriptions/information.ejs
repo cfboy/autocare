@@ -61,12 +61,15 @@
                                 <i class="fa fa-ellipsis-vertical"></i>
                             </button>
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuIconButton3">
+                                <% if(![stripeStatus.CANCELED,].includes(subStatus) && stripeSubscription.data.cancel_at == null && stripeSubscription.data.cancel_at_period_end !== true) { %>
+
                                 <a class="dropdown-item" href="#" title="Cancel Subscription"
                                     onclick="return confirmCancelSubscription('<%= stripeSubscription.id %>')">
                                     <i class="fa-solid fa-cancel"></i>
                                     Cancel Subscription
                                 </a>
                                 <div class="dropdown-divider"></div>
+                                <% } %>
                                 <%# if(![roles.ADMIN].includes(user.role)) { %>
                                 <a href="#" id="sync-btn-<%= stripeSubscription.id%>"
                                     value="<%= stripeSubscription.id%>" class="dropdown-item sync-btn"
@@ -81,16 +84,14 @@
                     <hr class="m-2">
                     <div>
                         <% if([stripeStatus.ACTIVE, stripeStatus.TRIALING].includes(stripeSubscription?.data?.status)) { %>
-                        <span class="badge badge-outline-success float-end"
-                            style="text-transform: uppercase" title="Membership Status" data-toggle="tooltip"
-                            data-placement="bottom">
+                        <span class="badge badge-outline-success float-end" style="text-transform: uppercase"
+                            title="Membership Status" data-toggle="tooltip" data-placement="bottom">
                             <%= stripeSubscription?.data?.status %>
                         </span>
 
                         <% } else if([stripeStatus.CANCELED, stripeStatus.UNPAID, stripeStatus.NONE, stripeStatus.INCOMPLETE_EXPIRED].includes(subStatus)) { %>
-                        <span class="badge badge-danger float-end"
-                            style="text-transform: uppercase" title="Membership Status" data-toggle="tooltip"
-                            data-placement="bottom">
+                        <span class="badge badge-danger float-end" style="text-transform: uppercase"
+                            title="Membership Status" data-toggle="tooltip" data-placement="bottom">
                             <%= stripeSubscription?.data?.status %>
                         </span>
                         <% } else { %>
@@ -113,12 +114,11 @@
                             <div class="">
                                 <ul class="px-0">
                                     <% for(car of item.cars) { %>
-
                                     <li class="btn text-start card list-group-item rounded-2" style="cursor: default;">
                                         <a href="/car/<%- car?.id%>" class="text-decoration-none">
 
                                             <i class="fa-solid fa-car fa-fw"></i>
-                                            <%- car?.carName()%>
+                                            <%= car?.carName()%>
                                             <% if(car?.cancel_date) { %>
                                             <b>
                                                 (<%= lingua.membership.validUntil%>:
@@ -136,15 +136,11 @@
                                             </a>
                                         </div>
                                         <% } %>
-                                        <% } %>
-
-
                                     </li>
+                                    <% } %>
 
                                     <%# if(!item.isValid) { %>
-                                    <% if(![stripeStatus.CANCELED, stripeStatus.UNPAID,
-                                                        stripeStatus.NONE,
-                                                        stripeStatus.INCOMPLETE_EXPIRED].includes(subStatus)) { %>
+                                    <% if(![stripeStatus.CANCELED, stripeStatus.UNPAID, stripeStatus.NONE, stripeStatus.INCOMPLETE_EXPIRED].includes(subStatus)) { %>
                                     <!-- If the length of cars is less than item quantity, then show add car btn. -->
                                     <% if(item.cars.length < item.data.quantity) { %>
                                     <!-- First Show the cars -->
@@ -446,15 +442,17 @@
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
                 confirmButtonText: 'Yes, cancel it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
+            }).then((resultOfConfirmation) => {
+                if (resultOfConfirmation.isConfirmed) {
                     console.log(`${subscriptionID}`);
                     $.ajax({
                         url: "/cancelSubscription",
                         type: "POST",
                         contentType: "application/json",
                         data: JSON.stringify({
-                            subscriptionID
+                            subscriptionID,
+                            daysSinceStart: result.daysSinceStart,
+                            cancelDate: result.cancelDate
                         }),
                         beforeSend: function () {
                             showResult(`#loading-update-${subscriptionID}`,
@@ -464,17 +462,19 @@
                             );
                         }
                     }).done(function (result) {
-                        showResult(`#loading-update-${subscriptionID}`, result.day);
+                        showResult(`#loading-update-${subscriptionID}`, result);
                         var delayInMilliseconds = 3000; //1 second
 
+                    }).fail(function (err) {
+                        console.log(err);
+                        showResult(`#loading-update-${subscriptionID}`, err.message);
+
+                    }).always(function () {
                         setTimeout(function () {
                             showResult(`#loading-update-${subscriptionID}`, '');
                             // location.reload();
 
                         }, delayInMilliseconds);
-
-                    }).fail(function (err) {
-                        console.log(err);
                     })
                 }
             })
