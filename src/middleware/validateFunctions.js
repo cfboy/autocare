@@ -13,13 +13,13 @@ async function validateSubscriptions(req, res, next) {
         // res.redirect('/create-subscriptions')
         res.redirect('/subscribe')
     } else {
-        let invalidSubs = user?.subscriptions.filter(subs => subs.items.some(item => !item.isValid))
+        // let invalidSubs = user?.subscriptions.filter(subs => subs.items.some(item => !item.isValid))
 
-        if (invalidSubs?.length > 0) {
-            req.session.invalidSubs = invalidSubs
-            res.redirect('/handleInvalidSubscriptions')
-        } else
-            return next()
+        // if (invalidSubs?.length > 0) {
+        //     req.session.invalidSubs = invalidSubs
+        //     res.redirect('/handleInvalidSubscriptions')
+        // } else
+        return next()
     }
 }
 

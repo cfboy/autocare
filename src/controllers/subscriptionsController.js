@@ -419,6 +419,10 @@ exports.syncSubscription = async (req, res) => {
                 for (subItem of subscriptionItems) {
                     let itemToUpdate = mySubscription?.items?.find(item => item.id == subItem.id)
                     if (itemToUpdate) {
+                        for (car of itemToUpdate.cars) {
+                            if (car.user_id != mySubscription.user.id)
+                                await CarService.updateCar(car.id, { user_id: mySubscription.user.id })
+                        }
                         let newItem = { id: itemToUpdate.id, cars: itemToUpdate.cars, data: subItem }
                         items.push(newItem)
                     }

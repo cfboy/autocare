@@ -118,7 +118,7 @@
                                         <a href="/car/<%- car?.id%>" class="text-decoration-none">
 
                                             <i class="fa-solid fa-car fa-fw"></i>
-                                            <%= car?.carName()%>
+                                            <%= car ? car.carName() : null()%>
                                             <% if(car?.cancel_date) { %>
                                             <b>
                                                 (<%= lingua.membership.validUntil%>:

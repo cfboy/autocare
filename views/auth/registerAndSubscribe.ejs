@@ -80,6 +80,7 @@
                                                                     for="email"><%= lingua.user.email%></label>
                                                                 <input type="email" id="email" name="email"
                                                                     onfocusout="validateEmail()"
+                                                                    value="<%= user ? user.email : ''%>"
                                                                     class="form-control form-control-lg"
                                                                     placeholder="example@gmail.com" required />
 

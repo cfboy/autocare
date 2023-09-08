@@ -392,21 +392,27 @@ async function getSubscriptionDayOfPeriod(id) {
         let subscription = await this.getSubscriptionById(id)
         let startDate = new Date(subscription.data.current_period_start * 1000),
             currentDate = new Date(),
-            // daysBetweenTwoDates = (currentDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24)
+            endDate = new Date(subscription.data.current_period_end * 1000),
+            daysBetweenTwoDates = (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24)
 
-            daysSinceStart = Math.floor((currentDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+        daysSinceStart = Math.floor((currentDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
 
         console.log(`La suscripción se encuentra en el día ${daysSinceStart} de su periodo.`);
 
         let message = `Si cancela no prodrá revertir esta acción.`
 
+        let cancelInNextPeriod = false,
+            cancelDate = endDate
         if (daysSinceStart > 25) {
+            cancelInNextPeriod = true
+            // Cancel in the next period
+            cancelDate = new Date(cancelDate.setDate(endDate.getDate() + daysBetweenTwoDates))
             message = `La suscripción se encuentra en el día ${daysSinceStart} de su periodo.
              Si cancela se le cobrará el próximo periodo.`
         }
 
 
-        return { message, daysSinceStart }
+        return { message, daysSinceStart, cancelInNextPeriod, cancelDate }
 
     }
     catch (error) {

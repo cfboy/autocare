@@ -213,7 +213,7 @@ const manageUpdateOrCreateSubscriptionsWebhook = async (subscription, bugsnag, l
                         if (newItem?.cars?.length == newItem.data.quantity) {
                             for (carObj of newItem.cars) {
                                 if (carObj.cancel_date !== null)
-                                    await CarService.updateCar(carObj.id, { cancel_date: null })
+                                    await CarService.updateCar(carObj.id, { cancel_date: null, user_id: customer.id })
                             }
                         }
                     } catch (e) {
@@ -267,10 +267,7 @@ const manageUpdateOrCreateSubscriptionsWebhook = async (subscription, bugsnag, l
 
             subscription = await SubscriptionService.updateSubscription(subscription.id, updates);
 
-            if (isDeleteWebhook)
-                alertInfo = { message: `Your membership ${subscription.id} has been cencelled successfully.`, alertType: alertTypes.BasicAlert }
-            else
-                alertInfo = { message: `Your membership ${subscription.id} has been updated successfully.`, alertType: alertTypes.BasicAlert }
+            alertInfo = { message: `Your membership ${subscription.id} has been updated successfully.`, alertType: alertTypes.BasicAlert }
 
             // Send customer balance on email.
             let { totalString } = await Stripe.getCustomerBalanceTransactions(customer.billingID)
@@ -295,6 +292,9 @@ const manageUpdateOrCreateSubscriptionsWebhook = async (subscription, bugsnag, l
                             await UtilizationService.handleUtilization(newCar, subscription.current_period_start, subscription.current_period_end)
                             if (newCar.cancel_date != null)
                                 await CarService.removeCarFromAllSubscriptions(newCar)
+
+                            // Reassign new user 
+                            newCar = await CarService.updateCar(newCar.id, { user_id: customer.id })
                         }
                         else
                             newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate, customer.id)
@@ -331,7 +331,7 @@ const manageUpdateOrCreateSubscriptionsWebhook = async (subscription, bugsnag, l
             let emailProperties
             if (activationResult) {
                 emailProperties = activationEmailProperties
-                
+
             } else {
                 emailTemplate = isNew ? 'subscription_created' : 'subscription_updated';
                 emailSubject = isNew ? 'Subscription Created - AutoCare Memberships' : 'Subscription Updated - AutoCare Memberships';
