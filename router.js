@@ -48,7 +48,7 @@ router.get('/account', checkAuthenticated, validateActiveAccount, validateLocati
 
 router.get('/login', checkNotAuthenticated, (req, res) => {
 
-    let { message, email, alertType } = req.session
+    let { message, email, alertType, isIncomplete } = req.session
 
     // Clear session alerts variables.
     if (message) {
@@ -56,9 +56,12 @@ router.get('/login', checkNotAuthenticated, (req, res) => {
         req.session.alertType = ''
     }
 
-    // TODO: Fix flash
-    // TODO: Optimize this approach.
-    if (req.flash('error')[0] == 'VALIDATION')
+    if (isIncomplete) {
+        req.session.isIncomplete = null
+    }
+
+    // TODO: Test incomplete account
+    if (isIncomplete)
         res.redirect('/activateAccountRequest')
     else
         res.render('auth/login.ejs', { message, email, alertType })

@@ -330,8 +330,6 @@ exports.handleInvalidSubscriptions = async (req, res) => {
         let { invalidSubs, message, alertType } = req.session
 
         // Clear session variables
-        // TODO: Move to external function
-
         req.session.message = null
         req.session.alertType = null
 
@@ -660,10 +658,10 @@ exports.cancelSubscription = async (req, res) => {
 
         let updates = {}
 
-        let cancelDateTimeStamp = Date.parse(cancelDate) / 1000;
 
         if (daysSinceStart > 25) {
-            updates = { cancel_at: cancelDate }
+            let cancelDateTimeStamp = Date.parse(cancelDate) / 1000;
+            updates = { cancel_at: cancelDateTimeStamp }
         }
         else {
             updates = { cancel_at_period_end: true }
