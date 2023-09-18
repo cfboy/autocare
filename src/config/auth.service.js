@@ -91,7 +91,7 @@ const generateAtivationLink = async (lingua, email, bugsnag) => {
         const link = `${clientURL}/activateAccount?token=${resetToken}&id=${user._id}`;
 
         var emailProperties = {
-            user: user.email,
+            email: user.email,
             emailType: "activate_account",
             payload: {
                 name: user?.fullName(),

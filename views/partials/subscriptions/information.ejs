@@ -114,10 +114,12 @@
                             <div class="">
                                 <ul class="px-0">
                                     <% for(car of item.cars) { %>
-                                    <li class="btn text-start card list-group-item rounded-2" style="cursor: default;">
+                                    <li class="btn text-start card list-group-item rounded-2" style="cursor: text; user-select: auto;">
                                         <a href="/car/<%- car?.id%>" class="text-decoration-none">
 
                                             <i class="fa-solid fa-car fa-fw"></i>
+                                        </a>
+
                                             <%= car ? car.carName() : null()%>
                                             <% if(car?.cancel_date) { %>
                                             <b>
@@ -126,7 +128,6 @@
                                                 )
                                             </b>
                                             <% } %>
-                                        </a>
                                         <% if([roles.ADMIN].includes(user.role)) { %>
                                         <div id="remove-update-<%= car.id%>" class="float-end">
                                             <a class="btn btn-icon btn-icon-no-border no-margin pt-0 pb-0"
