@@ -71,8 +71,99 @@ exports.webhook = async (req, res) => {
             // }
 
             // break;
-            // case 'customer.subscription.created':
-            // DO the same of the update
+            case 'customer.subscription.created':
+                console.log(`WEBHOOK: customer.subscription.created: ${data.id}`)
+
+                subscription = data
+                if (subscription.status == 'active') {
+                    customer = await UserService.getUserByBillingID(subscription.customer)
+                    if (customer) {
+                        subscription = await SubscriptionService.getSubscriptionById(subscription.id);
+
+                        if (!subscription) {
+                            // Find subcription again for expand product information
+                            subscription = await Stripe.getSubscriptionById(data.id)
+                            subscriptionItems = subscription.items.data
+                            let cars = []
+                            let userCartItems = customer?.cart?.items
+                            if (userCartItems) {
+                                // cars = userCartItems ? userCartItems : JSON.parse(subscription?.metadata?.cars)
+                                cars = userCartItems
+                            }
+
+                            let items = []
+                            for (subItem of subscriptionItems) {
+                                let newItem = { id: subItem.id, cars: [], data: subItem }
+                                if (cars.length > 0) {
+                                    for (carObj of cars) {
+                                        if (subItem.price.id === carObj.priceID) {
+                                            let newCar = await CarService.getCarByPlate(carObj.plate)
+                                            if (newCar) {
+                                                // Add old utilization / History
+                                                await UtilizationService.handleUtilization(newCar, subscription.current_period_start, subscription.current_period_end)
+                                                if (newCar.cancel_date != null)
+                                                    await CarService.removeCarFromAllSubscriptions(newCar)
+                                            }
+                                            else
+                                                newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate, customer.id)
+
+                                            if (newCar)
+                                                newItem.cars.push(newCar)
+                                            else {
+                                                // add alert to add car
+                                                req.bugsnag.notify(new Error(`Car not created at 'customer.subscription.created' (${carObj.brand} - ${carObj.model} - ${carObj.plate})`),
+                                                    function (event) {
+                                                        event.setUser(customer.email)
+                                                    })
+                                                console.error("ERROR: Car not created at 'customer.subscription.created'")
+                                            }
+                                        }
+
+                                    }
+                                }
+                                items.push(newItem)
+
+                            }
+
+                            alertInfo = { message: `Your membership ${subscription.id} has been created successfully.`, alertType: alertTypes.BasicAlert }
+
+                            subscription = await SubscriptionService.addSubscription({ id: subscription.id, items: items, data: subscription, user: customer });
+                        }
+
+                        [customer, notification] = await UserService.addNotification(customer.id, alertInfo.message);
+
+                        req.io.in(customer?.id).emit('notifications', notification);
+
+                        //Send Email
+                        var resultEmail = await sendEmail(
+                            customer.email,
+                            'subscription_created',
+                            {
+                                name: customer?.fullName(),
+                                subscription_id: subscription.id,
+                                message: alertInfo.message,
+                                subject: 'New Subscription - AutoCare Memberships'
+                            }
+                        );
+                        if (resultEmail.sent) {
+                            console.debug('Email Sent: ' + customer.email)
+
+                        } else {
+                            req.bugsnag.notify(new Error(resultEmail.data),
+                                function (event) {
+                                    event.setUser(customer.email)
+                                })
+                            console.error('ERROR: Email Not Sent.')
+                        }
+
+                    } else {
+                        console.log('customer.subscription.created: Not Found Customer.')
+                    }
+                } else {
+                    console.debug('WEBHOOK: SUBSCRIPTION STATUS NOT ACTIVE. HANDLE ON UPDATE.')
+                }
+
+                break;
             case 'customer.subscription.updated':
 
                 let updateOrCreateResult = await manageUpdateOrCreateSubscriptionsWebhook(data, req.bugsnag, lingua, req);
