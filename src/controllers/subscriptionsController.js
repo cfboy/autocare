@@ -88,7 +88,7 @@ exports.subscribe = async (req, res) => {
         req.session.message = ''
         req.session.alertType = ''
 
-        let { carPlate } = req.query
+        let { carPlate, userEmail } = req.query
 
         // If come from the validateMembership Popup
         if (carPlate) {
@@ -102,7 +102,7 @@ exports.subscribe = async (req, res) => {
 
         const prices = await Stripe.getAllPrices()
 
-        res.render('auth/registerAndSubscribe.ejs', { user, cart, allMakes, message, alertType, prices, carPlate })
+        res.render('auth/registerAndSubscribe.ejs', { user, cart, allMakes, message, alertType, prices, carPlate, userEmail })
 
     }
     catch (error) {
@@ -659,7 +659,7 @@ exports.cancelSubscription = async (req, res) => {
         let updates = {}
 
 
-        if (daysSinceStart > 25) {
+        if (daysSinceStart > Stripe.MIN_CANCEL_DAYS) {
             let cancelDateTimeStamp = Date.parse(cancelDate) / 1000;
             updates = { cancel_at: cancelDateTimeStamp }
         }

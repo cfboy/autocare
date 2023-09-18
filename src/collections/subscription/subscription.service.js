@@ -1,4 +1,4 @@
-const { STATUS } = require('../../connect/stripe');
+const { STATUS, MIN_CANCEL_DAYS } = require('../../connect/stripe');
 /**
  * IMPORTANT: All the subscription obj has the ID of Stripe Subscription Obj on id property.
  * So when need to find a subscription by id should use findOne instead findByID.
@@ -399,11 +399,12 @@ async function getSubscriptionDayOfPeriod(id) {
 
         console.log(`La suscripción se encuentra en el día ${daysSinceStart} de su periodo.`);
 
+        // TODO: use lingua for this messages.
         let message = `Si cancela no prodrá revertir esta acción.`
 
         let cancelInNextPeriod = false,
             cancelDate = endDate
-        if (daysSinceStart > 25) {
+        if (daysSinceStart > MIN_CANCEL_DAYS) {
             cancelInNextPeriod = true
             // Cancel in the next period
             cancelDate = new Date(cancelDate.setDate(endDate.getDate() + daysBetweenTwoDates))

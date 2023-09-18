@@ -13,6 +13,8 @@ const STATUS = {
     TRIALING: "trialing",
 }
 
+const MIN_CANCEL_DAYS = 25
+
 const Stripe = stripe(process.env.STRIPE_SECRET_KEY, {
     apiVersion: '2020-08-27'
 })
@@ -615,6 +617,7 @@ async function getBalanceTransactions(startDate, endDate) {
 
 module.exports = {
     STATUS,
+    MIN_CANCEL_DAYS,
     getCustomerByID,
     getCustomerByEmail,
     addNewCustomer,

@@ -63,7 +63,7 @@
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuIconButton3">
                                 <% if(![stripeStatus.CANCELED,].includes(subStatus) && stripeSubscription.data.cancel_at == null && stripeSubscription.data.cancel_at_period_end !== true) { %>
 
-                                <a class="dropdown-item" href="#" title="Cancel Subscription"
+                                <a class="dropdown-item" href="javascript:void(0)" title="Cancel Subscription"
                                     onclick="return confirmCancelSubscription('<%= stripeSubscription.id %>')">
                                     <i class="fa-solid fa-cancel"></i>
                                     Cancel Subscription
@@ -71,7 +71,7 @@
                                 <div class="dropdown-divider"></div>
                                 <% } %>
                                 <%# if(![roles.ADMIN].includes(user.role)) { %>
-                                <a href="#" id="sync-btn-<%= stripeSubscription.id%>"
+                                <a href="javascript:void(0)" id="sync-btn-<%= stripeSubscription.id%>"
                                     value="<%= stripeSubscription.id%>" class="dropdown-item sync-btn"
                                     title="Sync with Stripe">
                                     <i class="fa-solid fa-rotate"></i>
@@ -463,23 +463,21 @@
                         }
                     }).done(function (result) {
                         showResult(`#loading-update-${subscriptionID}`, result);
-                        var delayInMilliseconds = 3000; //1 second
-
                     }).fail(function (err) {
                         console.log(err);
                         showResult(`#loading-update-${subscriptionID}`, err.message);
 
                     }).always(function () {
+                        var delayInMilliseconds = 3000; //1 second
+
                         setTimeout(function () {
                             showResult(`#loading-update-${subscriptionID}`, '');
-                            // location.reload();
-
+                            location.reload();
                         }, delayInMilliseconds);
                     })
                 }
             })
-
-
+            
         }).fail(function (err) {
             console.log(err);
         })

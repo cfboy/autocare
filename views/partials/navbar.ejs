@@ -100,7 +100,7 @@
             <% } %>
             <% if(user.billingID) { %>
             <li class="nav-item">
-                <a class="nav-link" href="/subscribe" aria-expanded="false" title="Subscribe">
+                <a class="nav-link" href="/subscribe?userEmail=<%= user?.email%>" aria-expanded="false" title="Subscribe">
                     <i class="fa-solid fa-plus-square text-primary"></i>
                     <!-- TODO: implement cart qty -->
                     <!-- <i class="fa-solid fa-list"></i> -->
