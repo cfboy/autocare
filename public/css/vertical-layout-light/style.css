@@ -36178,3 +36178,9 @@ label.required:after {
     }
 
 }
+
+.cars-btn {
+    padding: 0.875rem 0.5rem !important;
+    cursor: text; 
+    user-select: auto;
+}

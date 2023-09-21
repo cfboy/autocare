@@ -277,6 +277,7 @@ exports.save = async (req, res) => {
             req.session.alertType = alertTypes.ErrorAlert
         }
 
+        // TODO: add dynamic redirect
         res.redirect('/cars')
 
     } catch (error) {

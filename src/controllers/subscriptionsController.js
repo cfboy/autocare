@@ -645,7 +645,6 @@ exports.getSubscriptionDay = async (req, res) => {
  */
 exports.cancelSubscription = async (req, res) => {
     try {
-        // TODO: implement cancel memberhsip based on the day of the period
         let { subscriptionID, daysSinceStart, cancelDate } = req.body
 
         if (!subscriptionID)
@@ -679,5 +678,51 @@ exports.cancelSubscription = async (req, res) => {
         console.error("ERROR: cancelSubscription -> Tyring to cancel membership.")
         console.error(error.message)
         res.send('Error cancel membership.')
+    }
+}
+
+
+/**
+ * This function fetch the subscription and prepare de list to send for checkout.
+ * This function is called by ajax function.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.renewSubscription = async (req, res) => {
+    try {
+        let { subscriptionID } = req.body
+
+        if (!subscriptionID)
+            res.send({ message: 'Missing subscription ID.' });
+
+        console.log(`subscriptionID:${subscriptionID}`);
+
+
+        let subscription = await SubscriptionService.getSubscriptionById(subscriptionID)
+        // Prepare to checkout
+
+        let subscriptionList = [];
+        let item = {}
+        for (item of subscription.items) {
+            for (carObj of item.cars) {
+                item = {
+                    brand: carObj.brand,
+                    plate: carObj.plate,
+                    priceID: item.data.price.id
+                }
+                subscriptionList.push(item)
+            }
+
+        }
+
+        res.send(subscriptionList)
+    } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
+        console.error("ERROR: renewSubscription -> Tyring to renew membership.")
+        console.error(error.message)
+        res.send('Error trying to renew membership.')
     }
 }

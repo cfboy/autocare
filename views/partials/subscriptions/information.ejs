@@ -12,7 +12,7 @@
         <% } %>
     </div>
     <div class="col-lg-8 col-md-8 col-sm-12 text-end">
-        <% if(![roles.ADMIN].includes(user.role)) { %>
+        <% if([roles.ADMIN].includes(user.role)) { %>
         <button id="sync-all-btn" value="<%- customer.billingID%>"
             class="btn btn-icon btn-primary m-0 sync-all-btn text-white" title="Sync all subscriptions with Stripe">
             <i class="fa-solid fa-rotate m-0"></i>
@@ -61,12 +61,21 @@
                                 <i class="fa fa-ellipsis-vertical"></i>
                             </button>
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuIconButton3">
-                                <% if(![stripeStatus.CANCELED,].includes(subStatus) && stripeSubscription.data.cancel_at == null && stripeSubscription.data.cancel_at_period_end !== true) { %>
+                                <% if(![stripeStatus.CANCELED].includes(subStatus) && stripeSubscription.data.cancel_at == null && stripeSubscription.data.cancel_at_period_end !== true) { %>
 
                                 <a class="dropdown-item" href="javascript:void(0)" title="Cancel Subscription"
                                     onclick="return confirmCancelSubscription('<%= stripeSubscription.id %>')">
                                     <i class="fa-solid fa-cancel"></i>
                                     Cancel Subscription
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <% } %>
+                                <% if([stripeStatus.CANCELED].includes(subStatus)) { %>
+
+                                <a class="dropdown-item" href="javascript:void(0)" title="Renew Subscription"
+                                    onclick="return confirmRenewSubscription('<%= stripeSubscription.id %>', '<%= user.email%>')">
+                                    <i class="fa-solid fa-copy"></i>
+                                    Renew Subscription
                                 </a>
                                 <div class="dropdown-divider"></div>
                                 <% } %>
@@ -114,20 +123,20 @@
                             <div class="">
                                 <ul class="px-0">
                                     <% for(car of item.cars) { %>
-                                    <li class="btn text-start card list-group-item rounded-2" style="cursor: text; user-select: auto;">
+                                    <li class="cars-btn btn text-start card list-group-item rounded-2">
                                         <a href="/car/<%- car?.id%>" class="text-decoration-none">
 
                                             <i class="fa-solid fa-car fa-fw"></i>
                                         </a>
 
-                                            <%= car ? car.carName() : null()%>
-                                            <% if(car?.cancel_date) { %>
-                                            <b>
-                                                (<%= lingua.membership.validUntil%>:
-                                                <%= moment(car?.cancel_date).isValid() ? moment(car?.cancel_date).format(shortDateFormat) : 'N/A' %>
-                                                )
-                                            </b>
-                                            <% } %>
+                                        <%= car ? car.carName() : null()%>
+                                        <% if(car?.cancel_date) { %>
+                                        <b>
+                                            (<%= lingua.membership.validUntil%>:
+                                            <%= moment(car?.cancel_date).isValid() ? moment(car?.cancel_date).format(shortDateFormat) : 'N/A' %>
+                                            )
+                                        </b>
+                                        <% } %>
                                         <% if([roles.ADMIN].includes(user.role)) { %>
                                         <div id="remove-update-<%= car.id%>" class="float-end">
                                             <a class="btn btn-icon btn-icon-no-border no-margin pt-0 pb-0"
@@ -247,6 +256,7 @@
     </div>
     <% } %>
 </div>
+<script type="text/javascript" src="https://js.stripe.com/v3/"></script>
 
 
 <script>
@@ -351,9 +361,6 @@
             selected.push($(this).val());
             toRemove.splice($.inArray($(this).val(), toRemove), 1);
         });
-        // console.debug('Selected: ' + selected);
-
-        // console.debug('toRemove: ' + toRemove);
 
         selectedDisplay.html(`(${selected.length?.toString()}/${requiredQty?.toString()})`);
 
@@ -478,9 +485,73 @@
                     })
                 }
             })
-            
+
         }).fail(function (err) {
             console.log(err);
+        })
+    }
+
+    function confirmRenewSubscription(subscriptionID, userEmail) {
+        const publishableKey = `<%= pkStripe%>`;
+        const stripe = Stripe(publishableKey);
+        let email = userEmail;
+
+        Swal.fire({
+            title: 'Are you sure to renew this subscription?',
+            text: 'Create a new subscription with the same properties.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Renew!'
+        }).then((resultOfConfirmation) => {
+            if (resultOfConfirmation.isConfirmed) {
+                console.log(`${subscriptionID}`);
+                $.ajax({
+                    url: "/renewSubscription",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        subscriptionID
+                    }),
+                    beforeSend: function () {
+                        showResult(`#loading-update-${subscriptionID}`,
+                            `<div class="spinner text-center m-0">
+                        <div class="spinner-grow spinner-grow-sm"></div>
+                    </div>`
+                        );
+                    }
+                }).done(function (result) {
+
+                    if (result) {
+                        fetch('/checkoutWithEmail', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'email': email
+                            },
+                            body: JSON.stringify({
+                                subscriptions: result,
+                                email: email,
+                                backURL: 'memberships'
+                            })
+                        })
+                            .then((result) => result.json())
+                            .then(({ sessionId }) => stripe.redirectToCheckout({ sessionId }))
+                            .catch((error) => {
+                                showResult(`#loading-update-${subscriptionID}`,
+                                    `<p class="alert alert-fill-danger mt-2 p-1">
+                                <i class="fa-circle-exclamation fa-solid"></i> ${error}
+                            </p>`);
+                            })
+
+                    }
+                }).fail(function (err) {
+                    console.log(err);
+                    showResult(`#loading-update-${subscriptionID}`, err.message);
+
+                })
+            }
         })
     }
 </script>
