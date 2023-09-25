@@ -449,6 +449,44 @@ const getCustomerInvoices = async (user) => {
 }
 
 /**
+ * This function mark uncollectible an invoice.
+ * @param {*} invoiceID 
+ * @returns 
+ */
+const markUncollectibleInvoice = async (invoiceID) => {
+    try {
+        const invoice = await Stripe.invoices.markUncollectible(invoiceID);
+
+        console.log(`Invoice markUncollectibleInvoice: ${invoice.id}`)
+
+        return invoice
+    }
+    catch (error) {
+        console.error(`ERROR-STRIPE: markUncollectibleInvoice(). ${error.message}`);
+    }
+
+}
+
+/**
+ * This function void an invoice.
+ * @param {*} user 
+ * @returns 
+ */
+const voidInvoice = async (invoiceID) => {
+    try {
+        const invoice = await Stripe.invoices.voidInvoice(invoiceID);
+
+        console.log(`Invoice voided: ${invoice.id}`)
+
+        return invoice
+    }
+    catch (error) {
+        console.error(`ERROR-STRIPE: voidInvoice(). ${error.message}`);
+    }
+
+}
+
+/**
  * This function get all subsctiptions.
  * @returns subscriptions list
  */
@@ -634,6 +672,8 @@ module.exports = {
     getCustomerEvents,
     getCustomerCharges,
     getCustomerInvoices,
+    markUncollectibleInvoice,
+    voidInvoice,
     getAllSubscriptions,
     getSubscriptionById,
     getSubscriptionItemById,

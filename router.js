@@ -196,6 +196,7 @@ router.post('/getGrossVolumeDistributedReport', checkAuthenticated, reportsContr
 //------ Stripe and Payment Routes ------
 router.get('/charges', checkAuthenticated, stripeController.charges)
 router.get('/invoices', checkAuthenticated, stripeController.invoices)
+router.post('/markUncollectibleInvoice', checkAuthenticated, stripeController.markUncollectibleInvoice)
 router.post('/changePrices', checkAuthenticated, authChangePrices, stripeController.changePrice)
 
 

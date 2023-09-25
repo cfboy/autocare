@@ -175,6 +175,14 @@ exports.webhook = async (req, res) => {
                 let deletedResult = await manageDeletedSubscriptionsWebhook(data, req.bugsnag, req);
 
                 break;
+
+            case 'invoice.marked_uncollectible':
+                const invoiceMarkedUncollectible = data;
+
+                let invoice = await Stripe.voidInvoice(invoiceMarkedUncollectible.id)
+                console.log('Inovice marked_void done.')
+
+                break;
             default:
                 console.log(`Unhandled event type ${event.type}`);
 
@@ -707,6 +715,45 @@ exports.invoices = async (req, res) => {
     }
 
 }
+
+/**
+ * This function render the stripe invoices of user.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.markUncollectibleInvoice = async (req, res) => {
+    try {
+
+        let invoiceID = req.body.id
+
+        if (invoiceID) {
+            let inovice = await Stripe.markUncollectibleInvoice(invoiceID)
+
+            if (inovice) {
+                
+                alertInfo = { message: `Your inovice ${inovice.id} has been updated successfully. `, alertType: alertTypes.BasicAlert }
+                console.debug(alertInfo.message)
+                res.send(`Action Completed. The page is reloaded in a few seconds...`)
+
+            } else {
+                res.send('Action not completed.')
+            }
+        } else {
+            console.log('Missing invoice ID')
+            res.send('Missing invoice ID.')
+        }
+
+    } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
+        console.error(`ERROR: subscriptionsController -> Tyring to sync membership. ${error.message}`)
+        res.render('Error on sync membership.')
+    }
+}
+
+
 
 /**
  * This function find all subscriptions with active status and oldPrice on any item, 
