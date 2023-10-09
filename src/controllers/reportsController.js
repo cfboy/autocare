@@ -229,9 +229,11 @@ exports.getGrossVolumeDistributedReport = async (req, res) => {
         const result = await ServiceService.getLocationsWithGrossVolumeDistributed(date)
 
         let headers = [
-            { title: 'Gross Amount', value: result?.grossVolumeString },
-            { title: 'Factor', value: result?.factorString },
-            { title: 'Service Qty.', value: result?.serviceQty }
+            { title: 'Gross Amount', value: result?.grossVolumeString, info: "Estimated revenue from payments that are settled to your Stripe Balance." },
+            { title: 'Net Amount', value: result?.netVolumeString, info: "Estimated revenue from payments after fees, refunds, disputes, and Connect transfers have been deducted." },
+            { title: 'Tax Amount', value: result?.taxVolumeString, info: "Estimated taxes from Gross Amount. (Tax Rate: 11.5%)" },
+            { title: 'Factor', value: result?.factorString, info: "The factor formula: Gross Volume divided by services quantity." },
+            { title: 'Service Qty.', value: result?.serviceQty, info: "Total quantity of services." }
         ]
         res.render('reports/partials/locationGrossVolumeReport.ejs', { headers, locations: result?.locations, startDate: result.startDate, endDate: result.endDate })
 

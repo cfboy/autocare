@@ -618,34 +618,42 @@ async function cancelSubscription(id) {
 async function getBalanceTransactions(startDate, endDate) {
 
     try {
-        let totalVolume = 0.00, grossVolume = 0
+        let taxVolume = 0, grossVolume = 0, netVolume = 0;
 
-        for await (const balance of Stripe.balanceTransactions.list(
+        let stripeBalanceTransactionList = Stripe.balanceTransactions.list(
             {
-                limit: 10,
+                limit: 100,
                 created: { 'gte': startDate, 'lte': endDate }
             }
-        )) {
-            // Do something with customer
+        )
+
+        for await (const balance of stripeBalanceTransactionList) {
+            // Sum only the charge balance type. (Based on the documentation)
+            // TODO: validate the refunds and other cases
             if (balance.type == 'charge') {
-                totalVolume += balance.amount
-            } else
                 grossVolume += balance.amount
+                netVolume += balance.net
+            }
         }
 
-        let grossVolumeString = null, totalVolumeString = null
-        //if the grossVolume == 0 || grossVolume is > 0 then keep the same value, if not then multiplu by -1.
-        grossVolume = grossVolume >= 0 ? grossVolume : grossVolume * -1
+        let grossVolumeString = null, netVolumeString = null, taxVolumeString = null;
+
         grossVolume = Dinero({ amount: grossVolume })
+        netVolume = Dinero({ amount: netVolume })
+
         grossVolumeString = grossVolume.toFormat('$0,0.00')
         console.debug('Gross Volume: ' + grossVolumeString)
 
+        netVolumeString = netVolume.toFormat('$0,0.00')
+        console.debug('Net Volume: ' + netVolumeString)
+        // Calculate tax
+        let taxRate = 11.5 / 100
+        taxVolume = grossVolume.multiply(taxRate)
+        taxVolumeString = Dinero({ amount: taxVolume.getAmount() }).toFormat('$0,0.00')
+        console.debug('Tax Volume: ' + taxVolumeString)
 
-        if (totalVolume > 0) {
-            totalVolumeString = Dinero({ amount: totalVolume }).toFormat('$0,0.00')
-            console.debug('Total Volume: ' + totalVolumeString)
-        }
-        return { grossVolume, grossVolumeString, totalVolumeString }
+        return { grossVolume, netVolume, taxVolume }
+
     } catch (error) {
         console.error(`ERROR-STRIPE: getBalanceTransactions(). ${error.message}`);
 

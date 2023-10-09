@@ -291,7 +291,12 @@ async function getGrossVolumeFactor(startDate, endDate, allServices) {
 
         factor = allServices?.length > 0 ? stripeBalance?.grossVolume.divide(allServices?.length).getAmount() : 0
 
-        return { factor, grossVolume: stripeBalance?.grossVolume?.getAmount() }
+        return {
+            factor,
+            grossVolume: stripeBalance?.grossVolume?.getAmount(),
+            netVolume: stripeBalance?.netVolume?.getAmount(),
+            taxVolume: stripeBalance?.taxVolume?.getAmount()
+        }
 
     } catch (error) {
         console.error(`ERROR-ServiceService: getGrossVolumeFactor()`);
@@ -311,9 +316,11 @@ async function getLocationsWithGrossVolumeDistributed(date) {
 
         const allServices = await this.getServicesBetweenDates(startDate, endDate)
 
-        const { factor, grossVolume } = await getGrossVolumeFactor(startDate, endDate, allServices),
+        const { factor, grossVolume, netVolume, taxVolume } = await getGrossVolumeFactor(startDate, endDate, allServices),
             factorString = Dinero({ amount: factor }).toFormat('$0,0.00')
         grossVolumeString = Dinero({ amount: grossVolume }).toFormat('$0,0.00')
+        netVolumeString = Dinero({ amount: netVolume }).toFormat('$0,0.00')
+        taxVolumeString = Dinero({ amount: taxVolume }).toFormat('$0,0.00')
 
 
         const locations = await LocationService.getLocations()
@@ -324,7 +331,19 @@ async function getLocationsWithGrossVolumeDistributed(date) {
             location.grossVolumeString = location.grossVolume ? Dinero({ amount: location.grossVolume }).toFormat('$0,0.00') : '$0'
         }
 
-        return { startDate, endDate, serviceQty: allServices?.length, grossVolume, grossVolumeString, factor, factorString, locations }
+        return {
+            startDate,
+            endDate,
+            serviceQty: allServices?.length,
+            grossVolume, grossVolumeString,
+            netVolume,
+            netVolumeString,
+            taxVolume,
+            taxVolumeString,
+            factor,
+            factorString,
+            locations
+        }
 
     } catch (error) {
         console.error(`ERROR-ServiceService: getLocationsWithGrossVolumeDistributed()`);
