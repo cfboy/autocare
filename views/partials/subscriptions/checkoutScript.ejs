@@ -57,7 +57,16 @@
                         })
                     })
                         .then((result) => result.json())
-                        .then(({ sessionId }) => stripe.redirectToCheckout({ sessionId }))
+                        .then(function ({ sessionId, message }) {
+                            if (sessionId)
+                                stripe.redirectToCheckout({ sessionId })
+                            else {
+                                showResult('#error-message',
+                                    `<p class="alert alert-fill-danger mt-2 p-1">
+                                <i class="fa-circle-exclamation fa-solid"></i> ${message}
+                            </p>`);
+                            }
+                        })
                         .catch((error) => {
                             showResult('#error-message',
                                 `<p class="alert alert-fill-danger mt-2 p-1">
