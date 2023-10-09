@@ -36177,10 +36177,14 @@ label.required:after {
         padding-left: 0.25rem !important;
     }
 
+    .card .card-title {
+        font-size: 1.0rem;
+    }
+
 }
 
 .cars-btn {
     padding: 0.875rem 0.5rem !important;
-    cursor: text; 
+    cursor: text;
     user-select: auto;
 }
