@@ -32,6 +32,9 @@ const groupByKey = (list, key, { omitKey = false }) =>
 exports.webhook = async (req, res) => {
     let event
     const lingua = req.res.lingua.content
+    const {
+        INVALIDATE_UNCOLECTIBLE_INVOICES
+    } = process.env;
 
     try {
         event = Stripe.createWebhook(req.body, req.header('Stripe-Signature'))
@@ -177,11 +180,12 @@ exports.webhook = async (req, res) => {
                 break;
 
             case 'invoice.marked_uncollectible':
-                const invoiceMarkedUncollectible = data;
+                if (INVALIDATE_UNCOLECTIBLE_INVOICES) {
+                    const invoiceMarkedUncollectible = data;
 
-                let invoice = await Stripe.voidInvoice(invoiceMarkedUncollectible.id)
-                console.log('Inovice marked_void done.')
-
+                    let invoice = await Stripe.voidInvoice(invoiceMarkedUncollectible.id)
+                    console.log('Inovice marked_void done.')
+                }
                 break;
             default:
                 console.log(`Unhandled event type ${event.type}`);
@@ -514,19 +518,46 @@ exports.checkoutWithEmail = async (req, res) => {
     const { subscriptions, email, backURL } = req.body
 
     try {
-        // Group by priceID
+        // Get stripe customer
+        const stripeCustomer = await Stripe.getCustomerByEmail(email);
+        // Get DB user.
         const customer = await UserService.getUserByEmail(email);
-        const subscriptionsGroup = groupByKey(subscriptions, 'priceID', { omitKey: false })
-        let session
-        if (customer)
-            session = await Stripe.createCheckoutSession(customer.billingID, subscriptions, Object.entries(subscriptionsGroup), backURL)
-        else
-            session = await Stripe.createCheckoutSessionWithEmail(email, subscriptions, Object.entries(subscriptionsGroup), backURL)
 
-        if (session) {
+        let billingID
+
+        if (customer)
+            billingID = customer.billingID
+        else if (stripeCustomer)
+            billingID = stripeCustomer.id
+
+        // Group by priceID    
+        const subscriptionsGroup = groupByKey(subscriptions, 'priceID', { omitKey: false })
+        
+        let session, existCar = false;
+        // Validate car to avoid duplicated plates in the system.
+        for (item of subscriptions) {
+            let car = await CarService.getCarByPlate(item.plate)
+            if (car) {
+                existCar = true;
+                break;
+            }
+
+        }
+        if (existCar) {
             res.send({
-                sessionId: session.id
+                sessionId: null, message: "Car already exist. Please cancel the order and add other car."
             })
+        } else {
+            if (billingID)
+                session = await Stripe.createCheckoutSession(billingID, subscriptions, Object.entries(subscriptionsGroup), backURL)
+            else
+                session = await Stripe.createCheckoutSessionWithEmail(email, subscriptions, Object.entries(subscriptionsGroup), backURL)
+
+            if (session) {
+                res.send({
+                    sessionId: session.id
+                })
+            }
         }
     } catch (e) {
         req.bugsnag.notify(new Error(e),
@@ -730,7 +761,7 @@ exports.markUncollectibleInvoice = async (req, res) => {
             let inovice = await Stripe.markUncollectibleInvoice(invoiceID)
 
             if (inovice) {
-                
+
                 alertInfo = { message: `Your inovice ${inovice.id} has been updated successfully. `, alertType: alertTypes.BasicAlert }
                 console.debug(alertInfo.message)
                 res.send(`Action Completed. The page is reloaded in a few seconds...`)
