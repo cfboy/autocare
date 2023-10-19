@@ -636,7 +636,7 @@ async function getBalanceTransactions(startDate, endDate) {
             }
         }
 
-        let grossVolumeString = null, netVolumeString = null, taxVolumeString = null;
+        let grossVolumeString = null, netVolumeString = null;
 
         grossVolume = Dinero({ amount: grossVolume })
         netVolume = Dinero({ amount: netVolume })
@@ -647,12 +647,23 @@ async function getBalanceTransactions(startDate, endDate) {
         netVolumeString = netVolume.toFormat('$0,0.00')
         console.debug('Net Volume: ' + netVolumeString)
         // Calculate tax
-        let taxRate = 11.5 / 100
-        taxVolume = grossVolume.multiply(taxRate)
-        taxVolumeString = Dinero({ amount: taxVolume.getAmount() }).toFormat('$0,0.00')
-        console.debug('Tax Volume: ' + taxVolumeString)
+        // TODO: find taxes in Stripe
+        let municipalTax = 1.0 / 100;
+        let stateTax = 10.5 / 100;
 
-        return { grossVolume, netVolume, taxVolume }
+        let totalVolumeWithoutTaxes = grossVolume.divide(1 + municipalTax + stateTax);
+        console.debug('totalVolumeWithoutTaxes: ' + totalVolumeWithoutTaxes.toFormat('$0,0.00'))
+
+        // Get the volume taxes
+        let municipalTaxVolume = totalVolumeWithoutTaxes.multiply(municipalTax);
+        console.debug('municipalTaxVolume: ' + municipalTaxVolume.toFormat('$0,0.00'))
+        let stateTaxVolume = totalVolumeWithoutTaxes.multiply(stateTax);
+        console.debug('stateTaxVolume: ' + stateTaxVolume.toFormat('$0,0.00'))
+
+        taxVolume = municipalTaxVolume.add(stateTaxVolume)
+        console.debug('Tax Volume: ' + taxVolume.toFormat('$0,0.00'))
+
+        return { grossVolume, netVolume, totalVolumeWithoutTaxes, taxVolume, municipalTaxVolume, stateTaxVolume }
 
     } catch (error) {
         console.error(`ERROR-STRIPE: getBalanceTransactions(). ${error.message}`);

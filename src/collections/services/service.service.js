@@ -289,13 +289,15 @@ async function getGrossVolumeFactor(startDate, endDate, allServices) {
         const stripeBalance = await Stripe.getBalanceTransactions(startDate, endDate)
 
 
-        factor = allServices?.length > 0 ? stripeBalance?.grossVolume.divide(allServices?.length).getAmount() : 0
+        factor = allServices?.length > 0 ? stripeBalance?.totalVolumeWithoutTaxes.divide(allServices?.length).getAmount() : 0
 
         return {
             factor,
             grossVolume: stripeBalance?.grossVolume?.getAmount(),
             netVolume: stripeBalance?.netVolume?.getAmount(),
-            taxVolume: stripeBalance?.taxVolume?.getAmount()
+            taxVolume: stripeBalance?.taxVolume?.getAmount(),
+            municipalTaxVolume: stripeBalance?.municipalTaxVolume?.getAmount(),
+            stateTaxVolume: stripeBalance?.stateTaxVolume?.getAmount()
         }
 
     } catch (error) {
