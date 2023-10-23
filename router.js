@@ -48,15 +48,20 @@ router.get('/account', checkAuthenticated, validateActiveAccount, validateLocati
 
 router.get('/login', checkNotAuthenticated, (req, res) => {
 
-    let { message, email, alertType } = req.session
+    let { message, email, alertType, isIncomplete } = req.session
 
     // Clear session alerts variables.
     if (message) {
         req.session.message = ''
         req.session.alertType = ''
     }
-    // TODO: Optimize this approach.
-    if (req.flash('error')[0] == 'VALIDATION')
+
+    if (isIncomplete) {
+        req.session.isIncomplete = null
+    }
+
+    // TODO: Test incomplete account
+    if (isIncomplete)
         res.redirect('/activateAccountRequest')
     else
         res.render('auth/login.ejs', { message, email, alertType })
@@ -136,12 +141,16 @@ router.post('/carcheck', subscriptionsController.carCheck)
 router.post('/readingData', subscriptionsController.readingData)
 router.get('/create-subscriptions', checkAuthenticated, subscriptionsController.createSubscriptions)
 router.get('/subscribe', subscriptionsController.subscribe)
-router.get('/handleInvalidSubscriptions', checkAuthenticated, subscriptionsController.handleInvalidSubscriptions)
+// Deprecated
+// router.get('/handleInvalidSubscriptions', checkAuthenticated, subscriptionsController.handleInvalidSubscriptions)
 router.post('/confirmValidCars', checkAuthenticated, subscriptionsController.confirmValidCars)
 router.post('/syncSubscription', checkAuthenticated, subscriptionsController.syncSubscription)
 router.post('/syncCustomerSubscriptions', checkAuthenticated, subscriptionsController.syncCustomerSubscriptions)
 router.post('/removeCar', checkAuthenticated, subscriptionsController.removeCarOfSubscription)
 
+router.post('/getSubscriptionDay', checkAuthenticated, subscriptionsController.getSubscriptionDay)
+router.post('/cancelSubscription', checkAuthenticated, subscriptionsController.cancelSubscription)
+router.post('/renewSubscription', checkAuthenticated, subscriptionsController.renewSubscription)
 
 router.post('/cars/create', checkAuthenticated, authAddCar, carsController.save)
 router.post('/edit-car', checkAuthenticated, authEditCar, carsController.update)
@@ -151,6 +160,7 @@ router.get('/delete-car/:id', checkAuthenticated, authDeleteCar, carsController.
 router.post('/validatePlate', carsController.validatePlate)
 router.post('/validateEmail', userController.validateEmail)
 router.post('/removeFromCart', userController.removeFromCart)
+router.post('/cancelOrder', userController.cancelOrder)
 
 //------ Services Routes ------
 router.get('/services', checkAuthenticated, servicesController.services)
@@ -186,6 +196,7 @@ router.post('/getGrossVolumeDistributedReport', checkAuthenticated, reportsContr
 //------ Stripe and Payment Routes ------
 router.get('/charges', checkAuthenticated, stripeController.charges)
 router.get('/invoices', checkAuthenticated, stripeController.invoices)
+router.post('/markUncollectibleInvoice', checkAuthenticated, stripeController.markUncollectibleInvoice)
 router.post('/changePrices', checkAuthenticated, authChangePrices, stripeController.changePrice)
 
 

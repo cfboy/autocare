@@ -9,11 +9,6 @@
                             <h4><%= lingua.user.info%></h4>
                         </div>
                         <div class="d-flex">
-                            <!-- <a href="/edit-user/<%# customer?.id%>?url=/validateMembership" type="button"
-                                data-toggle="tooltip" title="Edit user"
-                                class="btn btn-icon btn-icon-no-border no-margin">
-                                <span class="far fa-2x fa-edit icon-sm"></span>
-                            </a> -->
                             <a href="/customers/<%- customer?.id%>" type="button" data-toggle="tooltip"
                                 title="View Customer" data-toggle="tooltip" data-placement="bottom"
                                 class="btn btn-icon btn-icon-no-border m-1 p-0">
@@ -30,7 +25,7 @@
                         <b>
                             <%= lingua.user.firstName%>:
                         </b>
-                        <%- customer?.personalInfo.firstName + ' ' + customer?.personalInfo.lastName %>
+                        <%= customer?.fullName() %>
                     </p>
                     <p>
                         <b>
@@ -76,14 +71,12 @@
                     <% } %>
                 </div>
                 <div class="col-md-6 p-3">
-                    <!-- <h4 class="text-center">Membership Status</h4> -->
                     <div class="col-md-12 text-center validation-msgs">
                         <% if(car.hasService) { %>
                         <i class="far fa-8x fa-times-circle invalid"></i>
 
                         <p class="alert alert-danger mt-2"><%= lingua.car.maxServiceQty%>.</p>
-                        <% }
-                         else if (!car.isValid) { %>
+                        <% } else if (!car.isValid) { %>
                         <i class="far fa-8x fa-times-circle invalid"></i>
 
                         <p class="alert alert-danger mt-2">
@@ -111,6 +104,17 @@
                         </p>
                         <% } %>
 
+
+                        <% if([stripeStatus.CANCELED].includes(subscription?.data?.status)) { %>
+                        <button id="renew-btn" user-id="<%= customer?.id%>" car-id="<%= car?.id%>"
+                            inputType="<%= inputType%>" onclick="renewSubscriptionTrigger(this)"
+                            class="btn btn-block btn-outline-primary btn-lg font-weight-medium btn-icon-text m-1 p2 w-100"
+                            type="submit">
+                            Renovar
+
+                            <i class="fa-solid fa-repeat btn-icon-apepend m-2"></i>
+                        </button>
+                        <% } %>
                         <div class="mt-3 mb-3">
                             <% var subscriptionOnValidPeriod = moment(new Date()).isBefore(subscription?.data?.current_period_end * 1000) %>
                             <% if(subscriptionOnValidPeriod) { %>
@@ -118,31 +122,37 @@
                             <% if(!car?.hasService) { %>
                             <button id="use-service-button" user-id="<%= customer?.id%>" car-id="<%= car?.id%>"
                                 inputType="<%= inputType%>" onclick="confirmValidation(this)"
-                                class="btn btn-block btn-outline-success btn-lg font-weight-medium btn-icon-text m-1"
+                                class="btn btn-block btn-outline-success btn-lg font-weight-medium btn-icon-text m-1 p-2 w-100"
                                 type="submit">
                                 <%= lingua.service.use%>
-                                
+
                                 <i class="fa-solid fa-circle-check btn-icon-apepend m-2"></i>
                             </button>
                             <% } %>
+                            <% } else{ %>
+                            <p>Invalid Period.</p>
                             <% } %>
-                            <% } %>
-
                         </div>
+                        <% } %>
 
                     </div>
                 </div>
-                <% } else if(!customer){ %>
+                <% } else if(!car){ %>
                 <div class="col-md-12 text-center validation-msgs">
-                    <i class="fas fa-8x fa-exclamation-triangle warning"></i>
-                    <p><%= lingua.user.notFound%>.</p>
-
-                </div>
-                <% } else if(!car) { %>
-                <div class="col-md-12 text-center validation-msgs">
-                    <i class="fas fa-8x fa-exclamation-triangle warning"></i>
+                    <i class="fas fa-4x fa-exclamation-triangle warning"></i>
                     <p><%= lingua.car.notFound%>.</p>
+                    <div class="">
+                        <div class="card-body text-center">
+                            <h2><i class="fa-solid fa-car mx-1 text-primary" data-toggle="tooltip"
+                                    data-placement="right" title="Car"></i> <%= carPlate%>
+                            </h2>
+                            <button id="subscribe-btn" value="<%= carPlate%>"
+                                class="btn btn-block btn-sm-block btn-outline-primary btn-lg font-weight-medium btn-icon-text m-1 p2 w-50">
+                                <%= lingua.subscribe%>
+                            </button>
 
+                        </div>
+                    </div>
                 </div>
                 <% } %>
             </div>
@@ -156,6 +166,7 @@
             return (typeof $(el).data('placement') === 'undefined') ? 'bottom' : $(el).data('placement');
         }, trigger: 'hover'
     });
+
     function confirmValidation(element) {
 
         const userID = element.getAttribute("user-id");
@@ -188,5 +199,18 @@
             console.log(err);
         })
 
+    }
+    // popup allowed
+    $("#subscribe-btn").on("click", function (event) {
+        // window.open('https://javascript.info');
+        let carPlate = $(this).val();
+        let params = `scrollbars=no,resizable=no,status=no,location=no,toolbar=no,
+                    menubar=no,width=400,height=600,left=1000,top=20`;
+
+        open(`/subscribe?carPlate=${carPlate}`, '_self', params);
+    });
+
+    function renewSubscriptionTrigger(element) {
+        // TODO: implement function
     }
 </script>

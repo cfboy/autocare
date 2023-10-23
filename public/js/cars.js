@@ -56,14 +56,14 @@ function autofillCarInfo(selectedCar, linguaString) {
     if (selectedCar && selectedCar.value != '') {
         let id = selectedCar.selectedOptions[0].getAttribute('value');
         let brand = selectedCar.selectedOptions[0].getAttribute('brand');
-        let model = selectedCar.selectedOptions[0].getAttribute('model');
+        // let model = selectedCar.selectedOptions[0].getAttribute('model');
         let plate = selectedCar.selectedOptions[0].getAttribute('plate');
         let carBrand = $('#brand');
-        let carModel = $('#carModel');
+        // let carModel = $('#carModel');
         let carPlate = $('#carPlate');
 
         carBrand.attr('disabled', true);
-        carModel.attr('disabled', true);
+        // carModel.attr('disabled', true);
         carPlate.attr('disabled', true);
 
         // showResult function is in the helper-functions.js
@@ -78,15 +78,15 @@ function autofillCarInfo(selectedCar, linguaString) {
         carBrand.attr('disabled', false);
         // Set timeout in which the models loads.
         setTimeout(function () {
-            carModel.attr('disabled', true);
-            if (model) {
-                if (carModel.data('select2'))
-                    carModel.select2().val(model).trigger('change');
-                else {
-                    carModel.val(model);
-                }
-            }
-            carModel.attr('disabled', false);
+            // carModel.attr('disabled', true);
+            // if (model) {
+            //     if (carModel.data('select2'))
+            //         carModel.select2().val(model).trigger('change');
+            //     else {
+            //         carModel.val(model);
+            //     }
+            // }
+            // carModel.attr('disabled', false);
             carPlate.attr('disabled', false);
             carPlate.val(plate);
             showResult('#autofillLoading', "")

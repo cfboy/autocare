@@ -5,13 +5,14 @@
         <%= moment(endDate).isValid() ? moment(endDate).format("MMMM DD, YYYY") : 'N/A' %>
     </p>
     <% for(const header of headers) { %>
-    <div class="col-4">
-        <div class="card">
+    <div class="col-lg-3 col-md-4 col-sm-6">
+        <div class="card my-2">
             <div class="card-header" style="border-radius: 20px 20px 0 0;">
-                <%= header.title%>
+                <%= header.title%> <i class="fa-solid fa-circle-info mx-1 text-primary" data-toggle="tooltip" title="<%= header.info%> 
+                            <%= header?.anotherInfo%>"></i>
             </div>
             <div class="card-body">
-                <%= header.value%>
+                <h3><%= header.value%></h3>
             </div>
         </div>
     </div>
@@ -45,3 +46,12 @@
         </tbody>
     </table>
 </div>
+<script>
+
+    $('[data-toggle="tooltip"]').tooltip({
+        placement: function (t_el, el) {
+            return (typeof $(el).data('placement') === 'undefined') ? 'right' : $(el).data('placement');
+        }, trigger: 'hover'
+    });
+
+</script>

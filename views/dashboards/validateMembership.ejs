@@ -258,7 +258,7 @@
                     type: "POST",
                     contentType: "application/json",
                     data: JSON.stringify({
-                        plateNumber: valueToValidate.val(),
+                        plateNumber: valueToValidate.val().toUpperCase(),
                         inputType: "Manual"
                     }),
                     beforeSend: function () {

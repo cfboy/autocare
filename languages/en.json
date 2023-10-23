@@ -111,7 +111,8 @@
         "subTotal": "Sub Total",
         "proceedToCheckout": "Proceed to Checkout",
         "selectMembership": "Select membership plan",
-        "completeSubscription": "Complete Subscription"
+        "completeSubscription": "Complete Subscription",
+        "cancelOrder" : "Cancel Order"
     },
     "service": {
         "qty": "Service (Qty.)",

@@ -188,9 +188,23 @@ exports.activateAccountRequest = async (req, res) => {
 exports.activateAccountRequestController = async (req, res) => {
     const lingua = req.res.lingua.content;
 
-    const [requestSuccess, message] = await AuthService.generateAtivationLink(lingua, req.body.email, req.bugsnag);
+    const [requestSuccess, emailProperties, message] = await AuthService.generateAtivationLink(lingua, req.body.email, req.bugsnag);
 
     if (requestSuccess) {
+        // Send Email
+        var resultEmail = await sendEmail(emailProperties.email, emailProperties.emailType, emailProperties.payload);
+        
+        if (resultEmail.sent) {
+            console.debug('Email Sent: ' + emailProperties.email)
+
+        } else {
+            req.bugsnag.notify(new Error(resultEmail.data),
+                function (event) {
+                    event.setUser(emailProperties.email)
+                })
+            console.error('ERROR: Email Not Sent.')
+        }
+
         req.flash('info', message);
         res.redirect('/login')
     } else {

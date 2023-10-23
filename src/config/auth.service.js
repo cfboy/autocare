@@ -68,50 +68,49 @@ const resetPasswordRequest = async (lingua, email, bugsnag) => {
  * @returns 
  */
 const generateAtivationLink = async (lingua, email, bugsnag) => {
-
-    const user = await UserService.getUserByEmail(email);
-    var requestSuccess = false
-    if (!user) {
-        return [requestSuccess, lingua.validation.emailNotExist]
-    }
-
-    let token = await Token.findOne({ userId: user._id, type: "account" });
-    if (token) await token.deleteOne();
-
-    let resetToken = crypto.randomBytes(32).toString("hex");
-    const hash = await bcrypt.hash(resetToken, Number(bcryptSalt));
-
-    await new Token({
-        userId: user._id,
-        token: hash,
-        createdAt: Date.now(),
-        type: "account"
-    }).save();
-
-    const link = `${clientURL}/activateAccount?token=${resetToken}&id=${user._id}`;
-
-    var resultEmail = await sendEmail(
-        user.email,
-        "activate_account",
-        {
-            name: user?.fullName(),
-            link: link,
-            subject: 'AutoCare Memberships - Activate Account'
+    try {
+        const user = await UserService.getUserByEmail(email);
+        var requestSuccess = true
+        if (!user) {
+            return [false, null, lingua.validation.emailNotExist]
         }
-    )
 
-    if (resultEmail.sent) {
-        console.debug('Email Sent: ' + user.email)
-        requestSuccess = true
-        return [requestSuccess, lingua.email.verifyEmail(user.email)]
+        let token = await Token.findOne({ userId: user._id, type: "account" });
+        if (token) await token.deleteOne();
 
-    } else {
-        bugsnag.notify(new Error(resultEmail.data),
+        let resetToken = crypto.randomBytes(32).toString("hex");
+        const hash = await bcrypt.hash(resetToken, Number(bcryptSalt));
+
+        await new Token({
+            userId: user._id,
+            token: hash,
+            createdAt: Date.now(),
+            type: "account"
+        }).save();
+
+        const link = `${clientURL}/activateAccount?token=${resetToken}&id=${user._id}`;
+
+        var emailProperties = {
+            email: user.email,
+            emailType: "activate_account",
+            payload: {
+                name: user?.fullName(),
+                link: link,
+                subject: 'Welcome to AutoCare Memberships'
+            }
+        }
+
+        return [requestSuccess, emailProperties, "Generate Activation Success"]
+
+    } catch (error) {
+        bugsnag.notify(new Error(error),
             function (event) {
                 event.setUser(email)
             })
-        return [requestSuccess, lingua.validation.requestNotSend]
+        console.error(error);
+        return [false, null, error.message]
     }
+
 };
 
 /**
@@ -245,18 +244,18 @@ const registerAndActivateLink = async (stripeCustomer, role, lingua, bugsnag) =>
         if (customer) {
             console.debug(`A new user added to DB. The ID for ${customer.email} is ${customer.id}`);
 
-            const [requestSuccess, message] = await generateAtivationLink(lingua, customer.email, bugsnag);
+            const [requestSuccess, emailProperties, message] = await generateAtivationLink(lingua, customer.email, bugsnag);
 
-            return [requestSuccess, message, customer];
+            return [requestSuccess, message, customer, emailProperties];
 
         } else {
             bugsnag.notify(new Error('Account Not Created.'))
-            return [false, "Account not created.", null]
+            return [false, "Account not created.", null, null]
         }
 
     } catch (error) {
         console.error(error);
-        return [false, error.message, null]
+        return [false, error.message, null, null]
     }
 }
 

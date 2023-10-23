@@ -538,6 +538,30 @@ exports.removeFromCart = async (req, res) => {
 
     res.send(returnValues)
 }
+exports.cancelOrder = async (req, res) => {
+    try {
+        let returnValues
+        let user = req.user;
+        if (user)
+            await UserService.emptyCart(user.id);
+
+        res.cookie('subscriptionEmail', '');
+        res.cookie('cart', JSON.stringify([]));
+        subscriptionList = [];
+
+        returnValues = { orderCancelled: true, subscriptionList: subscriptionList }
+
+        res.send(returnValues)
+
+    } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req?.user?.email)
+            })
+        console.error(`ERROR: userController -> Tyring to cancelOrder. ${error.message}`)
+        res.status(500).send('Error cancelOrder.')
+    }
+}
 
 exports.validateEmail = async (req, res) => {
     try {

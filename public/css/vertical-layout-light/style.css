@@ -13651,12 +13651,12 @@ fieldset:disabled .swal2-modal .swal2-buttonswrapper .swal2-styled,
 }
 
 .btn-outline-danger {
-    color: #F95F53;
-    border-color: #F95F53;
+    color: #F95F53 !important;
+    border-color: #F95F53 !important;
 }
 
 .btn-outline-danger:hover {
-    color: #000;
+    color: #000 !important;
     background-color: #F95F53;
     border-color: #F95F53;
 }
@@ -13671,7 +13671,7 @@ fieldset:disabled .swal2-modal .swal2-buttonswrapper .swal2-styled,
 .btn-outline-danger:active,
 .btn-outline-danger.active,
 .btn-outline-danger.dropdown-toggle.show {
-    color: #000;
+    color: #000 !important;
     background-color: #F95F53;
     border-color: #F95F53;
 }
@@ -14129,7 +14129,7 @@ fieldset:disabled .swal2-modal .swal2-buttonswrapper .swal2-styled,
 .dropdown-item:active {
     color: #fff;
     text-decoration: none;
-    background-color: #0d6efd;
+    background-color: #0c4083 !important;
 }
 
 .dropdown-item.disabled,
@@ -14177,7 +14177,7 @@ fieldset:disabled .swal2-modal .swal2-buttonswrapper .swal2-styled,
 .dropdown-menu-dark .dropdown-item.active,
 .dropdown-menu-dark .dropdown-item:active {
     color: #fff;
-    background-color: #0d6efd;
+    background-color: #0c4083;
 }
 
 .dropdown-menu-dark .dropdown-item.disabled,
@@ -32545,7 +32545,8 @@ div.tagsinput span.tag a {
     line-height: 1.5;
 }
 
-.auth form .auth-link, .auth-link {
+.auth form .auth-link,
+.auth-link {
     font-size: 0.812rem;
 }
 
@@ -36147,4 +36148,46 @@ label.required:after {
     font-weight: 700;
     font-family: 'Roboto',sans-serif; */
     margin-right: auto;
+}
+
+@media (max-width: 576px) {
+    h5 {
+        font-size: 1.0rem !important;
+    }
+
+}
+
+@media (max-width: 500px) {
+    h5 {
+        font-size: 0.85rem !important;
+    }
+
+    .card-body {
+        padding: 1rem !important;
+    }
+
+    .btn-sm-block {
+        width: 100% !important;
+        float: none !important;
+        margin-bottom: 5px;
+    }
+
+    .px-sm-1 {
+        padding-right: 0.25rem !important;
+        padding-left: 0.25rem !important;
+    }
+
+    .card .card-title {
+        font-size: 1.0rem;
+    }
+
+    #form-genrate-report .input-group-append {
+        width: 100%;
+    }
+}
+
+.cars-btn {
+    padding: 0.875rem 0.5rem !important;
+    cursor: text;
+    user-select: auto;
 }

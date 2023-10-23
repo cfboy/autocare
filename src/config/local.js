@@ -20,7 +20,8 @@ passport.use(new LocalStrategy({ usernameField: 'email', passReqToCallback: true
 
         try {
             if (currentUser?.isIncomplete()) {
-                return done(null, false, { message: "VALIDATION" });
+                req.session.isIncomplete = true
+                return done(null, false, { message: "Incomplete user information." });
 
             } else if (!bcrypt.compareSync(password, currentUser.password)) {
                 return done(null, false, { message: lingua.validation.wrongPassword });

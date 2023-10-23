@@ -32,6 +32,9 @@ const groupByKey = (list, key, { omitKey = false }) =>
 exports.webhook = async (req, res) => {
     let event
     const lingua = req.res.lingua.content
+    const {
+        INVALIDATE_UNCOLECTIBLE_INVOICES
+    } = process.env;
 
     try {
         event = Stripe.createWebhook(req.body, req.header('Stripe-Signature'))
@@ -71,8 +74,99 @@ exports.webhook = async (req, res) => {
             // }
 
             // break;
-            // case 'customer.subscription.created':
-            // DO the same of the update
+            case 'customer.subscription.created':
+                console.log(`WEBHOOK: customer.subscription.created: ${data.id}`)
+
+                subscription = data
+                if (subscription.status == 'active') {
+                    customer = await UserService.getUserByBillingID(subscription.customer)
+                    if (customer) {
+                        subscription = await SubscriptionService.getSubscriptionById(subscription.id);
+
+                        if (!subscription) {
+                            // Find subcription again for expand product information
+                            subscription = await Stripe.getSubscriptionById(data.id)
+                            subscriptionItems = subscription.items.data
+                            let cars = []
+                            let userCartItems = customer?.cart?.items
+                            if (userCartItems) {
+                                // cars = userCartItems ? userCartItems : JSON.parse(subscription?.metadata?.cars)
+                                cars = userCartItems
+                            }
+
+                            let items = []
+                            for (subItem of subscriptionItems) {
+                                let newItem = { id: subItem.id, cars: [], data: subItem }
+                                if (cars.length > 0) {
+                                    for (carObj of cars) {
+                                        if (subItem.price.id === carObj.priceID) {
+                                            let newCar = await CarService.getCarByPlate(carObj.plate)
+                                            if (newCar) {
+                                                // Add old utilization / History
+                                                await UtilizationService.handleUtilization(newCar, subscription.current_period_start, subscription.current_period_end)
+                                                if (newCar.cancel_date != null)
+                                                    await CarService.removeCarFromAllSubscriptions(newCar)
+                                            }
+                                            else
+                                                newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate, customer.id)
+
+                                            if (newCar)
+                                                newItem.cars.push(newCar)
+                                            else {
+                                                // add alert to add car
+                                                req.bugsnag.notify(new Error(`Car not created at 'customer.subscription.created' (${carObj.brand} - ${carObj.model} - ${carObj.plate})`),
+                                                    function (event) {
+                                                        event.setUser(customer.email)
+                                                    })
+                                                console.error("ERROR: Car not created at 'customer.subscription.created'")
+                                            }
+                                        }
+
+                                    }
+                                }
+                                items.push(newItem)
+
+                            }
+
+                            alertInfo = { message: `Your membership ${subscription.id} has been created successfully.`, alertType: alertTypes.BasicAlert }
+
+                            subscription = await SubscriptionService.addSubscription({ id: subscription.id, items: items, data: subscription, user: customer });
+                        }
+
+                        [customer, notification] = await UserService.addNotification(customer.id, alertInfo.message);
+
+                        req.io.in(customer?.id).emit('notifications', notification);
+
+                        //Send Email
+                        var resultEmail = await sendEmail(
+                            customer.email,
+                            'subscription_created',
+                            {
+                                name: customer?.fullName(),
+                                subscription_id: subscription.id,
+                                message: alertInfo.message,
+                                subject: 'New Subscription - AutoCare Memberships'
+                            }
+                        );
+                        if (resultEmail.sent) {
+                            console.debug('Email Sent: ' + customer.email)
+
+                        } else {
+                            req.bugsnag.notify(new Error(resultEmail.data),
+                                function (event) {
+                                    event.setUser(customer.email)
+                                })
+                            console.error('ERROR: Email Not Sent.')
+                        }
+
+                    } else {
+                        console.log('customer.subscription.created: Not Found Customer.')
+                    }
+                } else {
+                    console.debug('WEBHOOK: SUBSCRIPTION STATUS NOT ACTIVE. HANDLE ON UPDATE.')
+                }
+
+                break;
             case 'customer.subscription.updated':
 
                 let updateOrCreateResult = await manageUpdateOrCreateSubscriptionsWebhook(data, req.bugsnag, lingua, req);
@@ -83,6 +177,15 @@ exports.webhook = async (req, res) => {
 
                 let deletedResult = await manageDeletedSubscriptionsWebhook(data, req.bugsnag, req);
 
+                break;
+
+            case 'invoice.marked_uncollectible':
+                if (INVALIDATE_UNCOLECTIBLE_INVOICES) {
+                    const invoiceMarkedUncollectible = data;
+
+                    let invoice = await Stripe.voidInvoice(invoiceMarkedUncollectible.id)
+                    console.log('Inovice marked_void done.')
+                }
                 break;
             default:
                 console.log(`Unhandled event type ${event.type}`);
@@ -158,7 +261,7 @@ const manageUpdateOrCreateSubscriptionsWebhook = async (subscription, bugsnag, l
     try {
         console.log('Start manageUpdateOrCreateSubscriptionsWebhook()');
         let isNew = false; //Flag to identify if is a new subscription or update
-        let items, subscriptionItems, alertInfo, result, message
+        let items, subscriptionItems, alertInfo, result, message, activationResult, activationEmailProperties
 
         // Find the customer in Stripe by BillingID
         let stripeCustomer = await Stripe.getCustomerByID(subscription.customer);
@@ -169,7 +272,7 @@ const manageUpdateOrCreateSubscriptionsWebhook = async (subscription, bugsnag, l
         if (!customer) {
             console.log('Not found Customer: manageUpdateOrCreateSubscriptionsWebhook()');
             // If the user not exist in the DB then create one.
-            [result, message, customer] = await AuthService.registerAndActivateLink(stripeCustomer, ROLES.CUSTOMER, lingua, bugsnag)
+            [activationResult, message, customer, activationEmailProperties] = await AuthService.registerAndActivateLink(stripeCustomer, ROLES.CUSTOMER, lingua, bugsnag)
 
             if (!customer) {
                 console.log('Not Found Customer.')
@@ -213,7 +316,7 @@ const manageUpdateOrCreateSubscriptionsWebhook = async (subscription, bugsnag, l
                         if (newItem?.cars?.length == newItem.data.quantity) {
                             for (carObj of newItem.cars) {
                                 if (carObj.cancel_date !== null)
-                                    await CarService.updateCar(carObj.id, { cancel_date: null })
+                                    await CarService.updateCar(carObj.id, { cancel_date: null, user_id: customer.id })
                             }
                         }
                     } catch (e) {
@@ -267,10 +370,7 @@ const manageUpdateOrCreateSubscriptionsWebhook = async (subscription, bugsnag, l
 
             subscription = await SubscriptionService.updateSubscription(subscription.id, updates);
 
-            if (isDeleteWebhook)
-                alertInfo = { message: `Your membership ${subscription.id} has been cencelled successfully.`, alertType: alertTypes.BasicAlert }
-            else
-                alertInfo = { message: `Your membership ${subscription.id} has been updated successfully.`, alertType: alertTypes.BasicAlert }
+            alertInfo = { message: `Your membership ${subscription.id} has been updated successfully.`, alertType: alertTypes.BasicAlert }
 
             // Send customer balance on email.
             let { totalString } = await Stripe.getCustomerBalanceTransactions(customer.billingID)
@@ -295,6 +395,9 @@ const manageUpdateOrCreateSubscriptionsWebhook = async (subscription, bugsnag, l
                             await UtilizationService.handleUtilization(newCar, subscription.current_period_start, subscription.current_period_end)
                             if (newCar.cancel_date != null)
                                 await CarService.removeCarFromAllSubscriptions(newCar)
+
+                            // Reassign new user 
+                            newCar = await CarService.updateCar(newCar.id, { user_id: customer.id })
                         }
                         else
                             newCar = await CarService.addCar(carObj.brand, carObj.model, carObj.plate, customer.id)
@@ -326,20 +429,30 @@ const manageUpdateOrCreateSubscriptionsWebhook = async (subscription, bugsnag, l
             req.io.in(customer?.id).emit('notifications', notification);
 
             // Prepare email variables
-            let emailTemplate = isNew ? 'subscription_created' : 'subscription_updated';
-            let emailSubject = isNew ? 'Subscription Created - AutoCare Memberships' : 'Subscription Updated - AutoCare Memberships';
+            let emailTemplate
+            let emailSubject
+            let emailProperties
+            if (activationResult) {
+                emailProperties = activationEmailProperties
+
+            } else {
+                emailTemplate = isNew ? 'subscription_created' : 'subscription_updated';
+                emailSubject = isNew ? 'Subscription Created - AutoCare Memberships' : 'Subscription Updated - AutoCare Memberships';
+
+                emailProperties = {
+                    email: customer.email,
+                    emailType: emailTemplate,
+                    payload: {
+                        name: customer?.fullName(),
+                        subscription_id: subscription.id,
+                        message: alertInfo.message,
+                        subject: emailSubject
+                    }
+                }
+            }
 
             // Send Email
-            var resultEmail = await sendEmail(
-                customer.email,
-                emailTemplate,
-                {
-                    name: customer?.fullName(),
-                    subscription_id: subscription.id,
-                    message: alertInfo.message,
-                    subject: emailSubject
-                }
-            );
+            var resultEmail = await sendEmail(emailProperties.email, emailProperties.emailType, emailProperties.payload);
             if (resultEmail.sent) {
                 console.debug('Email Sent: ' + customer.email)
 
@@ -405,19 +518,46 @@ exports.checkoutWithEmail = async (req, res) => {
     const { subscriptions, email, backURL } = req.body
 
     try {
-        // Group by priceID
+        // Get stripe customer
+        const stripeCustomer = await Stripe.getCustomerByEmail(email);
+        // Get DB user.
         const customer = await UserService.getUserByEmail(email);
-        const subscriptionsGroup = groupByKey(subscriptions, 'priceID', { omitKey: false })
-        let session
-        if (customer)
-            session = await Stripe.createCheckoutSession(customer.billingID, subscriptions, Object.entries(subscriptionsGroup), backURL)
-        else
-            session = await Stripe.createCheckoutSessionWithEmail(email, subscriptions, Object.entries(subscriptionsGroup), backURL)
 
-        if (session) {
+        let billingID
+
+        if (customer)
+            billingID = customer.billingID
+        else if (stripeCustomer)
+            billingID = stripeCustomer.id
+
+        // Group by priceID    
+        const subscriptionsGroup = groupByKey(subscriptions, 'priceID', { omitKey: false })
+        
+        let session, existCar = false;
+        // Validate car to avoid duplicated plates in the system.
+        for (item of subscriptions) {
+            let car = await CarService.getCarByPlate(item.plate)
+            if (car) {
+                existCar = true;
+                break;
+            }
+
+        }
+        if (existCar) {
             res.send({
-                sessionId: session.id
+                sessionId: null, message: "Car already exist. Please cancel the order and add other car."
             })
+        } else {
+            if (billingID)
+                session = await Stripe.createCheckoutSession(billingID, subscriptions, Object.entries(subscriptionsGroup), backURL)
+            else
+                session = await Stripe.createCheckoutSessionWithEmail(email, subscriptions, Object.entries(subscriptionsGroup), backURL)
+
+            if (session) {
+                res.send({
+                    sessionId: session.id
+                })
+            }
         }
     } catch (e) {
         req.bugsnag.notify(new Error(e),
@@ -606,6 +746,45 @@ exports.invoices = async (req, res) => {
     }
 
 }
+
+/**
+ * This function render the stripe invoices of user.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.markUncollectibleInvoice = async (req, res) => {
+    try {
+
+        let invoiceID = req.body.id
+
+        if (invoiceID) {
+            let inovice = await Stripe.markUncollectibleInvoice(invoiceID)
+
+            if (inovice) {
+
+                alertInfo = { message: `Your inovice ${inovice.id} has been updated successfully. `, alertType: alertTypes.BasicAlert }
+                console.debug(alertInfo.message)
+                res.send(`Action Completed. The page is reloaded in a few seconds...`)
+
+            } else {
+                res.send('Action not completed.')
+            }
+        } else {
+            console.log('Missing invoice ID')
+            res.send('Missing invoice ID.')
+        }
+
+    } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
+        console.error(`ERROR: subscriptionsController -> Tyring to sync membership. ${error.message}`)
+        res.render('Error on sync membership.')
+    }
+}
+
+
 
 /**
  * This function find all subscriptions with active status and oldPrice on any item, 

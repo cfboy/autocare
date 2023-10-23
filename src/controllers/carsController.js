@@ -277,6 +277,7 @@ exports.save = async (req, res) => {
             req.session.alertType = alertTypes.ErrorAlert
         }
 
+        // TODO: add dynamic redirect
         res.redirect('/cars')
 
     } catch (error) {
@@ -406,7 +407,12 @@ exports.validatePlate = async (req, res) => {
             } else {
                 addType = 'cookie'
                 // If the user is not logged in create a cart in the cookies.
-                let cookieCart = req.cookies.cart ? req.cookies.cart : res.cookie('cart', JSON.stringify([]));
+                let cookieCart
+                if (!req.cookies.cart) {
+                    cookieCart = JSON.stringify([]);
+                } else {
+                    cookieCart = req.cookies.cart
+                }
                 cookieCart = JSON.parse(cookieCart);
                 cookieCart.push(newItem)
                 res.cookie('cart', JSON.stringify(cookieCart));

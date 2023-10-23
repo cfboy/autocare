@@ -13,6 +13,8 @@ const STATUS = {
     TRIALING: "trialing",
 }
 
+const MIN_CANCEL_DAYS = 25
+
 const Stripe = stripe(process.env.STRIPE_SECRET_KEY, {
     apiVersion: '2020-08-27'
 })
@@ -447,6 +449,44 @@ const getCustomerInvoices = async (user) => {
 }
 
 /**
+ * This function mark uncollectible an invoice.
+ * @param {*} invoiceID 
+ * @returns 
+ */
+const markUncollectibleInvoice = async (invoiceID) => {
+    try {
+        const invoice = await Stripe.invoices.markUncollectible(invoiceID);
+
+        console.log(`Invoice markUncollectibleInvoice: ${invoice.id}`)
+
+        return invoice
+    }
+    catch (error) {
+        console.error(`ERROR-STRIPE: markUncollectibleInvoice(). ${error.message}`);
+    }
+
+}
+
+/**
+ * This function void an invoice.
+ * @param {*} user 
+ * @returns 
+ */
+const voidInvoice = async (invoiceID) => {
+    try {
+        const invoice = await Stripe.invoices.voidInvoice(invoiceID);
+
+        console.log(`Invoice voided: ${invoice.id}`)
+
+        return invoice
+    }
+    catch (error) {
+        console.error(`ERROR-STRIPE: voidInvoice(). ${error.message}`);
+    }
+
+}
+
+/**
  * This function get all subsctiptions.
  * @returns subscriptions list
  */
@@ -556,6 +596,19 @@ async function updateStripeSubscription(id, updates) {
 }
 
 /**
+ * This function cancel the stripe subscription.
+ * @param {*} id 
+ * @returns subscription obj
+ */
+async function cancelSubscription(id) {
+    console.log('ID: ' + id)
+    // console.log('cancelAt: ' + cancelAt)
+    const subscription = await Stripe.subscriptions.cancel(id);
+
+    return subscription
+}
+
+/**
  * This function return the stripe balance transactions between dates.
  * Calculate the Gross Volume
  * @param {*} startDate 
@@ -565,34 +618,53 @@ async function updateStripeSubscription(id, updates) {
 async function getBalanceTransactions(startDate, endDate) {
 
     try {
-        let totalVolume = 0.00, grossVolume = 0
+        let taxVolume = 0, grossVolume = 0, netVolume = 0;
 
-        for await (const balance of Stripe.balanceTransactions.list(
+        let stripeBalanceTransactionList = Stripe.balanceTransactions.list(
             {
-                limit: 10,
+                limit: 100,
                 created: { 'gte': startDate, 'lte': endDate }
             }
-        )) {
-            // Do something with customer
+        )
+
+        for await (const balance of stripeBalanceTransactionList) {
+            // Sum only the charge balance type. (Based on the documentation)
+            // TODO: validate the refunds and other cases
             if (balance.type == 'charge') {
-                totalVolume += balance.amount
-            } else
                 grossVolume += balance.amount
+                netVolume += balance.net
+            }
         }
 
-        let grossVolumeString = null, totalVolumeString = null
-        //if the grossVolume == 0 || grossVolume is > 0 then keep the same value, if not then multiplu by -1.
-        grossVolume = grossVolume >= 0 ? grossVolume : grossVolume * -1
+        let grossVolumeString = null, netVolumeString = null;
+
         grossVolume = Dinero({ amount: grossVolume })
+        netVolume = Dinero({ amount: netVolume })
+
         grossVolumeString = grossVolume.toFormat('$0,0.00')
         console.debug('Gross Volume: ' + grossVolumeString)
 
+        netVolumeString = netVolume.toFormat('$0,0.00')
+        console.debug('Net Volume: ' + netVolumeString)
+        // Calculate tax
+        // TODO: find taxes in Stripe
+        let municipalTax = 1.0 / 100;
+        let stateTax = 10.5 / 100;
 
-        if (totalVolume > 0) {
-            totalVolumeString = Dinero({ amount: totalVolume }).toFormat('$0,0.00')
-            console.debug('Total Volume: ' + totalVolumeString)
-        }
-        return { grossVolume, grossVolumeString, totalVolumeString }
+        let totalVolumeWithoutTaxes = grossVolume.divide(1 + municipalTax + stateTax);
+        console.debug('totalVolumeWithoutTaxes: ' + totalVolumeWithoutTaxes.toFormat('$0,0.00'))
+
+        // Get the volume taxes
+        let municipalTaxVolume = totalVolumeWithoutTaxes.multiply(municipalTax);
+        console.debug('municipalTaxVolume: ' + municipalTaxVolume.toFormat('$0,0.00'))
+        let stateTaxVolume = totalVolumeWithoutTaxes.multiply(stateTax);
+        console.debug('stateTaxVolume: ' + stateTaxVolume.toFormat('$0,0.00'))
+
+        taxVolume = municipalTaxVolume.add(stateTaxVolume)
+        console.debug('Tax Volume: ' + taxVolume.toFormat('$0,0.00'))
+
+        return { grossVolume, netVolume, totalVolumeWithoutTaxes, taxVolume, municipalTaxVolume, stateTaxVolume }
+
     } catch (error) {
         console.error(`ERROR-STRIPE: getBalanceTransactions(). ${error.message}`);
 
@@ -602,6 +674,7 @@ async function getBalanceTransactions(startDate, endDate) {
 
 module.exports = {
     STATUS,
+    MIN_CANCEL_DAYS,
     getCustomerByID,
     getCustomerByEmail,
     addNewCustomer,
@@ -618,11 +691,14 @@ module.exports = {
     getCustomerEvents,
     getCustomerCharges,
     getCustomerInvoices,
+    markUncollectibleInvoice,
+    voidInvoice,
     getAllSubscriptions,
     getSubscriptionById,
     getSubscriptionItemById,
     getCustomerBalanceTransactions,
     updateStripeSubscription,
+    cancelSubscription,
     getBalanceTransactions,
     getCustomerSubscriptions
 }

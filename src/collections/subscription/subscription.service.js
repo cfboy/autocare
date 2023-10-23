@@ -1,4 +1,4 @@
-const { STATUS } = require('../../connect/stripe');
+const { STATUS, MIN_CANCEL_DAYS } = require('../../connect/stripe');
 /**
  * IMPORTANT: All the subscription obj has the ID of Stripe Subscription Obj on id property.
  * So when need to find a subscription by id should use findOne instead findByID.
@@ -381,6 +381,47 @@ async function validateItemQty(item) {
     }
 }
 
+/**
+ * This function find the subscription by id and get the current day of the period.
+ * @param {*} id 
+ * @returns 
+ */
+async function getSubscriptionDayOfPeriod(id) {
+
+    try {
+        let subscription = await this.getSubscriptionById(id)
+        let startDate = new Date(subscription.data.current_period_start * 1000),
+            currentDate = new Date(),
+            endDate = new Date(subscription.data.current_period_end * 1000),
+            daysBetweenTwoDates = (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24)
+
+        daysSinceStart = Math.floor((currentDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+
+        console.log(`La suscripción se encuentra en el día ${daysSinceStart} de su periodo.`);
+
+        // TODO: use lingua for this messages.
+        let message = `Si cancela no prodrá revertir esta acción.`
+
+        let cancelInNextPeriod = false,
+            cancelDate = endDate
+        if (daysSinceStart > MIN_CANCEL_DAYS) {
+            cancelInNextPeriod = true
+            // Cancel in the next period
+            cancelDate = new Date(cancelDate.setDate(endDate.getDate() + daysBetweenTwoDates))
+            message = `La suscripción se encuentra en el día ${daysSinceStart} de su periodo.
+             Si cancela se le cobrará el próximo periodo.`
+        }
+
+
+        return { message, daysSinceStart, cancelInNextPeriod, cancelDate }
+
+    }
+    catch (error) {
+        console.log(`ERROR: subscription.service: getSubscriptionDayOfPeriod()`)
+        console.error(error)
+        return null
+    }
+}
 
 module.exports = (Subscription) => {
     return {
@@ -393,6 +434,7 @@ module.exports = (Subscription) => {
         getSubscriptionsByUser: getSubscriptionsByUser(Subscription),
         getSubscriptionsByPrice: getSubscriptionsByPrice(Subscription),
         getSubscriptionById: getSubscriptionById(Subscription),
+        getSubscriptionDayOfPeriod: getSubscriptionDayOfPeriod,
         getSubscriptionByCar: getSubscriptionByCar(Subscription),
         getSubscriptionsByCar: getSubscriptionsByCar(Subscription),
         getSubscriptionItemByCar: getSubscriptionItemByCar(Subscription),
