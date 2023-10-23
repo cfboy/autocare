@@ -53,7 +53,8 @@
                         body: JSON.stringify({
                             subscriptions,
                             email: email,
-                            backURL: 'subscribe'
+                            backURL: 'subscribe',
+                            renew: false
                         })
                     })
                         .then((result) => result.json())

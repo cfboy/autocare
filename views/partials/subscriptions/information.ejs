@@ -523,7 +523,7 @@
                     }
                 }).done(function (result) {
 
-                    if (result) {
+                    if (result.renew) {
                         fetch('/checkoutWithEmail', {
                             method: 'POST',
                             headers: {
@@ -531,13 +531,24 @@
                                 'email': email
                             },
                             body: JSON.stringify({
-                                subscriptions: result,
+                                subscriptions: result.subscriptionList,
                                 email: email,
-                                backURL: 'memberships'
+                                backURL: 'memberships',
+                                renew: result.renew //true
                             })
                         })
                             .then((result) => result.json())
-                            .then(({ sessionId }) => stripe.redirectToCheckout({ sessionId }))
+                            .then(({ sessionId, message }) => {
+                                if (sessionId)
+                                    stripe.redirectToCheckout({ sessionId })
+                                else {
+                                    showResult(`#loading-update-${subscriptionID}`,
+                                        `<p class="alert alert-fill-danger mt-2 p-1">
+                                            <i class="fa-circle-exclamation fa-solid"></i> ${message}
+                                         </p>`);
+                                }
+
+                            })
                             .catch((error) => {
                                 showResult(`#loading-update-${subscriptionID}`,
                                     `<p class="alert alert-fill-danger mt-2 p-1">
@@ -545,6 +556,11 @@
                             </p>`);
                             })
 
+                    } else {
+                        showResult(`#loading-update-${subscriptionID}`,
+                            `<p class="alert alert-fill-danger mt-2 p-1">
+                                <i class="fa-circle-exclamation fa-solid"></i> ${result.message}
+                            </p>`)
                     }
                 }).fail(function (err) {
                     console.log(err);
