@@ -234,7 +234,7 @@ exports.getGrossVolumeDistributedReport = async (req, res) => {
             { title: 'Gross w/o Taxes', value: result?.totalVolumeWithoutTaxesString, info: "Total Volume without taxes. Divide Gross Volume by 11.5%." },
             {
                 title: 'Tax Volume', value: result?.taxVolumeString,
-                info: "Estimated taxes from Gross Valume. (Tax Rate: 11.5%)",
+                info: "Estimated taxes from Gross Volume. (Tax Rate: 11.5%)",
                 anotherInfo: `M: ${result.municipalTaxVolumeString} S: ${result.stateTaxVolumeString}`
             },
             { title: 'Factor', value: result?.factorString, info: "The factor formula: Total volume without taxes divided by services quantity." },
