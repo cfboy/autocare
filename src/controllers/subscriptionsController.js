@@ -693,14 +693,18 @@ exports.renewSubscription = async (req, res) => {
         let { subscriptionID } = req.body
 
         if (!subscriptionID)
-            res.send({ message: 'Missing subscription ID.' });
+            res.send({ renew: false, message: 'Missing subscription ID.' });
 
         console.log(`subscriptionID:${subscriptionID}`);
 
 
         let subscription = await SubscriptionService.getSubscriptionById(subscriptionID)
-        // Prepare to checkout
+        // Validate subscription
+        if (![Stripe.STATUS.CANCELED].includes(subscription.data.status)) {
+            res.send({ renew: false, message: "This subscription is active." });
+        }
 
+        // Prepare to checkout
         let subscriptionList = [];
         let item = {}
         for (item of subscription.items) {
@@ -715,7 +719,7 @@ exports.renewSubscription = async (req, res) => {
 
         }
 
-        res.send(subscriptionList)
+        res.send({ renew: true, subscriptionList: subscriptionList })
     } catch (error) {
         req.bugsnag.notify(new Error(error),
             function (event) {
@@ -723,6 +727,6 @@ exports.renewSubscription = async (req, res) => {
             })
         console.error("ERROR: renewSubscription -> Tyring to renew membership.")
         console.error(error.message)
-        res.send('Error trying to renew membership.')
+        res.send({ renew: false, message: 'Error trying to renew membership.' })
     }
 }

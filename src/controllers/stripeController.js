@@ -515,7 +515,7 @@ exports.checkout = async (req, res) => {
  */
 exports.checkoutWithEmail = async (req, res) => {
     // The validation if the car is valid are handled on the client side..
-    const { subscriptions, email, backURL } = req.body
+    const { subscriptions, email, backURL, renew } = req.body
 
     try {
         // Get stripe customer
@@ -532,16 +532,22 @@ exports.checkoutWithEmail = async (req, res) => {
 
         // Group by priceID    
         const subscriptionsGroup = groupByKey(subscriptions, 'priceID', { omitKey: false })
-        
-        let session, existCar = false;
-        // Validate car to avoid duplicated plates in the system.
-        for (item of subscriptions) {
-            let car = await CarService.getCarByPlate(item.plate)
-            if (car) {
-                existCar = true;
-                break;
-            }
 
+        let session, existCar = false;
+
+        // When renew = false, then validate to avoid duplicated cars. 
+        // The validation comes from renewSubscription function.
+        if (!renew) {
+            // Validate car to avoid duplicated plates in the system.
+
+            for (item of subscriptions) {
+                let car = await CarService.getCarByPlate(item.plate)
+                if (car) {
+                    existCar = true;
+                    break;
+                }
+
+            }
         }
         if (existCar) {
             res.send({
