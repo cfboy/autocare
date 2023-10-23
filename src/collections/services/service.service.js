@@ -290,6 +290,7 @@ async function getGrossVolumeFactor(startDate, endDate, allServices) {
 
         return {
             factor,
+            totalVolumeWithoutTaxes: stripeBalance?.totalVolumeWithoutTaxes.getAmount(),
             grossVolume: stripeBalance?.grossVolume?.getAmount(),
             netVolume: stripeBalance?.netVolume?.getAmount(),
             taxVolume: stripeBalance?.taxVolume?.getAmount(),
@@ -313,8 +314,9 @@ async function getLocationsWithGrossVolumeDistributed(dateRange) {
         console.log(endDate);
         const allServices = await this.getServicesBetweenDates(startDate, endDate)
 
-        const { factor, grossVolume, netVolume, taxVolume, municipalTaxVolume, stateTaxVolume } = await getGrossVolumeFactor(startDate, endDate, allServices),
+        const { factor, totalVolumeWithoutTaxes, grossVolume, netVolume, taxVolume, municipalTaxVolume, stateTaxVolume } = await getGrossVolumeFactor(startDate, endDate, allServices),
             factorString = Dinero({ amount: factor }).toFormat('$0,0.00'),
+            totalVolumeWithoutTaxesString = Dinero({ amount: totalVolumeWithoutTaxes }).toFormat('$0,0.00'),
             grossVolumeString = Dinero({ amount: grossVolume }).toFormat('$0,0.00'),
             netVolumeString = Dinero({ amount: netVolume }).toFormat('$0,0.00'),
             taxVolumeString = Dinero({ amount: taxVolume }).toFormat('$0,0.00'),
@@ -344,6 +346,7 @@ async function getLocationsWithGrossVolumeDistributed(dateRange) {
             stateTaxVolumeString,
             factor,
             factorString,
+            totalVolumeWithoutTaxesString,
             locations
         }
 
