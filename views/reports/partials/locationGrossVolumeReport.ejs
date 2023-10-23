@@ -8,11 +8,11 @@
     <div class="col-lg-3 col-md-4 col-sm-6">
         <div class="card my-2">
             <div class="card-header" style="border-radius: 20px 20px 0 0;">
-                <%= header.title%> <i class="fa-solid fa-circle-info mx-1 text-primary" data-toggle="tooltip"
-                    title="<%= header.info%>"></i>
+                <%= header.title%> <i class="fa-solid fa-circle-info mx-1 text-primary" data-toggle="tooltip" title="<%= header.info%> 
+                            <%= header?.anotherInfo%>"></i>
             </div>
             <div class="card-body">
-                <%= header.value%>
+                <h3><%= header.value%></h3>
             </div>
         </div>
     </div>
