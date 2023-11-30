@@ -38,7 +38,8 @@
         } else {
             // If the user is not logged in.
             checkoutBtn.click(function () {
-                $(this).prop('disabled', true);
+                var triggerObj = $(this);
+                triggerObj.prop('disabled', true);
                 const subscriptions = JSON.parse($('#subscription-list').val());
                 const email = getCookie('subscriptionEmail');
 
@@ -58,20 +59,21 @@
                         })
                     })
                         .then((result) => result.json())
-                        .then(function ({ sessionId, message }) {
+                        .then(function ({ sessionId, message, error }) {
                             if (sessionId)
                                 stripe.redirectToCheckout({ sessionId })
                             else {
                                 showResult('#error-message',
                                     `<p class="alert alert-fill-danger mt-2 p-1">
-                                <i class="fa-circle-exclamation fa-solid"></i> ${message}
+                                <i class="fa-circle-exclamation fa-solid"></i> ${error.message}
                             </p>`);
+                                triggerObj.prop('disabled', false);
                             }
                         })
                         .catch((error) => {
                             showResult('#error-message',
                                 `<p class="alert alert-fill-danger mt-2 p-1">
-                                <i class="fa-circle-exclamation fa-solid"></i> ${error}
+                                <i class="fa-circle-exclamation fa-solid"></i> ${error.message}
                             </p>`);
                         })
                 } else {

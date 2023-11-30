@@ -67,7 +67,7 @@ const createCheckoutSession = async (customerID, subscriptions, subscriptionsEnt
     }
     catch (error) {
         console.error(`ERROR-STRIPE: createCheckoutSession. ${error.message}`);
-        return null
+        throw new Error(error)
     }
 }
 

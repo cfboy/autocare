@@ -417,9 +417,20 @@ const manageUpdateOrCreateSubscriptionsWebhook = async (subscription, bugsnag, l
                 }
                 items.push(newItem)
             }
+            try {
+                subscription = await SubscriptionService.addSubscription({ id: subscription.id, data: subscription, items: items, user: customer })
+                alertInfo = { message: `Your membership ${subscription.id} has been created successfully.`, alertType: alertTypes.BasicAlert }
 
-            subscription = await SubscriptionService.addSubscription({ id: subscription.id, data: subscription, items: items, user: customer })
-            alertInfo = { message: `Your membership ${subscription.id} has been created successfully.`, alertType: alertTypes.BasicAlert }
+            }
+            catch (error) {
+                console.error(`stripeController: manageUpdateSubscriptionsWebhook. ${error}`);
+                bugsnag.notify(new Error(error),
+                    function (event) {
+                        event.setUser(customer.email)
+                    })
+
+            }
+
         }
 
         if (subscription) {
@@ -468,7 +479,7 @@ const manageUpdateOrCreateSubscriptionsWebhook = async (subscription, bugsnag, l
         return [subscription, alertInfo, isNew, customer];
     }
     catch (error) {
-        console.error(`ERROR-STRIPE: manageUpdateSubscriptionsWebhook. ${error.message}`);
+        console.error(`ERROR-STRIPE: manageUpdateSubscriptionsWebhook. ${error}`);
         return [null, error.message]
     }
 }
@@ -533,7 +544,7 @@ exports.checkoutWithEmail = async (req, res) => {
         // Group by priceID    
         const subscriptionsGroup = groupByKey(subscriptions, 'priceID', { omitKey: false })
 
-        let session, existCar = false;
+        let session, canUseThisCar;
 
         // When renew = false, then validate to avoid duplicated cars. 
         // The validation comes from renewSubscription function.
@@ -542,19 +553,21 @@ exports.checkoutWithEmail = async (req, res) => {
 
             for (item of subscriptions) {
                 let car = await CarService.getCarByPlate(item.plate)
-                if (car) {
-                    existCar = true;
+                canUseThisCar = car ? await CarService.canUseThisCarForNewSubs(car) : true
+
+                if (!canUseThisCar) {
                     break;
                 }
 
             }
         }
-        if (existCar) {
+        if (!canUseThisCar) {
             res.send({
-                sessionId: null, message: "Car already exist. Please cancel the order and add other car."
+                sessionId: null, message: "Car not valid. Please cancel the order and add other car."
             })
         } else {
-            if (billingID)
+
+            if (billingID && stripeCustomer)
                 session = await Stripe.createCheckoutSession(billingID, subscriptions, Object.entries(subscriptionsGroup), backURL)
             else
                 session = await Stripe.createCheckoutSessionWithEmail(email, subscriptions, Object.entries(subscriptionsGroup), backURL)
@@ -571,7 +584,7 @@ exports.checkoutWithEmail = async (req, res) => {
                 event.setUser(email)
             })
         console.error(e)
-        res.status(400).send({
+        res.status(500).send({
             error: {
                 message: e.message
             }
