@@ -34,14 +34,32 @@ const addSubscription = (Subscription) => async ({ id, items, data, user }) => {
         setDefaultsOnInsert: true
     }
 
-    const subscription = await Subscription.findOneAndUpdate(query, update, options, function (error, result) {
-        if (error) {
+    try {
+        const subscription = await Subscription.findOneAndUpdate(query, update, options).populate({ path: 'user', model: 'user' });
+        return subscription;
+    } catch (error) {
+        if (error.code === 11000 || error.code === 11001) {
+            console.error('Duplicate key error:', error);
+            // Duplicate key error, update the existing document
+            const existingSubscription = await Subscription.findOne({ id });
+            if (existingSubscription) {
+                // Update the existing document with the new data
+                await Subscription.update(query, update); // Using update method
+
+                // Fetch and return the updated document
+                const updatedSubscription = await Subscription.findOne({ id }).populate({ path: 'user', model: 'user' });
+
+                return updatedSubscription;
+            } else {
+                // Handle the case where the existing document is not found
+                console.error('Existing document not found for id:', id);
+                throw new Error(error);
+            }
+        } else {
             console.error(error)
             throw new Error(error)
-        } else {
-            return result
-        };
-    }).populate({ path: 'user', model: 'user' })
+        }
+    }
 
     return subscription
 }

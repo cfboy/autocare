@@ -90,6 +90,9 @@ exports.subscribe = async (req, res) => {
 
         let { carPlate, userEmail } = req.query
 
+        if (userEmail)
+            res.cookie('subscriptionEmail', userEmail);
+
         // If come from the validateMembership Popup
         if (carPlate) {
             res.cookie('subscriptionEmail', '');

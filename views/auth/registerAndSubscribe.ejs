@@ -220,7 +220,6 @@
         var subscriptionEmail = '';
         var form = $("#form-subscriptions");
         var checkoutBtn = $('#checkout-btn'); //This btn is hidden for default
-        // var userExist = $("#userExist").val() == "true";
         var cart = [];
         var addCarDiv = $('#addCar-div');
         var cartDiv = $('#cartDiv');
@@ -368,16 +367,10 @@
         // This function add the data to the div of the cart.
         function addDataToTable(newItem, addType) {
             var id = newItem._id ? newItem._id : newItem.id;
-
             var dataString =
                 `<div class="col-md-6 col-lg-8 col-sm-12 mx-auto" id="divItem-${id}">
                     <div class="card">
                         <div class="card-body">
-                            <div class="w-100">
-                                <button title="Delete" type="button" id="delete-${id}" value="${id}" class="p-0 btn btn-icon btn-icon-no-border no-margin remove float-end">
-                                <i class="fas fa-xmark-square icon-sm text-danger"></i>
-                                </button>   
-                            </div>
                             <h5><i class="fa fa-envelope mx-1 text-primary" data-toggle="tooltip" data-placement="right" title="Email"></i> ${subscriptionEmail}</h5> <br>
                             <h5><i class="fa-solid fa-cart-plus mx-1 text-primary" data-toggle="tooltip" data-placement="right" title="Product"></i> ${newItem.product}</h5> <br>
                             <h5><i class="fa-solid fa-car mx-1 text-primary" data-toggle="tooltip" data-placement="right" title="Car"></i> ${newItem.brand} - ${newItem.plate} </h5> <br>
@@ -408,12 +401,10 @@
 
             if (subscriptionEmail) {
                 showResult('#subscriptionEmail',
-                    `<p class="alert alert-success"> 
-                    ${subscriptionEmail}
-                </p>`);
+                    ``);
             } else {
                 showResult('#subscriptionEmail',
-                    `<p class="alert alert-fill-danger mt-2 p-1">Missing Email.</p>`);
+                    `<p class="alert alert-fill-danger mt-2 p-1">Missing Email. Cancel Order.</p>`);
             }
 
         }
@@ -433,7 +424,6 @@
             if (form[0].checkValidity()) {
                 // Get all values
                 var brand = $("#brand").val(),
-                    // model = $("#carModel").val(),
                     plate = $("#carPlate").val().toUpperCase(),
                     priceID = $("#product").val(),
                     product = $("#product").find('option:selected').attr("name"),
@@ -481,7 +471,6 @@
                             showResult(`#addCarLoading`, ``);
 
                         } else {
-                            // console.log("newItem: " + result.item);
                             showResult('#plateValidationResult',
                                 `<p class="success"><%= lingua.car.validCar%></p>`);
 
@@ -507,77 +496,6 @@
         });
 
         // This event listener handles the click event for Remove subscription
-        $('#subscriptionData').on('click', '.remove', function () {
-
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete item!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $(this).prop('disabled', true);
-                    // var t = $('#cart-table').DataTable();
-                    var triggerObj = $(this);
-                    var id = $(this).attr('value');
-                    let itemToRemove = subscriptionList.find(item => item._id == id || item.id == id);
-                    // let itemToRemove = subscriptionList;
-
-                    $.ajax({
-                        url: "/removeFromCart",
-                        type: "POST",
-                        contentType: "application/json",
-                        data: JSON.stringify({
-                            item: itemToRemove,
-                            subscriptionList: subscriptionList
-                        }), beforeSend: function () {
-                            showResult(`#error-message`,
-                                `<div class="spinner text-center mx-0 my-0">
-                            <div class="spinner-grow spinner-grow-sm"></div>
-                        </div>`
-                            );
-                        }
-                    }).done(function (result) {
-
-                        if (result.itemRemoved) {
-                            $(`#subscriptionData #divItem-${id}`).remove();
-
-                            // // Remove from the table.
-                            // t.row(triggerObj.parents('tr')).remove().draw();
-                            // // Decrease the row index.
-                            // rowIdx--;
-                            // Remove the deleted item from de subscriptionList.
-                            subscriptionList = result.subscriptionList;
-
-                            $('#subscription-list').val(JSON.stringify(subscriptionList));
-
-                            // // If the susbcription list is empty, then hide ckeckout btn.
-                            if (subscriptionList.length < 1)
-                                checkoutBtn.attr("hidden", true);
-                            manageDivViews(subscriptionList);
-
-                            showResult(`#error-message`,
-                                ``
-                            );
-                        } else {
-                            console.log('not removed');
-                        }
-
-                    }).fail(function (err) {
-                        console.log(err);
-                        showResult(`#error-message`,
-                            `${err.message}`
-                        );
-                    })
-                }
-            })
-        });
-
-
-        // This event listener handles the click event for Remove subscription
         $('#cartDiv').on('click', '#cancel-btn', function () {
             Swal.fire({
                 title: 'Are you sure?',
@@ -589,8 +507,8 @@
                 confirmButtonText: 'Yes, cancel order!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    $(this).prop('disabled', true);
                     var triggerObj = $(this);
+                    triggerObj.prop('disabled', true);
                     $.ajax({
                         url: "/cancelOrder",
                         type: "POST",
@@ -615,11 +533,15 @@
                                 checkoutBtn.attr("hidden", true);
 
                             manageDivViews(subscriptionList);
+                            subscriptionEmail = getCookie('subscriptionEmail');
+                            if (subscriptionEmail) {
+                                $('#email').val(subscriptionEmail);
+                            }
 
                             showResult(`#error-message`, ``);
-                        } else {
-
-                        }
+                        } 
+                    }).always(function () {
+                        triggerObj.prop('disabled', false);
                     }).fail(function (err) {
                         console.log(err);
                         showResult(`#error-message`,

@@ -203,7 +203,7 @@
             if (form[0].checkValidity()) {
                 // Get all values
                 var brand = $("#brand").val(),
-                    model = $("#carModel").val(),
+                    // model = $("#carModel").val(),
                     plate = $("#carPlate").val().toUpperCase(),
                     priceID = $("#product").val(),
                     product = $("#product").find('option:selected').attr("name"),
@@ -211,11 +211,13 @@
                     // Prepare newItem Obj.
                     newItem = {
                         id: ++rowIdx,
-                        brand: brand, model: model, plate: plate,
+                        brand: brand,
+                        // model: model,
+                        plate: plate,
                         product: product, price: price, priceID: priceID
                     };
 
-                if (newItem.brand == '' || newItem.model == '' || newItem.plate == '') {
+                if (newItem.brand == '' || newItem.plate == '') {
                     let showMessage = `<p class="error">Missing values</p>`
                     showResult('#formValidationResult', showMessage);
 
@@ -306,7 +308,7 @@
             // Set the rowIdx to btn id to get the id of deleted element.
             t.row.add([
                 `<p> Brand: ${newItem.brand} </p> <br> 
-                            <p> Model: ${newItem.model} </p> <br>
+                        
                             <p> License Plate: ${newItem.plate} </p>`,
                 newItem.product,
                 newItem.price,

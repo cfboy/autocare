@@ -249,7 +249,7 @@ const registerAndActivateLink = async (stripeCustomer, role, lingua, bugsnag) =>
             return [requestSuccess, message, customer, emailProperties];
 
         } else {
-            bugsnag.notify(new Error('Account Not Created.'))
+            bugsnag.notify(new Error('registerAndActivateLink: Account Not Created.'))
             return [false, "Account not created.", null, null]
         }
 

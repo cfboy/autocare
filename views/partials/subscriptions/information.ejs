@@ -26,7 +26,7 @@
         </a>
         <% } %>
         <% if(showCreateBtn) { %>
-        <a href="/create-subscriptions" class="btn btn-primary btn-icon-text text-white m-1 p-3 btn-sm-block"
+        <a href="/subscribe?userEmail=<%= user?.email%>" class="btn btn-primary btn-icon-text text-white m-1 p-3 btn-sm-block"
             type="button">
             <i class="fas fa-plus btn-icon-prepend"></i> <%= lingua.membership.createSubscriptions%>
         </a>

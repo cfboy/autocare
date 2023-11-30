@@ -545,7 +545,7 @@ exports.cancelOrder = async (req, res) => {
         if (user)
             await UserService.emptyCart(user.id);
 
-        res.cookie('subscriptionEmail', '');
+        // res.cookie('subscriptionEmail', '');
         res.cookie('cart', JSON.stringify([]));
         subscriptionList = [];
 
