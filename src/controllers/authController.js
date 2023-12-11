@@ -188,7 +188,7 @@ exports.activateAccountRequest = async (req, res) => {
 exports.activateAccountRequestController = async (req, res) => {
     const lingua = req.res.lingua.content;
 
-    const [requestSuccess, emailProperties, message] = await AuthService.generateAtivationLink(lingua, req.body.email, req.bugsnag);
+    const [requestSuccess, emailProperties, message] = await AuthService.generateActivationLink(lingua, req.body.email, req.bugsnag);
 
     if (requestSuccess) {
         // Send Email

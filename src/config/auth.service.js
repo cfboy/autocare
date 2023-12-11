@@ -67,7 +67,7 @@ const resetPasswordRequest = async (lingua, email, bugsnag) => {
  * @param {*} email 
  * @returns 
  */
-const generateAtivationLink = async (lingua, email, bugsnag) => {
+const generateActivationLink = async (lingua, email, bugsnag) => {
     try {
         const user = await UserService.getUserByEmail(email);
         var requestSuccess = true
@@ -96,7 +96,7 @@ const generateAtivationLink = async (lingua, email, bugsnag) => {
             payload: {
                 name: user?.fullName(),
                 link: link,
-                subject: 'Welcome to AutoCare Memberships'
+                subject: 'Bienvenido a AutoCare Memberships'
             }
         }
 
@@ -244,7 +244,7 @@ const registerAndActivateLink = async (stripeCustomer, role, lingua, bugsnag) =>
         if (customer) {
             console.debug(`A new user added to DB. The ID for ${customer.email} is ${customer.id}`);
 
-            const [requestSuccess, emailProperties, message] = await generateAtivationLink(lingua, customer.email, bugsnag);
+            const [requestSuccess, emailProperties, message] = await generateActivationLink(lingua, customer.email, bugsnag);
 
             return [requestSuccess, message, customer, emailProperties];
 
@@ -264,7 +264,7 @@ module.exports = {
     resetPassword,
     activateAccount,
     validateToken,
-    generateAtivationLink,
+    generateActivationLink,
     registerAndActivateLink
 
 };
