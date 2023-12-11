@@ -242,10 +242,10 @@ exports.viewUser = async (req, res) => {
                 userType
             })
         } else {
-            message = 'Customer not found.'
-            alertType = alertTypes.ErrorAlert
+            req.session.message = 'Customer not found.';
+            req.session.alertType = alertTypes.ErrorAlert
             console.log('Customer not found.')
-            res.redirect('/users', { message, alertType })
+            res.redirect('/users')
         }
     } catch (error) {
         req.bugsnag.notify(new Error(error),
