@@ -11,7 +11,7 @@ const sendEmail = require("../utils/email/sendEmail");
 const bcrypt = require('bcrypt');
 
 /**
- * This function is a helper for agroup a list per key.
+ * This function is a helper for a group a list per key.
  * @param {*} list 
  * @param {*} key 
  * @param {*} {omitKey} 
@@ -84,7 +84,7 @@ exports.webhook = async (req, res) => {
                         subscription = await SubscriptionService.getSubscriptionById(subscription.id);
 
                         if (!subscription) {
-                            // Find subcription again for expand product information
+                            // Find subscription again for expand product information
                             subscription = await Stripe.getSubscriptionById(data.id)
                             subscriptionItems = subscription.items.data
                             let cars = []
@@ -128,7 +128,7 @@ exports.webhook = async (req, res) => {
 
                             }
 
-                            alertInfo = { message: `Your membership ${subscription.id} has been created successfully.`, alertType: alertTypes.BasicAlert }
+                            alertInfo = { message: `Tu membresía a sido creada exitosamente.`, alertType: alertTypes.BasicAlert }
 
                             subscription = await SubscriptionService.addSubscription({ id: subscription.id, items: items, data: subscription, user: customer });
                         }
@@ -184,7 +184,7 @@ exports.webhook = async (req, res) => {
                     const invoiceMarkedUncollectible = data;
 
                     let invoice = await Stripe.voidInvoice(invoiceMarkedUncollectible.id)
-                    console.log('Inovice marked_void done.')
+                    console.log('invoice marked_void done.')
                 }
                 break;
             default:
@@ -224,7 +224,7 @@ const manageDeletedSubscriptionsWebhook = async (subscription, bugsnag, req) => 
 
             subscription = await SubscriptionService.updateSubscription(subscription.id, updates);
 
-            alertInfo = { message: `Your membership ${subscription.id} has been cancelled successfully.`, alertType: alertTypes.BasicAlert };
+            alertInfo = { message: `Tu membresía a sido cancelada exitosamente.`, alertType: alertTypes.BasicAlert };
 
             // Add notification to user.
             [customer, notification] = await UserService.addNotification(customer.id, alertInfo.message)
@@ -370,7 +370,7 @@ const manageUpdateOrCreateSubscriptionsWebhook = async (subscription, bugsnag, l
 
             subscription = await SubscriptionService.updateSubscription(subscription.id, updates);
 
-            alertInfo = { message: `Your membership ${subscription.id} has been updated successfully.`, alertType: alertTypes.BasicAlert }
+            alertInfo = { message: `Tu membresía a sido actualizada exitosamente.`, alertType: alertTypes.BasicAlert }
 
             // Send customer balance on email.
             let { totalString } = await Stripe.getCustomerBalanceTransactions(customer.billingID)
@@ -419,7 +419,8 @@ const manageUpdateOrCreateSubscriptionsWebhook = async (subscription, bugsnag, l
             }
             try {
                 subscription = await SubscriptionService.addSubscription({ id: subscription.id, data: subscription, items: items, user: customer })
-                alertInfo = { message: `Your membership ${subscription.id} has been created successfully.`, alertType: alertTypes.BasicAlert }
+                alertInfo = { message: `Tu membresía a sido creada exitosamente.`, alertType: alertTypes.BasicAlert }
+                
 
             }
             catch (error) {
@@ -448,7 +449,7 @@ const manageUpdateOrCreateSubscriptionsWebhook = async (subscription, bugsnag, l
 
             } else {
                 emailTemplate = isNew ? 'subscription_created' : 'subscription_updated';
-                emailSubject = isNew ? 'Subscription Created - AutoCare Memberships' : 'Subscription Updated - AutoCare Memberships';
+                emailSubject = isNew ? 'Membresía Creada - AutoCare Memberships' : 'Membresía Actualizada - AutoCare Memberships';
 
                 emailProperties = {
                     email: customer.email,
@@ -777,11 +778,11 @@ exports.markUncollectibleInvoice = async (req, res) => {
         let invoiceID = req.body.id
 
         if (invoiceID) {
-            let inovice = await Stripe.markUncollectibleInvoice(invoiceID)
+            let invoice = await Stripe.markUncollectibleInvoice(invoiceID)
 
-            if (inovice) {
+            if (invoice) {
 
-                alertInfo = { message: `Your inovice ${inovice.id} has been updated successfully. `, alertType: alertTypes.BasicAlert }
+                alertInfo = { message: `Your invoice ${invoice.id} has been updated successfully. `, alertType: alertTypes.BasicAlert }
                 console.debug(alertInfo.message)
                 res.send(`Action Completed. The page is reloaded in a few seconds...`)
 
@@ -798,7 +799,7 @@ exports.markUncollectibleInvoice = async (req, res) => {
             function (event) {
                 event.setUser(req.user.email)
             })
-        console.error(`ERROR: subscriptionsController -> Tyring to sync membership. ${error.message}`)
+        console.error(`ERROR: subscriptionsController -> Trying to sync membership. ${error.message}`)
         res.render('Error on sync membership.')
     }
 }
