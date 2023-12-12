@@ -114,7 +114,7 @@ exports.register = async (req, res) => {
                 // Login the user
                 req.login(customer, function (err) {
                     if (!err) {
-                        res.redirect('/create-subscriptions')
+                        res.redirect(`/subscribe?userEmail=${customer?.email}`)
                     } else {
                         console.log(err);
                     }
