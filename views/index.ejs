@@ -74,10 +74,9 @@
                             <span class="text-uppercase">Account</span>
                         </a>
                         <% } else { %>
-                        <a class="nav-link" id="UserDropdown" href="/login" aria-expanded="false">
-                            <!-- <img class="img-xs rounded-circle" src="../../images/faces/profile/user.png"
-                                alt="Profile image"> -->
-                            <span class="text-uppercase">Login</span>
+                       
+                        <a class="btn btn-icon float-end p-1" href="/login" title="Login" data-toggle="tooltip"> <i
+                                class="fa-solid fa-sign-in m-1 mb-0 mt-0"></i>
                         </a>
                         <% } %>
                     </li>
@@ -164,8 +163,7 @@
                                 style="background-color:transparent !important; border-top: none">
                                 <!-- <button class="btn btn-primary btn-lg select-product-btn m-2"
                                     value="<%# price.id%>">Create Subscriptions</button> -->
-                                <a href="/subscribe" class="btn btn-primary btn-lg m-2"
-                                    value="<%- price.id%>">
+                                <a href="/subscribe" class="btn btn-primary btn-lg m-2" value="<%- price.id%>">
                                     <%= lingua.membership.createSubscriptions%>
                                 </a>
                             </div>
