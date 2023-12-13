@@ -4,6 +4,8 @@ const CarService = require('../collections/cars')
 const alertTypes = require('../helpers/alertTypes')
 const ServiceService = require('../collections/services')
 const Stripe = require('../connect/stripe')
+const { canManageSubscriptions
+} = require('../config/permissions')
 
 // let readingObjs = {}
 
@@ -21,7 +23,7 @@ exports.memberships = async (req, res) => {
 
             user.balance = totalString
 
-            res.render('subscriptions/index.ejs', { message, alertType, user, subscriptions })
+            res.render('subscriptions/index.ejs', { message, alertType, user, subscriptions, canManageSubscriptions: canManageSubscriptions(req.user, req.user) })
         } else {
             req.session.message = "This user don't have stripe account."
             req.session.alertType = alertTypes.WarningAlert
@@ -455,7 +457,7 @@ exports.syncSubscription = async (req, res) => {
             function (event) {
                 event.setUser(req.user.email)
             })
-        console.error(`ERROR: subscriptionsController -> Tyring to sync membership. ${error.message}`)
+        console.error(`ERROR: subscriptionsController -> Trying to sync membership. ${error.message}`)
         res.render('Error on sync membership.')
     }
 }
@@ -511,7 +513,7 @@ exports.syncCustomerSubscriptions = async (req, res) => {
                     //If the subscription does not exist in the DB, then create. 
                     let customer = await UserService.getUserByBillingID(customerID)
                     if (customer) {
-                        // Find subcription again for expand product information
+                        // Find subscription again for expand product information
                         stripeSubscription = await Stripe.getSubscriptionById(stripeSubscription.id)
                         subscriptionItems = stripeSubscription.items.data
                         let cars = [], userCartItems = customer?.cart?.items
@@ -604,7 +606,7 @@ exports.removeCarOfSubscription = async (req, res) => {
             function (event) {
                 event.setUser(req.user.email)
             })
-        console.error(`ERROR: subscriptionsController -> Tyring to remove car from subscription. ${error.message}`)
+        console.error(`ERROR: subscriptionsController -> Trying to remove car from subscription. ${error.message}`)
         res.render('Error on remove car.')
     }
 }
@@ -612,7 +614,7 @@ exports.removeCarOfSubscription = async (req, res) => {
 /**
  * This function cancel the subscription based on the day of the period.
  * This function is called by ajax function.
- * The result is rendered in the memberhsips page.
+ * The result is rendered in the memberships page.
  * @param {*} req 
  * @param {*} res 
  */
@@ -633,7 +635,7 @@ exports.getSubscriptionDay = async (req, res) => {
             function (event) {
                 event.setUser(req.user.email)
             })
-        console.error("ERROR: cancelSubscription -> Tyring to cancel membership.")
+        console.error("ERROR: cancelSubscription -> Trying to cancel membership.")
         console.error(error.message)
         res.render('Error cancel membership.')
     }
@@ -642,7 +644,7 @@ exports.getSubscriptionDay = async (req, res) => {
 /**
  * This function cancel the subscription based on the day of the period.
  * This function is called by ajax function.
- * The result is rendered in the memberhsips page.
+ * The result is rendered in the memberships page.
  * @param {*} req 
  * @param {*} res 
  */

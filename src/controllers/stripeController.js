@@ -420,7 +420,7 @@ const manageUpdateOrCreateSubscriptionsWebhook = async (subscription, bugsnag, l
             try {
                 subscription = await SubscriptionService.addSubscription({ id: subscription.id, data: subscription, items: items, user: customer })
                 alertInfo = { message: `Tu membresía a sido creada exitosamente.`, alertType: alertTypes.BasicAlert }
-                
+
 
             }
             catch (error) {
@@ -521,6 +521,7 @@ exports.checkout = async (req, res) => {
 
 /**
  * This function creates a checkout session on stripe with the email.
+ * This function is called from the checkout and renew process.
  * @param {*} req 
  * @param {*} res 
  * @returns 
@@ -547,21 +548,17 @@ exports.checkoutWithEmail = async (req, res) => {
 
         let session, canUseThisCar;
 
-        // When renew = false, then validate to avoid duplicated cars. 
-        // The validation comes from renewSubscription function.
-        if (!renew) {
-            // Validate car to avoid duplicated plates in the system.
+        // Validate car to avoid duplicated plates in the system.
+        for (item of subscriptions) {
+            let car = await CarService.getCarByPlate(item.plate)
+            canUseThisCar = car ? await CarService.canUseThisCarForNewSubs(car) : true
 
-            for (item of subscriptions) {
-                let car = await CarService.getCarByPlate(item.plate)
-                canUseThisCar = car ? await CarService.canUseThisCarForNewSubs(car) : true
-
-                if (!canUseThisCar) {
-                    break;
-                }
-
+            if (!canUseThisCar) {
+                break;
             }
+
         }
+
         if (!canUseThisCar) {
             res.send({
                 sessionId: null, message: "Car not valid. Please cancel the order and add other car."
@@ -594,7 +591,7 @@ exports.checkoutWithEmail = async (req, res) => {
 }
 
 /**
- * This function complete the checkout process after sucess.
+ * This function complete the checkout process after success.
  * Receive a session_id, then find the session object.
  * 
  * @param {*} req 
@@ -621,7 +618,7 @@ exports.completeCheckoutSuccess = async (req, res) => {
         res.cookie('subscriptionEmail', '');
         // }
 
-        req.session.message = `Subcription Created to account ${stripeCustomer.email}`
+        req.session.message = `Subscription Created to account ${stripeCustomer.email}`
         req.session.alertType = alertTypes.CompletedActionAlert
 
         res.redirect('/account')

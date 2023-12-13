@@ -76,6 +76,8 @@
                                                     </div>
                                                     <% } %> -->
 
+                                                    <% if(canEditCustomer) { %>
+
                                                     <a href="/changePassword/<%- customer.id%>?url=/editCustomers&userType=<%= userType%>&fromProfile=<%= isMyProfile%>"
                                                         type="button"
                                                         class="btn btn-primary btn-icon-text m-1 text-white">
@@ -83,7 +85,7 @@
                                                         <% if(user.password) { %>
                                                         <%= lingua.user.password.changePassword%>
                                                         <% } else { %>
-                                                            <%= lingua.user.password.create%>
+                                                        <%= lingua.user.password.create%>
                                                         <% } %>
                                                     </a>
                                                     <a href="/edit-user/<%- customer.id%>?url=/editCustomers&userType=<%= userType%>&fromProfile=<%= isMyProfile%>"
@@ -92,6 +94,7 @@
                                                         <i class="fa-solid fa-user-pen"></i>
                                                         <%= lingua.user.editPersonalInfo%>
                                                     </a>
+                                                    <% } %>
                                                 </div>
                                             </div>
                                             <br>
@@ -217,7 +220,7 @@
                                 <div class="col-md-12 grid-margin stretch-card">
                                     <div class="card card-rounded">
                                         <div class="card-body">
-                                            <%- include('../partials/subscriptions/information.ejs' , {invalid: false, subscriptions, showManageBtn : true, customer : customer, showCreateBtn: false, user : user}); %>
+                                            <%- include('../partials/subscriptions/information.ejs' , {invalid: false, subscriptions, showManageBtn : true, customer : customer, showCreateBtn: false, user : user, canManageSubscriptions}); %>
                                         </div>
                                     </div>
                                 </div>

@@ -28,7 +28,7 @@ const { checkAuthenticated,
     authChangePassword,
     authChangePrices } = require('./src/middleware/authFunctions')
 
-const { validateSubscriptions, validateLocation, validateSelectCurrectLocation, validateActiveAccount } = require('./src/middleware/validateFunctions')
+const { validateSubscriptions, validateLocation, validateSelectCurrentLocation, validateActiveAccount } = require('./src/middleware/validateFunctions')
 
 
 // Main Route
@@ -170,7 +170,7 @@ router.get('/delete-service/:id', checkAuthenticated, authDeleteService, service
 
 //------ Location Routes ------
 router.get('/locations', checkAuthenticated, locationController.locations)
-router.get('/getCurrentLocation', checkAuthenticated, validateSelectCurrectLocation, locationController.getCurrentLocation)
+router.get('/getCurrentLocation', checkAuthenticated, validateSelectCurrentLocation, locationController.getCurrentLocation)
 router.get('/create-location', checkAuthenticated, locationController.createLocation)
 router.get('/view-location/:id', checkAuthenticated, locationController.viewLocation)
 router.get('/edit-location/:id', checkAuthenticated, authEditLocation, locationController.editLocation)

@@ -18,7 +18,7 @@
             <i class="fa-solid fa-rotate m-0"></i>
         </button>
         <% } %>
-        <% if(showManageBtn) { %>
+        <% if(showManageBtn && canManageSubscriptions) { %>
         <a id="manage-billing-button"
             class="btn btn-primary btn-icon-text text-white manage-billing-button m-1 btn-sm-block" style="margin: 0;"
             type="submit" value="<%- customer.billingID%>" email="<%- customer.email%>">
@@ -26,8 +26,8 @@
         </a>
         <% } %>
         <% if(showCreateBtn) { %>
-        <a href="/subscribe?userEmail=<%= user?.email%>" class="btn btn-primary btn-icon-text text-white m-1 p-3 btn-sm-block"
-            type="button">
+        <a href="/subscribe?userEmail=<%= user?.email%>"
+            class="btn btn-primary btn-icon-text text-white m-1 p-3 btn-sm-block" type="button">
             <i class="fas fa-plus btn-icon-prepend"></i> <%= lingua.membership.createSubscriptions%>
         </a>
         <% } %>
@@ -55,6 +55,7 @@
 
                     <div class="d-flex justify-content-between align-items-start align-items-center">
                         <h6 class="mb-0">Information</h6>
+                        <% if(canManageSubscriptions) { %>
                         <div class="dropdown">
                             <button type="button" class="btn btn-icon mx-0 p-0" id="dropdownMenuIconButton3"
                                 data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -73,7 +74,7 @@
                                 <% if([stripeStatus.CANCELED].includes(subStatus)) { %>
 
                                 <a class="dropdown-item" href="javascript:void(0)" title="Renew Subscription"
-                                    onclick="return confirmRenewSubscription('<%= stripeSubscription.id %>', '<%= user.email%>')">
+                                    onclick="return confirmRenewSubscription('<%= stripeSubscription.id %>', '<%= customer.email%>')">
                                     <i class="fa-solid fa-copy"></i>
                                     Renew Subscription
                                 </a>
@@ -89,6 +90,7 @@
                                 <%# } %>
                             </div>
                         </div>
+                        <% } %>
                     </div>
                     <hr class="m-2">
                     <div>
@@ -533,7 +535,7 @@
                             body: JSON.stringify({
                                 subscriptions: result.subscriptionList,
                                 email: email,
-                                backURL: 'memberships',
+                                backURL: 'memberships', //TODO: make this backURL dynamic.
                                 renew: result.renew //true
                             })
                         })
