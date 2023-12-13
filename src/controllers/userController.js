@@ -494,7 +494,7 @@ exports.changeNotificationState = async (req, res) => {
 
         res.send({ changed })
     } catch (error) {
-        console.error("ERROR: userController -> Tyring to change notification state.")
+        console.error("ERROR: userController -> Trying to change notification state.")
         console.error(error.message)
         res.send({ changed })
 
@@ -502,7 +502,7 @@ exports.changeNotificationState = async (req, res) => {
 }
 
 exports.removeFromCart = async (req, res) => {
-    // NOTE: in the cart the items have the propperty id, in the DB is _id
+    // NOTE: in the cart the items have the property id, in the DB is _id
     let itemToRemove = req.body.item,
         subscriptionList = req.body.subscriptionList
     let returnValues
@@ -578,9 +578,6 @@ exports.validateEmail = async (req, res) => {
             existingEmail = true
             validationMessage = lingua.existEmail
         }
-
-        // Validate the email address.
-        isValid = validator.validate(email); // true
 
         validationResult = await emailValidator.validate(email);
         console.log(`Email Validation: Valid=${validationResult.valid} Reason=${validationResult.reason}`)
