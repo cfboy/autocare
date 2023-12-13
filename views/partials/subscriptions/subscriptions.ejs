@@ -17,7 +17,7 @@
 
                         <% } else { %>
                         <!-- Loop of subscriptions -->
-                        <%- include('./information.ejs' , {invalid: false, subscriptions, showManageBtn : true, customer : user, showCreateBtn: true, user : user}); %>
+                        <%- include('./information.ejs' , {invalid: false, subscriptions, showManageBtn : true, customer : user, showCreateBtn: true, user : user, canManageSubscriptions}); %>
                         <% } %>
                     </div>
                 </div>

@@ -7,6 +7,17 @@ function isAdmin(user) {
     )
 }
 
+function canEditCustomer(user, customer) {
+    return (
+        user.role === ROLES.ADMIN || user.role === ROLES.MANAGER || user.id === customer.id
+    )
+}
+
+function canManageSubscriptions(user, customer                              ) {
+    return (
+        user.role === ROLES.ADMIN || user.role === ROLES.MANAGER || user.id === customer.id
+    )
+}
 function canDeleteLocation(user) {
     return (
         user.role === ROLES.ADMIN
@@ -73,6 +84,7 @@ function canChangePassword(user, userID) {
 
 module.exports = {
     canManageCars,
+    canEditCustomer,
     canAddCar,
     canDeleteCar,
     canEditCar,
@@ -82,5 +94,6 @@ module.exports = {
     canValidateMemberships,
     canChangePassword,
     canDeleteService,
-    isAdmin
+    isAdmin,
+    canManageSubscriptions
 }

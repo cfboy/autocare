@@ -5,13 +5,11 @@ const { historyTypes } = require('../collections/history/history.model')
 const Stripe = require('../connect/stripe')
 const alertTypes = require('../helpers/alertTypes')
 const bcrypt = require('bcrypt');
-// const { municipalities } = require('../helpers/municipalities')
 const CarService = require('../collections/cars')
-const ServiceService = require('../collections/services')
 const SubscriptionService = require('../collections/subscription')
-const cars = require('../collections/cars')
 
-
+const { canEditCustomer, canManageSubscriptions
+} = require('../config/permissions')
 // ------------------------------- Create -------------------------------
 
 /**
@@ -50,9 +48,9 @@ exports.users = async (req, res) => {
             function (event) {
                 event.setUser(req.user.email)
             })
-        console.error("ERROR: userController -> Tyring to find users.")
+        console.error("ERROR: userController -> Trying to find users.")
         console.error(error.message)
-        req.session.message = 'Error tyring to find users.'
+        req.session.message = 'Error trying to find users.'
         req.session.alertType = alertTypes.ErrorAlert
         res.redirect('/account')
     }
@@ -91,9 +89,9 @@ exports.customers = async (req, res) => {
             function (event) {
                 event.setUser(req.user.email)
             })
-        console.error("ERROR: userController -> Tyring to find customers.")
+        console.error("ERROR: userController -> Trying to find customers.")
         console.error(error.message)
-        req.session.message = 'Error tyring to find customers.'
+        req.session.message = 'Error trying to find customers.'
         req.session.alertType = alertTypes.ErrorAlert
         res.redirect('/account')
     }
@@ -234,6 +232,8 @@ exports.viewUser = async (req, res) => {
             res.status(200).render('user/view.ejs', {
                 user: req.user,
                 isMyProfile,
+                canEditCustomer: canEditCustomer(req.user, customer),
+                canManageSubscriptions: canManageSubscriptions(req.user, customer),
                 customer,
                 subscriptions: customer?.subscriptions,
                 cars,
