@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>
-        <%= lingua.membership.createSusbscriptions%>
+        <%= lingua.membership.createSubscriptions%>
     </title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="../../vendors/feather/feather.css">
@@ -43,6 +43,7 @@
                                 <div class="col-sm-12 col-md-12 col-lg-12 mb-3">
                                     <div class="card">
                                         <div class="mt-3 mx-3">
+                                            <% if(user) { %>
                                             <a class="btn btn-icon float-end p-1" id="close-registration"
                                                 href="/logout"> <i class="fa-solid fa-sign-out m-1 mb-0 mt-0"></i>
                                             </a>
@@ -50,6 +51,15 @@
                                                 href="/account">
                                                 <i class="fa-solid fa-home m-1 mb-0 mt-0"></i>
                                             </a>
+                                            <% } else {  %>
+                                            <a class="btn btn-icon float-end p-1"
+                                                href="/login"> <i class="fa-solid fa-sign-in m-1 mb-0 mt-0"></i>
+                                            </a>
+                                            <a class="btn btn-icon float-end p-1" href="/home">
+                                                <i class="fa-solid fa-home m-1 mb-0 mt-0"></i>
+                                            </a>
+
+                                            <% } %>
                                         </div>
                                         <div class="card-body pt-0">
                                             <div class="card-title">
