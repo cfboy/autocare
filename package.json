@@ -30,6 +30,7 @@
         "cookie-parser": "^1.4.6",
         "crypto": "^1.0.1",
         "d3": "^7.6.1",
+        "deep-email-validator": "^0.1.21",
         "dinero.js": "^1.9.1",
         "dotenv": "^10.0.0",
         "dropify": "0.2.2",

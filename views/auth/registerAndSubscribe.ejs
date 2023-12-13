@@ -80,6 +80,7 @@
                                                                     for="email"><%= lingua.user.email%></label>
                                                                 <input type="email" id="email" name="email"
                                                                     onfocusout="validateEmail()"
+                                                                    onkeypress="clearValidity(this)"
                                                                     value="<%= userEmail %>"
                                                                     class="form-control form-control-lg"
                                                                     placeholder="example@gmail.com" required />
@@ -228,6 +229,7 @@
         $(document).ready(function () {
             displayLoading('#loading-div', 1000);
             manageEmail();
+            validateEmail();
             initializeCart(cartString);
             manageCheckoutBtn();
             setTimeout(function () {
@@ -291,6 +293,10 @@
             $('#submit-btn').prop('disabled', true);
         };
 
+        function clearValidity(field) {
+            field.setCustomValidity('');
+        }
+
         // This function validate the email calling the AJAX function to verify if exist in the DB.
         function validateEmail() {
             showResult('#emailValidationResult', ``);
@@ -313,26 +319,24 @@
                             email: email.value
                         }),
                     }).done(function (result) {
-                        if (result.invalidEmail) {
-                            // email.setCustomValidity(result.invalidMsj);
-                            // email.reportValidity();
-                            // let reportMessage = `<p class="error">` + result.invalidMsj + `</p>`;
-                            let reportMessage = `<p class="alert alert-fill-warning mt-2 p-1"><i class="fa-circle-exclamation fa-solid"></i>${result.invalidMsj}</p>`;
-
-                            showResult('#emailValidationResult', reportMessage);
-
-                            // checkoutBtn.attr("hidden", true);
+                        let reportMessage;
+                        if (result.isValid) {
+                            $('#addSub').prop('disabled', false);
+                            email.setCustomValidity('');
+                            if (result.existingEmail) {
+                                reportMessage = `<p class="alert alert-fill-primary mt-2 p-1"><i class="fa-circle-info fa-solid"></i>${result.validationMessage}</p>`;
+                            } else {
+                                reportMessage = `<p class="alert alert-fill-success mt-2 p-1 success"><i class="fa-check-circle fa-solid"></i><%= lingua.validEmail%></p>`
+                            }
 
                         } else {
-                            showResult('#emailValidationResult',
-                                `<p class="alert alert-fill-success mt-2 p-1 success"><i class="fa-check-circle fa-solid"></i><%= lingua.validEmail%></p>`);
-                            setTimeout(function () {
-                                // email.setCustomValidity("");
-                                showResult('#emailValidationResult', "");
-                            }, 2500);
-
-                            // checkoutBtn.attr("hidden", false);
+                            $('#addSub').prop('disabled', true);
+                            reportMessage = `<p class="alert alert-fill-danger mt-2 p-1"><i class="fa-circle-exclamation fa-solid"></i>${result.validationMessage}</p>`
+                            email.setCustomValidity(result.validationMessage);
                         }
+
+                        showResult('#emailValidationResult', reportMessage);
+
                     }).fail(function (error) {
                         console.log(error);
                         showResult('#emailValidationResult',
@@ -344,10 +348,6 @@
                     showResult('#emailValidationResult',
                         `<p class="alert alert-fill-danger mt-2 p-1"><i class="fa-circle-exclamation fa-solid"></i>Invalid Email</p>`);
                 }
-
-                setTimeout(function () {
-                    showResult('#emailValidationResult', "");
-                }, 2500);
             }
         }
 
@@ -465,8 +465,10 @@
                     }).done(function (result) {
                         if (result.existingCar) {
                             document.getElementById("carPlate").setCustomValidity(result.invalidMsj);
-                            document.getElementById("carPlate").reportValidity();
-                            let reportMessage = `<p class="error">` + result.invalidMsj + `</p>`
+                            // document.getElementById("carPlate").reportValidity();
+
+                            let reportMessage = `<p class="alert alert-fill-danger mt-2 p-1"><i class="fa-circle-exclamation fa-solid"></i>${result.invalidMsj}</p>`
+
                             showResult('#plateValidationResult', reportMessage);
                             showResult(`#addCarLoading`, ``);
 
@@ -491,8 +493,6 @@
                 }
             } else
                 $('#addSub').prop('disabled', false);
-
-
         });
 
         // This event listener handles the click event for Remove subscription
@@ -539,7 +539,7 @@
                             }
 
                             showResult(`#error-message`, ``);
-                        } 
+                        }
                     }).always(function () {
                         triggerObj.prop('disabled', false);
                     }).fail(function (err) {

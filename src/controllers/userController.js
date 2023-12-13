@@ -7,6 +7,7 @@ const alertTypes = require('../helpers/alertTypes')
 const bcrypt = require('bcrypt');
 const CarService = require('../collections/cars')
 const SubscriptionService = require('../collections/subscription')
+const emailValidator = require('deep-email-validator');
 
 const { canEditCustomer, canManageSubscriptions
 } = require('../config/permissions')
@@ -558,7 +559,7 @@ exports.cancelOrder = async (req, res) => {
             function (event) {
                 event.setUser(req?.user?.email)
             })
-        console.error(`ERROR: userController -> Tyring to cancelOrder. ${error.message}`)
+        console.error(`ERROR: userController -> Trying to cancelOrder. ${error.message}`)
         res.status(500).send('Error cancelOrder.')
     }
 }
@@ -569,22 +570,33 @@ exports.validateEmail = async (req, res) => {
 
         let { email } = req.body,
             user = await UserService.getUserByEmail(email),
-            invalidEmail = false,
-            invalidMsj = '';
+            existingEmail = false,
+            validationResult = true,
+            validationMessage = '';
 
         if (user) {
-            invalidEmail = true
-            invalidMsj = lingua.existEmail
+            existingEmail = true
+            validationMessage = lingua.existEmail
         }
 
-        res.status(200).send({ invalidEmail: invalidEmail, invalidMsj: invalidMsj })
+        // Validate the email address.
+        isValid = validator.validate(email); // true
+
+        validationResult = await emailValidator.validate(email);
+        console.log(`Email Validation: Valid=${validationResult.valid} Reason=${validationResult.reason}`)
+
+        if (!validationResult.valid) {
+            validationMessage = lingua.invalidEmail;
+        }
+
+        res.status(200).send({ existingEmail, isValid: validationResult.valid, validationMessage })
 
     } catch (error) {
         req.bugsnag.notify(new Error(error),
             function (event) {
                 event.setUser(req.user.email)
             })
-        console.error(`ERROR: userController -> Tyring to validate email. ${error.message}`)
+        console.error(`ERROR: userController -> Trying to validate email. ${error.message}`)
         res.status(500).send('Error validating email.')
     }
 
