@@ -241,7 +241,7 @@
             });
         });
 
-        // This function display/hidethe checkout btn basend on the email value in the document ready.
+        // This function display/hide the checkout btn based on the email value in the document ready.
         function manageCheckoutBtn() {
 
             // if (userExist) {
@@ -389,7 +389,7 @@
             var stringSubscriptionList = JSON.stringify(subscriptionList)
             $('#subscription-list').val(stringSubscriptionList);
             console.log("List: " + stringSubscriptionList);
-            // If the susbcription has at least one item, then show ckeckout btn.
+            // If the subscription has at least one item, then show checkout btn.
             if (subscriptionList.length > 0)
                 checkoutBtn.removeAttr('hidden');
         };

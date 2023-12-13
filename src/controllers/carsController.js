@@ -429,7 +429,7 @@ exports.validatePlate = async (req, res) => {
             function (event) {
                 event.setUser(req?.user?.email)
             })
-        console.error(`ERROR: carController -> Tyring to validate car plate. ${error.message}`)
+        console.error(`ERROR: carController -> Trying to validate car plate. ${error.message}`)
         res.render('Error validating car plate.')
     }
 
@@ -441,7 +441,7 @@ exports.syncUtilization = async (req, res) => {
 
         if (cars) {
             let updatedQty = await UtilizationService.syncCarsUtilization(cars)
-            res.send({ updatedQty: updatedQty, message: `Syncronization Completed. (Updated Cars: ${updatedQty})` })
+            res.send({ updatedQty: updatedQty, message: `Synchronization Completed. (Updated Cars: ${updatedQty})` })
 
         } else {
             res.send({ updatedQty: 0, message: `Not cars to synchronize.` })
@@ -453,7 +453,7 @@ exports.syncUtilization = async (req, res) => {
             function (event) {
                 event.setUser(req.user.email)
             })
-        console.error(`ERROR: carsController -> Tyring to syncUtilization. ${error.message}`)
+        console.error(`ERROR: carsController -> Trying to syncUtilization. ${error.message}`)
         res.send({ message: 'Error on sync % utilization.' })
     }
 }

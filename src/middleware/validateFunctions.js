@@ -85,7 +85,7 @@ async function validateLocation(req, res, next) {
  * @param {*} next 
  * @returns 
  */
-async function validateSelectCurrectLocation(req, res, next) {
+async function validateSelectCurrentLocation(req, res, next) {
     let user = req.user
 
     if ([ROLES.CUSTOMER].includes(user.role)) {
@@ -123,6 +123,6 @@ module.exports = {
     validateSubscriptions,
     // redirectBySubscriptionStatus,
     validateLocation,
-    validateSelectCurrectLocation,
+    validateSelectCurrentLocation,
     validateActiveAccount
 }
