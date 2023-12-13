@@ -600,13 +600,17 @@ exports.checkoutWithEmail = async (req, res) => {
 exports.completeCheckoutSuccess = async (req, res) => {
     try {
         let { session_id } = req.query,
-            session
+            session, message, alertType, customer;
 
         if (session_id) {
             console.debug("sessionID: " + session_id)
             session = await Stripe.getSessionByID(session_id)
             stripeCustomer = await Stripe.getCustomerByID(session.customer)
         }
+
+        if (stripeCustomer)
+            customer = await UserService.getUserByEmail(stripeCustomer.email)
+
 
         // if (req.user) {
         //     // clean cart items.
@@ -618,11 +622,16 @@ exports.completeCheckoutSuccess = async (req, res) => {
         res.cookie('subscriptionEmail', '');
         // }
 
-        req.session.message = `Subscription Created to account ${stripeCustomer.email}`
-        req.session.alertType = alertTypes.CompletedActionAlert
+        message = `Subscription Created to account ${stripeCustomer?.email}`
+        alertType = alertTypes.CompletedActionAlert
 
-        res.redirect('/account')
-
+        res.status(200).render('subscriptions/completedCheckout.ejs', {
+            stripeCustomer,
+            customer,
+            session,
+            message,
+            alertType
+        })
     }
     catch (error) {
         req.bugsnag.notify(new Error(error),

@@ -106,7 +106,8 @@ async function validateSelectCurrentLocation(req, res, next) {
 async function validateActiveAccount(req, res, next) {
 
     if (req.user) {
-        let user = await UserService.getUserById(req.user.id)
+        // let user = await UserService.getUserById(req.user.id)
+        let user = req.user;
 
         if (user?.isIncomplete()) {
             req.flash('warning', 'Finish your account information to continue.')
