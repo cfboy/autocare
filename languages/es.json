@@ -20,6 +20,7 @@
     "invalidLink": "Enlace es Invalido",
     "existEmail": "Ese correo electrónico ya existe en nuestra sistema.",
     "validEmail": "Email Válido",
+    "invalidEmail": "Email Inválido. Por favor escoja un email válido.",
     "members": "Miembros",
     "add": "Añadir",
     "car": {
