@@ -254,7 +254,7 @@ exports.save = async (req, res) => {
                 // fields.subItem.split('/')[1] has the subItem ID 
                 let itemID = fields.subItem.split('/')[1]
 
-                //Get subscription by id to handleutilization.
+                //Get subscription by id to handleUtilization.
                 let currentSub = await SubscriptionService.getSubscriptionById(subscriptionID)
                 // Add old utilization / History
                 await UtilizationService.handleUtilization(car, currentSub.data.current_period_start, currentSub.data.current_period_end)
