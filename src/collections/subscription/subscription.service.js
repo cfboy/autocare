@@ -229,6 +229,7 @@ const getSubscriptionsByCar = (Subscription) => async (car) => {
  * @returns Subscription
  */
 const getLastSubscriptionByCar = (Subscription) => async (car) => {
+    // TODO: Get last subscription ACTIVE by car.
     return await Subscription.findOne(
         { "items.cars": { _id: (car.id ? car.id : car._id) } },
         function (err, doc) {

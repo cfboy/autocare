@@ -117,36 +117,55 @@ const getCarByID = (Car) => async (carID) => {
  * @returns car object
  */
 const addCar = (Car) => async (brand, model, plate, user_id) => {
+
+    if (!brand || !plate) {
+        throw new Error(`Missing Data. Please provide all data for car.`)
+    }
+
+    console.log(`CAR-SERVICE: addCar(${brand})`)
+
+    const query = {
+        plate: plate.toUpperCase(),
+        user_id
+    }
+
+    const update = {
+        brand,
+        model
+    }
+
+    const options = {
+        upsert: true,
+        new: true,
+        setDefaultsOnInsert: true
+    }
     try {
-        if (!brand || !plate) {
-            throw new Error(`Missing Data. Please provide all data for car.`)
-        }
-
-        console.log(`CAR-SERVICE: addCar(${brand})`)
-
-        const query = {
-            brand,
-            model,
-            plate: plate.toUpperCase(),
-            user_id
-        }
-
-        const update = {
-
-        }
-
-        const options = {
-            upsert: true,
-            new: true,
-            setDefaultsOnInsert: true
-        }
-
         const car = await Car.findOneAndUpdate(query, update, options)
 
         return car
     } catch (error) {
-        console.error(`ERROR: CAR-SERVICE: addCar(). ${error.message}`)
-        return null
+        if (error.code === 11000 || error.code === 11001) {
+            console.error('Duplicate key error:', error);
+            // Duplicate key error, update the existing document
+            const existingCar = await Car.findOne({ $and: [{ plate: new RegExp(`^${query.plate}$`, 'i') }, { plate: { $ne: '' } }] });
+            if (existingCar) {
+                let id = existingCar.id;
+                // Update the existing document with the new data
+                await Car.update(query, update); // Using update method
+
+                // Fetch and return the updated document
+                const updatedCar = await Car.findOne({ id });
+
+                return updatedCar;
+            } else {
+                // Handle the case where the existing document is not found
+                console.error('Existing document not found for plate:', query.plate);
+                throw new Error(error);
+            }
+        } else {
+            console.error(error)
+            throw new Error(error)
+        }
     }
 }
 
