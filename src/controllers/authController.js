@@ -455,7 +455,7 @@ exports.changeLocation = async (req, res) => {
             function (event) {
                 event.setUser(req.user.email)
             })
-        console.error(`ERROR: changeLocation -> Tyring to change location. ${error.message}`)
+        console.error(`ERROR: changeLocation -> Trying to change location. ${error.message}`)
         req.session.message = `ERROR: ${error.message}`
         req.session.alertType = alertTypes.ErrorAlert
         res.status(500).send(error);
