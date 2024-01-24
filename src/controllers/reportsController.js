@@ -73,8 +73,8 @@ exports.createReport = async (req, res) => {
             function (event) {
                 event.setUser(req.user.email)
             })
-        console.error(`ERROR: reportController -> Tyring to render create report form. ${error.message}`)
-        req.session.message = 'Error tyring to render create report form.'
+        console.error(`ERROR: reportController -> Trying to render create report form. ${error.message}`)
+        req.session.message = 'Error trying to render create report form.'
         req.session.alertType = alertTypes.ErrorAlert
         res.redirect('/reports')
     }

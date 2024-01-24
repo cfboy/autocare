@@ -62,8 +62,8 @@ exports.cars = async (req, res) => {
             function (event) {
                 event.setUser(req.user.email)
             })
-        console.error(`ERROR: carsController -> Tyring to find user cars. ${error.message}`)
-        req.session.message = 'Error tyring to find user cars.'
+        console.error(`ERROR: carsController -> Trying to find user cars. ${error.message}`)
+        req.session.message = 'Error trying to find user cars.'
         req.session.alertType = alertTypes.ErrorAlert
         res.redirect('/account')
     }
@@ -196,7 +196,7 @@ exports.create = async (req, res) => {
                 event.setUser(req.user.email)
             })
         console.error(error)
-        res.status(500).send('Something went worng')
+        res.status(500).send('Something went wrong')
     }
 }
 
@@ -278,7 +278,7 @@ exports.save = async (req, res) => {
         }
 
         // TODO: add dynamic redirect
-        res.redirect('/cars')
+        res.redirect('/memberships')
 
     } catch (error) {
         req.bugsnag.notify(new Error(error),

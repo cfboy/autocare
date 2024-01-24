@@ -27,7 +27,7 @@ exports.memberships = async (req, res) => {
         } else {
             req.session.message = "This user don't have stripe account."
             req.session.alertType = alertTypes.WarningAlert
-            res.redirect('/account')
+            res.redirect('/logout')
         }
     }
     catch (error) {
@@ -186,7 +186,7 @@ exports.validate = async (req, res) => {
             function (event) {
                 event.setUser(req.user.email)
             })
-        console.error("ERROR: subscriptionsController -> Tyring to validate membership.")
+        console.error("ERROR: subscriptionsController -> Trying to validate membership.")
         console.error(error.message)
         res.render('Error validating membership.')
     }
@@ -573,7 +573,7 @@ exports.syncCustomerSubscriptions = async (req, res) => {
             function (event) {
                 event.setUser(req.user.email)
             })
-        console.error(`ERROR: subscriptionsController -> Tyring to sync all memberships. ${error.message}`)
+        console.error(`ERROR: subscriptionsController -> Trying to sync all memberships. ${error.message}`)
         res.render('Error on sync all memberships.')
     }
 }
@@ -680,7 +680,7 @@ exports.cancelSubscription = async (req, res) => {
             function (event) {
                 event.setUser(req.user.email)
             })
-        console.error("ERROR: cancelSubscription -> Tyring to cancel membership.")
+        console.error("ERROR: cancelSubscription -> Trying to cancel membership.")
         console.error(error.message)
         res.send('Error cancel membership.')
     }
@@ -730,7 +730,7 @@ exports.renewSubscription = async (req, res) => {
             function (event) {
                 event.setUser(req.user.email)
             })
-        console.error("ERROR: renewSubscription -> Tyring to renew membership.")
+        console.error("ERROR: renewSubscription -> Trying to renew membership.")
         console.error(error.message)
         res.send({ renew: false, message: 'Error trying to renew membership.' })
     }

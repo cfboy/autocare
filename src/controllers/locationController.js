@@ -35,8 +35,8 @@ exports.locations = async (req, res) => {
             function (event) {
                 event.setUser(req.user.email)
             })
-        console.error(`ERROR: locationController -> Tyring to find locations. ${error.message}`)
-        req.session.message = 'Error tyring to find locations.'
+        console.error(`ERROR: locationController -> Trying to find locations. ${error.message}`)
+        req.session.message = 'Error trying to find locations.'
         req.session.alertType = alertTypes.ErrorAlert
         res.redirect('/account')
     }
@@ -60,8 +60,8 @@ exports.createLocation = async (req, res) => {
 
         res.render('location/create.ejs', { user: req.user, products, users, message, alertType })
     } catch (error) {
-        console.error(`ERROR: locationController -> Tyring to render create location form. ${error.message}`)
-        req.session.message = 'Error tyring to render create location form.'
+        console.error(`ERROR: locationController -> Trying to render create location form. ${error.message}`)
+        req.session.message = 'Error trying to render create location form.'
         req.session.alertType = alertTypes.ErrorAlert
         res.redirect('/locations')
     }
@@ -342,7 +342,7 @@ exports.getCurrentLocation = async (req, res) => {
             function (event) {
                 event.setUser(req.user.email)
             })
-        console.error("ERROR: locationController -> Tyring to send current location.")
+        console.error("ERROR: locationController -> Trying to send current location.")
         res.status(500).send(error)
     }
 }

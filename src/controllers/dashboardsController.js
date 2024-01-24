@@ -106,6 +106,6 @@ exports.account = async (req, res) => {
             function (event) {
                 event.setUser(req.user.email)
             })
-        console.error(`ERROR: dashboardController -> Tyring generate user dashboard. ${error.message}`)
+        console.error(`ERROR: dashboardController -> Trying generate user dashboard. ${error.message}`)
     }
 }
