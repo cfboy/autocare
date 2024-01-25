@@ -12,6 +12,7 @@ const userSchema = new Schema({
     email: String,
     password: String,
     billingID: String, //Stripe ID
+    googleID: String,
     role: { type: String, enum: Object.values(ROLES), default: ROLES.CUSTOMER },
     personalInfo: {
         firstName: String,
@@ -37,6 +38,17 @@ const userSchema = new Schema({
         }]
     }
 })
+
+userSchema.methods.fullName = function () {
+    var strings = [this.personalInfo.firstName, this.personalInfo.middleName, this.personalInfo.lastName];
+
+    return strings.filter(Boolean).join(" ");
+};
+
+userSchema.methods.isIncomplete = function () {
+
+    return (!this.personalInfo?.firstName || !this.personalInfo?.lastName || !this.password);
+};
 
 const User = mongoose.model('user', userSchema, 'user')
 

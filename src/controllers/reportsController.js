@@ -73,8 +73,8 @@ exports.createReport = async (req, res) => {
             function (event) {
                 event.setUser(req.user.email)
             })
-        console.error(`ERROR: reportController -> Tyring to render create report form. ${error.message}`)
-        req.session.message = 'Error tyring to render create report form.'
+        console.error(`ERROR: reportController -> Trying to render create report form. ${error.message}`)
+        req.session.message = 'Error trying to render create report form.'
         req.session.alertType = alertTypes.ErrorAlert
         res.redirect('/reports')
     }
@@ -225,13 +225,20 @@ exports.delete = async (req, res) => {
  */
 exports.getGrossVolumeDistributedReport = async (req, res) => {
     try {
-        const date = req.body.date;
-        const result = await ServiceService.getLocationsWithGrossVolumeDistributed(date)
+        const dateRange = req.body.date;
+        const result = await ServiceService.getLocationsWithGrossVolumeDistributed(dateRange)
 
         let headers = [
-            { title: 'Gross Amount', value: result?.grossVolumeString },
-            { title: 'Factor', value: result?.factorString },
-            { title: 'Service Qty.', value: result?.serviceQty }
+            { title: 'Gross Volume', value: result?.grossVolumeString, info: "Estimated revenue from payments that are settled to your Stripe Balance." },
+            { title: 'Net Volume', value: result?.netVolumeString, info: "Estimated revenue from payments after fees, refunds, disputes, and Connect transfers have been deducted." },
+            { title: 'Gross w/o Taxes', value: result?.totalVolumeWithoutTaxesString, info: "Total Volume without taxes. Divide Gross Volume by 11.5%." },
+            {
+                title: 'Tax Volume', value: result?.taxVolumeString,
+                info: "Estimated taxes from Gross Volume. (Tax Rate: 11.5%)",
+                anotherInfo: `M: ${result.municipalTaxVolumeString} S: ${result.stateTaxVolumeString}`
+            },
+            { title: 'Factor', value: result?.factorString, info: "The factor formula: Total volume without taxes divided by services quantity." },
+            { title: 'Service Qty.', value: result?.serviceQty, info: "Total quantity of services." }
         ]
         res.render('reports/partials/locationGrossVolumeReport.ejs', { headers, locations: result?.locations, startDate: result.startDate, endDate: result.endDate })
 

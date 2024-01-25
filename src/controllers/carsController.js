@@ -62,8 +62,8 @@ exports.cars = async (req, res) => {
             function (event) {
                 event.setUser(req.user.email)
             })
-        console.error(`ERROR: carsController -> Tyring to find user cars. ${error.message}`)
-        req.session.message = 'Error tyring to find user cars.'
+        console.error(`ERROR: carsController -> Trying to find user cars. ${error.message}`)
+        req.session.message = 'Error trying to find user cars.'
         req.session.alertType = alertTypes.ErrorAlert
         res.redirect('/account')
     }
@@ -196,7 +196,7 @@ exports.create = async (req, res) => {
                 event.setUser(req.user.email)
             })
         console.error(error)
-        res.status(500).send('Something went worng')
+        res.status(500).send('Something went wrong')
     }
 }
 
@@ -254,7 +254,7 @@ exports.save = async (req, res) => {
                 // fields.subItem.split('/')[1] has the subItem ID 
                 let itemID = fields.subItem.split('/')[1]
 
-                //Get subscription by id to handleutilization.
+                //Get subscription by id to handleUtilization.
                 let currentSub = await SubscriptionService.getSubscriptionById(subscriptionID)
                 // Add old utilization / History
                 await UtilizationService.handleUtilization(car, currentSub.data.current_period_start, currentSub.data.current_period_end)
@@ -262,14 +262,14 @@ exports.save = async (req, res) => {
                 let subscription = await SubscriptionService.addSubscriptionCar(subscriptionID, car, itemID)
 
                 if (subscription) {
-                    req.session.message = `Added Car to subscription: ${subscription.id}. New Car:  ${car.brand} - ${car.model} - ${car.plate}`
+                    req.session.message = `Added Car to subscription: ${subscription.id}. New Car:  ${car.carName()}`
                 }
 
-                req.session.message = `New Car:  ${car.brand} - ${car.model} - ${car.plate}.`
+                req.session.message = `New Car:  ${car.carName()}.`
                 req.session.alertType = alertTypes.CompletedActionAlert
                 req.flash('info', 'Car created.')
             } else {
-                req.session.message = `This Car:  ${car.brand} - ${car.model} - ${car.plate} can not be added to this subscription..`
+                req.session.message = `This Car: (${car.carName()}) can not be added to this subscription..`
                 req.session.alertType = alertTypes.WarningAlert
             }
         } else {
@@ -277,7 +277,8 @@ exports.save = async (req, res) => {
             req.session.alertType = alertTypes.ErrorAlert
         }
 
-        res.redirect('/cars')
+        // TODO: add dynamic redirect
+        res.redirect('/memberships')
 
     } catch (error) {
         req.bugsnag.notify(new Error(error),
@@ -314,7 +315,7 @@ exports.update = async (req, res) => {
 
         } else {
             req.flash('info', 'Car Updated.')
-            req.session.message = `Car updated: ${car.model} - ${car.brand} - ${car.plate}.`
+            req.session.message = `Car updated: ${car.carName()}.`
             req.session.alertType = alertTypes.CompletedActionAlert
         }
         res.redirect(`${url}`)
@@ -376,13 +377,14 @@ exports.validatePlate = async (req, res) => {
     try {
         const lingua = req.res.lingua.content
 
-        let { plateNumber, newItem, addToCart } = req.body,
+        let { plateNumber, newItem, addToCart, subscriptionEmail, oldProcess } = req.body,
             car = await CarService.getCarByPlate(plateNumber),
             subscriptionList = req.body.subscriptionList,
             invalidCar = false,
             invalidMsj = ''
         canUseThisCar = car ? await CarService.canUseThisCarForNewSubs(car) : false
-        let customer, item = null
+        let customer, item = null,
+            addType
 
         // if the canUseThisCar is true, it means that this car is an existing and valid car to assign to a new membership.
         if ((car && !canUseThisCar)) {
@@ -394,20 +396,40 @@ exports.validatePlate = async (req, res) => {
             invalidMsj = lingua.car.alreadyAddedToCart
 
         } else if (addToCart) {
-            [customer, item] = await UserService.addItemToCart(req.user.id, newItem)
+            if (oldProcess) {
+                addType = 'db'
+                // If the user is logged create a cart in the DB.
+                let result = await UserService.addItemToCart(req.user.id, newItem)
+                item = result.itemToRtrn
+                if (result.customer && item)
+                    console.debug('Item Added successfully to ' + subscriptionEmail)
 
-            if (customer && item)
-                console.debug('Item Added successfully')
+            } else {
+                addType = 'cookie'
+                // If the user is not logged in create a cart in the cookies.
+                let cookieCart
+                if (!req.cookies.cart) {
+                    cookieCart = JSON.stringify([]);
+                } else {
+                    cookieCart = req.cookies.cart
+                }
+                cookieCart = JSON.parse(cookieCart);
+                cookieCart.push(newItem)
+                res.cookie('cart', JSON.stringify(cookieCart));
+                res.cookie('subscriptionEmail', subscriptionEmail);
+                item = newItem;
+            }
+
         }
 
-        res.send({ existingCar: invalidCar, invalidMsj: invalidMsj, item })
+        res.send({ existingCar: invalidCar, invalidMsj: invalidMsj, item, addType, subscriptionEmail })
 
     } catch (error) {
         req.bugsnag.notify(new Error(error),
             function (event) {
-                event.setUser(req.user.email)
+                event.setUser(req?.user?.email)
             })
-        console.error(`ERROR: carController -> Tyring to validate car plate. ${error.message}`)
+        console.error(`ERROR: carController -> Trying to validate car plate. ${error.message}`)
         res.render('Error validating car plate.')
     }
 
@@ -419,7 +441,7 @@ exports.syncUtilization = async (req, res) => {
 
         if (cars) {
             let updatedQty = await UtilizationService.syncCarsUtilization(cars)
-            res.send({ updatedQty: updatedQty, message: `Syncronization Completed. (Updated Cars: ${updatedQty})` })
+            res.send({ updatedQty: updatedQty, message: `Synchronization Completed. (Updated Cars: ${updatedQty})` })
 
         } else {
             res.send({ updatedQty: 0, message: `Not cars to synchronize.` })
@@ -431,7 +453,7 @@ exports.syncUtilization = async (req, res) => {
             function (event) {
                 event.setUser(req.user.email)
             })
-        console.error(`ERROR: carsController -> Tyring to syncUtilization. ${error.message}`)
+        console.error(`ERROR: carsController -> Trying to syncUtilization. ${error.message}`)
         res.send({ message: 'Error on sync % utilization.' })
     }
 }

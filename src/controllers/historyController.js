@@ -30,8 +30,8 @@ exports.activity = async (req, res) => {
 
         }
     } catch (error) {
-        console.error(`ERROR: historyController -> Tyring to find My Activity. ${error.message}`)
-        req.session.message = 'Error tyring to find My Activity.'
+        console.error(`ERROR: historyController -> Trying to find My Activity. ${error.message}`)
+        req.session.message = 'Error trying to find My Activity.'
         req.session.alertType = alertTypes.ErrorAlert
         res.redirect('/account')
     }
@@ -68,8 +68,8 @@ exports.history = async (req, res) => {
             function (event) {
                 event.setUser(req.user.email)
             })
-        console.error(`ERROR: historyController -> Tyring to find History Log. ${error.message}`)
-        req.session.message = 'Error tyring to find History Log.'
+        console.error(`ERROR: historyController -> Trying to find History Log. ${error.message}`)
+        req.session.message = 'Error trying to find History Log.'
         req.session.alertType = alertTypes.ErrorAlert
         res.redirect('/account')
     }
@@ -107,8 +107,8 @@ exports.viewHistory = async (req, res) => {
             res.redirect('/account')
         }
     } catch (error) {
-        console.error(`ERROR: historyController -> Tyring to view History details. ${error.message}`)
-        req.session.message = 'Error tyring to view History details.'
+        console.error(`ERROR: historyController -> Trying to view History details. ${error.message}`)
+        req.session.message = 'Error trying to view History details.'
         req.session.alertType = alertTypes.ErrorAlert
         res.redirect('/account')
     }

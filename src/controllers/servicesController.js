@@ -129,7 +129,7 @@ exports.useService = async (req, res) => {
             function (event) {
                 event.setUser(req.user.email)
             })
-        console.error(`ERROR: dashboardController -> Tyring to log use service. ${error.message}`)
+        console.error(`ERROR: dashboardController -> Trying to log use service. ${error.message}`)
         req.session.message = `ERROR: ${error.message}`
         req.session.alertType = alertTypes.ErrorAlert
         res.render(`Error trying to log service.`)

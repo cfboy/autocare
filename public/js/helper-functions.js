@@ -92,3 +92,19 @@ function changeLocation(element, fromSelect) {
     })
 
 }
+
+// showing loading
+function displayLoading(div, time, withTimeout = true) {
+    showResult(div,
+        `<div class="mx-4 my-2 spinner text-center">
+            <div class="spinner-grow spinner-grow-sm"></div>
+            <div class="text-small">Loading...</div>
+        </div>`);
+
+    if (withTimeout) {
+        // // to stop loading after some time
+        setTimeout(() => {
+            showResult(div, ``);
+        }, time);
+    }
+}

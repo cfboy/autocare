@@ -1,6 +1,6 @@
 {
     "name": "autocare-subscriptions-app",
-    "version": "2.1.6",
+    "version": "3.0.0",
     "author": "cfboy",
     "description": "AutoCare Memberships web application using Express, MongoDB, and Stripe.",
     "main": "app.js",
@@ -30,6 +30,7 @@
         "cookie-parser": "^1.4.6",
         "crypto": "^1.0.1",
         "d3": "^7.6.1",
+        "deep-email-validator": "^0.1.21",
         "dinero.js": "^1.9.1",
         "dotenv": "^10.0.0",
         "dropify": "0.2.2",
@@ -84,6 +85,7 @@
         "nouislider": "^13.1.5",
         "owl-carousel-2": "0.0.3",
         "passport": "^0.6.0",
+        "passport-google-oauth2": "^0.2.0",
         "passport-local": "^1.0.0",
         "perfect-scrollbar": "^1.4.0",
         "popper.js": "^1.15.0",

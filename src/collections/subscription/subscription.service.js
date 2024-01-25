@@ -1,4 +1,4 @@
-const { STATUS } = require('../../connect/stripe');
+const { STATUS, MIN_CANCEL_DAYS } = require('../../connect/stripe');
 /**
  * IMPORTANT: All the subscription obj has the ID of Stripe Subscription Obj on id property.
  * So when need to find a subscription by id should use findOne instead findByID.
@@ -34,14 +34,32 @@ const addSubscription = (Subscription) => async ({ id, items, data, user }) => {
         setDefaultsOnInsert: true
     }
 
-    const subscription = await Subscription.findOneAndUpdate(query, update, options, function (error, result) {
-        if (error) {
+    try {
+        const subscription = await Subscription.findOneAndUpdate(query, update, options).populate({ path: 'user', model: 'user' });
+        return subscription;
+    } catch (error) {
+        if (error.code === 11000 || error.code === 11001) {
+            console.error('Duplicate key error:', error);
+            // Duplicate key error, update the existing document
+            const existingSubscription = await Subscription.findOne({ id });
+            if (existingSubscription) {
+                // Update the existing document with the new data
+                await Subscription.update(query, update); // Using update method
+
+                // Fetch and return the updated document
+                const updatedSubscription = await Subscription.findOne({ id }).populate({ path: 'user', model: 'user' });
+
+                return updatedSubscription;
+            } else {
+                // Handle the case where the existing document is not found
+                console.error('Existing document not found for id:', id);
+                throw new Error(error);
+            }
+        } else {
             console.error(error)
             throw new Error(error)
-        } else {
-            return result
-        };
-    }).populate({ path: 'user', model: 'user' })
+        }
+    }
 
     return subscription
 }
@@ -96,7 +114,7 @@ const removeSubscriptionCar = (Subscription) => async (id, item, car) => {
             if (err) {
                 console.error(err.message)
             } else {
-                console.debug(`Car ${car.model} Removed of subscription: ${doc.id}`);
+                console.debug(`Car ${car.carName()} Removed of subscription: ${doc.id}`);
             }
         }).populate('user').populate({ path: 'items.cars', model: 'car' })
 }
@@ -211,6 +229,7 @@ const getSubscriptionsByCar = (Subscription) => async (car) => {
  * @returns Subscription
  */
 const getLastSubscriptionByCar = (Subscription) => async (car) => {
+    // TODO: Get last subscription ACTIVE by car.
     return await Subscription.findOne(
         { "items.cars": { _id: (car.id ? car.id : car._id) } },
         function (err, doc) {
@@ -381,6 +400,47 @@ async function validateItemQty(item) {
     }
 }
 
+/**
+ * This function find the subscription by id and get the current day of the period.
+ * @param {*} id 
+ * @returns 
+ */
+async function getSubscriptionDayOfPeriod(id) {
+
+    try {
+        let subscription = await this.getSubscriptionById(id)
+        let startDate = new Date(subscription.data.current_period_start * 1000),
+            currentDate = new Date(),
+            endDate = new Date(subscription.data.current_period_end * 1000),
+            daysBetweenTwoDates = (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24)
+
+        daysSinceStart = Math.floor((currentDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+
+        console.log(`La suscripción se encuentra en el día ${daysSinceStart} de su periodo.`);
+
+        // TODO: use lingua for this messages.
+        let message = `Si cancela no prodrá revertir esta acción.`
+
+        let cancelInNextPeriod = false,
+            cancelDate = endDate
+        if (daysSinceStart > MIN_CANCEL_DAYS) {
+            cancelInNextPeriod = true
+            // Cancel in the next period
+            cancelDate = new Date(cancelDate.setDate(endDate.getDate() + daysBetweenTwoDates))
+            message = `La suscripción se encuentra en el día ${daysSinceStart} de su periodo.
+             Si cancela se le cobrará el próximo periodo.`
+        }
+
+
+        return { message, daysSinceStart, cancelInNextPeriod, cancelDate }
+
+    }
+    catch (error) {
+        console.log(`ERROR: subscription.service: getSubscriptionDayOfPeriod()`)
+        console.error(error)
+        return null
+    }
+}
 
 module.exports = (Subscription) => {
     return {
@@ -393,6 +453,7 @@ module.exports = (Subscription) => {
         getSubscriptionsByUser: getSubscriptionsByUser(Subscription),
         getSubscriptionsByPrice: getSubscriptionsByPrice(Subscription),
         getSubscriptionById: getSubscriptionById(Subscription),
+        getSubscriptionDayOfPeriod: getSubscriptionDayOfPeriod,
         getSubscriptionByCar: getSubscriptionByCar(Subscription),
         getSubscriptionsByCar: getSubscriptionsByCar(Subscription),
         getSubscriptionItemByCar: getSubscriptionItemByCar(Subscription),

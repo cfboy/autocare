@@ -88,7 +88,7 @@
                                                                             <input type="hidden" id="inputType"
                                                                                 name="inputType" value="User" />
                                                                             <button id="validateMembershipBtn"
-                                                                                class="btn btn-block btn-inverse-dark btn-lg font-weight-medium auth-form-btn float-end"
+                                                                                class="btn btn-block btn-outline-primary btn-lg font-weight-medium auth-form-btn float-end"
                                                                                 type="submit"><%= lingua.validate%></button>
                                                                         </div>
                                                                     </div>
@@ -258,7 +258,7 @@
                     type: "POST",
                     contentType: "application/json",
                     data: JSON.stringify({
-                        plateNumber: valueToValidate.val(),
+                        plateNumber: valueToValidate.val().toUpperCase(),
                         inputType: "Manual"
                     }),
                     beforeSend: function () {

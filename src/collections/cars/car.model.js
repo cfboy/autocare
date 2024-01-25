@@ -16,6 +16,13 @@ const carSchema = new Schema({
     }
 })
 
+carSchema.methods.carName = function () {
+    var strings = [this.brand, this.model, this.plate];
+
+    return strings.filter(Boolean).join(" ");
+};
+
+
 carSchema.indexes({ brand: 1, model: 1, plate: 1 }, { unique: true })
 
 const Car = mongoose.model('car', carSchema, 'car')

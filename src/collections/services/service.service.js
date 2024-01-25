@@ -1,6 +1,7 @@
 const LocationService = require('../location')
 const Stripe = require('../../connect/stripe')
 const Dinero = require('dinero.js')
+const moment = require('moment');
 
 /**
  * This function add new service to DB
@@ -211,10 +212,6 @@ const getServicesByCarBetweenDates = (Service) => async (car, startDate, endDate
             $lte: endDate
         }
     })
-        // .populate({ path: 'location', model: 'location' })
-        // .populate({ path: 'authorizedBy', model: 'user' })
-        // .populate({ path: 'user', model: 'user' })
-        // .populate({ path: 'car', model: 'car' })
         .then(result => {
             if (result) {
                 // console.debug(`getServicesByCarBetweenDates(): Successfully found ${result.length} services.`);
@@ -235,8 +232,8 @@ const getServicesByCarBetweenDates = (Service) => async (car, startDate, endDate
 const getServicesBetweenDates = (Service) => async (startDate, endDate) => {
     return Service.find({
         created_date: {
-            $gte: startDate,
-            $lte: endDate
+            $gt: moment(startDate, "MM/DD/YYYY").startOf('day').toDate(),
+            $lt: moment(endDate, "MM/DD/YYYY").endOf('day').toDate()
         }
     }).populate({ path: 'location', model: 'location' })
         .then(result => {
@@ -289,9 +286,17 @@ async function getGrossVolumeFactor(startDate, endDate, allServices) {
         const stripeBalance = await Stripe.getBalanceTransactions(startDate, endDate)
 
 
-        factor = allServices?.length > 0 ? stripeBalance?.grossVolume.divide(allServices?.length).getAmount() : 0
+        factor = allServices?.length > 0 ? stripeBalance?.totalVolumeWithoutTaxes.divide(allServices?.length).getAmount() : 0
 
-        return { factor, grossVolume: stripeBalance?.grossVolume?.getAmount() }
+        return {
+            factor,
+            totalVolumeWithoutTaxes: stripeBalance?.totalVolumeWithoutTaxes.getAmount(),
+            grossVolume: stripeBalance?.grossVolume?.getAmount(),
+            netVolume: stripeBalance?.netVolume?.getAmount(),
+            taxVolume: stripeBalance?.taxVolume?.getAmount(),
+            municipalTaxVolume: stripeBalance?.municipalTaxVolume?.getAmount(),
+            stateTaxVolume: stripeBalance?.stateTaxVolume?.getAmount()
+        }
 
     } catch (error) {
         console.error(`ERROR-ServiceService: getGrossVolumeFactor()`);
@@ -301,20 +306,22 @@ async function getGrossVolumeFactor(startDate, endDate, allServices) {
     }
 }
 
-async function getLocationsWithGrossVolumeDistributed(date) {
+async function getLocationsWithGrossVolumeDistributed(dateRange) {
     try {
-        date = date ? date.split('-')[2] ? new Date(date) : new Date(date + '-1') : new Date();
-        const startDate = new Date(date.getFullYear(), date.getMonth(), 1);
+        const startDate = new Date(dateRange.split('-')[0].trim());
+        const endDate = new Date(dateRange.split('-')[1].trim());
         console.log(startDate);
-        const endDate = new Date(date.getFullYear(), date.getMonth() + 1, 0);
         console.log(endDate);
-
         const allServices = await this.getServicesBetweenDates(startDate, endDate)
 
-        const { factor, grossVolume } = await getGrossVolumeFactor(startDate, endDate, allServices),
-            factorString = Dinero({ amount: factor }).toFormat('$0,0.00')
-        grossVolumeString = Dinero({ amount: grossVolume }).toFormat('$0,0.00')
-
+        const { factor, totalVolumeWithoutTaxes, grossVolume, netVolume, taxVolume, municipalTaxVolume, stateTaxVolume } = await getGrossVolumeFactor(startDate, endDate, allServices),
+            factorString = Dinero({ amount: factor }).toFormat('$0,0.00'),
+            totalVolumeWithoutTaxesString = Dinero({ amount: totalVolumeWithoutTaxes }).toFormat('$0,0.00'),
+            grossVolumeString = Dinero({ amount: grossVolume }).toFormat('$0,0.00'),
+            netVolumeString = Dinero({ amount: netVolume }).toFormat('$0,0.00'),
+            taxVolumeString = Dinero({ amount: taxVolume }).toFormat('$0,0.00'),
+            municipalTaxVolumeString = Dinero({ amount: municipalTaxVolume }).toFormat('$0,0.00'),
+            stateTaxVolumeString = Dinero({ amount: stateTaxVolume }).toFormat('$0,0.00')
 
         const locations = await LocationService.getLocations()
 
@@ -324,7 +331,24 @@ async function getLocationsWithGrossVolumeDistributed(date) {
             location.grossVolumeString = location.grossVolume ? Dinero({ amount: location.grossVolume }).toFormat('$0,0.00') : '$0'
         }
 
-        return { startDate, endDate, serviceQty: allServices?.length, grossVolume, grossVolumeString, factor, factorString, locations }
+        return {
+            startDate,
+            endDate,
+            serviceQty: allServices?.length,
+            grossVolume, grossVolumeString,
+            netVolume,
+            netVolumeString,
+            taxVolume,
+            taxVolumeString,
+            municipalTaxVolume,
+            municipalTaxVolumeString,
+            stateTaxVolume,
+            stateTaxVolumeString,
+            factor,
+            factorString,
+            totalVolumeWithoutTaxesString,
+            locations
+        }
 
     } catch (error) {
         console.error(`ERROR-ServiceService: getLocationsWithGrossVolumeDistributed()`);

@@ -10,14 +10,14 @@
                             <%= lingua.membership.notPlan%>
                         </p>
                         <br>
-                        <a href="/create-subscriptions" class="btn btn-primary btn-icon-text text-white m-1"
-                            type="button">
+                        <a href="/subscribe?userEmail=<%= user?.email%>"
+                            class="btn btn-primary btn-icon-text text-white m-1 btn-sm-block" type="button">
                             <i class="fas fa-plus btn-icon-prepend"></i> <%= lingua.membership.createSubscriptions%>
                         </a>
 
                         <% } else { %>
                         <!-- Loop of subscriptions -->
-                        <%- include('./information.ejs' , {invalid: false, subscriptions, showManageBtn : true, customer : user, showCreateBtn: true, user : user}); %>
+                        <%- include('./information.ejs' , {invalid: false, subscriptions, showManageBtn : true, customer : user, showCreateBtn: true, user : user, canManageSubscriptions}); %>
                         <% } %>
                     </div>
                 </div>

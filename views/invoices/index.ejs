@@ -63,14 +63,17 @@
                                                             <th><%= lingua.dueDate%></th>
                                                             <th><%= lingua.createdDate%></th>
                                                             <th><%= lingua.membership.status%></th>
-                                                            <!-- <th>Action</th> -->
+                                                            <% if([roles.ADMIN].includes(user.role)) { %>
+                                                            <th>Action</th>
+                                                            <% } %>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         <% if(invoices) { %>
                                                         <% for(const invoice of invoices) { %>
                                                         <tr>
-                                                            <td><%= invoice?.total %>
+                                                            <td>
+                                                                <%= invoice?.total %>
                                                                 <span class="text-uppercase"> <%= invoice.currency%>
                                                                 </span>
                                                             </td>
@@ -101,7 +104,37 @@
                                                                 <%= moment(invoice.created).isValid() ? moment(invoice.created * 1000).format(completeDateFormat) : 'N/A' %>
 
                                                             </td>
-                                                            <td class="text-uppercase"><%= invoice.status%></td>
+                                                            <td class="text-uppercase">
+                                                                <%= invoice.status%>
+
+                                                            </td>
+                                                            <% if([roles.ADMIN].includes(user.role)) { %>
+
+                                                            <td class="d-flex">
+                                                                <div class="dropdown">
+                                                                    <button type="button" class="btn btn-icon mx-0 p-0"
+                                                                        id="actions-<%= invoice.id%>"
+                                                                        data-bs-toggle="dropdown" aria-haspopup="true"
+                                                                        aria-expanded="false">
+                                                                        <i class="fa fa-ellipsis-vertical"></i>
+                                                                    </button>
+                                                                    <div class="dropdown-menu"
+                                                                        aria-labelledby="actions-<%= invoice.id%>">
+                                                                        <a href="javascript:void(0)"
+                                                                            id="uncollectible-btn-<%= invoice.id%>"
+                                                                            value="<%= invoice.id%>"
+                                                                            class="dropdown-item mark-uncollectible-btn"
+                                                                            title="Mark as incollecitble">
+                                                                            <i class="fa-solid fa-rotate"></i>
+                                                                            Mark as Incollectible
+                                                                        </a>
+                                                                    </div>
+                                                                </div>
+                                                                <div id="loading-update-<%= invoice?.id%>"
+                                                                    class="text-small text-wrap">
+                                                                </div>
+                                                            </td>
+                                                            <% } %>
 
                                                             <!-- <td>
                                                                 <a id="deleteBtn"
@@ -160,6 +193,50 @@
     <!-- Alerts Code -->
     <%- include('../partials/alerts.ejs', {message, alertType}); %>
     <%- include('../partials/dataTable.ejs', {tableID : '#invoice', dateColumn : 3}); %>
+    <script>
+
+        const uncollectibleBtn = $('.mark-uncollectible-btn');
+
+        uncollectibleBtn.click(function (event) {
+            $(this).prop('disabled', true);
+            event.preventDefault();
+            event.stopPropagation();
+
+            const value = $(this).attr("value");
+
+            $(`#actions-${value}`).click();
+
+            $.ajax({
+                url: "/markUncollectibleInvoice",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    id: value
+                }),
+                beforeSend: function () {
+                    showResult(`#loading-update-${value}`,
+                        `<div class="spinner text-center m-0">
+                            <div class="spinner-grow spinner-grow-sm"></div>
+                    </div>`
+                    );
+                }
+            }).done(function (result) {
+                showResult(`#loading-update-${value}`, result);
+                var delayInMilliseconds = 2000; //1 second
+
+                setTimeout(function () {
+                    showResult(`#loading-update-${value}`, '');
+                    // syncBtn.prop('disabled', false);
+                    location.reload();
+
+                }, delayInMilliseconds);
+
+            }).fail(function (err) {
+                console.log(err);
+            })
+
+        })
+    </script>
 </body>
 
 </html>

@@ -36,11 +36,7 @@ exports.account = async (req, res) => {
     try {
         // Message for alerts
         let { message, alertType } = req.session
-        // clear message y alertType
-        if (message) {
-            req.session.message = ''
-            req.session.alertType = ''
-        }
+
         // Passport store the user in req.user
         let user = req.user,
             role = user.role,
@@ -63,6 +59,11 @@ exports.account = async (req, res) => {
         let reportURL
         switch (role) {
             case ROLES.ADMIN:
+                // clear message y alertType
+                if (message) {
+                    req.session.message = ''
+                    req.session.alertType = ''
+                }
                 reportURL = reports.find(report => report.name.indexOf('Dashboard') != -1)?.url
                 // Get Customers
                 // customers = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
@@ -74,6 +75,11 @@ exports.account = async (req, res) => {
                 res.redirect('/memberships')
                 break;
             case ROLES.MANAGER:
+                // clear message y alertType
+                if (message) {
+                    req.session.message = ''
+                    req.session.alertType = ''
+                }
                 reportURL = reports.find(report => report.name.indexOf('Service') != -1)?.url
                 // Get Customers
                 // customers = await UserService.getUsersPerRole(req, ROLES.CUSTOMER)
@@ -100,6 +106,6 @@ exports.account = async (req, res) => {
             function (event) {
                 event.setUser(req.user.email)
             })
-        console.error(`ERROR: dashboardController -> Tyring generate user dashboard. ${error.message}`)
+        console.error(`ERROR: dashboardController -> Trying generate user dashboard. ${error.message}`)
     }
 }

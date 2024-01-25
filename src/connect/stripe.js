@@ -13,11 +13,13 @@ const STATUS = {
     TRIALING: "trialing",
 }
 
+const MIN_CANCEL_DAYS = 25
+
 const Stripe = stripe(process.env.STRIPE_SECRET_KEY, {
     apiVersion: '2020-08-27'
 })
 
-const createCheckoutSession = async (customerID, subscriptions, subscriptionsEntries) => {
+const createCheckoutSession = async (customerID, subscriptions, subscriptionsEntries, backURL = null) => {
     try {
         let items = [];
         let cars_price = subscriptions;
@@ -51,14 +53,66 @@ const createCheckoutSession = async (customerID, subscriptions, subscriptionsEnt
             line_items: items,
             subscription_data: {
                 metadata: {
-                    cars_data: JSON.stringify(cars)
+                    cars_data: JSON.stringify(cars_price)
                 },
                 default_tax_rates: defaultTaxes,
 
             },
             allow_promotion_codes: true,
             success_url: `${process.env.DOMAIN}/completeCheckoutSuccess?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${process.env.DOMAIN}`
+            cancel_url: `${process.env.DOMAIN}/${backURL}`
+        })
+
+        return session
+    }
+    catch (error) {
+        console.error(`ERROR-STRIPE: createCheckoutSession. ${error.message}`);
+        throw new Error(error)
+    }
+}
+
+const createCheckoutSessionWithEmail = async (email, subscriptions, subscriptionsEntries, backURL = null) => {
+    try {
+        let items = [];
+        let cars_price = subscriptions;
+        if (subscriptionsEntries) {
+            // Prepare items to create a session.
+            // The first position [0] has the priceID (divided by groups)
+            // The second position [1] has the list of cars per priceID.
+            for (sub of subscriptionsEntries) {
+                items.push({
+                    price: sub[0], quantity: sub[1].length
+                })
+            }
+        }
+
+        const taxes = await Stripe.taxRates.list({
+            active: true
+        });
+
+        let defaultTaxes = []
+        if (taxes.data.length > 0)
+            defaultTaxes = taxes?.data?.map(({ id }) => (id));
+
+        let cars = []
+        for (obj of cars_price) {
+            cars.push({ plate: obj.plate, priceID: obj.priceID })
+        }
+        const session = await Stripe.checkout.sessions.create({
+            mode: 'subscription',
+            payment_method_types: ['card'],
+            customer_email: email,
+            line_items: items,
+            subscription_data: {
+                metadata: {
+                    cars_data: JSON.stringify(cars_price)
+                },
+                default_tax_rates: defaultTaxes,
+
+            },
+            allow_promotion_codes: true,
+            success_url: `${process.env.DOMAIN}/completeCheckoutSuccess?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${process.env.DOMAIN}/${backURL}`
         })
 
         return session
@@ -161,19 +215,15 @@ const getCustomerByEmail = async (email) => {
  * @returns customer object
  */
 const addNewCustomer = async (email,
-    firstName,
-    lastName,
-    phoneNumber,
-    city) => {
+    firstName = null,
+    lastName = null,
+    phoneNumber = null) => {
     try {
         const customer = await Stripe.customers.create({
             email,
-            description: 'New Customer',
+            description: 'Created by app.',
             name: firstName + ' ' + lastName,
-            phone: phoneNumber,
-            address: {
-                city: city
-            }
+            phone: phoneNumber
         })
 
         return customer
@@ -399,6 +449,44 @@ const getCustomerInvoices = async (user) => {
 }
 
 /**
+ * This function mark uncollectible an invoice.
+ * @param {*} invoiceID 
+ * @returns 
+ */
+const markUncollectibleInvoice = async (invoiceID) => {
+    try {
+        const invoice = await Stripe.invoices.markUncollectible(invoiceID);
+
+        console.log(`Invoice markUncollectibleInvoice: ${invoice.id}`)
+
+        return invoice
+    }
+    catch (error) {
+        console.error(`ERROR-STRIPE: markUncollectibleInvoice(). ${error.message}`);
+    }
+
+}
+
+/**
+ * This function void an invoice.
+ * @param {*} user 
+ * @returns 
+ */
+const voidInvoice = async (invoiceID) => {
+    try {
+        const invoice = await Stripe.invoices.voidInvoice(invoiceID);
+
+        console.log(`Invoice voided: ${invoice.id}`)
+
+        return invoice
+    }
+    catch (error) {
+        console.error(`ERROR-STRIPE: voidInvoice(). ${error.message}`);
+    }
+
+}
+
+/**
  * This function get all subsctiptions.
  * @returns subscriptions list
  */
@@ -428,14 +516,21 @@ async function getCustomerSubscriptions(customerID) {
  * @returns subscriptions list
  */
 async function getSubscriptionById(id) {
-    const subscription = await Stripe.subscriptions.retrieve(id,
-        {
-            expand: ['items.data.price.product']
-        })
+    try {
+        const subscription = await Stripe.subscriptions.retrieve(id,
+            {
+                expand: ['items.data.price.product']
+            })
 
-    // console.debug("Subscription: " + subscription.id)
+        // console.debug("Subscription: " + subscription.id)
 
-    return subscription
+        return subscription
+    }
+    catch (error) {
+        console.error(`ERROR-STRIPE: getSubscriptionById(). ${error.message}`);
+
+        return null
+    }
 }
 
 /**
@@ -456,25 +551,32 @@ async function getSubscriptionItemById(id) {
  * @returns balance transactions list, amount, and string amount
  */
 async function getCustomerBalanceTransactions(id) {
-    const balanceTransactions = await Stripe.customers.listBalanceTransactions(
-        id
-    );
+    try {
+        const balanceTransactions = await Stripe.customers.listBalanceTransactions(
+            id
+        );
 
-    // console.debug("Balance Transactions: " + balanceTransactions.data.length)
+        // console.debug("Balance Transactions: " + balanceTransactions.data.length)
 
-    let total = 0.00
-    for (balance of balanceTransactions.data) {
-        total += balance.amount
+        let total = 0.00
+        for (balance of balanceTransactions.data) {
+            total += balance.amount
+        }
+        let totalString = null
+
+        // If the total is zero then totalString is null/undefined.
+        if (total * -1 > 0) {
+            totalString = Dinero({ amount: total * -1 }).toFormat('$0,0.00')
+            console.debug('Total Customer Balance: ' + totalString)
+        }
+
+        return { transactions: balanceTransactions.data, total: total, totalString: totalString }
     }
-    let totalString = null
+    catch (error) {
+        console.error(`ERROR-STRIPE: getCustomerBalanceTransactions(). ${error.message}`);
 
-    // If the total is zero then totalString is null/undefined.
-    if (total * -1 > 0) {
-        totalString = Dinero({ amount: total * -1 }).toFormat('$0,0.00')
-        console.debug('Total Customer Balance: ' + totalString)
+        return { transactions: null, total: null, totalString: null }
     }
-
-    return { transactions: balanceTransactions.data, total: total, totalString: totalString }
 }
 
 /**
@@ -494,6 +596,19 @@ async function updateStripeSubscription(id, updates) {
 }
 
 /**
+ * This function cancel the stripe subscription.
+ * @param {*} id 
+ * @returns subscription obj
+ */
+async function cancelSubscription(id) {
+    console.log('ID: ' + id)
+    // console.log('cancelAt: ' + cancelAt)
+    const subscription = await Stripe.subscriptions.cancel(id);
+
+    return subscription
+}
+
+/**
  * This function return the stripe balance transactions between dates.
  * Calculate the Gross Volume
  * @param {*} startDate 
@@ -503,34 +618,53 @@ async function updateStripeSubscription(id, updates) {
 async function getBalanceTransactions(startDate, endDate) {
 
     try {
-        let totalVolume = 0.00, grossVolume = 0
+        let taxVolume = 0, grossVolume = 0, netVolume = 0;
 
-        for await (const balance of Stripe.balanceTransactions.list(
+        let stripeBalanceTransactionList = Stripe.balanceTransactions.list(
             {
-                limit: 10,
+                limit: 100,
                 created: { 'gte': startDate, 'lte': endDate }
             }
-        )) {
-            // Do something with customer
+        )
+
+        for await (const balance of stripeBalanceTransactionList) {
+            // Sum only the charge balance type. (Based on the documentation)
+            // TODO: validate the refunds and other cases
             if (balance.type == 'charge') {
-                totalVolume += balance.amount
-            } else
                 grossVolume += balance.amount
+                netVolume += balance.net
+            }
         }
 
-        let grossVolumeString = null, totalVolumeString = null
-        //if the grossVolume == 0 || grossVolume is > 0 then keep the same value, if not then multiplu by -1.
-        grossVolume = grossVolume >= 0 ? grossVolume : grossVolume * -1
+        let grossVolumeString = null, netVolumeString = null;
+
         grossVolume = Dinero({ amount: grossVolume })
+        netVolume = Dinero({ amount: netVolume })
+
         grossVolumeString = grossVolume.toFormat('$0,0.00')
         console.debug('Gross Volume: ' + grossVolumeString)
 
+        netVolumeString = netVolume.toFormat('$0,0.00')
+        console.debug('Net Volume: ' + netVolumeString)
+        // Calculate tax
+        // TODO: find taxes in Stripe
+        let municipalTax = 1.0 / 100;
+        let stateTax = 10.5 / 100;
 
-        if (totalVolume > 0) {
-            totalVolumeString = Dinero({ amount: totalVolume }).toFormat('$0,0.00')
-            console.debug('Total Volume: ' + totalVolumeString)
-        }
-        return { grossVolume, grossVolumeString, totalVolumeString }
+        let totalVolumeWithoutTaxes = grossVolume.divide(1 + municipalTax + stateTax);
+        console.debug('totalVolumeWithoutTaxes: ' + totalVolumeWithoutTaxes.toFormat('$0,0.00'))
+
+        // Get the volume taxes
+        let municipalTaxVolume = totalVolumeWithoutTaxes.multiply(municipalTax);
+        console.debug('municipalTaxVolume: ' + municipalTaxVolume.toFormat('$0,0.00'))
+        let stateTaxVolume = totalVolumeWithoutTaxes.multiply(stateTax);
+        console.debug('stateTaxVolume: ' + stateTaxVolume.toFormat('$0,0.00'))
+
+        taxVolume = municipalTaxVolume.add(stateTaxVolume)
+        console.debug('Tax Volume: ' + taxVolume.toFormat('$0,0.00'))
+
+        return { grossVolume, netVolume, totalVolumeWithoutTaxes, taxVolume, municipalTaxVolume, stateTaxVolume }
+
     } catch (error) {
         console.error(`ERROR-STRIPE: getBalanceTransactions(). ${error.message}`);
 
@@ -540,12 +674,14 @@ async function getBalanceTransactions(startDate, endDate) {
 
 module.exports = {
     STATUS,
+    MIN_CANCEL_DAYS,
     getCustomerByID,
     getCustomerByEmail,
     addNewCustomer,
     updateCustomer,
     getSessionByID,
     createCheckoutSession,
+    createCheckoutSessionWithEmail,
     createBillingSession,
     createWebhook,
     getAllProducts,
@@ -555,11 +691,14 @@ module.exports = {
     getCustomerEvents,
     getCustomerCharges,
     getCustomerInvoices,
+    markUncollectibleInvoice,
+    voidInvoice,
     getAllSubscriptions,
     getSubscriptionById,
     getSubscriptionItemById,
     getCustomerBalanceTransactions,
     updateStripeSubscription,
+    cancelSubscription,
     getBalanceTransactions,
     getCustomerSubscriptions
 }

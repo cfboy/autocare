@@ -117,35 +117,6 @@
                                                                 placeholder="XXX-XXX-XXXX" required autofocus />
                                                         </div>
                                                     </div>
-                                                    <div class="col-lg-6">
-                                                        <div class="form-group">
-                                                            <label for="dateOfBirth"
-                                                                class="required"><%= lingua.user.dateOfBirth%></label>
-
-                                                            <input
-                                                                value="<%- moment(customer.personalInfo.dateOfBirth).utc().format('YYYY-MM-DD')%>"
-                                                                type="date" id="dateOfBirth"
-                                                                name="personalInfo.dateOfBirth"
-                                                                class="form-control mb-3 form-control-lg" required
-                                                                autofocus />
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-6">
-                                                        <div class="form-group">
-                                                            <label for="city"
-                                                                class="required"><%= lingua.user.city%></label>
-                                                            <select id="city" name="personalInfo.city" required
-                                                                class="form-control mb-3 form-control-lg js-example-basic-single w-100">
-                                                                <option value=""><%= lingua.selectOne%></option>
-                                                                <% for(const municipality of municipalities) { %>
-                                                                <% var selected = (customer?.personalInfo?.city == municipality) ? "selected" : "";   %>
-                                                                <option value="<%= municipality%>" <%= selected%>>
-                                                                    <%= municipality%>
-                                                                </option>
-                                                                <% } %>
-                                                            </select>
-                                                        </div>
-                                                    </div>
                                                 </div>
                                                 <div class="row">
                                                     <div class="mt-3">

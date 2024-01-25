@@ -25,6 +25,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.4/css/dataTables.bootstrap5.min.css">
     <!-- End plugin css for this page -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
     <!-- inject:css -->
     <link rel="stylesheet" href="../css/vertical-layout-light/style.css">
     <!-- endinject -->
@@ -49,23 +50,26 @@
                                 <div class="col-12 grid-margin stretch-card">
                                     <div class="card card-rounded">
                                         <div class="card-body">
-                                            <div class="d-flex justify-content-between align-items-start">
-                                                <div>
-                                                    <h4 class="card-title card-title-dash">Reports</h4>
+                                            <div class="row">
+                                                <div class="col-lg-4 col-md-4 col-sm-12">
+                                                    <h4 class="card-title card-title-dash">
+                                                        Reports
+                                                    </h4>
+
                                                 </div>
-                                                <div>
+                                                <div class="col-lg-8 col-md-8 col-sm-12 text-end">
                                                     <a href="<%= financialReports%>" target="_blank"
-                                                        class="btn btn-primary btn-icon-text m-1"
+                                                        class="btn btn-primary btn-icon-text m-1 btn-sm-block"
                                                         type="button">Financial
                                                         Reports <i
                                                             class="fa-solid fa-arrow-up-right-from-square btn-icon-append"></i></a>
-                                                    <a href="/create-report" class="btn btn-primary btn-icon-text m-1"
+                                                    <a href="/create-report"
+                                                        class="btn btn-primary btn-icon-text m-1 btn-sm-block"
                                                         type="button">
                                                         <i class="fas fa-plus btn-icon-prepend btn-icon-prepend"></i>
                                                         Add Report</a>
                                                 </div>
                                             </div>
-                                            <br>
 
                                             <div class="table-responsive  mt-1">
                                                 <table id="reports" class="table table-hover stripe">
@@ -109,24 +113,26 @@
                                 <div class="col-12 grid-margin stretch-card">
                                     <div class="card card-rounded">
                                         <div class="card-body">
-                                            <div class="d-flex justify-content-between align-items-start">
-                                                <div>
-                                                    <h4 class="card-title card-title-dash">Gross Volume Distribution
-                                                        Report</h4>
+                                            <div class="row">
+                                                <div class="col-lg-6 col-md-6 col-sm-12">
+                                                    <h4 class="card-title card-title-dash">
+                                                        Gross Volume Distribution
+                                                        Report
+                                                    </h4>
                                                 </div>
-                                                <div>
+                                                <div class="col-lg-6 col-md-6 col-sm-12">
+
                                                     <form id="form-genrate-report" class="" method="post">
                                                         <div class="form-group">
-                                                            <label>Report Date</label>
+                                                            <label class="label">Report Date</label>
                                                             <div class="input-group col-xs-12">
-                                                                <input type="month" id="reportDate" name="reportDate"
-                                                                    placeholder="mm/dd/yyyy"
+                                                                <input type="text" name="reportRange" id="reportRange"
                                                                     class="form-control form-control-lg w-auto"
-                                                                    required />
+                                                                    value="" />
                                                                 <span class="input-group-append">
-
                                                                     <button onclick="generateReport(this.event)"
-                                                                        class="btn btn-primary h-100" type="button">
+                                                                        class="btn btn-primary h-100 btn-sm-block"
+                                                                        type="button">
 
                                                                         Generate Report
                                                                     </button>
@@ -162,6 +168,9 @@
     <script type="text/javascript"
         src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
     <!-- End plugin js for this page -->
     <!-- inject:js -->
     <script src="../js/off-canvas.js"></script>
@@ -179,11 +188,32 @@
     <%- include('../partials/alerts.ejs', {message, alertType}); %>
     <%- include('../partials/dataTable.ejs', {tableID : '#reports'}); %>
     <script>
+        $(function () {
+
+            $('#reportRange').daterangepicker({
+                "showDropdowns": true,
+                ranges: {
+                    'Today': [moment(), moment()],
+                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                },
+                "startDate": moment().startOf('month'),
+                "endDate": moment().endOf('month'),
+                "maxDate": moment(),
+                "opens": "center"
+            }, function (start, end, label) {
+                console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
+            });
+
+        });
 
         function generateReport() {
             event.preventDefault();
             event.stopPropagation();
-            var valueToValidate = $("#reportDate");
+            var valueToValidate = $("#reportRange");
             // reportValidity and checkValidity validate inputs on form.
             valueToValidate[0].reportValidity();
             if (valueToValidate[0].checkValidity()) {

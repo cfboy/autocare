@@ -4,6 +4,8 @@ const CarService = require('../collections/cars')
 const alertTypes = require('../helpers/alertTypes')
 const ServiceService = require('../collections/services')
 const Stripe = require('../connect/stripe')
+const { canManageSubscriptions
+} = require('../config/permissions')
 
 // let readingObjs = {}
 
@@ -21,11 +23,11 @@ exports.memberships = async (req, res) => {
 
             user.balance = totalString
 
-            res.render('subscriptions/index.ejs', { message, alertType, user, subscriptions })
+            res.render('subscriptions/index.ejs', { message, alertType, user, subscriptions, canManageSubscriptions: canManageSubscriptions(req.user, req.user) })
         } else {
             req.session.message = "This user don't have stripe account."
             req.session.alertType = alertTypes.WarningAlert
-            res.redirect('/account')
+            res.redirect('/logout')
         }
     }
     catch (error) {
@@ -67,6 +69,46 @@ exports.createSubscriptions = async (req, res) => {
             req.session.alertType = alertTypes.WarningAlert
             res.redirect('/account')
         }
+    }
+    catch (error) {
+        console.error(error)
+        req.session.message = error.message
+        req.session.alertType = alertTypes.ErrorAlert
+        res.redirect('/account')
+    }
+}
+
+/**
+ * This function render the register and create subscriptions form.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.subscribe = async (req, res) => {
+    try {
+        let { message, alertType } = req.session
+        // clear message y alertType
+        req.session.message = ''
+        req.session.alertType = ''
+
+        let { carPlate, userEmail } = req.query
+
+        if (userEmail)
+            res.cookie('subscriptionEmail', userEmail);
+
+        // If come from the validateMembership Popup
+        if (carPlate) {
+            res.cookie('subscriptionEmail', '');
+            res.cookie('cart', JSON.stringify([]));
+        }
+
+        let user = req.user,
+            cart = user?.cart;
+        let { allMakes } = await CarService.getAllMakes()
+
+        const prices = await Stripe.getAllPrices()
+
+        res.render('auth/registerAndSubscribe.ejs', { user, cart, allMakes, message, alertType, prices, carPlate, userEmail })
+
     }
     catch (error) {
         console.error(error)
@@ -121,6 +163,7 @@ exports.validate = async (req, res) => {
             // subscription = await SubscriptionService.getLastActiveSubscriptionByCar(car)
             subscription = await SubscriptionService.getLastSubscriptionByCar(car)
 
+            // TODO: get the customer by another source if the subscription not exist
             customer = subscription?.user
             let today = new Date(), tomorrow = new Date()
             tomorrow = new Date(tomorrow.setDate(today.getDate() + 1))
@@ -135,6 +178,7 @@ exports.validate = async (req, res) => {
             customer,
             inputType,
             car,
+            carPlate,
             subscription
         })
     } catch (error) {
@@ -142,7 +186,7 @@ exports.validate = async (req, res) => {
             function (event) {
                 event.setUser(req.user.email)
             })
-        console.error("ERROR: subscriptionsController -> Tyring to validate membership.")
+        console.error("ERROR: subscriptionsController -> Trying to validate membership.")
         console.error(error.message)
         res.render('Error validating membership.')
     }
@@ -291,8 +335,6 @@ exports.handleInvalidSubscriptions = async (req, res) => {
         let { invalidSubs, message, alertType } = req.session
 
         // Clear session variables
-        // TODO: Move to external function
-
         req.session.message = null
         req.session.alertType = null
 
@@ -380,6 +422,10 @@ exports.syncSubscription = async (req, res) => {
                 for (subItem of subscriptionItems) {
                     let itemToUpdate = mySubscription?.items?.find(item => item.id == subItem.id)
                     if (itemToUpdate) {
+                        for (car of itemToUpdate.cars) {
+                            if (car.user_id != mySubscription.user.id)
+                                await CarService.updateCar(car.id, { user_id: mySubscription.user.id })
+                        }
                         let newItem = { id: itemToUpdate.id, cars: itemToUpdate.cars, data: subItem }
                         items.push(newItem)
                     }
@@ -411,7 +457,7 @@ exports.syncSubscription = async (req, res) => {
             function (event) {
                 event.setUser(req.user.email)
             })
-        console.error(`ERROR: subscriptionsController -> Tyring to sync membership. ${error.message}`)
+        console.error(`ERROR: subscriptionsController -> Trying to sync membership. ${error.message}`)
         res.render('Error on sync membership.')
     }
 }
@@ -467,7 +513,7 @@ exports.syncCustomerSubscriptions = async (req, res) => {
                     //If the subscription does not exist in the DB, then create. 
                     let customer = await UserService.getUserByBillingID(customerID)
                     if (customer) {
-                        // Find subcription again for expand product information
+                        // Find subscription again for expand product information
                         stripeSubscription = await Stripe.getSubscriptionById(stripeSubscription.id)
                         subscriptionItems = stripeSubscription.items.data
                         let cars = [], userCartItems = customer?.cart?.items
@@ -527,7 +573,165 @@ exports.syncCustomerSubscriptions = async (req, res) => {
             function (event) {
                 event.setUser(req.user.email)
             })
-        console.error(`ERROR: subscriptionsController -> Tyring to sync all memberships. ${error.message}`)
+        console.error(`ERROR: subscriptionsController -> Trying to sync all memberships. ${error.message}`)
         res.render('Error on sync all memberships.')
+    }
+}
+
+/**
+ * This function remove a car from a subscription.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.removeCarOfSubscription = async (req, res) => {
+    try {
+
+        let { subscriptionID, itemID, carID } = req.body
+
+        if (subscriptionID && itemID && carID) {
+            let car = await CarService.getCarByID(carID)
+
+            let subscription = await SubscriptionService.removeSubscriptionCar(subscriptionID, itemID, car)
+            if (subscription) {
+                res.send(`Car Removed.`)
+            }
+
+        } else {
+            console.log('Missing values.')
+            res.send('Missing values.')
+        }
+
+    } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
+        console.error(`ERROR: subscriptionsController -> Trying to remove car from subscription. ${error.message}`)
+        res.render('Error on remove car.')
+    }
+}
+
+/**
+ * This function cancel the subscription based on the day of the period.
+ * This function is called by ajax function.
+ * The result is rendered in the memberships page.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.getSubscriptionDay = async (req, res) => {
+    try {
+        let subscriptionID = req.body.subscriptionID
+
+        if (!subscriptionID)
+            res.send(null);
+
+        console.log(`subscriptionID:${subscriptionID}`);
+        let { message, daysSinceStart, cancelDate } = await SubscriptionService.getSubscriptionDayOfPeriod(subscriptionID)
+
+
+        res.send({ daysSinceStart, cancelDate, message })
+    } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
+        console.error("ERROR: cancelSubscription -> Trying to cancel membership.")
+        console.error(error.message)
+        res.render('Error cancel membership.')
+    }
+}
+
+/**
+ * This function cancel the subscription based on the day of the period.
+ * This function is called by ajax function.
+ * The result is rendered in the memberships page.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.cancelSubscription = async (req, res) => {
+    try {
+        let { subscriptionID, daysSinceStart, cancelDate } = req.body
+
+        if (!subscriptionID)
+            res.send({ day: null });
+
+        console.log(`subscriptionID:${subscriptionID}`);
+        if (!daysSinceStart)
+            ({ daysSinceStart } = await SubscriptionService.getSubscriptionDayOfPeriod(subscriptionID))
+
+
+        let updates = {}
+
+
+        if (daysSinceStart > Stripe.MIN_CANCEL_DAYS) {
+            let cancelDateTimeStamp = Date.parse(cancelDate) / 1000;
+            updates = { cancel_at: cancelDateTimeStamp }
+        }
+        else {
+            updates = { cancel_at_period_end: true }
+        }
+
+        let result = await Stripe.updateStripeSubscription(subscriptionID, updates)
+
+
+        res.send(result)
+    } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
+        console.error("ERROR: cancelSubscription -> Trying to cancel membership.")
+        console.error(error.message)
+        res.send('Error cancel membership.')
+    }
+}
+
+
+/**
+ * This function fetch the subscription and prepare de list to send for checkout.
+ * This function is called by ajax function.
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.renewSubscription = async (req, res) => {
+    try {
+        let { subscriptionID } = req.body
+
+        if (!subscriptionID)
+            res.send({ renew: false, message: 'Missing subscription ID.' });
+
+        console.log(`subscriptionID:${subscriptionID}`);
+
+
+        let subscription = await SubscriptionService.getSubscriptionById(subscriptionID)
+        // Validate subscription
+        if (![Stripe.STATUS.CANCELED].includes(subscription.data.status)) {
+            res.send({ renew: false, message: "This subscription is active." });
+        }
+
+        // Prepare to checkout
+        let subscriptionList = [];
+        let item = {}
+        for (item of subscription.items) {
+            for (carObj of item.cars) {
+                item = {
+                    brand: carObj.brand,
+                    plate: carObj.plate,
+                    priceID: item.data.price.id
+                }
+                subscriptionList.push(item)
+            }
+
+        }
+
+        res.send({ renew: true, subscriptionList: subscriptionList })
+    } catch (error) {
+        req.bugsnag.notify(new Error(error),
+            function (event) {
+                event.setUser(req.user.email)
+            })
+        console.error("ERROR: renewSubscription -> Trying to renew membership.")
+        console.error(error.message)
+        res.send({ renew: false, message: 'Error trying to renew membership.' })
     }
 }

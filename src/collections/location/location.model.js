@@ -6,7 +6,8 @@ const locationSchema = new Schema({
     created_date: { type: Date, default: Date.now },
     isActive: { type: Boolean, default: false },
     services: [],
-    users: [],
+    // users: [],
+    users: [{ type: Schema.Types.ObjectId, ref: 'user', default: null }],
     agentID: String
 })
 

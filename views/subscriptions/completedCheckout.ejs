@@ -5,7 +5,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Login </title>
+    <title>Subscription Created</title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="../../vendors/feather/feather.css">
     <link rel="stylesheet" href="../../vendors/mdi/css/materialdesignicons.min.css">
@@ -26,21 +26,23 @@
 <body>
     <div class="container-scroller">
         <div class="container-fluid page-body-wrapper full-page-wrapper">
-            <div class="content-wrapper d-flex align-items-center px-0">
+            <div class="content-wrapper d-flex align-items-center auth px-0">
                 <div class="row w-100 mx-0">
-                    <div class="col-lg-6 col-md-8 col-sm-8 mx-auto">
+                    <div class="col-lg-6 col-md-6 col-sm-12 mx-auto">
                         <div class="text-center py-4 px-4 px-sm-5">
                             <div class="row">
                                 <div class="col-sm-12">
                                     <div class="card">
                                         <div class="card-body">
+
                                             <div class="card-title d-flex flex-nowrap">
                                                 <div class="brand-logo text-center mb-1 w-100">
-                                                    <img class="w-50" src="/images/charlieBoy/CB-5.jpg" alt="logo">
+                                                    <img src="/images/charlieBoy/CB-5.jpg" alt="logo"
+                                                        style="width: 50% !important;">
                                                 </div>
                                             </div>
                                             <h4 class="card-title">
-                                                Select Location to work
+                                                <%= lingua.processCompleted%>
                                             </h4>
                                             <div class="text-center">
                                                 <% if (messages.error) { %>
@@ -59,20 +61,39 @@
                                                     <%= messages.warning %>
                                                 </p>
                                                 <% } %>
-                                            </div>
-                                            <% for(const location of userLocations) { %>
-                                            <div>
-                                                <a class="btn btn-outline-behance mt-3 w-50" id="<%= location.id%>"
-                                                    onclick="changeLocation(this, false)">
-                                                    <%= location.name %>
+
+                                                <% if(customer.isIncomplete()) { %>
+                                                <h5><%= lingua.welcomeUser(stripeCustomer.email)%></h5>
+                                                <br>
+                                                <h5>
+                                                    <%= lingua.thanksUser%>
+                                                </h5>
+
+                                                <p>
+                                                    <%= lingua.verifyEmail%>
+                                                    <a href="/activateAccountRequest">
+                                                        Link.
+                                                    </a>
+                                                </p>
+                                                <a href="/login"
+                                                    class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn w-100"
+                                                    type="button"><%= lingua.login%>
                                                 </a>
+                                                <% }  else { %>
+                                                <h5>
+                                                    <%= lingua.membershipCreatedSuccess%>
+                                                </h5>
+                                                <p> <%= lingua.pressLink%></p>
+                                                <a href="/account"
+                                                    class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn w-100"
+                                                    type="button"><%= lingua.account%>
+                                                </a>
+                                                <% } %>
                                             </div>
-                                            <% } %>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>
@@ -95,8 +116,6 @@
     <script src="../../js/off-canvas.js "></script>
     <script src="../../js/hoverable-collapse.js "></script>
     <script src="../../js/template.js "></script>
-    <script src="../../js/settings.js "></script>
-    <script src="../../js/todolist.js "></script>
 
     <!-- endinject -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.3.3/dist/sweetalert2.all.min.js "></script>
@@ -105,9 +124,8 @@
     <!-- Alerts Code -->
     <script type="text/javascript " src="./js/sweet-alerts.js "></script>
     <script src="./js/helper-functions.js"></script>
-    <%# include('../partials/alerts.ejs', {message, alertType}); %>
 
-
+    <%- include('../partials/alerts.ejs', {message, alertType}); %>
 </body>
 
 </html>

@@ -10,7 +10,7 @@
     </title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="../../vendors/feather/feather.css">
-    <link rel="stylesheet" href="../../vendors/mdi/css/materialdesignicons.min.css">
+    <!-- <link rel="stylesheet" href="../../vendors/mdi/css/materialdesignicons.min.css"> -->
     <link rel="stylesheet" href="../../vendors/ti-icons/css/themify-icons.css">
     <link rel="stylesheet" href="../../vendors/typicons/typicons.css">
     <link rel="stylesheet" href="../../vendors/simple-line-icons/css/simple-line-icons.css">
@@ -52,13 +52,15 @@
                                     </div>
                                     <form id="form-subscriptions" class="pt-3" method="post">
                                         <div class="row">
+                                            <input id="oldProcess" name="oldProcess" value="true" hidden />
+
                                             <input id="userID" name="userID" value="<%= user.id%>" hidden />
                                             <h5><i class="fa-solid fa-1 list-number"></i>
                                                 <%= lingua.car.selectOrCreate%>
                                             </h5>
                                             <hr>
 
-                                            <%- include('../cars/formFields.ejs', {allMakes, car: null, userCars}); %>
+                                            <%- include('../cars/formFields.ejs', {allMakes, car: null, userCars, carPlate : null}); %>
 
                                             <h5><i class="fa-solid fa-2 list-number"></i>
                                                 <%= lingua.membership.selectMembership%>
@@ -188,6 +190,7 @@
 
         // Add subscription
         $('#addSub').on('click', function (event) {
+            $(this).prop('disabled', true);
             // Clean plate input validator.
             document.getElementById("carPlate").setCustomValidity("");
             showResult('#plateValidationResult', ``);
@@ -200,7 +203,7 @@
             if (form[0].checkValidity()) {
                 // Get all values
                 var brand = $("#brand").val(),
-                    model = $("#carModel").val(),
+                    // model = $("#carModel").val(),
                     plate = $("#carPlate").val().toUpperCase(),
                     priceID = $("#product").val(),
                     product = $("#product").find('option:selected').attr("name"),
@@ -208,11 +211,13 @@
                     // Prepare newItem Obj.
                     newItem = {
                         id: ++rowIdx,
-                        brand: brand, model: model, plate: plate,
+                        brand: brand,
+                        // model: model,
+                        plate: plate,
                         product: product, price: price, priceID: priceID
                     };
 
-                if (newItem.brand == '' || newItem.model == '' || newItem.plate == '') {
+                if (newItem.brand == '' || newItem.plate == '') {
                     let showMessage = `<p class="error">Missing values</p>`
                     showResult('#formValidationResult', showMessage);
 
@@ -225,7 +230,8 @@
                             plateNumber: plate,
                             newItem: newItem,
                             subscriptionList: subscriptionList ? subscriptionList : [],
-                            addToCart: true
+                            addToCart: true,
+                            oldProcess: true
                         }),
                     }).done(function (result) {
                         if (result.existingCar) {
@@ -239,39 +245,45 @@
                             showResult('#plateValidationResult',
                                 `<p class="success"><%= lingua.car.validCar%></p>`);
 
-                            addDataToTable(result.item);
+                            addDataToTable(result.item, result.addType);
                             // Clear all elements on form for next submit.
                             clearForm(form);
                             showResult('#plateValidationResult', ``);
                         }
 
+                        $('#addSub').prop('disabled', false);
+
                     }).fail(function (err) {
                         console.log(err);
                     })
                 }
-            }
+            } else
+                $('#addSub').prop('disabled', false);
+
+
         });
         // Remove subscription
         $('#cart-table tbody').on('click', '.remove', function () {
             var t = $('#cart-table').DataTable();
             var id = $(this).attr('value');
+            var triggerObj = $(this);
             let itemToRemove = subscriptionList.find(item => item._id == id);
-
-            // Remove from the table.
-            t.row($(this).parents('tr')).remove().draw();
-            // Decrease the row index.
-            rowIdx--;
 
             $.ajax({
                 url: "/removeFromCart",
                 type: "POST",
                 contentType: "application/json",
                 data: JSON.stringify({
-                    item: itemToRemove
+                    item: itemToRemove,
+                    subscriptionList: subscriptionList
                 }),
             }).done(function (result) {
 
                 if (result.itemRemoved) {
+                    // Remove from the table.
+                    t.row(triggerObj.parents('tr')).remove().draw();
+                    // Decrease the row index.
+                    rowIdx--;
                     // Remove the deleted item from de subscriptionList.
                     subscriptionList = result.subscriptionList;
 
@@ -289,24 +301,28 @@
             })
         });
 
-        function addDataToTable(newItem) {
+        function addDataToTable(newItem, addType) {
             // Initialize DataTable
             var t = $('#cart-table').DataTable();
             // Add row to table.
             // Set the rowIdx to btn id to get the id of deleted element.
             t.row.add([
                 `<p> Brand: ${newItem.brand} </p> <br> 
-                            <p> Model: ${newItem.model} </p> <br>
-                            <p> Plate: ${newItem.plate} </p>`,
+                        
+                            <p> License Plate: ${newItem.plate} </p>`,
                 newItem.product,
                 newItem.price,
                 `<td class="text-center">
-                                <button  id="${rowIdx}" value="${newItem._id}" class="btn btn-icon btn-icon-no-border no-margin remove">
-                                    <i class="fas fa-trash-alt icon-sm text-danger"></i>
-                                </button>
-                            </td>`
+                    <div class="d-flex">
+                        <button type="button" id="${rowIdx}" value="${newItem._id ? newItem._id : newItem.id}" class="btn btn-icon btn-icon-no-border no-margin remove">
+                            <i class="fas fa-trash-alt icon-sm text-danger"></i>
+                        </button>
+                        <span class="m-auto" id="deleteSection-${newItem._id ? newItem._id : newItem.id}"></span>
+                    </div>
+                </td>`
             ]).draw(false);
             // Add newItem to subscriptionList
+            newItem.addType = addType;
             subscriptionList.push(newItem);
             // Stringify the value to store on input element for checkout.
             var stringSubscriptionList = JSON.stringify(subscriptionList)
@@ -315,7 +331,7 @@
             // If the susbcription has at least one item, then show ckeckout btn.
             if (subscriptionList.length > 0)
                 checkoutBtn.removeAttr('hidden');
-        }
+        };
     </script>
 </body>
 

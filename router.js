@@ -28,10 +28,11 @@ const { checkAuthenticated,
     authChangePassword,
     authChangePrices } = require('./src/middleware/authFunctions')
 
-const { validateSubscriptions, validateLocation, validateSelectCurrectLocation } = require('./src/middleware/validateFunctions')
+const { validateSubscriptions, validateLocation, validateSelectCurrentLocation, validateActiveAccount } = require('./src/middleware/validateFunctions')
+
 
 // Main Route
-router.get('/', checkAuthenticated, (req, res) => {
+router.get('/', checkAuthenticated, validateActiveAccount, (req, res) => {
     res.redirect('/account')
 })
 
@@ -41,13 +42,13 @@ router.get('/home', dashboardsController.home)
 
 router.get('/termsandconditions', dashboardsController.termsAndConditions)
 
-router.get('/account', checkAuthenticated, validateLocation, dashboardsController.account)
+router.get('/account', checkAuthenticated, validateActiveAccount, validateLocation, dashboardsController.account)
 
 //------ Auth Routes ------
 
 router.get('/login', checkNotAuthenticated, (req, res) => {
 
-    let { message, email, alertType } = req.session
+    let { message, email, alertType, isIncomplete } = req.session
 
     // Clear session alerts variables.
     if (message) {
@@ -55,14 +56,32 @@ router.get('/login', checkNotAuthenticated, (req, res) => {
         req.session.alertType = ''
     }
 
-    res.render('auth/login.ejs', { message, email, alertType })
+    if (isIncomplete) {
+        req.session.isIncomplete = null
+    }
+
+    // TODO: Test incomplete account
+    if (isIncomplete)
+        res.redirect('/activateAccountRequest')
+    else
+        res.render('auth/login.ejs', { message, email, alertType })
 })
 
 router.post('/login', checkNotAuthenticated, authController.login)
 
+router.get('/auth/google', authController.googleLogin);
+router.get('/auth/google/callback', authController.googleCallBack);
+router.get('/connectGoogleAccount', authController.connectGoogleAccount);
+
 router.get('/create-account', checkNotAuthenticated, authController.createAccount)
 
 router.post('/register', checkNotAuthenticated, authController.register)
+
+// Activate account
+router.get('/activateAccountRequest', authController.activateAccountRequest)
+router.post('/activateAccountRequest', authController.activateAccountRequestController)
+router.get('/activateAccount', authController.activateAccountForm)
+router.post('/activateAccount', authController.activateAccount)
 
 router.get('/logout', checkAuthenticated, authController.logout)
 
@@ -121,19 +140,27 @@ router.post('/validateMembership', checkAuthenticated, authValidateMembership, s
 router.post('/carcheck', subscriptionsController.carCheck)
 router.post('/readingData', subscriptionsController.readingData)
 router.get('/create-subscriptions', checkAuthenticated, subscriptionsController.createSubscriptions)
-router.get('/handleInvalidSubscriptions', checkAuthenticated, subscriptionsController.handleInvalidSubscriptions)
+router.get('/subscribe', subscriptionsController.subscribe)
+// Deprecated
+// router.get('/handleInvalidSubscriptions', checkAuthenticated, subscriptionsController.handleInvalidSubscriptions)
 router.post('/confirmValidCars', checkAuthenticated, subscriptionsController.confirmValidCars)
 router.post('/syncSubscription', checkAuthenticated, subscriptionsController.syncSubscription)
 router.post('/syncCustomerSubscriptions', checkAuthenticated, subscriptionsController.syncCustomerSubscriptions)
+router.post('/removeCar', checkAuthenticated, subscriptionsController.removeCarOfSubscription)
 
+router.post('/getSubscriptionDay', checkAuthenticated, subscriptionsController.getSubscriptionDay)
+router.post('/cancelSubscription', checkAuthenticated, subscriptionsController.cancelSubscription)
+router.post('/renewSubscription', checkAuthenticated, subscriptionsController.renewSubscription)
 
 router.post('/cars/create', checkAuthenticated, authAddCar, carsController.save)
 router.post('/edit-car', checkAuthenticated, authEditCar, carsController.update)
 router.get('/delete-car/:id', checkAuthenticated, authDeleteCar, carsController.delete)
 
 // router.post('/clearQueue', checkAuthenticated, subscriptionsController.clearQueue)
-router.post('/validatePlate', checkAuthenticated, carsController.validatePlate)
-router.post('/removeFromCart', checkAuthenticated, userController.removeFromCart)
+router.post('/validatePlate', carsController.validatePlate)
+router.post('/validateEmail', userController.validateEmail)
+router.post('/removeFromCart', userController.removeFromCart)
+router.post('/cancelOrder', userController.cancelOrder)
 
 //------ Services Routes ------
 router.get('/services', checkAuthenticated, servicesController.services)
@@ -143,7 +170,7 @@ router.get('/delete-service/:id', checkAuthenticated, authDeleteService, service
 
 //------ Location Routes ------
 router.get('/locations', checkAuthenticated, locationController.locations)
-router.get('/getCurrentLocation', checkAuthenticated, validateSelectCurrectLocation, locationController.getCurrentLocation)
+router.get('/getCurrentLocation', checkAuthenticated, validateSelectCurrentLocation, locationController.getCurrentLocation)
 router.get('/create-location', checkAuthenticated, locationController.createLocation)
 router.get('/view-location/:id', checkAuthenticated, locationController.viewLocation)
 router.get('/edit-location/:id', checkAuthenticated, authEditLocation, locationController.editLocation)
@@ -169,6 +196,7 @@ router.post('/getGrossVolumeDistributedReport', checkAuthenticated, reportsContr
 //------ Stripe and Payment Routes ------
 router.get('/charges', checkAuthenticated, stripeController.charges)
 router.get('/invoices', checkAuthenticated, stripeController.invoices)
+router.post('/markUncollectibleInvoice', checkAuthenticated, stripeController.markUncollectibleInvoice)
 router.post('/changePrices', checkAuthenticated, authChangePrices, stripeController.changePrice)
 
 
@@ -176,8 +204,9 @@ router.post('/changePrices', checkAuthenticated, authChangePrices, stripeControl
 router.post('/webhook', stripeController.webhook)
 
 router.post('/checkout', checkAuthenticated, stripeController.checkout)
+router.post('/checkoutWithEmail', stripeController.checkoutWithEmail)
 
-router.get('/completeCheckoutSuccess', checkAuthenticated, stripeController.completeCheckoutSuccess)
+router.get('/completeCheckoutSuccess', stripeController.completeCheckoutSuccess)
 
 router.get('/stripeCheckout', stripeController.stripeCheckout)
 

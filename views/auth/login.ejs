@@ -28,87 +28,108 @@
         <div class="container-fluid page-body-wrapper full-page-wrapper">
             <div class="content-wrapper d-flex align-items-center auth px-0">
                 <div class="row w-100 mx-0">
-                    <div class="col-lg-4 mx-auto">
-                        <div class="auth-form-light text-center py-4 px-4 px-sm-5">
-                            <div class="brand-logo">
-                                <img src="/images/charlieBoy/CB-5.jpg" alt="logo">
-                            </div>
-                            <h4>
-                                <%= lingua.login%>
-                            </h4>
+                    <div class="col-lg-5 col-m-6 col-sm-12 mx-auto">
+                        <div class="text-center py-4 px-4 px-sm-5">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="card">
+                                        <div class="card-body">
 
-                            <h6 class="fw-light">
-                                <%= lingua.title %>
-                            </h6>
-                            <% if (messages.error) { %>
-                            <p class="error">
-                                <%= messages.error %>
-                            </p>
-                            <% } %>
+                                            <div class="card-title d-flex flex-nowrap">
+                                                <div class="brand-logo text-center mb-1 w-100">
+                                                    <img src="/images/charlieBoy/CB-5.jpg" alt="logo"
+                                                        style="width: 50% !important;">
+                                                </div>
+                                            </div>
+                                            <h4 class="card-title">
+                                                <%= lingua.login%>
+                                            </h4>
+                                            <div class="text-center">
+                                                <% if (messages.error) { %>
+                                                <p class="error">
+                                                    <%= messages.error %>
+                                                </p>
+                                                <% } %>
 
-                            <% if (messages.info) { %>
-                            <p class="info">
-                                <%= messages.info %>
-                            </p>
-                            <% } %>
-                            <form id="login-form" class="pt-3" action="/login" method="post">
-                                <div class="form-group">
-                                    <input type="email" id="email" name="email" class="form-control form-control-lg"
-                                        value="<%= email%>" placeholder="Email address" required autofocus />
-                                </div>
+                                                <% if (messages.info) { %>
+                                                <p class="info">
+                                                    <%= messages.info %>
+                                                </p>
+                                                <% } %>
+                                                <% if (messages.warning) { %>
+                                                <p class="warning">
+                                                    <%= messages.warning %>
+                                                </p>
+                                                <% } %>
+                                            </div>
+                                            <form id="login-form" class="pt-3" action="/login" method="post">
+                                                <div class="form-group">
+                                                    <input type="email" id="email" name="email"
+                                                        class="form-control form-control-lg" value="<%= email%>"
+                                                        placeholder="Email address" required autofocus />
+                                                </div>
 
-                                <div class="form-group">
-                                    <input type="password" id="password" name="password"
-                                        class="form-control mb-3 form-control-lg" placeholder="Password" required
-                                        autofocus />
-                                </div>
+                                                <div class="form-group">
+                                                    <input type="password" id="password" name="password"
+                                                        class="form-control mb-3 form-control-lg" placeholder="Password"
+                                                        required autofocus />
+                                                </div>
 
-                                <div class="mt-3">
-                                    <button
-                                        class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn w-100"
-                                        type="submit"><%= lingua.login%></button>
-                                </div>
+                                                <div class="mt-3">
+                                                    <button
+                                                        class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn w-100"
+                                                        type="submit"><%= lingua.login%></button>
+                                                </div>
+                                            </form>
 
-                                <div class="mt-3">
-                                    <a href="/create-account"
-                                        class="btn btn-block btn-success btn-lg font-weight-medium auth-form-btn w-100 tex-white">
-                                        <%= lingua.create %></a>
-                                </div>
-                                <div class="my-2 d-flex justify-content-between align-items-center">
-                                    <a href="/resetPasswordRequest"
-                                        class="auth-link text-black"><%= lingua.user.password.forgot%></a>
-                                </div>
+                                            <div class="my-2 d-flex justify-content-between align-items-center">
+                                                <a href="/resetPasswordRequest"
+                                                    class="auth-link text-black"><%= lingua.user.password.forgot%></a>
+                                                <a href="/create-account"
+                                                    class="auth-link text-black"><%= lingua.createAccount %></a>
+                                            </div>
+                                            <!-- <div class="mt-4 text-center">
+                                                <div class="signin-other-title">
+                                                    <div class="login-or">
+                                                        <span>or</span>
+                                                    </div>
+                                                </div>
+                                                <div class="google-signup">
+                                                    <a id="googlesetup" class="google-btn" href="/auth/google">
+                                                        <span class="google-signup-icon"></span>
+                                                        <span class="google-signup-btn-text">Sign in with
+                                                            Google</span>
+                                                    </a>
+                                                </div>
+                                            </div> -->
+                                            <br>
+                                            <div class="dropdown">
+                                                <button type="button" class="btn btn-secondary dropdown-toggle w-100"
+                                                    id="dropdownMenuLang" data-bs-toggle="dropdown" aria-haspopup="true"
+                                                    aria-expanded="false">
+                                                    <div id="showLang" style="display: contents;">
+                                                        <span id="es-lang">
 
-                                <!-- <div class="text-center mt-4 fw-light">
-                                    <%# lingua.dontHaveAccount %>
-                                    <a href="/create-account" class="text-primary">
-                                        <%# lingua.create %>
-                                    </a>
-                                </div> -->
-                            </form>
-                            <br>
-                            <div class="dropdown">
-                                <button type="button" class="btn btn-secondary dropdown-toggle" id="dropdownMenuLang"
-                                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <div id="showLang" style="display: contents;">
-                                        <span id="es-lang">
+                                                            <span class="flag-icon flag-icon-pr "></span> ESPAÑOL
+                                                        </span>
+                                                        <span id="en-lang">
+                                                            <span class="flag-icon flag-icon-um "></span> ENGLISH
+                                                        </span>
+                                                    </div>
+                                                    <%# lingua.selectLanguage%>
+                                                </button>
+                                                <div class="dropdown-menu w-100" aria-labelledby="dropdownMenuLang">
+                                                    <a id="es-lang" href="?lang=es" class="dropdown-item">
 
-                                            <span class="flag-icon flag-icon-pr "></span> ESPAÑOL
-                                        </span>
-                                        <span id="en-lang">
-                                            <span class="flag-icon flag-icon-um "></span> ENGLISH
-                                        </span>
+                                                        <span class="flag-icon flag-icon-pr "></span> ESPAÑOL
+                                                    </a>
+                                                    <a id="en-lang" href="?lang=en" class="dropdown-item">
+                                                        <span class="flag-icon flag-icon-um "></span> ENGLISH
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <%# lingua.selectLanguage%>
-                                </button>
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuLang">
-                                    <a id="es-lang" href="?lang=es" class="dropdown-item">
-
-                                        <span class="flag-icon flag-icon-pr "></span> ESPAÑOL
-                                    </a>
-                                    <a id="en-lang" href="?lang=en" class="dropdown-item">
-                                        <span class="flag-icon flag-icon-um "></span> ENGLISH
-                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -133,8 +154,6 @@
     <script src="../../js/off-canvas.js "></script>
     <script src="../../js/hoverable-collapse.js "></script>
     <script src="../../js/template.js "></script>
-    <script src="../../js/settings.js "></script>
-    <script src="../../js/todolist.js "></script>
 
     <!-- endinject -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.3.3/dist/sweetalert2.all.min.js "></script>
@@ -149,7 +168,6 @@
     <script>
         $(document).ready(function () {
             manageLangDropdown();
-
         });
     </script>
 </body>

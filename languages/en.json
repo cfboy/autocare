@@ -5,9 +5,19 @@
     "termsAndConditions": "Terms and Conditions",
     "title": "Membership Portal",
     "welcome": "Welcome",
+    "welcomeUser": "¡Welcome, {username}!",
+    "thanksUser": "Thank you for choosing Charlie Boy's unlimited membership!",
+    "verifyEmail": "Please check your email to activate your account. If you have not received an email, press here:",
+    "membershipCreatedSuccess": "Your membership has been created successfully!",
+    "pressLink": "Press the link below to view your membership:",
+    "processCompleted": "Process completed!",
     "login": "Login",
     "signOut": "Sign Out",
     "register": "Register",
+    "activateAccount": "Activate Account",
+    "completeAccount": "Complete Account",
+    "account": "Account",
+    "activate": "Activate",
     "pricingList": "Pricing List",
     "dontHaveAccount": "Don't have an account?",
     "create": "Create",
@@ -15,7 +25,9 @@
     "accountCreated": "Account Created",
     "validLink": "Valid Link",
     "invalidLink": "Invalid Link",
-    "existEmail": "That email already exists in our system, please login.",
+    "existEmail": "That email already exists in our system.",
+    "validEmail": "Valid Email",
+    "invalidEmail": "Invalid Email. Please enter a valid email address.",
     "members": "Members",
     "add": "Add",
     "car": {
@@ -28,8 +40,8 @@
         "cars": "Cars",
         "name": "Car",
         "manageMyCars": "Manage My Cars",
-        "plate": "Plate",
-        "plateNumber": "Plate Number",
+        "plate": "License Plate",
+        "plateNumber": "License Plate Number",
         "brand": "Brand",
         "model": "Model",
         "carsQty": "Cars Qty.",
@@ -39,11 +51,12 @@
         "maxServiceQty": "This car has the maximum quantity of services for the day",
         "carExpiredOn": "This car expired on {date}",
         "notFound": "Car not found",
-        "existingCar": "This is an existing Car Plate in the system. Please provide another plate",
-        "validCar": "Valid Car Plate",
+        "existingCar": "This is an existing Car License Plate in the system. Please provide another plate",
+        "validCar": "Valid Car License Plate",
         "membershipToAddCar": "Membership to add a Car",
         "alreadyAddedToCart": "This car is already added to the cart.",
-        "selectOrCreate": "Select or create a new car"
+        "selectOrCreate": "Select or create a new car",
+        "select": "Select a car"
     },
     "user": {
         "name": "User",
@@ -68,6 +81,7 @@
             "forgot": "Forgot Password?",
             "name": "Password",
             "new": "New Password",
+            "create": "Create Password",
             "changePassword": "Change Password",
             "passwordRequirement": "Password must contain the following:",
             "lowerCase": "lowercase letter",
@@ -89,7 +103,7 @@
         "notHappy": "Not happy with your current plan? Cancel or Upgrade by clicking the button below.",
         "disclaimer": "This is an auto-renewable subscription every 30 days upon purchase date.",
         "perGroupOf": "per group of",
-        "manageBilling": "Manage Billing",
+        "manageBilling": "Manage Memberships",
         "info": "Membership Information",
         "period": "Period",
         "startDate": "Start Date",
@@ -104,7 +118,9 @@
         "price": "Price",
         "subTotal": "Sub Total",
         "proceedToCheckout": "Proceed to Checkout",
-        "selectMembership": "Select membership plan"
+        "selectMembership": "Select membership plan",
+        "completeSubscription": "Complete Subscription",
+        "cancelOrder" : "Cancel Order"
     },
     "service": {
         "qty": "Service (Qty.)",
@@ -132,7 +148,7 @@
         "userNotExist": "User with email {email} does not exist. Please Register.",
         "wrongPassword": "Incorrect password provided",
         "emailNotExist": "Email does not exist.",
-        "requestNotSend": "Password Reset Request Not Send",
+        "requestNotSend": "Reset Request Not Send",
         "passwordUpdated": "Password Updated {email}."
     },
     "invoice": {
@@ -201,7 +217,7 @@
     "hasBeenDeleted": "${message} has been deleted.",
     "email": {
         "title": "Auto Care - Memberships",
-        "verifyEmail": "Verify your email {email} to complete the reset password process.",
+        "verifyEmail": "Verify your email {email} to complete the process.",
         "resetSucessfully": "Auto Care Password Reset Successfully",
         "notSend": "Email Not Send.",
         "passwordReset": "Auto Care Password Reset Request"
@@ -209,5 +225,7 @@
     "clear": "Clear",
     "utilizationHistory": "Utilization History",
     "loading": "Loading",
-    "agentID": "Agent ID"
+    "agentID": "Agent ID",
+    "subscribe": "Subscribe",
+    "orderReview": "Order Review"
 }

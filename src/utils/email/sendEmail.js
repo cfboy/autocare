@@ -15,7 +15,9 @@ const sendEmail = async (email, emailType, payload) => {
         var emailResult
         const {
             SENDER_EMAIL_ADDRESS,
-            NODE_ENV
+            NODE_ENV,
+            EMAILS_IN_TEST,
+            DOMAIN
         } = process.env;
 
         var template_variables = {
@@ -23,12 +25,12 @@ const sendEmail = async (email, emailType, payload) => {
             "user_email": email,
             "user_name": payload.name,
             "reset_link": payload.link,
-            "link": `${process.env.DOMAIN}/account`,
+            "link": `${DOMAIN}/account`,
             "message": payload.message,
             "subscription_id": payload.subscription_id
         }
 
-        if (NODE_ENV == "production") {
+        if (NODE_ENV == "production" || EMAILS_IN_TEST == "true") {
             const {
                 MAILTRAP_TOKEN,
                 MAILTRAP_ENDPOINT
@@ -39,6 +41,9 @@ const sendEmail = async (email, emailType, payload) => {
             switch (emailType) {
                 case 'welcome':
                     MAILTRAP_TEMPLATE = process.env.WELCOME_ID
+                    break;
+                case 'activate_account':
+                    MAILTRAP_TEMPLATE = process.env.ACTIVATE_ID
                     break;
                 case 'reset_password_request':
                     MAILTRAP_TEMPLATE = process.env.RESET_PASSWORD_REQUEST_ID
@@ -84,8 +89,12 @@ const sendEmail = async (email, emailType, payload) => {
 
             switch (emailType) {
                 case 'welcome':
-                    subject = `Welcome to AutoCare Memberships, ${template_variables.user_name}!`
+                    subject = `Welcome to AutoCare Memberships!`
                     template = '../template/welcome.handlebars'
+                    break;
+                case 'activate_account':
+                    subject = `AutoCare Memberships - Activate Account`
+                    template = '../template/activateAccount.handlebars'
                     break;
                 case 'reset_password_request':
                     subject = 'Password reset request'
@@ -137,7 +146,7 @@ const sendEmail = async (email, emailType, payload) => {
             emailResult = await transport.sendMail(options());
 
             if (emailResult.accepted.length) {
-                emailResult = { sent: true, data: null }
+                emailResult = { sent: true, data: emailResult }
             } else {
                 emailResult = { sent: false, data: null }
             }

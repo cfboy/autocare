@@ -53,18 +53,48 @@
                                                         <%= lingua.user.view%>
                                                         <% } %></h4>
                                                 </div>
+
                                                 <div class="d-flex justify-content-between align-items-start">
-                                                    <a href="/changePassword/<%- customer.id%>?url=/editCustomers&userType=<%- userType%>"
-                                                        type="button" class="btn btn-primary btn-icon-text m-1 text-white">
+
+                                                    <!-- <% if(isMyProfile && customer.googleID) { %>
+                                                   
+                                                    <div class="google-signup">
+                                                        <a id="googlesetup" class="google-btn m-1 disabled-link"
+                                                            href="/auth/google">
+                                                            <span class="google-signup-icon"></span>
+                                                            <span class="google-signup-btn-text">Signed in with
+                                                                Google</span>
+                                                        </a>
+                                                    </div>
+                                                    <% } else if(isMyProfile && !customer.googleID) { %>
+                                                    <div class="google-signup">
+                                                        <a id="googlesetup" class="google-btn m-1" href="/auth/google">
+                                                            <span class="google-signup-icon"></span>
+                                                            <span class="google-signup-btn-text">Sign in with
+                                                                Google</span>
+                                                        </a>
+                                                    </div>
+                                                    <% } %> -->
+
+                                                    <% if(canEditCustomer) { %>
+
+                                                    <a href="/changePassword/<%- customer.id%>?url=/editCustomers&userType=<%= userType%>&fromProfile=<%= isMyProfile%>"
+                                                        type="button"
+                                                        class="btn btn-primary btn-icon-text m-1 text-white">
                                                         <i class="fa-solid fa-key"></i>
+                                                        <% if(user.password) { %>
                                                         <%= lingua.user.password.changePassword%>
+                                                        <% } else { %>
+                                                        <%= lingua.user.password.create%>
+                                                        <% } %>
                                                     </a>
-                                                    <a href="/edit-user/<%- customer.id%>?url=/editCustomers&userType=<%- userType%>"
+                                                    <a href="/edit-user/<%- customer.id%>?url=/editCustomers&userType=<%= userType%>&fromProfile=<%= isMyProfile%>"
                                                         data-id="user" type="button"
                                                         class="btn btn-primary btn-icon-text m-1 text-white">
                                                         <i class="fa-solid fa-user-pen"></i>
                                                         <%= lingua.user.editPersonalInfo%>
                                                     </a>
+                                                    <% } %>
                                                 </div>
                                             </div>
                                             <br>
@@ -93,7 +123,7 @@
                                                         <tr>
                                                             <td><%= lingua.user.firstName%></td>
                                                             <td>
-                                                                <%- customer.personalInfo.firstName + ' ' + customer.personalInfo.lastName %>
+                                                                <%- customer.fullName() %>
                                                             </td>
                                                         </tr>
                                                         <tr>
@@ -102,26 +132,13 @@
                                                                 <%- customer.personalInfo.phoneNumber %>
                                                             </td>
                                                         </tr>
-                                                        <tr>
-                                                            <td><%= lingua.user.dateOfBirth%></td>
-                                                            <td>
-                                                                <%= moment(customer.personalInfo.dateOfBirth).isValid() ? moment(customer.personalInfo.dateOfBirth).utc().format(shortDateFormat) : 'N/A' %>
-
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td><%= lingua.user.city%></td>
-                                                            <td>
-                                                                <%- customer.personalInfo.city %>
-                                                            </td>
-                                                        </tr>
                                                     </tbody>
                                                 </table>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <% if(cars) { %>
+                                <% if(cars?.length > 0) { %>
                                 <div class="col-sm-12 col-md-12 grid-margin stretch-card">
                                     <div class="card card-rounded">
                                         <div class="card-body">
@@ -135,9 +152,7 @@
                                                 <table id="users" class="table table-hover stripe">
                                                     <thead>
                                                         <tr>
-                                                            <th><%= lingua.car.brand%></th>
-                                                            <th><%= lingua.car.model%></th>
-                                                            <th><%= lingua.car.plate%></th>
+                                                            <th><%= lingua.car.name%></th>
                                                             <th><%= lingua.membership.name%></th>
                                                             <th><%= lingua.action%></th>
                                                         </tr>
@@ -149,16 +164,29 @@
 
                                                         <tr>
                                                             <td>
-                                                                <a class="btn-link"
-                                                                    href="/car/<%- car.id%>"><%- car.brand%></a>
-                                                            </td>
+                                                                <a href="/car/<%- car?.id%>"
+                                                                    class="text-decoration-none">
 
-                                                            <td><%- car.model%></td>
-                                                            <td><%- car.plate%></td>
+                                                                    <i class="fa-solid fa-car fa-fw"></i>
+                                                                    <%- car?.carName()%>
+                                                                    <% if(car?.cancel_date) { %>
+                                                                    <b>
+                                                                        (<%= lingua.membership.validUntil%>:
+                                                                        <%= moment(car?.cancel_date).isValid() ? moment(car?.cancel_date).format(shortDateFormat) : 'N/A' %>
+                                                                        )
+                                                                    </b>
+                                                                    <% } %>
+                                                                </a>
+                                                            </td>
                                                             <td>
                                                                 <%# car.subscription.data%>
                                                                 <span style="text-transform: uppercase;">
-                                                                    <%- car.subscription.data.status%>
+                                                                    <% if(car?.subscription) { %>
+                                                                    <%- car?.subscription?.data?.status%>
+                                                                    <% } else { %>
+                                                                    N/A <i
+                                                                        class="warning fa-solid fa-warning fa-fw"></i>
+                                                                    <% } %>
                                                                 </span>
                                                             </td>
                                                             <td>
@@ -192,7 +220,7 @@
                                 <div class="col-md-12 grid-margin stretch-card">
                                     <div class="card card-rounded">
                                         <div class="card-body">
-                                            <%- include('../partials/subscriptions/information.ejs' , {invalid: false, subscriptions, showManageBtn : true, customer : customer, showCreateBtn: false, user : user}); %>
+                                            <%- include('../partials/subscriptions/information.ejs' , {invalid: false, subscriptions, showManageBtn : true, customer : customer, showCreateBtn: false, user : user, canManageSubscriptions}); %>
                                         </div>
                                     </div>
                                 </div>
