@@ -579,7 +579,15 @@ exports.validateEmail = async (req, res) => {
             validationMessage = lingua.existEmail
         }
 
-        validationResult = await emailValidator.validate(email);
+        validationResult = await emailValidator.validate({
+            email: email,
+            sender: email,
+            validateRegex: true,
+            validateMx: true,
+            validateTypo: true,
+            validateDisposable: true,
+            validateSMTP: !email.includes('@yahoo.com'),
+        });
         console.log(`Email Validation: Valid=${validationResult.valid} Reason=${validationResult.reason}`)
 
         // console.log(JSON.stringify(validationResult));
