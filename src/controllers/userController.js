@@ -582,6 +582,9 @@ exports.validateEmail = async (req, res) => {
         validationResult = await emailValidator.validate(email);
         console.log(`Email Validation: Valid=${validationResult.valid} Reason=${validationResult.reason}`)
 
+        // console.log(JSON.stringify(validationResult));
+        console.dir(validationResult);
+
         if (!validationResult.valid) {
             validationMessage = lingua.invalidEmail;
         }
