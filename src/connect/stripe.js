@@ -221,7 +221,7 @@ const addNewCustomer = async (email,
     try {
         const customer = await Stripe.customers.create({
             email,
-            description: 'Created by app.',
+            description: 'Created by Memberships app.',
             name: firstName + ' ' + lastName,
             phone: phoneNumber
         })
@@ -250,7 +250,7 @@ const createWebhook = (rawBody, sig) => {
 
 /**
  * This function get all stripe products where the active field is true.
- * Aditionally get the price per product.
+ * Additionally get the price per product.
  * @returns product list
  */
 async function getAllProducts() {
