@@ -169,7 +169,8 @@ exports.register = async (req, res) => {
  * @param {*} res 
  */
 exports.activateAccountRequest = async (req, res) => {
-    let { message, email, alertType } = req.session
+    let { message, email, alertType } = req.session,
+    user = req.user;
 
     // Clear session alerts variables.
     if (message) {
@@ -177,7 +178,7 @@ exports.activateAccountRequest = async (req, res) => {
         req.session.alertType = ''
     }
 
-    res.render('auth/activateAccountRequest.ejs', { message, email, alertType })
+    res.render('auth/activateAccountRequest.ejs', { user, message, email, alertType })
 }
 
 /**
@@ -196,6 +197,7 @@ exports.activateAccountRequestController = async (req, res) => {
         
         if (resultEmail.sent) {
             console.debug('Email Sent: ' + emailProperties.email)
+            req.flash('info', message);
 
         } else {
             req.bugsnag.notify(new Error(resultEmail.data),
@@ -203,10 +205,12 @@ exports.activateAccountRequestController = async (req, res) => {
                     event.setUser(emailProperties.email)
                 })
             console.error('ERROR: Email Not Sent.')
+            req.flash('error', 'Email not sent.')
         }
 
-        req.flash('info', message);
-        res.redirect('/login')
+        // TODO: Redirect to a success email sent.
+        // res.redirect('/login')
+        res.status(200).render('auth/completedActivationRequest.ejs')
     } else {
         req.flash('error', message);
         res.redirect('/activateAccountRequest')
