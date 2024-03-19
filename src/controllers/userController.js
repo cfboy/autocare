@@ -360,13 +360,21 @@ exports.update = async (req, res) => {
             // return res.status(404).send()
 
         } else {
+            // TODO: Update Stripe User
+            try {
+                let stripeUpdate = { email: user.email, name: user.fullName(), phone: user?.personalInfo?.phoneNumber }
+                await Stripe.updateCustomer(user.billingID, stripeUpdate);
+            } catch (err) {
+                console.log(err.message);
+                req.flash('error', err.message);
+            }
+
             req.flash('info', 'Update Completed.')
             req.session.message = `User updated ${user.email}`
             req.session.alertType = alertTypes.CompletedActionAlert
         }
-        // res.status(201).send(user)
-        res.redirect(`${url}`)
 
+        res.redirect(`${url}`)
 
     } catch (error) {
         req.bugsnag.notify(new Error(error),
@@ -375,9 +383,7 @@ exports.update = async (req, res) => {
             })
         req.session.message = error.message
         req.session.alertType = alertTypes.ErrorAlert
-        // res.status(400).send(error)
         res.redirect(`${url}`)
-
     }
 }
 

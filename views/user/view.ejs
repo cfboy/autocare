@@ -117,19 +117,25 @@
                                                         <tr>
                                                             <td><%= lingua.user.role%></td>
                                                             <td>
-                                                                <%- customer.role%>
+                                                                <%= customer.role%>
                                                             </td>
                                                         </tr>
                                                         <tr>
                                                             <td><%= lingua.user.firstName%></td>
                                                             <td>
-                                                                <%- customer.fullName() %>
+                                                                <%= customer.fullName() %>
                                                             </td>
                                                         </tr>
                                                         <tr>
                                                             <td><%= lingua.user.phoneNumber%></td>
                                                             <td>
-                                                                <%- customer.personalInfo.phoneNumber %>
+                                                                <%= customer.personalInfo.phoneNumber %>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><%= lingua.user.billingID%></td>
+                                                            <td>
+                                                                <%= customer.billingID %>
                                                             </td>
                                                         </tr>
                                                     </tbody>

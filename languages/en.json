@@ -90,7 +90,8 @@
             "characters": "characters"
         },
         "authorizedBy": "Authorized By",
-        "notFound": "Customer not found"
+        "notFound": "Customer not found",
+        "billingID" : "Billing ID (Stripe ID)"
     },
     "membership": {
         "name": "Membership",
