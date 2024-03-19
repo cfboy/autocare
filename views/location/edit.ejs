@@ -92,9 +92,9 @@
                                                                 class="form-control form-control-lg js-example-basic-multiple w-100"
                                                                 multiple="multiple">
                                                                 <% for(const user of users) { %>
-                                                                <% var selected = (location.users.includes(user.id)) ? "selected" : "";   %>
+                                                                <% var selected = (location.users.some(u => u.id === user.id)) ? "selected" : "";   %>
                                                                 <option value="<%= user.id%>" <%= selected%>>
-                                                                    <%= user.personalInfo.firstName +' '+ user.personalInfo.lastName + ' (' + user.role + ')' %>
+                                                                    <%= user.fullName() + ' (' + user.role + ')' %>
                                                                 </option>
                                                                 <% } %>
                                                             </select>

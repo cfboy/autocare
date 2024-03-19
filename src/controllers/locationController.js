@@ -220,7 +220,7 @@ exports.update = async (req, res) => {
         // Handle empty values.
         req.body.services = req.body.services ? req.body.services : []
         req.body.users = req.body.users ? req.body.users : []
-        // Indentify the removed users to update their relationsip.
+        // Identify the removed users to update their relationship.
         let unselectedUsers = req.body.unselectedUsers ? req.body.unselectedUsers.split(',') : [],
             newSelectedUsers = req.body.newSelectedUsers ? req.body.newSelectedUsers.split(',') : []
 

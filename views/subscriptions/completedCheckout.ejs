@@ -62,7 +62,7 @@
                                                 </p>
                                                 <% } %>
 
-                                                <% if(customer.isIncomplete()) { %>
+                                                <% if(customer?.isIncomplete()) { %>
                                                 <h5><%= lingua.welcomeUser(stripeCustomer.email)%></h5>
                                                 <br>
                                                 <h5>

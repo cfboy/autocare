@@ -579,14 +579,27 @@ exports.validateEmail = async (req, res) => {
             validationMessage = lingua.existEmail
         }
 
-        validationResult = await emailValidator.validate(email);
-        console.log(`Email Validation: Valid=${validationResult.valid} Reason=${validationResult.reason}`)
+        validationResult = await emailValidator.validate({
+            email: email,
+            sender: email,
+            validateRegex: true,
+            validateMx: true,
+            validateTypo: true,
+            validateDisposable: true,
+            validateSMTP: email.includes('@gmail.com'),
+        });
+        console.log(`Email Validation ${email} - ${validationResult.valid ? "Valid" : "Invalid"}.`)
 
         if (!validationResult.valid) {
+            console.dir(validationResult);
             validationMessage = lingua.invalidEmail;
         }
 
-        res.status(200).send({ existingEmail, isValid: validationResult.valid, validationMessage })
+        res.status(200).send({
+            existingEmail, isValid: validationResult.valid,
+            validationMessage,
+            validators: validationResult.validators
+        })
 
     } catch (error) {
         req.bugsnag.notify(new Error(error),
