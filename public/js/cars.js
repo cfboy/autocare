@@ -1,5 +1,5 @@
 /**
- * This function is called from AJAX function to fing the mondel of selected brand/make.
+ * This function is called from AJAX function to find the model of selected brand/make.
  * @param {*} makeName 
  * @param {*} carModel 
  */

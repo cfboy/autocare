@@ -128,7 +128,7 @@ exports.webhook = async (req, res) => {
 
                             }
 
-                            alertInfo = { message: `Tu membresía a sido creada exitosamente.`, alertType: alertTypes.BasicAlert }
+                            alertInfo = { message: lingua.membershipCreatedSuccess, alertType: alertTypes.BasicAlert }
 
                             subscription = await SubscriptionService.addSubscription({ id: subscription.id, items: items, data: subscription, user: customer });
                         }
@@ -175,7 +175,7 @@ exports.webhook = async (req, res) => {
             case 'customer.subscription.deleted':
                 // console.log(`WEBHOOK: customer.subscription.deleted: ${data.id}`)
 
-                let deletedResult = await manageDeletedSubscriptionsWebhook(data, req.bugsnag, req);
+                let deletedResult = await manageDeletedSubscriptionsWebhook(data, req.bugsnag, lingua, req);
 
                 break;
 
@@ -199,7 +199,7 @@ exports.webhook = async (req, res) => {
     }
 }
 
-const manageDeletedSubscriptionsWebhook = async (subscription, bugsnag, req) => {
+const manageDeletedSubscriptionsWebhook = async (subscription, bugsnag, lingua, req) => {
     let customer = await UserService.getUserByBillingID(subscription.customer)
     let notification, alertInfo
     if (customer) {
@@ -224,7 +224,7 @@ const manageDeletedSubscriptionsWebhook = async (subscription, bugsnag, req) => 
 
             subscription = await SubscriptionService.updateSubscription(subscription.id, updates);
 
-            alertInfo = { message: `Tu membresía a sido cancelada exitosamente.`, alertType: alertTypes.BasicAlert };
+            alertInfo = { message: lingua.membershipCreatedSuccess, alertType: alertTypes.BasicAlert };
 
             // Add notification to user.
             [customer, notification] = await UserService.addNotification(customer.id, alertInfo.message)
@@ -370,7 +370,7 @@ const manageUpdateOrCreateSubscriptionsWebhook = async (subscription, bugsnag, l
 
             subscription = await SubscriptionService.updateSubscription(subscription.id, updates);
 
-            alertInfo = { message: `Tu membresía a sido actualizada exitosamente.`, alertType: alertTypes.BasicAlert }
+            alertInfo = { message: lingua.membershipUpdatedSuccess, alertType: alertTypes.BasicAlert }
 
             // Send customer balance on email.
             let { totalString } = await Stripe.getCustomerBalanceTransactions(customer.billingID)
@@ -419,7 +419,7 @@ const manageUpdateOrCreateSubscriptionsWebhook = async (subscription, bugsnag, l
             }
             try {
                 subscription = await SubscriptionService.addSubscription({ id: subscription.id, data: subscription, items: items, user: customer })
-                alertInfo = { message: `Tu membresía a sido creada exitosamente.`, alertType: alertTypes.BasicAlert }
+                alertInfo = { message: lingua.membershipCreatedSuccess, alertType: alertTypes.BasicAlert }
 
 
             }
@@ -449,7 +449,7 @@ const manageUpdateOrCreateSubscriptionsWebhook = async (subscription, bugsnag, l
 
             } else {
                 emailTemplate = isNew ? 'subscription_created' : 'subscription_updated';
-                emailSubject = isNew ? 'Membresía Creada - AutoCare Memberships' : 'Membresía Actualizada - AutoCare Memberships';
+                emailSubject = isNew ? lingua.membershipCreatedEmailTitle : lingua.membershipUpdatedEmailTitle;
 
                 emailProperties = {
                     email: customer.email,
@@ -469,6 +469,7 @@ const manageUpdateOrCreateSubscriptionsWebhook = async (subscription, bugsnag, l
                 console.debug('Email Sent: ' + customer.email)
 
             } else {
+                // TODO: manage this error
                 req.bugsnag.notify(new Error(resultEmail.data),
                     function (event) {
                         event.setUser(customer.email)

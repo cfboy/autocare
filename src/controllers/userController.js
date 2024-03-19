@@ -342,14 +342,7 @@ exports.changePassword = async (req, res) => {
  * @param {*} res 
  */
 exports.update = async (req, res) => {
-    const updates = Object.keys(req.body)
-    // TODO: Implement allowedUpdates per ROLE.
-    // const allowedUpdates = ['name', 'email']
-    // const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
-    // if (!isValidOperation) {
 
-    // return res.status(400).send('Invalid updates!')
-    // }
     const url = req.query.url
     try {
         const user = await UserService.updateUser(req.body.id, req.body)
@@ -357,10 +350,7 @@ exports.update = async (req, res) => {
         if (!user) {
             req.session.message = `Can't update User  ${req.body.email}`
             req.session.alertType = alertTypes.WarningAlert
-            // return res.status(404).send()
-
         } else {
-            // TODO: Update Stripe User
             try {
                 let stripeUpdate = { email: user.email, name: user.fullName(), phone: user?.personalInfo?.phoneNumber }
                 await Stripe.updateCustomer(user.billingID, stripeUpdate);

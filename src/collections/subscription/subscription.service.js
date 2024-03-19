@@ -196,7 +196,7 @@ const getSubscriptionById = (Subscription) => (id) => {
  */
 const getSubscriptionByCar = (Subscription) => async (car) => {
     return Subscription.findOne({
-        "items.cars": { _id: (car.id ? car.id : car._id) } //Added the conditional statemet if the car.id is undefined.
+        "items.cars": { _id: (car.id ? car.id : car._id) } //Added the conditional statement if the car.id is undefined.
     },
         function (err, docs) {
             if (err) {
@@ -306,7 +306,7 @@ const getSubscriptionCarsById = (Subscription) => async (id) => {
 }
 
 /**
- * This function set the subscription information temporary on .subscriptons property in the user object.
+ * This function set the subscription information temporary on .subscriptions property in the user object.
  * @param {*} customerObj 
  * @param {*} prices 
  * @returns customer object
@@ -372,7 +372,7 @@ async function validateItemQty(item) {
             else if (itemObj?.cars?.length > itemObj?.data?.quantity) {
                 // This case is when the item has more cars than it can have. 
                 // console.debug('Item has more cars than quantity. ')
-                // Verify if any car dont have cancel_date set. 
+                // Verify if any car don't have cancel_date set. 
                 let notNeedSetCancelDate = itemObj.cars.filter(car => car.cancel_date == null)?.length === itemObj?.data?.quantity
 
                 if (notNeedSetCancelDate)
@@ -405,7 +405,7 @@ async function validateItemQty(item) {
  * @param {*} id 
  * @returns 
  */
-async function getSubscriptionDayOfPeriod(id) {
+async function getSubscriptionDayOfPeriod(id, lingua) {
 
     try {
         let subscription = await this.getSubscriptionById(id)
@@ -416,10 +416,9 @@ async function getSubscriptionDayOfPeriod(id) {
 
         daysSinceStart = Math.floor((currentDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
 
-        console.log(`La suscripción se encuentra en el día ${daysSinceStart} de su periodo.`);
+        console.log(lingua.cancelationDaysRemaining(daysSinceStart));
 
-        // TODO: use lingua for this messages.
-        let message = `Si cancela no prodrá revertir esta acción.`
+        let message = lingua.cancelationMessage;
 
         let cancelInNextPeriod = false,
             cancelDate = endDate
@@ -427,8 +426,7 @@ async function getSubscriptionDayOfPeriod(id) {
             cancelInNextPeriod = true
             // Cancel in the next period
             cancelDate = new Date(cancelDate.setDate(endDate.getDate() + daysBetweenTwoDates))
-            message = `La suscripción se encuentra en el día ${daysSinceStart} de su periodo.
-             Si cancela se le cobrará el próximo periodo.`
+            message = lingua.cancelationDaysRemaining(daysSinceStart);
         }
 
 

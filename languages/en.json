@@ -9,6 +9,7 @@
     "thanksUser": "Thank you for choosing Charlie Boy's unlimited membership!",
     "verifyEmail": "Please check your email to activate your account. If you have not received an email, press here:",
     "membershipCreatedSuccess": "Your membership has been created successfully!",
+    "membershipUpdatedSuccess": "Your membership has been updated successfully!",
     "pressLink": "Press the link below to view your membership:",
     "processCompleted": "Process completed!",
     "login": "Login",
@@ -219,7 +220,7 @@
     "email": {
         "title": "Auto Care - Memberships",
         "verifyEmail": "Verify your email {email} to complete the process.",
-        "resetSucessfully": "Auto Care Password Reset Successfully",
+        "resetSuccessfully": "Auto Care Password Reset Successfully",
         "notSend": "Email Not Send.",
         "passwordReset": "Auto Care Password Reset Request"
     },
@@ -228,5 +229,20 @@
     "loading": "Loading",
     "agentID": "Agent ID",
     "subscribe": "Subscribe",
-    "orderReview": "Order Review"
+    "orderReview": "Order Review",
+    "cancelationMessage" : "If you cancel, you won't be able to reverse this action.",
+    "cancelationDaysRemaining" : "The subscription is on day {daysSinceStart} of its period. If you cancel, you will be charged for the next period.",
+    "membershipCreatedEmailTitle" : "New Membership - AutoCare Memberships",
+    "membershipUpdatedEmailTitle" : "Updated Membership - AutoCare Memberships",
+    "information" : "Information",
+    "renew" : "Renew",
+    "synchronize" : "Synchronize",
+    "created" : "Created",
+    "period" : "Period",
+    "validUntil" : "This membership its valid until",
+    "cancelMembershipValidation" : "Are you sure to cancel this subscription?",
+    "confirmCancel" : "Yes, Cancel it",
+    "renewMembershipValidation" : "Are you sure to renew this subscription?",
+    "confirmRenew" : "Yes, Renew it",
+    "renewMembershipInformation" : "Create a new subscription with the same properties."
 }

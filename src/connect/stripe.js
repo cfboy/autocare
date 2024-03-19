@@ -629,7 +629,6 @@ async function getBalanceTransactions(startDate, endDate) {
 
         for await (const balance of stripeBalanceTransactionList) {
             // Sum only the charge balance type. (Based on the documentation)
-            // TODO: validate the refunds and other cases
             if (balance.type == 'charge') {
                 grossVolume += balance.amount
                 netVolume += balance.net
