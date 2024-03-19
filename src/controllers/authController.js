@@ -208,8 +208,6 @@ exports.activateAccountRequestController = async (req, res) => {
             req.flash('error', 'Email not sent.')
         }
 
-        // TODO: Redirect to a success email sent.
-        // res.redirect('/login')
         res.status(200).render('auth/completedActivationRequest.ejs')
     } else {
         req.flash('error', message);

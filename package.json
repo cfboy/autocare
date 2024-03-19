@@ -5,7 +5,8 @@
     "description": "AutoCare Memberships web application using Express, MongoDB, and Stripe.",
     "main": "app.js",
     "scripts": {
-        "start": "nodemon app.js"
+        "start": "nodemon app.js",
+        "debug": "nodemon --inspect app.js"
     },
     "engines": {
         "node": "16.14.0",

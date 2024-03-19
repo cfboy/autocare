@@ -9,6 +9,7 @@
     "thanksUser": "¡Gracias por escoger la membresía ilimitada de Charlie Boy!",
     "verifyEmail": "Verifique su correco electrónico para activar tu cuenta. De no haber recibido un correo electrónico presione aquí:",
     "membershipCreatedSuccess": "¡La membresia ha sido creada exisotamente!",
+    "membershipUpdatedSuccess": "¡La membresia ha sido actualizada exisotamente!",
     "pressLink": "Presione el link de abajo para ver su membresía:",
     "processCompleted": "Proceso completado!",
     "login": "Iniciar Sesión",
@@ -90,7 +91,8 @@
             "characters": "caracteres"
         },
         "authorizedBy": "Autorizado por",
-        "notFound": "Cliente no encontrado"
+        "notFound": "Cliente no encontrado",
+        "billingID" : "Billing ID (Stripe ID)"
     },
     "membership": {
         "name": "Membresías",
@@ -218,7 +220,7 @@
     "email": {
         "title": "Auto Care - Membresías",
         "verifyEmail": "Verifique su correo electrónico {email} para completar el proceso.",
-        "resetSucessfully": "Auto Care - Contraseña restablecida exitosamente",
+        "resetSuccessfully": "Auto Care - Contraseña restablecida exitosamente",
         "notSend": "No se pudo enviar el correo electrónico.",
         "passwordReset": "Auto Care - Solicitud de restablecimiento de contraseña"
     },
@@ -227,5 +229,20 @@
     "loading": "Cargando",
     "agentID": "Agent ID",
     "subscribe" : "Subcribirte",
-    "orderReview": "Revisión de la Orden"
+    "orderReview": "Revisión de la Orden",
+    "cancelationMessage" : "Si cancela no prodrá revertir esta acción.",
+    "cancelationDaysRemaining" : "La suscripción se encuentra en el día {daysSinceStart} de su periodo. Si cancela se le cobrará el próximo periodo.",
+    "membershipCreatedEmailTitle" : "Membresía Creada - AutoCare Memberships",
+    "membershipUpdatedEmailTitle" : "Membresía Actualizada - AutoCare Memberships",
+    "information" : "Información",
+    "renew" : "Renovar",
+    "synchronize" : "Sincronizar",
+    "created" : "Creada",
+    "period" : "Periodo",
+    "validUntil" : "Esta membresía es valida hasta",
+    "cancelMembershipValidation" : "¿Está seguro de cancelar esta subscripción?",
+    "confirmCancel" : "Sí, Cancelar",
+    "renewMembershipValidation" : "¿Está seguro que quiere renovar esta suscripción?",
+    "confirmRenew" : "Sí, Renovar",
+    "renewMembershipInformation" : "Crear una nueva subscripción con las mismas propiedades."
 }

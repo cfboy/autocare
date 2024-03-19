@@ -345,7 +345,6 @@ exports.delete = async (req, res) => {
 
     try {
         let car = await CarService.getCarByID(carID)
-        // removeCarFromAllSubscriptions = await CarService.removeCarFromAllSubscriptions(car)
 
         if (car) {
             CarService.deleteCar(car.id) //TODO: verify if is need to delete the car forever.

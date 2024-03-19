@@ -147,7 +147,6 @@ exports.validateMembership = async (req, res) => {
  */
 exports.validate = async (req, res) => {
     try {
-        // TODO: handle multiple cars with the same plate
         let carPlate = req.body.plateNumber,
             inputType = req.body.inputType,
             car = await CarService.getCarByPlate(carPlate),
@@ -158,12 +157,8 @@ exports.validate = async (req, res) => {
         if (car) {
             console.log(`subscriptionsController.validate(): FOUND CAR: '${car?.plate}' in ${req.session?.location?.name}.`)
 
-            // TODO: Handle new/different subscriptions for old cars.
-            // subscription = await SubscriptionService.getSubscriptionByCar(car)
-            // subscription = await SubscriptionService.getLastActiveSubscriptionByCar(car)
             subscription = await SubscriptionService.getLastSubscriptionByCar(car)
 
-            // TODO: get the customer by another source if the subscription not exist
             customer = subscription?.user
             let today = new Date(), tomorrow = new Date()
             tomorrow = new Date(tomorrow.setDate(today.getDate() + 1))
@@ -256,7 +251,7 @@ exports.readingData = async (req, res) => {
                     }
 
                     if (readingObjs.plate !== '' & readingObjs.plate?.length > 3) {
-                        // console.debug(`IDENTFIED PLATE: ${plate} (${bodyResult.results[0].confidence})`)
+                        // console.debug(`IDENTIFIED PLATE: ${plate} (${bodyResult.results[0].confidence})`)
                         req.io.in(agentID).emit('read-plates', readingObjs);
                     }
 
@@ -621,12 +616,13 @@ exports.removeCarOfSubscription = async (req, res) => {
 exports.getSubscriptionDay = async (req, res) => {
     try {
         let subscriptionID = req.body.subscriptionID
+        const lingua = req.res.lingua.content
 
         if (!subscriptionID)
             res.send(null);
 
         console.log(`subscriptionID:${subscriptionID}`);
-        let { message, daysSinceStart, cancelDate } = await SubscriptionService.getSubscriptionDayOfPeriod(subscriptionID)
+        let { message, daysSinceStart, cancelDate } = await SubscriptionService.getSubscriptionDayOfPeriod(subscriptionID, lingua)
 
 
         res.send({ daysSinceStart, cancelDate, message })
@@ -651,13 +647,14 @@ exports.getSubscriptionDay = async (req, res) => {
 exports.cancelSubscription = async (req, res) => {
     try {
         let { subscriptionID, daysSinceStart, cancelDate } = req.body
+        const lingua = req.res.lingua.content
 
         if (!subscriptionID)
             res.send({ day: null });
 
         console.log(`subscriptionID:${subscriptionID}`);
         if (!daysSinceStart)
-            ({ daysSinceStart } = await SubscriptionService.getSubscriptionDayOfPeriod(subscriptionID))
+            ({ daysSinceStart } = await SubscriptionService.getSubscriptionDayOfPeriod(subscriptionID, lingua))
 
 
         let updates = {}

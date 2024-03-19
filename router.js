@@ -60,7 +60,6 @@ router.get('/login', checkNotAuthenticated, (req, res) => {
         req.session.isIncomplete = null
     }
 
-    // TODO: Test incomplete account
     if (isIncomplete)
         res.redirect('/activateAccountRequest')
     else
