@@ -494,12 +494,12 @@ const manageUpdateOrCreateSubscriptionsWebhook = async (subscription, bugsnag, l
  */
 exports.checkout = async (req, res) => {
     // The validation if the car is valid are handled on the client side..
-    const { subscriptions, customerID, backURL } = req.body
+    const { subscriptions, customerID, backPathname } = req.body
 
     try {
         // Group by priceID
         const subscriptionsGroup = groupByKey(subscriptions, 'priceID', { omitKey: false })
-        const session = await Stripe.createCheckoutSession(customerID, subscriptions, Object.entries(subscriptionsGroup), backURL)
+        const session = await Stripe.createCheckoutSession(customerID, subscriptions, Object.entries(subscriptionsGroup), backPathname)
         // res.redirect(session.url)
         if (session) {
             res.send({
@@ -529,7 +529,7 @@ exports.checkout = async (req, res) => {
  */
 exports.checkoutWithEmail = async (req, res) => {
     // The validation if the car is valid are handled on the client side..
-    const { subscriptions, email, backURL, renew } = req.body
+    const { subscriptions, email, backPathname, renew } = req.body
 
     try {
         // Get stripe customer
@@ -567,9 +567,9 @@ exports.checkoutWithEmail = async (req, res) => {
         } else {
 
             if (billingID && stripeCustomer)
-                session = await Stripe.createCheckoutSession(billingID, subscriptions, Object.entries(subscriptionsGroup), backURL)
+                session = await Stripe.createCheckoutSession(billingID, subscriptions, Object.entries(subscriptionsGroup), backPathname)
             else
-                session = await Stripe.createCheckoutSessionWithEmail(email, subscriptions, Object.entries(subscriptionsGroup), backURL)
+                session = await Stripe.createCheckoutSessionWithEmail(email, subscriptions, Object.entries(subscriptionsGroup), backPathname)
 
             if (session) {
                 res.send({
@@ -679,10 +679,10 @@ exports.stripeCheckout = async (req, res) => {
  * @returns 
  */
 exports.billing = async (req, res) => {
-    const { customer } = req.body
+    const { customer, backPathname } = req.body
     console.log('customer', customer)
 
-    const session = await Stripe.createBillingSession(customer)
+    const session = await Stripe.createBillingSession(customer, backPathname)
     console.log('session', session)
 
     res.json({ url: session.url })

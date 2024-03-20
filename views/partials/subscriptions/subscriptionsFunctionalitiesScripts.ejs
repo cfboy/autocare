@@ -7,6 +7,7 @@
         const publishableKey = `<%= pkStripe%>`;
         const stripe = Stripe(publishableKey);
         let email = userEmail;
+        let backPathname = window.location.pathname.replace(/\//g,'');
 
         Swal.fire({
             title: '<%= lingua.renewMembershipValidation%>',
@@ -35,7 +36,10 @@
                         );
                     }
                 }).done(function (result) {
-
+                    showResult('#full-page-loading-div',
+                        `<div class="spinner-big">
+                        <div class="spinner-grow spinner-center"></div>
+                    </div>`)
                     if (result.renew) {
                         fetch('/checkoutWithEmail', {
                             method: 'POST',
@@ -46,7 +50,7 @@
                             body: JSON.stringify({
                                 subscriptions: result.subscriptionList,
                                 email: email,
-                                backURL: 'memberships', //TODO: make this backURL dynamic.
+                                backPathname: backPathname,
                                 renew: result.renew //true
                             })
                         })

@@ -17023,12 +17023,32 @@ fieldset:disabled .swal2-modal .swal2-buttonswrapper .swal2-styled,
     top: 0;
     left: 0;
     z-index: 1;
-    background-color: #FFF;
+    /* background-color: #FFF; */
+    background-color: rgb(254 254 254 / 50%);
     min-height: 100%;
     width: 100%;
     height: auto;
-    opacity: .50;
+    /* opacity: .50; */
     background-size: 120px;
+}
+.spinner-center {
+    z-index: 1;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+}
+
+@media (max-width: 576px) {
+    .spinner-center {
+        top: 25%;
+        left: 45%;
+    }
+}
+@media (max-width: 320px) {
+    .spinner-center {
+        top: 50%;
+        left: 45%;
+    }
 }
 
 @keyframes spinner-grow {

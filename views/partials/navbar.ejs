@@ -269,6 +269,7 @@
 
         const manageBillingButton = $('.manage-billing-button');
         manageBillingButton.click(function () {
+            let backPathname = window.location.pathname.replace(/\//g,'');
             const billingID = $(this).attr("value");
             const email = $(this).attr("email");
             const requestOptions = {
@@ -278,12 +279,13 @@
                     email: email
                 },
                 body: JSON.stringify({
-                    customer: billingID
+                    customer: billingID,
+                    backPathname: backPathname
                 })
             }
             showResult('#full-page-loading-div',
                 `<div class="spinner-big">
-                <div class="spinner-grow" style="z-index: 1;position: fixed;top: 50%;left: 50%;"></div>
+                <div class="spinner-grow spinner-center"></div>
             </div>`)
             fetch('/billing', requestOptions)
                 .then((response) => response.json())

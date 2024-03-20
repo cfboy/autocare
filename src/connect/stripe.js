@@ -19,7 +19,7 @@ const Stripe = stripe(process.env.STRIPE_SECRET_KEY, {
     apiVersion: '2020-08-27'
 })
 
-const createCheckoutSession = async (customerID, subscriptions, subscriptionsEntries, backURL = null) => {
+const createCheckoutSession = async (customerID, subscriptions, subscriptionsEntries, backPathname = null) => {
     try {
         let items = [];
         let cars_price = subscriptions;
@@ -60,7 +60,7 @@ const createCheckoutSession = async (customerID, subscriptions, subscriptionsEnt
             },
             allow_promotion_codes: true,
             success_url: `${process.env.DOMAIN}/completeCheckoutSuccess?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${process.env.DOMAIN}/${backURL}`
+            cancel_url: `${process.env.DOMAIN}/${backPathname}`
         })
 
         return session
@@ -71,7 +71,7 @@ const createCheckoutSession = async (customerID, subscriptions, subscriptionsEnt
     }
 }
 
-const createCheckoutSessionWithEmail = async (email, subscriptions, subscriptionsEntries, backURL = null) => {
+const createCheckoutSessionWithEmail = async (email, subscriptions, subscriptionsEntries, backPathname = null) => {
     try {
         let items = [];
         let cars_price = subscriptions;
@@ -112,7 +112,7 @@ const createCheckoutSessionWithEmail = async (email, subscriptions, subscription
             },
             allow_promotion_codes: true,
             success_url: `${process.env.DOMAIN}/completeCheckoutSuccess?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${process.env.DOMAIN}/${backURL}`
+            cancel_url: `${process.env.DOMAIN}/${backPathname}`
         })
 
         return session
@@ -123,10 +123,12 @@ const createCheckoutSessionWithEmail = async (email, subscriptions, subscription
     }
 }
 
-const createBillingSession = async (customer) => {
+const createBillingSession = async (customer, backPathname) => {
+    let returnURL = backPathname ? `${process.env.DOMAIN}/${backPathname}` : `${process.env.DOMAIN}`;
+
     const session = await Stripe.billingPortal.sessions.create({
         customer,
-        return_url: `${process.env.DOMAIN}`
+        return_url: returnURL
     })
     return session
 }
