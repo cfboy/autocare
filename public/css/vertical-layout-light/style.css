@@ -17018,6 +17018,19 @@ fieldset:disabled .swal2-modal .swal2-buttonswrapper .swal2-styled,
     border-width: 0.2em;
 }
 
+.spinner-big {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    background-color: #FFF;
+    min-height: 100%;
+    width: 100%;
+    height: auto;
+    opacity: .50;
+    background-size: 120px;
+}
+
 @keyframes spinner-grow {
     0% {
         transform: scale(0);

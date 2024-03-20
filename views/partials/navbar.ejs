@@ -231,6 +231,8 @@
         </button>
     </div>
 </nav>
+<div id="full-page-loading-div" class="text-small text-wrap">
+</div>
 <!-- <div id="notifications-target"></div> -->
 <script src="../js/helper-functions.js"></script>
 <script src="https://cdn.socket.io/socket.io-3.0.1.min.js"></script>
@@ -279,7 +281,10 @@
                     customer: billingID
                 })
             }
-
+            showResult('#full-page-loading-div',
+                `<div class="spinner-big">
+                <div class="spinner-grow" style="z-index: 1;position: fixed;top: 50%;left: 50%;"></div>
+            </div>`)
             fetch('/billing', requestOptions)
                 .then((response) => response.json())
                 .then((result) => window.location.replace(result.url))
