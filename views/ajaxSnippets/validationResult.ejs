@@ -107,10 +107,10 @@
 
                         <% if([stripeStatus.CANCELED].includes(subscription?.data?.status)) { %>
                         <button id="renew-btn" user-id="<%= customer?.id%>" car-id="<%= car?.id%>"
-                            inputType="<%= inputType%>" onclick="renewSubscriptionTrigger(this)"
+                            inputType="<%= inputType%>" onclick="confirmRenewSubscription('<%=subscription.id%>', '<%= customer.email%>')"
                             class="btn btn-block btn-outline-primary btn-lg font-weight-medium btn-icon-text m-1 p2 w-100"
                             type="submit">
-                            Renovar
+                            <%= lingua.renew%>
 
                             <i class="fa-solid fa-repeat btn-icon-apepend m-2"></i>
                         </button>
@@ -129,8 +129,6 @@
                                 <i class="fa-solid fa-circle-check btn-icon-apepend m-2"></i>
                             </button>
                             <% } %>
-                            <% } else{ %>
-                            <p>Invalid Period.</p>
                             <% } %>
                         </div>
                         <% } %>
@@ -214,3 +212,4 @@
         // TODO: implement function
     }
 </script>
+<%- include('../partials/subscriptions/subscriptionsFunctionalitiesScripts.ejs'); %>

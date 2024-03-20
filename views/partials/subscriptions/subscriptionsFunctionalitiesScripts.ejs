@@ -1,0 +1,86 @@
+<!-- Common Subscription functionalities. -->
+<!-- TODO: Avoid duplicated script -->
+<script type="text/javascript" src="https://js.stripe.com/v3/"></script>
+
+<script>
+  function confirmRenewSubscription(subscriptionID, userEmail) {
+        const publishableKey = `<%= pkStripe%>`;
+        const stripe = Stripe(publishableKey);
+        let email = userEmail;
+
+        Swal.fire({
+            title: '<%= lingua.renewMembershipValidation%>',
+            text: '<%= lingua.renewMembershipInformation%>',
+            icon: 'warning',
+            showCancelButton: true,
+            cancelButtonText: '<%= lingua.cancel%>',
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: '<%= lingua.confirmRenew%>'
+        }).then((resultOfConfirmation) => {
+            if (resultOfConfirmation.isConfirmed) {
+                console.log(`${subscriptionID}`);
+                $.ajax({
+                    url: "/renewSubscription",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        subscriptionID
+                    }),
+                    beforeSend: function () {
+                        showResult(`#loading-update-${subscriptionID}`,
+                            `<div class="spinner text-center m-0">
+                        <div class="spinner-grow spinner-grow-sm"></div>
+                    </div>`
+                        );
+                    }
+                }).done(function (result) {
+
+                    if (result.renew) {
+                        fetch('/checkoutWithEmail', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'email': email
+                            },
+                            body: JSON.stringify({
+                                subscriptions: result.subscriptionList,
+                                email: email,
+                                backURL: 'memberships', //TODO: make this backURL dynamic.
+                                renew: result.renew //true
+                            })
+                        })
+                            .then((result) => result.json())
+                            .then(({ sessionId, message }) => {
+                                if (sessionId)
+                                    stripe.redirectToCheckout({ sessionId })
+                                else {
+                                    showResult(`#loading-update-${subscriptionID}`,
+                                        `<p class="alert alert-fill-danger mt-2 p-1">
+                                            <i class="fa-circle-exclamation fa-solid"></i> ${message}
+                                         </p>`);
+                                }
+
+                            })
+                            .catch((error) => {
+                                showResult(`#loading-update-${subscriptionID}`,
+                                    `<p class="alert alert-fill-danger mt-2 p-1">
+                                <i class="fa-circle-exclamation fa-solid"></i> ${error}
+                            </p>`);
+                            })
+
+                    } else {
+                        showResult(`#loading-update-${subscriptionID}`,
+                            `<p class="alert alert-fill-danger mt-2 p-1">
+                                <i class="fa-circle-exclamation fa-solid"></i> ${result.message}
+                            </p>`)
+                    }
+                }).fail(function (err) {
+                    console.log(err);
+                    showResult(`#loading-update-${subscriptionID}`, err.message);
+
+                })
+            }
+        })
+    }
+</script>
