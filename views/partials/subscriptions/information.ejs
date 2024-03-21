@@ -118,10 +118,13 @@
                             <div class="card-title m-1">
                                 <p>
                                     <b><%- item.data.price.product.name %></b>
-                                    (<%= item.cars.length %>/<%= item.data.quantity%>
-                                    <small> <%= lingua.car.carsQty%></small>)
+                                </p>
+                                <p>
+                                    <%= item.cars.length %>/<%= item.data.quantity%>
+                                    <small> <%= lingua.car.carsQty%></small>
                                 </p>
                             </div>
+                            <% if(item.cars.length > 0) { %>
                             <div class="">
                                 <ul class="px-0">
                                     <% for(car of item.cars) { %>
@@ -218,6 +221,7 @@
                                     <%# } %>
                                 </ul>
                             </div>
+                            <% } %>
                         </div>
                     </div>
                     <% } %>
@@ -231,7 +235,7 @@
                             <%= lingua.created%>:
                             <%= moment(stripeSubscription?.data?.created * 1000).format(completeDateFormat)%>
                         </p>
-                        <p>  <%= lingua.period%>:
+                        <p> <%= lingua.period%>:
 
                             <%= moment(stripeSubscription?.data?.current_period_start * 1000).isValid() ? moment(stripeSubscription?.data?.current_period_start * 1000).format(shortDateFormat) : 'N/A' %>
                             /
